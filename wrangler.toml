@@ -1,0 +1,8 @@
+name = "gonzalo-caceres"
+compatibility_date = "2026-09-17"
+
+[assets]
+directory = "./public"
+
+[observability]
+enabled = true

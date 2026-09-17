@@ -6,278 +6,200 @@
 <title>Gonzalo Cáceres — Architecture</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#ffffff;
-    --ink:#0f1216;
-    --rule:#d8d6d1;
-    --mute:#7b7d80;
-    --live:#1a2ce0;
-    --font:"Archivo","Helvetica Neue",Arial,sans-serif;
+    --paper:#f4f3f1;
+    --ink:#14161a;
+    --rule:#c9c6c0;
+    --mute:#6f7175;
+    --live:#1f3aa8;
+    --pad:clamp(1.25rem,5vw,4rem);
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --paper:#0d0e10;
-      --ink:#f2f1ee;
-      --rule:#2b2d30;
-      --mute:#8b8d90;
-      --live:#7d8bff;
+      --paper:#131416;
+      --ink:#eceae6;
+      --rule:#33353a;
+      --mute:#8e9095;
+      --live:#93a4ff;
     }
   }
   :root[data-theme="dark"]{
-    --paper:#0d0e10;
-    --ink:#f2f1ee;
-    --rule:#2b2d30;
-    --mute:#8b8d90;
-    --live:#7d8bff;
+    --paper:#131416; --ink:#eceae6; --rule:#33353a; --mute:#8e9095; --live:#93a4ff;
   }
 
   *{box-sizing:border-box}
-  html,body{margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
   body{
+    margin:0;
     background:var(--paper);
     color:var(--ink);
-    font-family:var(--font);
+    font-family:"Archivo","Helvetica Neue",Arial,sans-serif;
     font-size:16px;
-    line-height:1.4;
-    -webkit-font-smoothing:antialiased;
+    line-height:1.45;
     min-height:100vh;
     display:flex;
     flex-direction:column;
+    -webkit-font-smoothing:antialiased;
   }
   a{color:inherit;text-decoration:none}
   button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
-  :focus-visible{outline:2px solid var(--live);outline-offset:3px}
+  :focus-visible{outline:2px solid var(--live);outline-offset:4px}
 
-  /* ---------- top bar ---------- */
   .bar{
     display:flex;
     justify-content:space-between;
     align-items:baseline;
     gap:1rem;
-    padding:1.1rem clamp(1rem,4vw,2.5rem);
-    font-size:.82rem;
-    letter-spacing:.01em;
+    padding:1.4rem var(--pad);
+    font-size:.9rem;
   }
-  .bar nav{display:flex;gap:1.25rem}
-  .bar a:hover,.bar button:hover{color:var(--live)}
+  .bar .who{font-weight:500}
+  .bar nav{display:flex;gap:1.5rem;color:var(--mute)}
+  .bar nav *:hover{color:var(--ink)}
 
-  /* ---------- index ---------- */
-  main{flex:1 0 auto;padding:clamp(1.5rem,6vh,5rem) clamp(1rem,4vw,2.5rem)}
-  .index{list-style:none;margin:0;padding:0;max-width:1400px}
-  .group + .group{margin-top:.1em}
+  main{flex:1 0 auto;padding:clamp(2rem,9vh,7rem) var(--pad) 0}
+  .index{list-style:none;margin:0;padding:0}
+  .group{border-top:1px solid var(--rule)}
+  .group:last-child{border-bottom:1px solid var(--rule)}
 
   .head{
-    display:block;
+    display:flex;
+    align-items:baseline;
+    gap:1rem;
     width:100%;
-    text-align:left;
-    font-weight:800;
-    font-size:clamp(3.2rem,13vw,11rem);
-    line-height:.9;
-    letter-spacing:-.045em;
-    transition:font-size .45s cubic-bezier(.2,.7,.2,1), color .2s;
+    padding:.35em 0 .3em;
+    font-weight:700;
+    font-size:clamp(2.6rem,9vw,7.5rem);
+    line-height:1;
+    letter-spacing:-.04em;
+    transition:color .2s;
   }
   .head:hover{color:var(--live)}
-  .group[data-open="true"] .head{color:var(--live)}
-  body.is-open .group[data-open="false"] .head{
-    font-size:clamp(1.6rem,4.5vw,3rem);
+  .head .n{
+    font-size:.85rem;
+    font-weight:400;
+    letter-spacing:0;
     color:var(--mute);
+    transform:translateY(-.9em);
   }
+  .group[data-open="true"] .head .n{color:var(--live)}
 
-  .panel{
-    display:grid;
-    grid-template-rows:0fr;
-    transition:grid-template-rows .45s cubic-bezier(.2,.7,.2,1);
-  }
+  .panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s cubic-bezier(.22,.7,.2,1)}
   .group[data-open="true"] .panel{grid-template-rows:1fr}
   .panel > div{overflow:hidden}
 
-  .works{list-style:none;margin:.9rem 0 2rem;padding:0;max-width:62ch}
-  .work{border-top:1px solid var(--rule)}
-  .work:last-child{border-bottom:1px solid var(--rule)}
+  .works{list-style:none;margin:0;padding:0 0 2.2rem}
   .work a{
     display:flex;
     justify-content:space-between;
     align-items:baseline;
-    gap:1.5rem;
-    padding:.55rem 0;
-    transition:padding-left .25s cubic-bezier(.2,.7,.2,1),color .2s;
+    gap:2rem;
+    padding:.7rem 0;
+    border-top:1px solid var(--rule);
+    transition:color .18s;
   }
-  .work a:hover,.work a:focus-visible{color:var(--live);padding-left:.6rem}
-  .work .name{font-weight:500;font-size:clamp(1rem,2.2vw,1.3rem);letter-spacing:-.015em}
-  .work .meta{color:var(--mute);font-size:.8rem;white-space:nowrap}
+  .works li:first-child a{border-top:0}
+  .work a:hover,.work a:focus-visible{color:var(--live)}
+  .work .name{font-size:clamp(1.05rem,2vw,1.45rem);font-weight:500;letter-spacing:-.015em}
+  .work .meta{font-size:.82rem;color:var(--mute);white-space:nowrap}
   .work a:hover .meta{color:var(--live)}
-
-  /* ---------- hover preview ---------- */
-  .peek{
-    position:fixed;
-    right:clamp(1rem,4vw,2.5rem);
-    bottom:clamp(1rem,4vw,2.5rem);
-    width:min(30vw,340px);
-    aspect-ratio:4/3;
-    border:1px solid var(--rule);
-    opacity:0;
-    transform:translateY(8px);
-    transition:opacity .25s,transform .25s;
-    pointer-events:none;
-    display:grid;
-    place-items:center;
-    background:var(--paper);
-  }
-  .peek[data-on="true"]{opacity:1;transform:none}
-  .peek .fill{position:absolute;inset:0}
-  .peek .cap{
-    position:relative;
-    align-self:end;
-    justify-self:start;
-    margin:.6rem;
-    padding:.2rem .45rem;
-    background:var(--paper);
-    font-size:.72rem;
-    color:var(--mute);
-  }
 
   footer{
     display:flex;
     justify-content:space-between;
-    gap:1rem;
-    padding:1.1rem clamp(1rem,4vw,2.5rem);
-    font-size:.72rem;
+    flex-wrap:wrap;
+    gap:.5rem 1.5rem;
+    padding:2.5rem var(--pad) 1.6rem;
+    font-size:.78rem;
     color:var(--mute);
   }
 
-  @media (max-width:760px){
-    .peek{display:none}
-    .works{max-width:none}
-    .work .meta{font-size:.72rem}
-  }
-  @media (prefers-reduced-motion:reduce){
-    *{transition-duration:.01ms !important}
-  }
+  @media (prefers-reduced-motion:reduce){*{transition-duration:.01ms !important}}
 </style>
 </head>
 <body>
 
 <header class="bar">
-  <a href="#" class="mark">Gonzalo Cáceres Valcárcel</a>
+  <span class="who">Gonzalo Cáceres Valcárcel</span>
   <nav>
     <a href="#about">About</a>
     <a href="mailto:hello@example.com">Contact</a>
-    <button id="theme" aria-label="Switch colour theme">Theme</button>
+    <button id="theme">Theme</button>
   </nav>
 </header>
 
 <main>
-  <ul class="index" id="index">
+  <ul class="index">
 
     <li class="group" data-open="false">
-      <h2 style="margin:0"><button class="head" aria-expanded="false" aria-controls="p-built">Built</button></h2>
-      <div class="panel" id="p-built">
-        <div>
-          <ul class="works">
-            <li class="work"><a href="#" data-hue="18"><span class="name">Casa Larapa</span><span class="meta">Cusco · 2023</span></a></li>
-            <li class="work"><a href="#" data-hue="210"><span class="name">Edificio Magdalena</span><span class="meta">Lima · 2021</span></a></li>
-            <li class="work"><a href="#" data-hue="96"><span class="name">Plywood shell pavilion</span><span class="meta">New York · 2026</span></a></li>
-          </ul>
-        </div>
-      </div>
+      <h2 style="margin:0">
+        <button class="head" aria-expanded="false" aria-controls="p1">Built<span class="n">3</span></button>
+      </h2>
+      <div class="panel" id="p1"><div>
+        <ul class="works">
+          <li class="work"><a href="#"><span class="name">Casa Larapa</span><span class="meta">Cusco, 2023</span></a></li>
+          <li class="work"><a href="#"><span class="name">Edificio Magdalena</span><span class="meta">Lima, 2021</span></a></li>
+          <li class="work"><a href="#"><span class="name">Plywood shell pavilion</span><span class="meta">New York, 2026</span></a></li>
+        </ul>
+      </div></div>
     </li>
 
     <li class="group" data-open="false">
-      <h2 style="margin:0"><button class="head" aria-expanded="false" aria-controls="p-studies">Studies</button></h2>
-      <div class="panel" id="p-studies">
-        <div>
-          <ul class="works">
-            <li class="work"><a href="#" data-hue="200"><span class="name">Dry dock for a stranded barge</span><span class="meta">Advance V · 2026</span></a></li>
-            <li class="work"><a href="#" data-hue="42"><span class="name">Hamptons art house</span><span class="meta">Advance IV · 2026</span></a></li>
-            <li class="work"><a href="#" data-hue="330"><span class="name">Core studio sequence</span><span class="meta">GSAPP · 2025</span></a></li>
-          </ul>
-        </div>
-      </div>
+      <h2 style="margin:0">
+        <button class="head" aria-expanded="false" aria-controls="p2">Studies<span class="n">3</span></button>
+      </h2>
+      <div class="panel" id="p2"><div>
+        <ul class="works">
+          <li class="work"><a href="#"><span class="name">Dry dock for a stranded barge</span><span class="meta">Advance V, 2026</span></a></li>
+          <li class="work"><a href="#"><span class="name">Hamptons art house</span><span class="meta">Advance IV, 2026</span></a></li>
+          <li class="work"><a href="#"><span class="name">Core studio sequence</span><span class="meta">GSAPP, 2025</span></a></li>
+        </ul>
+      </div></div>
     </li>
 
     <li class="group" data-open="false">
-      <h2 style="margin:0"><button class="head" aria-expanded="false" aria-controls="p-research">Research</button></h2>
-      <div class="panel" id="p-research">
-        <div>
-          <ul class="works">
-            <li class="work"><a href="#" data-hue="260"><span class="name">The Nahda as a spatial project</span><span class="meta">Essay · 2026</span></a></li>
-            <li class="work"><a href="#" data-hue="8"><span class="name">Gothic and the sublime</span><span class="meta">Seminar · 2026</span></a></li>
-            <li class="work"><a href="#" data-hue="150"><span class="name">Land value and housing yield in Cusco</span><span class="meta">Ongoing</span></a></li>
-          </ul>
-        </div>
-      </div>
+      <h2 style="margin:0">
+        <button class="head" aria-expanded="false" aria-controls="p3">Research<span class="n">3</span></button>
+      </h2>
+      <div class="panel" id="p3"><div>
+        <ul class="works">
+          <li class="work"><a href="#"><span class="name">The Nahda as a spatial project</span><span class="meta">Essay, 2026</span></a></li>
+          <li class="work"><a href="#"><span class="name">Gothic and the sublime</span><span class="meta">Seminar, 2026</span></a></li>
+          <li class="work"><a href="#"><span class="name">Land value and housing yield in Cusco</span><span class="meta">Ongoing</span></a></li>
+        </ul>
+      </div></div>
     </li>
 
   </ul>
 </main>
 
-<div class="peek" id="peek" aria-hidden="true">
-  <span class="fill" id="peekFill"></span>
-  <span class="cap" id="peekCap"></span>
-</div>
-
 <footer>
-  <span>Architecture and development. New York and Cusco.</span>
+  <span>Architecture and development — New York and Cusco</span>
   <span>© 2026</span>
 </footer>
 
 <script>
 (function(){
-  var groups = Array.prototype.slice.call(document.querySelectorAll('.group'));
-
-  function setOpen(group, open){
-    groups.forEach(function(g){
-      var on = (g === group) && open;
-      g.setAttribute('data-open', on ? 'true' : 'false');
-      g.querySelector('.head').setAttribute('aria-expanded', on ? 'true' : 'false');
-    });
-    document.body.classList.toggle('is-open', open);
-  }
-
+  var groups = [].slice.call(document.querySelectorAll('.group'));
   groups.forEach(function(g){
     g.querySelector('.head').addEventListener('click', function(){
-      setOpen(g, g.getAttribute('data-open') !== 'true');
+      var open = g.getAttribute('data-open') !== 'true';
+      groups.forEach(function(o){
+        var on = (o === g) && open;
+        o.setAttribute('data-open', on ? 'true' : 'false');
+        o.querySelector('.head').setAttribute('aria-expanded', on ? 'true' : 'false');
+      });
     });
   });
-
-  document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape') setOpen(null, false);
-  });
-
-  // hover preview
-  var peek = document.getElementById('peek');
-  var fill = document.getElementById('peekFill');
-  var cap  = document.getElementById('peekCap');
-
-  document.querySelectorAll('.work a').forEach(function(a){
-    function show(){
-      var h = a.getAttribute('data-hue');
-      fill.style.background =
-        'repeating-linear-gradient(135deg, hsl('+h+' 30% 62%) 0 6px, hsl('+h+' 30% 68%) 6px 12px)';
-      cap.textContent = a.querySelector('.name').textContent;
-      peek.setAttribute('data-on','true');
-    }
-    function hide(){ peek.setAttribute('data-on','false'); }
-    a.addEventListener('mouseenter', show);
-    a.addEventListener('focus', show);
-    a.addEventListener('mouseleave', hide);
-    a.addEventListener('blur', hide);
-  });
-
-  // theme toggle
-  var btn = document.getElementById('theme');
-  btn.addEventListener('click', function(){
-    var cur = document.documentElement.getAttribute('data-theme');
-    var next = cur === 'dark' ? 'light' : 'dark';
+  var b = document.getElementById('theme');
+  b.addEventListener('click', function(){
+    var next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
-    try { localStorage.setItem('gc-theme', next); } catch(e){}
+    try{ localStorage.setItem('gc-theme', next); }catch(e){}
   });
-  try {
-    var saved = localStorage.getItem('gc-theme');
-    if(saved) document.documentElement.setAttribute('data-theme', saved);
-  } catch(e){}
+  try{ var s = localStorage.getItem('gc-theme'); if(s) document.documentElement.setAttribute('data-theme', s); }catch(e){}
 })();
 </script>
 </body>

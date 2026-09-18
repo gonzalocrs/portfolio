@@ -6,7 +6,7 @@
 <title>Gonzalo Cáceres — Architecture</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#ffffff;
@@ -15,6 +15,7 @@
     --mute:#7b7d80;
     --live:#1a2ce0;
     --font:"Archivo","Helvetica Neue",Arial,sans-serif;
+    --mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
@@ -54,18 +55,62 @@
   .bar{
     display:flex;
     justify-content:space-between;
-    align-items:baseline;
+    align-items:center;
     gap:1rem;
     padding:1.1rem clamp(1rem,4vw,2.5rem);
-    font-size:.82rem;
-    letter-spacing:.01em;
+    font-family:var(--mono);
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.04em;
   }
-  .bar nav{display:flex;gap:1.25rem}
-  .bar a:hover,.bar button:hover{color:var(--live)}
+  .bar nav{display:flex;align-items:center;gap:1.25rem}
+  .bar a:hover{color:var(--live)}
+  .bar .mark{
+    font-family:var(--font);
+    font-weight:800;
+    font-size:1.1rem;
+    text-transform:none;
+    letter-spacing:-.02em;
+  }
+
+  /* ---------- theme switch ---------- */
+  .switch{
+    display:inline-flex;
+    align-items:center;
+    gap:.55rem;
+    font-family:var(--mono);
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+  .switch:hover .switch-label{color:var(--live)}
+  .switch-track{
+    position:relative;flex:0 0 auto;
+    width:32px;height:18px;
+    border-radius:6px;
+    background:var(--rule);
+    transition:background .25s ease;
+  }
+  .switch[aria-checked="true"] .switch-track{background:var(--live)}
+  .switch-knob{
+    position:absolute;top:2px;left:2px;
+    width:14px;height:14px;
+    border-radius:3px;
+    background:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,.35),0 1px 1px rgba(0,0,0,.18);
+    transition:transform .25s cubic-bezier(.2,.7,.2,1);
+  }
+  .switch[aria-checked="true"] .switch-knob{transform:translateX(14px)}
+
+  /* ---------- layout ---------- */
+  main{
+    flex:1 0 auto;
+    position:relative;
+    padding:clamp(1.5rem,6vh,5rem) clamp(1rem,4vw,2.5rem);
+  }
 
   /* ---------- index ---------- */
-  main{flex:1 0 auto;padding:clamp(1.5rem,6vh,5rem) clamp(1rem,4vw,2.5rem)}
-  .index{list-style:none;margin:0;padding:0;max-width:1400px}
+  .index{list-style:none;margin:0;padding:0;max-width:40vw;position:relative;z-index:1}
   .group + .group{margin-top:.1em}
 
   .head{
@@ -104,38 +149,40 @@
     padding:.55rem 0;
     transition:padding-left .25s cubic-bezier(.2,.7,.2,1),color .2s;
   }
-  .work a:hover,.work a:focus-visible{color:var(--live);padding-left:.6rem}
+  .work a.current{color:var(--live);padding-left:.6rem}
   .work .name{font-weight:500;font-size:clamp(1rem,2.2vw,1.3rem);letter-spacing:-.015em}
-  .work .meta{color:var(--mute);font-size:.8rem;white-space:nowrap}
-  .work a:hover .meta{color:var(--live)}
+  .work .meta{font-family:var(--mono);color:var(--mute);font-size:.72rem;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
+  .work a.current .meta{color:var(--live)}
 
-  /* ---------- hover preview ---------- */
-  .peek{
-    position:fixed;
-    right:clamp(1rem,4vw,2.5rem);
-    bottom:clamp(1rem,4vw,2.5rem);
-    width:min(30vw,340px);
-    aspect-ratio:4/3;
-    border:1px solid var(--rule);
-    opacity:0;
-    transform:translateY(8px);
-    transition:opacity .25s,transform .25s;
+  /* ---------- collage ---------- */
+  .collage{
+    position:absolute;
+    inset:0 0 0 46%;
     pointer-events:none;
-    display:grid;
-    place-items:center;
+    z-index:0;
+  }
+  .tile{
+    position:absolute;
+    border:1px solid var(--rule);
+    overflow:hidden;
+    opacity:0;
+    transition:opacity 1.6s ease;
     background:var(--paper);
   }
-  .peek[data-on="true"]{opacity:1;transform:none}
-  .peek .fill{position:absolute;inset:0}
-  .peek .cap{
-    position:relative;
-    align-self:end;
-    justify-self:start;
-    margin:.6rem;
-    padding:.2rem .45rem;
-    background:var(--paper);
-    font-size:.72rem;
-    color:var(--mute);
+  .tile.on{opacity:1}
+  .tile .fill{position:absolute;inset:0;opacity:0;transition:opacity .6s ease}
+  .tile .fill.on{opacity:1}
+  .tile.preview{
+    z-index:2;
+  }
+  .tile .cap{
+    position:absolute;left:.6rem;bottom:.6rem;
+    font-family:var(--mono);font-size:.68rem;
+    text-transform:uppercase;letter-spacing:.05em;
+    padding:.25em .55em;
+    background:var(--paper);color:var(--mute);
+    max-width:calc(100% - 1.2rem);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   }
 
   footer{
@@ -143,14 +190,17 @@
     justify-content:space-between;
     gap:1rem;
     padding:1.1rem clamp(1rem,4vw,2.5rem);
-    font-size:.72rem;
+    font-family:var(--mono);
+    font-size:.68rem;
+    text-transform:uppercase;
+    letter-spacing:.03em;
     color:var(--mute);
   }
 
-  @media (max-width:760px){
-    .peek{display:none}
+  @media (max-width:900px){
+    .index{max-width:none}
+    .collage{display:none}
     .works{max-width:none}
-    .work .meta{font-size:.72rem}
   }
   @media (prefers-reduced-motion:reduce){
     *{transition-duration:.01ms !important}
@@ -160,11 +210,14 @@
 <body>
 
 <header class="bar">
-  <a href="#" class="mark">Gonzalo Cáceres Valcárcel</a>
+  <a href="#" class="mark" id="home">Gonzalo Cáceres Valcárcel</a>
   <nav>
     <a href="#about">About</a>
     <a href="mailto:hello@example.com">Contact</a>
-    <button id="theme" aria-label="Switch colour theme">Theme</button>
+    <button class="switch" id="theme" role="switch" aria-checked="false" aria-label="Dark mode">
+      <span class="switch-label">Dark mode</span>
+      <span class="switch-track"><span class="switch-knob"></span></span>
+    </button>
   </nav>
 </header>
 
@@ -211,15 +264,26 @@
     </li>
 
   </ul>
+
+  <div class="collage" id="collage" aria-hidden="true">
+    <div class="tile preview" id="previewA">
+      <span class="fill on" id="previewFillA"></span>
+      <span class="cap" id="previewCapA"></span>
+    </div>
+    <div class="tile preview" id="previewB">
+      <span class="fill on" id="previewFillB"></span>
+      <span class="cap" id="previewCapB"></span>
+    </div>
+    <div class="tile ambient"></div>
+    <div class="tile ambient"></div>
+    <div class="tile ambient"></div>
+    <div class="tile ambient"></div>
+    <div class="tile ambient"></div>
+  </div>
 </main>
 
-<div class="peek" id="peek" aria-hidden="true" data-on="false">
-  <span class="fill" id="peekFill"></span>
-  <span class="cap" id="peekCap"></span>
-</div>
-
 <footer>
-  <span>Architecture and development. New York and Cusco.</span>
+  <span>Architecture and development. Based in New York.</span>
   <span>© 2026</span>
 </footer>
 
@@ -238,7 +302,12 @@
 
   groups.forEach(function(g){
     g.querySelector('.head').addEventListener('click', function(){
-      setOpen(g, g.getAttribute('data-open') !== 'true');
+      var open = g.getAttribute('data-open') !== 'true';
+      setOpen(g, open);
+      if(open){
+        var firstLink = g.querySelector('.work a');
+        if(firstLink) selectProject(firstLink);
+      }
     });
   });
 
@@ -246,38 +315,229 @@
     if(e.key === 'Escape') setOpen(null, false);
   });
 
-  // hover preview
-  var peek = document.getElementById('peek');
-  var fill = document.getElementById('peekFill');
-  var cap  = document.getElementById('peekCap');
+  // the name in the header doubles as a home link: collapses everything
+  // back to the plain index, ready to also mean "back" once individual
+  // project pages exist
+  document.getElementById('home').addEventListener('click', function(e){
+    e.preventDefault();
+    setOpen(null, false);
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  });
 
-  document.querySelectorAll('.work a').forEach(function(a){
-    function show(){
-      var h = a.getAttribute('data-hue');
-      fill.style.background =
-        'repeating-linear-gradient(135deg, hsl('+h+' 30% 62%) 0 6px, hsl('+h+' 30% 68%) 6px 12px)';
-      cap.textContent = a.querySelector('.name').textContent;
-      peek.setAttribute('data-on','true');
+  function rand(min, max){ return min + Math.random() * (max - min); }
+  function swatch(h){
+    return 'repeating-linear-gradient(135deg, hsl('+h+' 30% 62%) 0 6px, hsl('+h+' 30% 68%) 6px 12px)';
+  }
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('.work a'));
+  var hues = links.map(function(a){ return a.getAttribute('data-hue'); });
+
+  // ambient tiles: rotate between a small pool of hand-placed, non-overlapping
+  // slots (three well-spaced rows), so the collage shifts over time without
+  // sprawling into fully free-form chaos
+  var AMBIENT_SLOTS = [
+    {top:'4%',  left:'2%',  width:'17%', aspect:'5/4'},
+    {top:'2%',  left:'38%', width:'15%', aspect:'1/1'},
+    {top:'8%',  left:'70%', width:'19%', aspect:'4/5'},
+    {top:'42%', left:'14%', width:'17%', aspect:'4/5'},
+    {top:'46%', left:'62%', width:'19%', aspect:'1/1'},
+    {top:'76%', left:'4%',  width:'15%', aspect:'1/1'},
+    {top:'72%', left:'40%', width:'17%', aspect:'5/6'}
+  ];
+  // tracks which slots are currently occupied so two tiles never land on
+  // the same rectangle at once
+  var slotTaken = AMBIENT_SLOTS.map(function(){ return false; });
+
+  var ambientTiles = Array.prototype.slice.call(document.querySelectorAll('.tile.ambient'));
+  var ambientState = ambientTiles.map(function(tile){
+    var fill = document.createElement('span');
+    fill.className = 'fill on';
+    tile.appendChild(fill);
+    return { tile: tile, fill: fill, timer: null, paused: false, slot: -1 };
+  });
+
+  function ambientCycle(s){
+    if(s.paused) return;
+    var candidates = [];
+    for(var k = 0; k < AMBIENT_SLOTS.length; k++){
+      if(!slotTaken[k] && k !== s.slot) candidates.push(k);
     }
-    function hide(){ peek.setAttribute('data-on','false'); }
+    if(candidates.length === 0){
+      // every slot is in use right now: wait a beat rather than overlap
+      s.timer = setTimeout(function(){ ambientCycle(s); }, 500 + Math.random() * 600);
+      return;
+    }
+    var i = candidates[Math.floor(Math.random() * candidates.length)];
+    s.slot = i;
+    slotTaken[i] = true;
+    var slot = AMBIENT_SLOTS[i];
+    s.tile.style.top = slot.top;
+    s.tile.style.left = slot.left;
+    s.tile.style.width = slot.width;
+    s.tile.style.aspectRatio = slot.aspect;
+
+    var h = hues[Math.floor(Math.random() * hues.length)];
+    s.fill.style.background = swatch(h);
+    s.tile.classList.add('on');
+    var visibleFor = 3200 + Math.random() * 3200;
+    s.timer = setTimeout(function(){
+      s.tile.classList.remove('on');
+      slotTaken[s.slot] = false;
+      var gap = 1400 + Math.random() * 2600;
+      s.timer = setTimeout(function(){ ambientCycle(s); }, gap);
+    }, visibleFor);
+  }
+  function ambientPause(s){
+    s.paused = true;
+    clearTimeout(s.timer);
+    s.tile.classList.remove('on');
+    if(s.slot !== -1){ slotTaken[s.slot] = false; s.slot = -1; }
+  }
+  function ambientResume(s){
+    if(!s.paused) return;
+    s.paused = false;
+    s.timer = setTimeout(function(){ ambientCycle(s); }, rand(0, 900));
+  }
+  ambientState.forEach(function(s){ s.timer = setTimeout(function(){ ambientCycle(s); }, rand(0, 3000)); });
+
+  // hover preview: appears only while hovering a project, cycling through a
+  // few curated positions so each new project lands somewhere different;
+  // ambient tiles clear out of the way while it's active
+  var PREVIEW_SLOTS = [
+    {top:'6%',  left:'2%',  width:'27%', aspect:'5/4'},
+    {top:'16%', left:'36%', width:'32%', aspect:'4/5'},
+    {top:'8%',  left:'62%', width:'26%', aspect:'4/5'},
+    {top:'52%', left:'10%', width:'28%', aspect:'6/5'},
+    {top:'50%', left:'54%', width:'27%', aspect:'1/1'}
+  ];
+  // two alternating tiles: the incoming one pops in immediately, the
+  // outgoing one lingers and fades out slowly, so switching feels instant
+  // rather than waiting through a fade before the new project shows
+  var previews = [
+    { tile: document.getElementById('previewA'), fill: document.getElementById('previewFillA'), cap: document.getElementById('previewCapA') },
+    { tile: document.getElementById('previewB'), fill: document.getElementById('previewFillB'), cap: document.getElementById('previewCapB') }
+  ];
+  var lastSlot = -1;
+  var activeIndex = -1;
+  var leaveTimer = null;
+  var currentLink = null;
+
+  function nextSlot(){
+    var i;
+    do { i = Math.floor(Math.random() * PREVIEW_SLOTS.length); } while(i === lastSlot && PREVIEW_SLOTS.length > 1);
+    lastSlot = i;
+    return PREVIEW_SLOTS[i];
+  }
+
+  function popIn(p, a){
+    var slot = nextSlot();
+    p.tile.style.top = slot.top;
+    p.tile.style.left = slot.left;
+    p.tile.style.width = slot.width;
+    p.tile.style.aspectRatio = slot.aspect;
+    p.fill.style.background = swatch(a.getAttribute('data-hue'));
+    p.cap.textContent = a.querySelector('.name').textContent;
+    p.tile.style.transition = 'opacity .18s ease';
+    p.tile.classList.add('on');
+  }
+  function fadeOut(p){
+    p.tile.style.transition = 'opacity 1.6s ease';
+    p.tile.classList.remove('on');
+  }
+
+  // selects a project's preview directly (not just as an event side-effect),
+  // so it can be triggered reliably from hover, focus, or the scroll wheel
+  function selectProject(a){
+    clearTimeout(leaveTimer);
+    ambientState.forEach(ambientPause);
+    if(currentLink === a) return;
+    if(currentLink) currentLink.classList.remove('current');
+    currentLink = a;
+    currentLink.classList.add('current');
+
+    var outgoingIndex = activeIndex;
+    activeIndex = activeIndex === 0 ? 1 : 0;
+    popIn(previews[activeIndex], a);
+    if(outgoingIndex !== -1) fadeOut(previews[outgoingIndex]);
+  }
+
+  links.forEach(function(a){
+    function show(){ selectProject(a); }
+    function hide(){
+      clearTimeout(leaveTimer);
+      leaveTimer = setTimeout(function(){
+        if(currentLink) currentLink.classList.remove('current');
+        currentLink = null;
+        activeIndex = -1;
+        previews.forEach(fadeOut);
+        ambientState.forEach(ambientResume);
+      }, 120);
+    }
     a.addEventListener('mouseenter', show);
     a.addEventListener('focus', show);
     a.addEventListener('mouseleave', hide);
     a.addEventListener('blur', hide);
   });
 
-  // theme toggle
+  // while a project is hovered, the scroll wheel steps the selection up/down
+  // through that group's list; hitting the end opens the next (or previous)
+  // category and continues into it, instead of just scrolling the page
+  document.addEventListener('wheel', function(e){
+    if(!currentLink) return;
+    var group = currentLink.closest('.group');
+    var worksEl = currentLink.closest('.works');
+    if(!group || !worksEl) return;
+    var list = Array.prototype.slice.call(worksEl.querySelectorAll('a'));
+    var idx = list.indexOf(currentLink);
+    if(idx === -1) return;
+    var dir = e.deltaY > 0 ? 1 : -1;
+    var nextIdx = idx + dir;
+
+    if(nextIdx >= 0 && nextIdx < list.length){
+      e.preventDefault();
+      selectProject(list[nextIdx]);
+      list[nextIdx].focus({preventScroll:true});
+      return;
+    }
+
+    var groupIdx = groups.indexOf(group);
+    var targetGroupIdx = groupIdx + dir;
+    if(targetGroupIdx < 0 || targetGroupIdx >= groups.length) return;
+    e.preventDefault();
+    var targetGroup = groups[targetGroupIdx];
+    setOpen(targetGroup, true);
+    var targetLinks = Array.prototype.slice.call(targetGroup.querySelectorAll('.work a'));
+    if(!targetLinks.length) return;
+    var targetLink = dir > 0 ? targetLinks[0] : targetLinks[targetLinks.length - 1];
+    selectProject(targetLink);
+    targetLink.focus({preventScroll:true});
+  }, {passive:false});
+
+  // theme switch
   var btn = document.getElementById('theme');
-  btn.addEventListener('click', function(){
-    var cur = document.documentElement.getAttribute('data-theme');
-    var next = cur === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    try { localStorage.setItem('gc-theme', next); } catch(e){}
-  });
+
+  function isDark(){
+    var attr = document.documentElement.getAttribute('data-theme');
+    if(attr === 'dark') return true;
+    if(attr === 'light') return false;
+    return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }
+  function syncSwitch(){
+    btn.setAttribute('aria-checked', isDark() ? 'true' : 'false');
+  }
+
   try {
     var saved = localStorage.getItem('gc-theme');
     if(saved) document.documentElement.setAttribute('data-theme', saved);
   } catch(e){}
+  syncSwitch();
+
+  btn.addEventListener('click', function(){
+    var next = isDark() ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('gc-theme', next); } catch(e){}
+    syncSwitch();
+  });
 })();
 </script>
 

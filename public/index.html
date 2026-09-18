@@ -47,22 +47,18 @@
     display:grid;
     grid-template-columns:minmax(0,1fr) minmax(0,1fr);
     gap:clamp(1.5rem,4vw,4rem);
-    padding:clamp(1rem,4vh,3rem) var(--pad) 0;
+    padding:clamp(.5rem,2vh,1.5rem) var(--pad) 0;
     align-items:start;
   }
 
   .index{list-style:none;margin:0;padding:0}
-  .group{border-top:1px solid var(--rule)}
-  .group:last-child{border-bottom:1px solid var(--rule)}
   .head{
     display:flex;align-items:baseline;gap:.7rem;width:100%;
     padding:.3em 0 .28em;font-weight:700;
-    font-size:clamp(2.2rem,6.5vw,5.5rem);line-height:1;letter-spacing:-.04em;
+    font-size:clamp(3rem,8.5vw,7.5rem);line-height:.95;letter-spacing:-.045em;
     transition:color .2s;
   }
   .head:hover{color:var(--live)}
-  .head .n{font-size:.75rem;font-weight:400;letter-spacing:0;color:var(--mute);transform:translateY(-1.1em)}
-  .group[data-open="true"] .head .n{color:var(--live)}
 
   .panel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .4s cubic-bezier(.22,.7,.2,1)}
   .group[data-open="true"] .panel{grid-template-rows:1fr}
@@ -84,7 +80,7 @@
   .work a:hover .yr,.work a.on .yr{color:var(--live)}
 
   /* viewer */
-  .viewer{position:sticky;top:clamp(1rem,4vh,3rem)}
+  .viewer{position:sticky;top:clamp(.5rem,2vh,1.5rem)}
   .frame{
     position:relative;width:100%;aspect-ratio:4/3;
     border:1px solid var(--rule);overflow:hidden;
@@ -131,7 +127,7 @@
 
   <ul class="index">
     <li class="group" data-open="true">
-      <h2 style="margin:0"><button class="head" aria-expanded="true" aria-controls="p1">Built<span class="n">11</span></button></h2>
+      <h2 style="margin:0"><button class="head" aria-expanded="true" aria-controls="p1">Built</button></h2>
       <div class="panel" id="p1"><div>
         <ul class="works">
           <li class="work"><a href="#" data-h="212"><span class="studio">Robert Marino</span><span class="name">Goldberg Residence</span><span class="yr">2026</span></a></li>
@@ -150,7 +146,7 @@
     </li>
 
     <li class="group" data-open="false">
-      <h2 style="margin:0"><button class="head" aria-expanded="false" aria-controls="p2">Unbuilt<span class="n">4</span></button></h2>
+      <h2 style="margin:0"><button class="head" aria-expanded="false" aria-controls="p2">Unbuilt</button></h2>
       <div class="panel" id="p2"><div>
         <ul class="works">
           <li class="work"><a href="#" data-h="196"><span class="studio">Columbia / ADV IV</span><span class="name">The Outermost Dock</span><span class="yr">2026</span></a></li>
@@ -162,7 +158,7 @@
     </li>
 
     <li class="group" data-open="false">
-      <h2 style="margin:0"><button class="head" aria-expanded="false" aria-controls="p3">Research<span class="n">3</span></button></h2>
+      <h2 style="margin:0"><button class="head" aria-expanded="false" aria-controls="p3">Research</button></h2>
       <div class="panel" id="p3"><div>
         <ul class="works">
           <li class="work"><a href="#" data-h="260"><span class="studio">Robert Marino</span><span class="name">Vaulted Shell Structures</span><span class="yr">2026</span></a></li>

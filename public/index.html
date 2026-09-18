@@ -6,7 +6,7 @@
 <title>Gonzalo Cáceres — Architecture</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@200;400;500;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#ffffff;
@@ -65,12 +65,29 @@
   }
   .bar nav{display:flex;align-items:center;gap:1.25rem}
   .bar a:hover{color:var(--live)}
-  .bar .mark{
-    font-family:var(--font);
-    font-weight:800;
-    font-size:1.1rem;
-    text-transform:none;
-    letter-spacing:-.02em;
+
+  /* ---------- wordmark: two justified lines; the N, R and L are mirrored
+     at rest and flip upright on hover/focus ---------- */
+  .gv-mark{
+    display:block;
+    width:214px;
+    font-family:'Archivo',sans-serif;
+    font-weight:200;
+    font-size:11px;
+    color:var(--ink);
+    text-decoration:none;
+  }
+  .gv-mark__line{display:flex;justify-content:space-between;line-height:1.5}
+  .gv-mark__gap{flex:0 0 .8em}
+  .gv-mark__flip{
+    display:inline-block;
+    transform:scaleX(-1);
+    transition:transform .45s cubic-bezier(.2,.8,.2,1);
+  }
+  .gv-mark:hover .gv-mark__flip,
+  .gv-mark:focus-visible .gv-mark__flip{transform:scaleX(1)}
+  @media (max-width:640px){
+    .gv-mark{width:168px;font-size:9px}
   }
 
   /* ---------- theme switch ---------- */
@@ -118,13 +135,22 @@
     width:100%;
     text-align:left;
     font-weight:800;
-    font-size:clamp(3.2rem,13vw,11rem);
+    font-size:clamp(2.6rem,10.5vw,9rem);
     line-height:.9;
     letter-spacing:-.045em;
-    transition:font-size .45s cubic-bezier(.2,.7,.2,1), color .2s;
+    transition:
+      font-weight .3s ease,
+      letter-spacing .4s cubic-bezier(.2,.8,.2,1),
+      font-size .4s cubic-bezier(.2,.8,.2,1),
+      color .2s;
   }
-  .head:hover{color:var(--live)}
-  .group[data-open="true"] .head{color:var(--live)}
+  /* the hovered (or open) title spreads out and takes the highlight color */
+  body:not(.is-open) .head:hover,
+  body:not(.is-open) .head:focus-visible,
+  .group[data-open="true"] .head{
+    letter-spacing:.048em;
+    color:var(--live);
+  }
   body.is-open .group[data-open="false"] .head{
     font-size:clamp(1.6rem,4.5vw,3rem);
     color:var(--mute);
@@ -210,7 +236,16 @@
 <body>
 
 <header class="bar">
-  <a href="#" class="mark" id="home">Gonzalo Cáceres Valcárcel</a>
+  <a href="#" class="gv-mark" id="home">
+    <span class="gv-mark__line">
+      <span>G</span><span>O</span><span class="gv-mark__flip">N</span><span>Z</span><span>A</span><span>L</span><span>O</span>
+      <span class="gv-mark__gap">&nbsp;</span>
+      <span>C</span><span>Á</span><span>C</span><span>E</span><span class="gv-mark__flip">R</span><span>E</span><span>S</span>
+    </span>
+    <span class="gv-mark__line">
+      <span>V</span><span>A</span><span class="gv-mark__flip">L</span><span>C</span><span>Á</span><span>R</span><span>C</span><span>E</span><span>L</span>
+    </span>
+  </a>
   <nav>
     <a href="#about">About</a>
     <a href="mailto:hello@example.com">Contact</a>

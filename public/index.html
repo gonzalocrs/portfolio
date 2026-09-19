@@ -6,7 +6,7 @@
 <title>Gonzalo Cáceres — Architecture</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@200;400;500;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@200;300;400;500;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#ffffff;
@@ -70,15 +70,18 @@
      at rest and flip upright on hover/focus ---------- */
   .gv-mark{
     display:block;
-    width:214px;
+    width:230px;
     font-family:'Archivo',sans-serif;
-    font-weight:200;
-    font-size:11px;
+    font-weight:300;
+    font-size:14px;
     color:var(--ink);
     text-decoration:none;
   }
-  .gv-mark__line{display:flex;justify-content:space-between;line-height:1.5}
+  .gv-mark__line{display:flex;justify-content:space-between;line-height:1}
   .gv-mark__gap{flex:0 0 .8em}
+  /* optical alignment: the V lines up under the G and the last L under the S */
+  .gv-mark__line + .gv-mark__line > span:first-child{margin-left:.047em}
+  .gv-mark__line + .gv-mark__line > span:last-child{margin-right:.046em}
   .gv-mark__flip{
     display:inline-block;
     transform:scaleX(-1);
@@ -87,7 +90,7 @@
   .gv-mark:hover .gv-mark__flip,
   .gv-mark:focus-visible .gv-mark__flip{transform:scaleX(1)}
   @media (max-width:640px){
-    .gv-mark{width:168px;font-size:9px}
+    .gv-mark{width:170px;font-size:10.5px}
   }
 
   /* ---------- theme switch ---------- */
@@ -135,9 +138,10 @@
     width:100%;
     text-align:left;
     font-weight:800;
-    font-size:clamp(2.6rem,10.5vw,9rem);
+    font-size:clamp(1.9rem,7.4vw,6.5rem);
     line-height:.9;
-    letter-spacing:-.045em;
+    letter-spacing:-.02em;
+    white-space:nowrap;
     transition:
       font-weight .3s ease,
       letter-spacing .4s cubic-bezier(.2,.8,.2,1),
@@ -264,7 +268,7 @@
       <div class="panel" id="p-built">
         <div>
           <ul class="works">
-            <li class="work"><a href="#" data-hue="18"><span class="name">Casa Larapa</span><span class="meta">Cusco · 2023</span></a></li>
+            <li class="work"><a href="project.html" data-hue="18"><span class="name">Casa Larapa</span><span class="meta">Cusco · 2023</span></a></li>
             <li class="work"><a href="#" data-hue="210"><span class="name">Edificio Magdalena</span><span class="meta">Lima · 2021</span></a></li>
             <li class="work"><a href="#" data-hue="96"><span class="name">Plywood shell pavilion</span><span class="meta">New York · 2026</span></a></li>
           </ul>

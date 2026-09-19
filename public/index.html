@@ -285,9 +285,9 @@
       <div class="panel" id="p-built">
         <div>
           <ul class="works">
-            <li class="work"><a href="#" data-hue="18"><span class="name">Sierra Hotel<span class="tag">Urba</span></span><span class="meta">Cusco · 2023</span></a></li>
-            <li class="work"><a href="#" data-hue="210"><span class="name">Edificio Murano<span class="tag">Urba</span></span><span class="meta">Cusco · 2021</span></a></li>
-            <li class="work"><a href="#" data-hue="96"><span class="name">Urba Branding<span class="tag">Cirkel</span></span><span class="meta">Lima · 2020</span></a></li>
+            <li class="work"><a href="project.html?p=sierra-hotel" data-hue="18"><span class="name">Sierra Hotel<span class="tag">Urba</span></span><span class="meta">Cusco · 2023</span></a></li>
+            <li class="work"><a href="project.html?p=edificio-murano" data-hue="210"><span class="name">Edificio Murano<span class="tag">Urba</span></span><span class="meta">Cusco · 2021</span></a></li>
+            <li class="work"><a href="project.html?p=urba-branding" data-hue="96"><span class="name">Urba Branding<span class="tag">Cirkel</span></span><span class="meta">Lima · 2020</span></a></li>
           </ul>
         </div>
       </div>
@@ -298,10 +298,10 @@
       <div class="panel" id="p-unbuilt">
         <div>
           <ul class="works">
-            <li class="work"><a href="#" data-hue="200"><span class="name">The Outermost Dock</span><span class="meta">Columbia GSAPP · 2026</span></a></li>
-            <li class="work"><a href="#" data-hue="42"><span class="name">Social Sanctuary</span><span class="meta">Columbia GSAPP · 2025</span></a></li>
-            <li class="work"><a href="#" data-hue="330"><span class="name">Permanent Impermanence</span><span class="meta">Columbia GSAPP · 2025</span></a></li>
-            <li class="work"><a href="#" data-hue="150"><span class="name">Intra-Urban Forestation</span><span class="meta">Columbia GSAPP · 2024</span></a></li>
+            <li class="work"><a href="project.html?p=the-outermost-dock" data-hue="200"><span class="name">The Outermost Dock</span><span class="meta">Columbia GSAPP · 2026</span></a></li>
+            <li class="work"><a href="project.html?p=social-sanctuary" data-hue="42"><span class="name">Social Sanctuary</span><span class="meta">Columbia GSAPP · 2025</span></a></li>
+            <li class="work"><a href="project.html?p=permanent-impermanence" data-hue="330"><span class="name">Permanent Impermanence</span><span class="meta">Columbia GSAPP · 2025</span></a></li>
+            <li class="work"><a href="project.html?p=intra-urban-forestation" data-hue="150"><span class="name">Intra-Urban Forestation</span><span class="meta">Columbia GSAPP · 2024</span></a></li>
           </ul>
         </div>
       </div>
@@ -311,11 +311,10 @@
       <h2 style="margin:0"><button class="head" aria-expanded="false" aria-controls="p-research">Research</button></h2>
       <div class="panel" id="p-research">
         <div>
-          <div class="sub"><b>Structures &amp; exploration</b></div>
           <ul class="works">
-            <li class="work"><a href="#" data-hue="8"><span class="name">Anticlastic Roof Structure<span class="tag">Robert Marino</span></span><span class="meta">2026</span></a></li>
-            <li class="work"><a href="#" data-hue="260"><span class="name">Vaulted Shell Structure<span class="tag">Robert Marino</span></span><span class="meta">2026</span></a></li>
-            <li class="work"><a href="#" data-hue="120"><span class="name">Modular Living Architecture</span><span class="meta">2025</span></a></li>
+            <li class="work"><a href="project.html?p=anticlastic-roof-structure" data-hue="8"><span class="name">Anticlastic Roof Structure<span class="tag">Robert Marino</span></span><span class="meta">2026</span></a></li>
+            <li class="work"><a href="project.html?p=vaulted-shell-structure" data-hue="260"><span class="name">Vaulted Shell Structure<span class="tag">Robert Marino</span></span><span class="meta">2026</span></a></li>
+            <li class="work"><a href="project.html?p=modular-living-architecture" data-hue="120"><span class="name">Modular Living Architecture</span><span class="meta">2025</span></a></li>
           </ul>
         </div>
       </div>
@@ -570,6 +569,16 @@
     selectProject(targetLink);
     targetLink.focus({preventScroll:true});
   }, {passive:false});
+
+  // open a category from the URL (e.g. /?open=built), used by the project pages' back links
+  (function(){
+    var want = new URLSearchParams(location.search).get('open');
+    if(!want) return;
+    groups.forEach(function(g){
+      var head = g.querySelector('.head');
+      if(head.textContent.trim().toLowerCase() === want.toLowerCase()) head.click();
+    });
+  })();
 
   // theme switch
   var btn = document.getElementById('theme');

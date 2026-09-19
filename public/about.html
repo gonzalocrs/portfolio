@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>About — Gonzalo Cáceres</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@200;300;400;500;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+  try{var s=localStorage.getItem('gc-theme');if(s)document.documentElement.setAttribute('data-theme',s)}catch(e){}
+</script>
+<style>
+  :root{
+    --paper:#ffffff;
+    --ink:#0f1216;
+    --rule:#d8d6d1;
+    --mute:#7b7d80;
+    --live:#1a2ce0;
+    --font:"Archivo","Helvetica Neue",Arial,sans-serif;
+    --mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
+    --pad:clamp(1rem,4vw,2.5rem);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0d0e10;
+      --ink:#f2f1ee;
+      --rule:#2b2d30;
+      --mute:#8b8d90;
+      --live:#7d8bff;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0d0e10;
+    --ink:#f2f1ee;
+    --rule:#2b2d30;
+    --mute:#8b8d90;
+    --live:#7d8bff;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--font);
+    font-size:16px;
+    line-height:1.4;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+  :focus-visible{outline:2px solid var(--live);outline-offset:3px}
+
+  .bar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:1rem;
+    padding:1.1rem var(--pad);
+    font-family:var(--mono);
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+  .bar nav{display:flex;align-items:center;gap:1.25rem}
+  .bar a:hover{color:var(--live)}
+  .bar a[aria-current="page"]{color:var(--live)}
+
+  .gv-mark{
+    display:block;
+    width:230px;
+    font-family:'Archivo',sans-serif;
+    font-weight:300;
+    font-size:14px;
+    color:var(--ink);
+    text-decoration:none;
+  }
+  .gv-mark__line{display:flex;justify-content:space-between;line-height:1}
+  .gv-mark__gap{flex:0 0 .8em}
+  .gv-mark__line + .gv-mark__line > span:first-child{margin-left:.047em}
+  .gv-mark__line + .gv-mark__line > span:last-child{margin-right:.046em}
+  .gv-mark__flip{
+    display:inline-block;
+    transform:scaleX(-1);
+    transition:transform .45s cubic-bezier(.2,.8,.2,1);
+  }
+  .gv-mark:hover .gv-mark__flip,
+  .gv-mark:focus-visible .gv-mark__flip{transform:scaleX(1)}
+
+  .switch{
+    display:inline-flex;
+    align-items:center;
+    gap:.55rem;
+    font-family:var(--mono);
+    font-size:.78rem;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+  .switch:hover .switch-label{color:var(--live)}
+  .switch-track{
+    position:relative;flex:0 0 auto;
+    width:32px;height:18px;
+    border-radius:6px;
+    background:var(--rule);
+    transition:background .25s ease;
+  }
+  .switch[aria-checked="true"] .switch-track{background:var(--live)}
+  .switch-knob{
+    position:absolute;top:2px;left:2px;
+    width:14px;height:14px;
+    border-radius:3px;
+    background:#fff;
+    box-shadow:0 1px 3px rgba(0,0,0,.35),0 1px 1px rgba(0,0,0,.18);
+    transition:transform .25s cubic-bezier(.2,.7,.2,1);
+  }
+  .switch[aria-checked="true"] .switch-knob{transform:translateX(14px)}
+
+  main{
+    flex:1 0 auto;
+    padding:clamp(1.5rem,6vh,4rem) var(--pad) clamp(3rem,8vh,6rem);
+  }
+  .mono{
+    font-family:var(--mono);
+    font-size:.72rem;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+  }
+  .title{
+    margin:0;
+    font-weight:800;
+    font-size:clamp(1.9rem,7.4vw,6.5rem);
+    line-height:.9;
+    letter-spacing:-.02em;
+  }
+  .exp-wrap{margin-top:clamp(2.5rem,7vw,5rem);max-width:min(100%,900px)}
+  .exp-wrap h2{margin:0 0 1.1rem;font-weight:400;color:var(--mute)}
+  .exp{margin:0;padding:0;list-style:none;border-bottom:1px solid var(--rule)}
+  .exp li{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1.7fr) 11rem;
+    gap:1.5rem;
+    align-items:baseline;
+    padding:.8rem 0;
+    border-top:1px solid var(--rule);
+  }
+  .exp b{font-weight:500;font-size:1.05rem}
+  .exp span{color:var(--mute);font-size:.95rem}
+  .exp .mono{text-align:right;white-space:nowrap}
+
+  footer{
+    display:flex;
+    justify-content:space-between;
+    gap:1rem;
+    padding:1.1rem var(--pad);
+    font-family:var(--mono);
+    font-size:.68rem;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    color:var(--mute);
+  }
+
+  @media (max-width:640px){
+    .gv-mark{width:170px;font-size:10.5px}
+    .exp li{grid-template-columns:1fr auto}
+    .exp li > span:nth-child(2){grid-column:1 / -1;order:3}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{transition-duration:.01ms !important}
+  }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <a href="/" class="gv-mark" aria-label="Gonzalo Cáceres Valcárcel — home">
+    <span class="gv-mark__line">
+      <span>G</span><span>O</span><span class="gv-mark__flip">N</span><span>Z</span><span>A</span><span>L</span><span>O</span>
+      <span class="gv-mark__gap">&nbsp;</span>
+      <span>C</span><span>Á</span><span>C</span><span>E</span><span class="gv-mark__flip">R</span><span>E</span><span>S</span>
+    </span>
+    <span class="gv-mark__line">
+      <span>V</span><span>A</span><span class="gv-mark__flip">L</span><span>C</span><span>Á</span><span>R</span><span>C</span><span>E</span><span>L</span>
+    </span>
+  </a>
+  <nav>
+    <a href="about.html" aria-current="page">About</a>
+    <a href="mailto:hello@example.com">Contact</a>
+    <button class="switch" id="theme" role="switch" aria-checked="false" aria-label="Dark mode">
+      <span class="switch-label">Dark mode</span>
+      <span class="switch-track"><span class="switch-knob"></span></span>
+    </button>
+  </nav>
+</header>
+
+<main>
+  <h1 class="title">About</h1>
+
+  <section class="exp-wrap">
+    <h2 class="mono">Experience</h2>
+    <ul class="exp">
+      <li><b>Robert Marino</b><span>Intern</span><span class="mono">New York &middot; 2026</span></li>
+      <li><b>Menorca</b><span>Design and financial project optimization</span><span class="mono">Lima &middot; 2019</span></li>
+      <li><b>Marcan</b><span>Project management across multiple projects</span><span class="mono">Lima &middot; 2016&ndash;2018</span></li>
+      <li><b>Gra&ntilde;a y Montero</b><span>Construction intern</span><span class="mono">Lima &middot; 2015</span></li>
+    </ul>
+  </section>
+</main>
+
+<footer>
+  <span>Architecture and development. Based in New York.</span>
+  <span>&copy; 2026</span>
+</footer>
+
+<script>
+(function(){
+  var btn = document.getElementById('theme');
+  function isDark(){
+    var a = document.documentElement.getAttribute('data-theme');
+    if(a === 'dark') return true;
+    if(a === 'light') return false;
+    return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }
+  function sync(){ btn.setAttribute('aria-checked', isDark() ? 'true' : 'false'); }
+  sync();
+  btn.addEventListener('click', function(){
+    var next = isDark() ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try{ localStorage.setItem('gc-theme', next); }catch(e){}
+    sync();
+  });
+})();
+</script>
+
+</body>
+</html>

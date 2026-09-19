@@ -204,10 +204,15 @@
   /* ---------- collage ---------- */
   .collage{
     position:absolute;
-    inset:0 0 0 46%;
+    inset:0 0 0 37%;   /* the first column of tiles lands at the golden section: 38.2% empty on the left, 61.8% tiles */
+    overflow:hidden;     /* the wall can be taller than this area; it must never make the page scroll */
     pointer-events:none;
     z-index:0;
   }
+  /* the wall is a square about 20% larger than it used to be (never wider than the area);
+     the openings only use its upper ~80%, so it is centred on that part vertically */
+  .collage{container-type:size;--side:min(100cqw,calc(1.2 * min(85cqw,100cqh)))}
+  .wall{position:absolute;left:0;top:max(0px,calc((100cqh - .8 * var(--side)) / 2));width:var(--side);height:var(--side);pointer-events:none}
   .tile{
     position:absolute;
     border:1px solid var(--rule);
@@ -331,11 +336,14 @@
       <span class="fill on" id="previewFillB"></span>
       <span class="cap" id="previewCapB"></span>
     </div>
-    <div class="tile ambient"></div>
-    <div class="tile ambient"></div>
-    <div class="tile ambient"></div>
-    <div class="tile ambient"></div>
-    <div class="tile ambient"></div>
+    <div class="wall">
+      <div class="tile ambient"></div>
+      <div class="tile ambient"></div>
+      <div class="tile ambient"></div>
+      <div class="tile ambient"></div>
+      <div class="tile ambient"></div>
+      <div class="tile ambient"></div>
+    </div>
   </div>
 </main>
 
@@ -393,13 +401,21 @@
   // slots (three well-spaced rows), so the collage shifts over time without
   // sprawling into fully free-form chaos
   var AMBIENT_SLOTS = [
-    {top:'4%',  left:'2%',  width:'17%', aspect:'5/4'},
-    {top:'2%',  left:'38%', width:'15%', aspect:'1/1'},
-    {top:'8%',  left:'70%', width:'19%', aspect:'4/5'},
-    {top:'42%', left:'14%', width:'17%', aspect:'4/5'},
-    {top:'46%', left:'62%', width:'19%', aspect:'1/1'},
-    {top:'76%', left:'4%',  width:'15%', aspect:'1/1'},
-    {top:'72%', left:'40%', width:'17%', aspect:'5/6'}
+    // big openings of different sizes and proportions on one square 'wall', loosely
+    // after the Ronchamp window pattern, so an image is actually readable in each.
+    // None overlap.
+    {top:'2%', left:'2%', width:'27%', aspect:'10/11'},
+    {top:'3%', left:'33%', width:'20%', aspect:'4/3'},
+    {top:'2%', left:'57%', width:'16%', aspect:'3/5'},
+    {top:'5%', left:'77%', width:'21%', aspect:'1/1'},
+    {top:'33%', left:'2%', width:'18%', aspect:'3/2'},
+    {top:'33%', left:'25%', width:'21%', aspect:'1/1'},
+    {top:'33%', left:'51%', width:'25%', aspect:'1/1'},
+    {top:'31%', left:'80%', width:'17%', aspect:'3/4'},
+    {top:'56%', left:'3%', width:'26%', aspect:'4/3'},
+    {top:'60%', left:'33%', width:'19%', aspect:'1/1'},
+    {top:'62%', left:'56%', width:'25%', aspect:'3/2'},
+    {top:'58%', left:'85%', width:'12%', aspect:'1/1'}
   ];
   // tracks which slots are currently occupied so two tiles never land on
   // the same rectangle at once
@@ -434,7 +450,7 @@
     s.tile.style.aspectRatio = slot.aspect;
 
     var h = hues[Math.floor(Math.random() * hues.length)];
-    s.fill.style.background = swatch(h);
+    s.fill.style.background = slot.dot ? 'var(--ink)' : swatch(h);
     s.tile.classList.add('on');
     var visibleFor = 3200 + Math.random() * 3200;
     s.timer = setTimeout(function(){

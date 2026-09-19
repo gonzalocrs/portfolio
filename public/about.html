@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@200;300;400;500;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script>
-  try{var s=localStorage.getItem('gc-theme');if(s)document.documentElement.setAttribute('data-theme',s)}catch(e){}
+  try{var s=sessionStorage.getItem('gc-theme');if(s)document.documentElement.setAttribute('data-theme',s)}catch(e){}
 </script>
 <style>
   :root{
@@ -136,6 +136,12 @@
     line-height:.9;
     letter-spacing:-.02em;
   }
+  /* label, rule, paragraph: the block is as tall as the old title + gap, so the rest of the page stays put */
+  .about{min-height:calc(clamp(1.9rem,7.4vw,6.5rem)*.9 + clamp(2.5rem,7vw,5rem));max-width:min(100%,900px)}
+  .about h2{margin:0;padding-bottom:1.1rem;border-bottom:1px solid var(--rule);font-weight:400;color:var(--mute)}
+  .about + .exp-wrap{margin-top:0}
+  /* the text ends where the degree column ends (full width minus the place/year column and its gap) */
+  .bio{margin:0;padding-top:.9rem;text-align:justify;hyphens:auto;max-width:calc(100% - 11rem - 1.5rem);font-size:.95rem;line-height:1.5;letter-spacing:-.005em}
   .exp-wrap{margin-top:clamp(2.5rem,7vw,5rem);max-width:min(100%,900px)}
   .exp-wrap h2{margin:0 0 1.1rem;font-weight:400;color:var(--mute)}
   .exp{margin:0;padding:0;list-style:none;border-bottom:1px solid var(--rule)}
@@ -165,6 +171,7 @@
 
   @media (max-width:640px){
     .gv-mark{width:170px;font-size:10.5px}
+    .bio{max-width:none;text-align:left}
     .exp li{grid-template-columns:1fr auto}
     .exp li > span:nth-child(2){grid-column:1 / -1;order:3}
   }
@@ -188,7 +195,7 @@
   </a>
   <nav>
     <a href="about.html" aria-current="page">About</a>
-    <a href="mailto:hello@example.com">Contact</a>
+    <a href="contact.html">Contact</a>
     <button class="switch" id="theme" role="switch" aria-checked="false" aria-label="Dark mode">
       <span class="switch-label">Dark mode</span>
       <span class="switch-track"><span class="switch-knob"></span></span>
@@ -197,7 +204,10 @@
 </header>
 
 <main>
-  <h1 class="title">About</h1>
+  <section class="about">
+    <h2 class="mono">About</h2>
+    <p class="bio">My work explores the relationship between structure, materiality, and form, drawing on my background in engineering to investigate how technical possibilities can generate architectural expression. I am interested in using material and structure not only to shape space, but also to engage with cultural and political ideas.</p>
+  </section>
 
   <section class="exp-wrap">
     <h2 class="mono">Education</h2>
@@ -247,9 +257,19 @@
   btn.addEventListener('click', function(){
     var next = isDark() ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
-    try{ localStorage.setItem('gc-theme', next); }catch(e){}
+    try{ sessionStorage.setItem('gc-theme', next); }catch(e){}
     sync();
   });
+
+  // the site follows the system theme; the switch only overrides it for this visit
+  try{
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    mq.addEventListener('change', function(){
+      document.documentElement.removeAttribute('data-theme');
+      try{ sessionStorage.removeItem('gc-theme'); }catch(e){}
+      sync();
+    });
+  }catch(e){}
 })();
 </script>
 

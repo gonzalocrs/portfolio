@@ -269,7 +269,7 @@
   </a>
   <nav>
     <a href="about.html">About</a>
-    <a href="mailto:hello@example.com">Contact</a>
+    <a href="contact.html">Contact</a>
     <button class="switch" id="theme" role="switch" aria-checked="false" aria-label="Dark mode">
       <span class="switch-label">Dark mode</span>
       <span class="switch-track"><span class="switch-knob"></span></span>
@@ -594,7 +594,7 @@
   }
 
   try {
-    var saved = localStorage.getItem('gc-theme');
+    var saved = sessionStorage.getItem('gc-theme');
     if(saved) document.documentElement.setAttribute('data-theme', saved);
   } catch(e){}
   syncSwitch();
@@ -602,9 +602,19 @@
   btn.addEventListener('click', function(){
     var next = isDark() ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
-    try { localStorage.setItem('gc-theme', next); } catch(e){}
+    try { sessionStorage.setItem('gc-theme', next); } catch(e){}
     syncSwitch();
   });
+
+  // the site follows the system theme; the switch only overrides it for this visit
+  try{
+    var mq = window.matchMedia('(prefers-color-scheme: dark)');
+    mq.addEventListener('change', function(){
+      document.documentElement.removeAttribute('data-theme');
+      try{ sessionStorage.removeItem('gc-theme'); }catch(e){}
+      syncSwitch();
+    });
+  }catch(e){}
 })();
 </script>
 

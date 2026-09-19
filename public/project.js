@@ -20,11 +20,9 @@
 
   var app = document.getElementById('app');
 
-  var back = el('a', 'back mono', '← ' + p.group);
-  back.href = backHref;
-  app.appendChild(back);
+  // the first screen is just image, title and subtitle; everything else scrolls in below
+  var intro = el('section', 'intro');
 
-  // hero
   var hero = el('div', 'hero');
   hero.setAttribute('role', 'img');
   hero.setAttribute('aria-label', p.title);
@@ -39,10 +37,24 @@
     hero.appendChild(ha);
   }
   hero.appendChild(el('span', 'cap mono', p.title));
-  app.appendChild(hero);
+  intro.appendChild(hero);
 
-  app.appendChild(el('h1', 'title', p.title));
-  app.appendChild(el('p', 'kicker mono', p.kicker + ' · ' + p.group));
+  intro.appendChild(el('h1', 'title', p.title));
+
+  var kicker = el('p', 'kicker mono');
+  kicker.appendChild(document.createTextNode(p.kicker + ' · '));
+  var kgroup = el('a', null, p.group);
+  kgroup.href = backHref;
+  kicker.appendChild(kgroup);
+  intro.appendChild(kicker);
+  app.appendChild(intro);
+
+  // size the intro to the screen below the header
+  var bar = document.querySelector('.bar');
+  function setBar(){ document.documentElement.style.setProperty('--bar-h', bar.offsetHeight + 'px'); }
+  setBar();
+  window.addEventListener('resize', setBar);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(setBar);
 
   // description + credits
   var info = el('section', 'info');

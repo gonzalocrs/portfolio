@@ -57,6 +57,10 @@
 
   /* ---------- top bar (same as the index) ---------- */
   .bar{
+    position:sticky;      /* the ribbon stays put while a project scrolls underneath it */
+    top:0;
+    z-index:20;
+    background:var(--paper);
     display:flex;
     justify-content:space-between;
     align-items:center;

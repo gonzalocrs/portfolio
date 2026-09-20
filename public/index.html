@@ -126,11 +126,12 @@
   main{
     flex:1 0 auto;
     position:relative;
-    padding:clamp(1.5rem,6vh,5rem) clamp(1rem,4vw,2.5rem);
+    padding:clamp(1.5rem,6vh,4rem) clamp(1rem,4vw,2.5rem);   /* same top padding as the contact page */
   }
 
   /* ---------- index ---------- */
-  .index{list-style:none;margin:0;padding:0;max-width:40vw;position:relative;z-index:1}
+  /* the top margin equals the small 'Reaching out about' line above the titles on the contact page, so the titles sit at the same height there */
+  .index{list-style:none;margin:2.05rem 0 0;padding:0;max-width:40vw;position:relative;z-index:1}
   .group + .group{margin-top:.1em}
 
   .head{
@@ -138,8 +139,8 @@
     width:100%;
     text-align:left;
     font-weight:800;
-    font-size:clamp(1.9rem,7.4vw,6.5rem);
-    line-height:.9;
+    font-size:clamp(1.7rem,6vw,5rem);   /* halfway between the old size (up to 104px) and the contact-page size (57.6px) */
+    line-height:1;
     letter-spacing:-.02em;
     white-space:nowrap;
     transition:
@@ -155,8 +156,23 @@
     letter-spacing:.048em;
     color:var(--live);
   }
+  /* the small + after each title (a - once its list is open), as on the contact page */
+  .head::after{
+    content:"+";
+    display:inline-block;
+    margin-left:1rem;
+    font-family:var(--mono);
+    font-size:1.1rem;
+    font-weight:400;
+    letter-spacing:0;
+    color:var(--mute);
+    transition:color .2s;
+  }
+  body:not(.is-open) .head:hover::after,
+  body:not(.is-open) .head:focus-visible::after{color:var(--live)}
+  .group[data-open="true"] .head::after{content:"−";color:var(--live)}
   body.is-open .group[data-open="false"] .head{
-    font-size:clamp(1.6rem,4.5vw,3rem);
+    font-size:clamp(1.6rem,4.5vw,3rem);   /* the unselected titles keep their original size (up to 48px) */
     color:var(--mute);
   }
 

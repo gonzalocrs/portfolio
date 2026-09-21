@@ -200,13 +200,25 @@
   .send{
     display:inline-flex;
     align-items:center;
-    gap:.7rem;
     padding:.85rem 1.4rem;
     border:1px solid var(--ink);
     transition:color .2s,border-color .2s,background .2s,opacity .2s;
   }
   .send:hover:not(:disabled),.send:focus-visible{color:var(--live);border-color:var(--live)}
   .send:disabled{opacity:.4;cursor:default}
+  /* pressing Send: the loading logo takes the place of the word, centred in the button, which keeps its size
+     (the circle is drawn clockwise and the stitches appear one at a time) */
+  .send{position:relative}
+  .send__label{transition:opacity .2s ease}
+  .send__logo{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;line-height:0;color:var(--mute);transition:opacity .2s ease;pointer-events:none}
+  .send__logo svg{display:block}
+  .send__logo .ring{stroke:var(--mute);stroke-dasharray:100;stroke-dashoffset:0}
+  .send__logo .st{stroke:currentColor;transition:opacity .25s ease}
+  .send.loading .send__label{opacity:0}
+  .send.loading .send__logo{opacity:1;color:var(--ink)}
+  .send.loading .st{opacity:0}
+  .send.loading .st.on{opacity:1}
+  .send.loading:disabled{opacity:1;border-color:var(--ink)}
   .status{margin:1rem 0 0;min-height:1.2em;color:var(--mute)}
   .status.error{color:#d14b4b}
 
@@ -290,7 +302,17 @@
             <textarea name="message" id="message" rows="3" placeholder="Write whatever you like"></textarea>
           </label>
           <label class="trap" aria-hidden="true">Leave this empty <input type="text" name="company" id="company" tabindex="-1" autocomplete="off"></label>
-          <button type="submit" class="send mono" id="send">Send <span aria-hidden="true">&rarr;</span></button>
+          <button type="submit" class="send mono" id="send"><span class="send__label">Send</span><span class="send__logo" aria-hidden="true"><svg viewBox="0 0 200 200" width="34" height="34" fill="none">
+              <circle class="ring" cx="100" cy="100" r="70" stroke-width="7" pathLength="100" transform="rotate(-90 100 100)"/>
+              <g stroke-width="13">
+                <path class="st" d="M120.09 60.74 L 132.29 48.54"/>
+                <path class="st" d="M143.75 100 H 161"/>
+                <path class="st" d="M120.09 139.26 L 132.29 151.46"/>
+                <path class="st" d="M67.71 151.46 L 79.91 139.26"/>
+                <path class="st" d="M42.13 108.55 A 58.5 58.5 0 0 1 42.13 91.45"/>
+                <path class="st" d="M67.71 48.54 L 79.91 60.74"/>
+              </g>
+            </svg></span></button>
           <p class="status mono" id="status" role="status" aria-live="polite"></p>
         </form>
       </div>

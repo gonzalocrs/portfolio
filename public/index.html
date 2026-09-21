@@ -88,10 +88,31 @@
     transition:transform .45s cubic-bezier(.2,.8,.2,1);
   }
   .gv-mark:hover .gv-mark__flip,
+  .gv-mark.is-hover .gv-mark__flip,
   .gv-mark:focus-visible .gv-mark__flip{transform:scaleX(1)}
   @media (max-width:640px){
     .gv-mark{width:170px;font-size:10.5px}
   }
+
+  /* ---------- intro ---------- */
+  #introveil{position:fixed;inset:0;z-index:100;background:var(--paper);display:none;pointer-events:none}
+  html.intro-on{overflow:hidden}
+  html.intro-on #introveil{display:block;animation:introSafety 0s 7s forwards}   /* if the script ever fails, the veil goes by itself */
+  html.intro-on .gv-mark{position:relative;z-index:101}
+  @keyframes introSafety{to{opacity:0;visibility:hidden}}
+  html.intro-on .gv-mark__line > span:not(.gv-mark__gap){display:inline-block;transform:scaleX(-1);opacity:0}   /* each letter is absent until its own flip begins */
+  /* keep the name and every letter on their own stable layers while the intro runs: the text is drawn once and only
+     scaled, instead of being re-drawn (and re-snapped to the pixel grid) on every frame of a flip, which showed as a slight shake */
+  html.intro-on .gv-mark,
+  html.intro-on .gv-mark__line > span{will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  /* during the intro the pointer is the logo: the ring is drawn clockwise and the stitches appear as it passes them */
+  html.intro-on, html.intro-on *{cursor:none !important}
+  .introcur{position:fixed;left:0;top:0;width:46px;height:46px;margin:-23px 0 0 -23px;z-index:200;pointer-events:none;opacity:0;transition:opacity .3s ease;color:var(--ink)}
+  .introcur.on{opacity:1}
+  .introcur .ring{stroke:var(--mute);opacity:.6}
+  .introcur .st{stroke:currentColor;opacity:0;transition:opacity .3s ease}
+  .introcur .st.on{opacity:1}
+
 
   /* ---------- theme switch ---------- */
   .switch{
@@ -274,8 +295,24 @@
     *{transition-duration:.01ms !important}
   }
 </style>
+<script>
+  // The intro: on the first visit of a session the signature starts big and centred on a clean screen, then moves
+  // to its place in the header. It is skipped when coming back from a project (?open=), when the visitor prefers
+  // reduced motion, and on later visits in the same session. Add ?intro to the address to see it again.
+  try{
+    var q = location.search;
+    var force = /[?&]intro(=|&|$)/.test(q);
+    var skip = /[?&]open=/.test(q) || sessionStorage.getItem('gc-intro') === '1' ||
+               (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    if(force || !skip){
+      document.documentElement.classList.add('intro-on');
+      sessionStorage.setItem('gc-intro', '1');
+    }
+  }catch(e){}
+</script>
 </head>
 <body>
+<div id="introveil" aria-hidden="true"></div>
 
 <header class="bar">
   <a href="#" class="gv-mark" id="home">
@@ -647,6 +684,119 @@
       syncSwitch();
     });
   }catch(e){}
+})();
+</script>
+
+<script>
+// The intro, on the real header signature: it is moved to the middle of the screen and enlarged with a transform.
+// The letters are not there at first. At random moments, out of step like the letters on an airport board, each one
+// appears and flips once into its place, every letter upright: nothing is mirrored while the name is in the middle.
+// Meanwhile the pointer is the logo and its grey circle is drawn clockwise, like a clock hand, with the stitches
+// appearing as it passes them. Then the name holds a moment, glides and shrinks back to its place, and only there,
+// as the veil fades and the page appears, N, R and L flip round to mirrored, the signature's own resting look.
+(function(){
+  var root = document.documentElement;
+  if(!root.classList.contains('intro-on')) return;
+  var veil = document.getElementById('introveil'), mark = document.querySelector('.gv-mark');
+  if(!veil || !mark){ root.classList.remove('intro-on'); return; }
+  var letters = Array.prototype.slice.call(mark.querySelectorAll('.gv-mark__line > span:not(.gv-mark__gap)'));
+  var FLIP = 950, SPREAD = 950, HOLD = 380, MOVE = 1200;    // each flip takes 0.95 s: half a second slower than the 0.45 s hover flip
+  var timers = [], cursor = null, ring = null;
+  function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
+  function rnd(a, b){ return a + Math.random() * (b - a); }
+
+  // ---- the pointer as the logo (only where there is a mouse) ----
+  var stitches = [];
+  var fine = window.matchMedia && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
+  if(fine){
+    cursor = document.createElement('div');
+    cursor.className = 'introcur';
+    // the circle starts at twelve o'clock and is drawn clockwise; the stitches sit at 1, 3, 5, 7, 9 and 11 o'clock
+    cursor.innerHTML = '<svg viewBox="0 0 200 200" width="46" height="46" fill="none" aria-hidden="true">' +
+      '<circle class="ring" cx="100" cy="100" r="70" stroke-width="3" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" transform="rotate(-90 100 100)"/>' +
+      '<g stroke-width="8">' +
+      '<path class="st" d="M120.09 60.74 L 132.29 48.54"/>' +      // 1 o'clock
+      '<path class="st" d="M143.75 100 H 161"/>' +                  // 3
+      '<path class="st" d="M120.09 139.26 L 132.29 151.46"/>' +     // 5
+      '<path class="st" d="M67.71 151.46 L 79.91 139.26"/>' +       // 7
+      '<path class="st" d="M42.13 108.55 A 58.5 58.5 0 0 1 42.13 91.45"/>' +   // 9
+      '<path class="st" d="M67.71 48.54 L 79.91 60.74"/>' +         // 11
+      '</g></svg>';
+    document.body.appendChild(cursor);
+    ring = cursor.querySelector('.ring');
+    stitches = Array.prototype.slice.call(cursor.querySelectorAll('.st'));
+    var seen = false;
+    window.addEventListener('mousemove', function(e){
+      seen = true;
+      cursor.style.transform = 'translate(' + e.clientX + 'px,' + e.clientY + 'px)';
+      cursor.classList.add('on');
+    });
+    // until the mouse moves, show it just under the name so the clock is there to see
+    later(function(){
+      if(seen) return;
+      cursor.style.transform = 'translate(' + Math.round(window.innerWidth / 2) + 'px,' + Math.round(window.innerHeight * .68) + 'px)';
+      cursor.classList.add('on');
+    }, 250);
+  }
+
+  function finish(){
+    timers.forEach(clearTimeout);
+    root.classList.remove('intro-on');
+    mark.style.cssText = '';
+    letters.forEach(function(s){ s.style.cssText = ''; });
+    veil.style.cssText = '';
+    if(cursor){ cursor.remove(); cursor = null; }
+  }
+
+  function run(){
+    var r = mark.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight;
+    var s = Math.min(2.6, (vw * .62) / r.width);                                   // big, but not that big
+    var dx = vw / 2 - (r.left + r.width / 2), dy = vh / 2 - (r.top + r.height / 2);
+    mark.style.transformOrigin = '50% 50%';
+    mark.style.transition = 'none';
+    mark.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + s + ')';
+
+    // the letters: absent, then at its own random moment each one appears and flips once into place: they all come in
+    // mirrored and turn upright, N, R and L too. (When the intro ends, clearing the styles lets N, R and L flip to
+    // their mirrored resting look by the signature's own transition.)
+    var flipsEnd = 0;
+    letters.forEach(function(sp){
+      var from = -1, to = 1;
+      sp.style.transition = 'none';
+      sp.style.opacity = '0';
+      sp.style.transform = 'scaleX(' + from + ')';
+      var t = 60 + rnd(0, SPREAD);
+      later(function(){
+        sp.style.transition = 'transform ' + FLIP + 'ms cubic-bezier(.2,.8,.2,1), opacity 140ms ease';
+        sp.style.opacity = '1';
+        sp.style.transform = 'scaleX(' + to + ')';
+      }, t);
+      flipsEnd = Math.max(flipsEnd, t + FLIP);
+    });
+    void mark.offsetWidth;                                     // settle the starting states first
+
+    // the clock: the circle is drawn clockwise over the whole build, and each stitch appears as it passes
+    var total = flipsEnd + HOLD;
+    if(ring){
+      ring.style.transition = 'stroke-dashoffset ' + total + 'ms linear';
+      later(function(){ ring.style.strokeDashoffset = '0'; }, 30);
+    }
+    stitches.forEach(function(st, k){ later(function(){ st.classList.add('on'); }, total * (k * 2 + 1) / 12); });   // at 1, 3, 5, 7, 9, 11 o'clock
+
+    later(function(){
+      if(cursor) cursor.classList.remove('on');
+      mark.style.transition = 'transform ' + MOVE + 'ms cubic-bezier(.65,0,.2,1)';
+      mark.style.transform = 'translate(0px,0px) scale(1)';
+      veil.style.transition = 'opacity ' + Math.round(MOVE * .8) + 'ms ease ' + Math.round(MOVE * .15) + 'ms';
+      veil.style.opacity = '0';
+      later(finish, MOVE + 250);
+    }, total);
+  }
+  // wait for the fonts (the signature's size depends on them), but never for long
+  var go = false;
+  function start(){ if(go) return; go = true; run(); }
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(start);
+  setTimeout(start, 900);
 })();
 </script>
 

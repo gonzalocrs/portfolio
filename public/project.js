@@ -36,6 +36,8 @@
   // before it turns the page (see the paging code at the bottom).
   var segs = [];
   var stages = [];
+  var freeSets = [];        // the free-layout galleries (photos & renders)
+  var lb = null;            // the full-screen viewer, when open
 
   // ---- 1. overview: image, title, subtitle -------------------------------
   var intro = el('section', 'intro seg');
@@ -111,7 +113,7 @@
   var G = p.gallery || {};
   if(showLayout && !G.drawings && !G.physical && !G.photos){
     function demo(label, n){ var a = []; for(var i = 1; i <= n; i++) a.push({caption: label + ' ' + two(i)}); return a; }
-    G = { drawings: demo('Drawing', 4), physical: demo('Physical model', 3), photos: demo('Photo or render', 5) };
+    G = { drawings: demo('Drawing', 4), physical: demo('Physical model', 3), photos: demo('Photo or render', 6) };
   }
 
   // width / height of the placeholder frames, cycled; real images use their own proportions
@@ -121,7 +123,7 @@
     {key: 'physical', label: 'Physical models', kind: 'physical', name: 'Physical models',
      mode: 'strip', shapes: [4/3, 3/4, 1/1]},   // a horizontal gallery: click right = next, left = previous, centre = zoom
     {key: 'photos', label: 'Photos & renders', kind: 'photo', name: 'Photos & renders',
-     shapes: [16/9, 4/3, 4/3, 3/4, 4/3]}
+     mode: 'free', shapes: [1/1, 3/4, 4/3, 3/4, 4/3, 16/9]}   // free layout: a long section you scroll through normally
   ];
 
   var n = 0;
@@ -133,6 +135,43 @@
     head.appendChild(el('span', null, s.label));
     head.appendChild(el('span', null, two(items.length)));
     seg.appendChild(head);
+
+    // photos & renders: no frames and no fixed page height; images at their own proportions, placed freely
+    // (see buildFree). The segment is as long as it needs to be and scrolls as normal.
+    if(s.mode === 'free'){
+      seg.classList.add('seg--free');
+      var free = el('div', 'free');
+      var fitems = [];
+      items.forEach(function(it, i){
+        n += 1;
+        var item = {a: it.aspect || s.shapes[i % s.shapes.length], caption: it.caption || '', num: n, src: it.src,
+                    alt: it.caption || p.title, hue: (p.hue + i * 40) % 360, kind: s.kind};
+        var fig = el('figure', 'ffig'), frame = el('div', 'frame');
+        if(it.src){
+          var img = el('img');
+          img.src = it.src; img.alt = item.alt; img.loading = 'lazy';
+          img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
+          img.addEventListener('load', function(){
+            if(!it.aspect && img.naturalWidth && img.naturalHeight){ item.a = img.naturalWidth / img.naturalHeight; scheduleFree(); }
+          });
+          frame.appendChild(img);
+        } else {
+          var art = el('div', 'art art--' + s.kind);
+          art.style.setProperty('--h', item.hue);
+          frame.appendChild(art);
+        }
+        fig.appendChild(frame);
+        fig.appendChild(el('figcaption', 'fcap mono', two(n) + '  ' + item.caption));
+        fig.addEventListener('click', function(){ openLightbox(fitems, i); });
+        item.fig = fig;
+        fitems.push(item);
+      });
+      seg.appendChild(free);
+      app.appendChild(seg);
+      freeSets.push({el: free, items: fitems});
+      segs.push({el: seg, name: s.name, free: true});
+      return;
+    }
 
     var stage = el('div', 'stage');
     stage._items = [];
@@ -289,6 +328,96 @@
     stage.classList.toggle('at-end', c === items.length - 1);
   }
 
+  // ---- the free layout (photos & renders only) --------------------------------
+  // Rows, one after another, each with its own composition, in a repeating order:
+  //   stagger  two pictures of similar width, the taller one higher on one side and the shorter one lower on the
+  //            other, with empty space above it (the opening, so the section never starts with a full-width picture)
+  //   single   one picture pushed to one side with empty space next to it (a narrow portrait sits in from the edge)
+  //   duo      a big picture with a smaller one hanging beside it
+  //   wide     a landscape picture across the whole width (never first or last: the opening is a stagger, the ending a single)
+  // Pictures keep their own proportions; the sides alternate; a row needing two pictures with only one left is a single.
+  var ROWS = ['stagger', 'single', 'duo', 'wide'];
+  function buildFree(set){
+    var box = set.el, items = set.items, r = 0, i = 0, side = 0, oneSide = 1;   // 'side' alternates the pairs, 'oneSide' alternates the single pictures
+    box.textContent = '';
+    function place(row, it, cls){
+      it.fig.className = 'ffig' + (cls ? ' ' + cls : '');
+      it.fig.style.setProperty('--a', it.a.toFixed(4));
+      row.appendChild(it.fig);
+    }
+    while(i < items.length){
+      var it = items[i], nx = items[i + 1], kind = ROWS[r % ROWS.length], row = el('div', 'free__row');
+      if((kind === 'stagger' || kind === 'duo') && !nx) kind = 'single';
+      if(kind === 'wide' && (it.a < 1.5 || i === items.length - 1)) kind = 'single';   // never a full-width picture last either
+      if(kind === 'stagger'){
+        var up = it.a <= nx.a ? it : nx, down = up === it ? nx : it;        // the taller one goes higher
+        row.classList.add('row--stagger');
+        if(side){ place(row, down, 'stag--down'); place(row, up, 'stag--up'); }
+        else { place(row, up, 'stag--up'); place(row, down, 'stag--down'); }
+        side ^= 1; i += 2;
+      } else if(kind === 'duo'){
+        var big = it.a >= nx.a ? it : nx, small = big === it ? nx : it;
+        row.classList.add('row--duo', r % 4 === 1 ? 'duo--top' : 'duo--bottom');
+        if(side){ place(row, small, 'ffig--small'); place(row, big, 'ffig--big'); }
+        else { place(row, big, 'ffig--big'); place(row, small, 'ffig--small'); }
+        side ^= 1; i += 2;
+      } else if(kind === 'wide'){
+        row.classList.add('row--full');
+        place(row, it); i += 1;
+      } else {
+        row.classList.add(it.a < .95 ? 'row--narrow' : 'row--inset', oneSide ? 'row--r' : 'row--l');
+        place(row, it); oneSide ^= 1; i += 1;
+      }
+      box.appendChild(row);
+      r += 1;
+    }
+  }
+  var freeQueued = false;
+  function scheduleFree(){
+    if(freeQueued) return;
+    freeQueued = true;
+    requestAnimationFrame(function(){ freeQueued = false; freeSets.forEach(buildFree); });
+  }
+
+  // click a picture to see it whole, filling the screen; Esc or a click closes it, the arrow keys move along
+  function renderLightbox(){
+    var it = lb._list[lb._i];
+    lb.textContent = '';
+    var frame = el('div', 'lightbox__frame');
+    frame.style.setProperty('--a', it.a.toFixed(4));
+    if(it.src){
+      var img = el('img'); img.src = it.src; img.alt = it.alt;
+      img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
+      frame.appendChild(img);
+    } else {
+      var art = el('div', 'art art--' + it.kind);
+      art.style.setProperty('--h', it.hue);
+      frame.appendChild(art);
+    }
+    lb.appendChild(frame);
+    lb.appendChild(el('span', 'lightbox__cap mono', two(it.num) + '  ' + it.caption));
+  }
+  function openLightbox(list, i){
+    closeLightbox();
+    lb = el('div', 'lightbox');
+    lb._list = list; lb._i = i;
+    renderLightbox();
+    lb.addEventListener('click', closeLightbox);
+    document.body.appendChild(lb);
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(function(){ if(lb) lb.classList.add('on'); });
+  }
+  function closeLightbox(){
+    if(!lb) return;
+    lb.remove(); lb = null;
+    document.body.style.overflow = '';
+  }
+  function stepLightbox(dir){
+    if(!lb) return;
+    lb._i = (lb._i + dir + lb._list.length) % lb._list.length;
+    renderLightbox();
+  }
+
   function layoutStage(stage){
     if(stage._mode === 'strip'){ layoutStrip(stage); return; }
     var W = stage.clientWidth, H = stage.clientHeight, items = stage._items;
@@ -331,7 +460,7 @@
   var HALF_LIFE = 170;         // ms for the stretch to halve while easing back
   var MAXSTRETCH = 140;        // the most the page can ever stretch (px), approached slowly
   var cur = 0, pull = 0, grace = GRACE_TRACKPAD, lastInput = 0;
-  var stripSwipe = 0, stripAt = 0;
+  var stripSwipe = 0, stripAt = 0, nativeAt = 0;
   var lockQuiet = false, lockAt = 0, animating = false, raf = null, lastFrame = 0, exiting = false;
 
   // indicator: dots on the right edge, and the "keep scrolling" cue at the bottom
@@ -354,9 +483,18 @@
   function targetFor(i){
     return i === 0 ? 0 : Math.max(0, segs[i].el.offsetTop - bar.offsetHeight);
   }
+  // a long segment (photos & renders) has a top and a bottom position; the page scrolls as normal between them
+  function bottomFor(i){
+    var s = segs[i];
+    return Math.max(targetFor(i), s.el.offsetTop + s.el.offsetHeight - window.innerHeight);
+  }
   function nearest(){
     var y = window.scrollY, best = 0, bd = 1e9;
-    segs.forEach(function(s, i){ var d = Math.abs(targetFor(i) - y); if(d < bd){ bd = d; best = i; } });
+    segs.forEach(function(s, i){
+      var t = targetFor(i), bt = s.free ? bottomFor(i) : t;
+      var d = y < t ? t - y : (y > bt ? y - bt : 0);
+      if(d < bd){ bd = d; best = i; }
+    });
     return best;
   }
   function markDots(){
@@ -432,7 +570,7 @@
     window.scrollTo(0, Math.max(0, window.scrollY + off));   // same picture as the stretched page, now as a real scroll position
     cur += dir; markDots();
     lockQuiet = true; lockAt = performance.now();
-    animateTo(targetFor(cur), easeOut, 750);
+    animateTo((dir < 0 && segs[cur].free) ? bottomFor(cur) : targetFor(cur), easeOut, 750);
     kick();
   }
 
@@ -451,16 +589,24 @@
     i = Math.max(0, Math.min(segs.length - 1, i));
     unzoomAll();
     pull = 0; render();
+    var fromBelow = i < cur;
     if(i !== cur){ cur = i; markDots(); }
     lockQuiet = true; lockAt = performance.now();
-    animateTo(targetFor(i), easeInOut, 850);
+    animateTo((fromBelow && segs[i].free) ? bottomFor(i) : targetFor(i), easeInOut, 850);
     kick();
   }
 
   document.addEventListener('wheel', function(e){
     if(!pagedMQ.matches) return;
-    e.preventDefault();
+    if(lb){ e.preventDefault(); return; }
     var now = performance.now();
+    var s0 = segs[cur];
+    if(s0.free && !exiting && !lockQuiet && !animating && e.deltaY){
+      var y0 = window.scrollY, topY = targetFor(cur), botY = bottomFor(cur);
+      if((e.deltaY > 0 && y0 < botY - 1) || (e.deltaY < 0 && y0 > topY + 1)){ nativeAt = now; return; }   // inside a long segment the page scrolls as normal
+      if(now - nativeAt < 350){ e.preventDefault(); lastInput = now; return; }                           // that scroll's momentum is still arriving: it must not turn the page
+    }
+    e.preventDefault();
     lastInput = now;
     if(exiting) return;
     var st0 = currentStage();
@@ -491,6 +637,11 @@
 
   document.addEventListener('keydown', function(e){
     var tag = (e.target.tagName || '').toLowerCase();
+    if(lb){
+      if(e.key === 'Escape'){ closeLightbox(); e.preventDefault(); }
+      else if(e.key === 'ArrowRight' || e.key === 'ArrowLeft'){ stepLightbox(e.key === 'ArrowRight' ? 1 : -1); e.preventDefault(); }
+      return;
+    }
     if(e.key === 'Escape'){ unzoomAll(); return; }
     var st = currentStage();
     if(st && st._mode === 'strip' && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')){
@@ -505,8 +656,14 @@
     if(!pagedMQ.matches || tag === 'input' || tag === 'textarea') return;
     var k = e.key;
     if(k === ' ' && (tag === 'button' || tag === 'a')) return;
-    if(k === 'ArrowDown' || k === 'PageDown' || (k === ' ' && !e.shiftKey)){ e.preventDefault(); go(cur + 1); }
-    else if(k === 'ArrowUp' || k === 'PageUp' || (k === ' ' && e.shiftKey)){ e.preventDefault(); go(cur - 1); }
+    if(k === 'ArrowDown' || k === 'PageDown' || (k === ' ' && !e.shiftKey)){
+      if(segs[cur].free && window.scrollY < bottomFor(cur) - 1) return;     // inside a long segment the keys scroll as normal
+      e.preventDefault(); go(cur + 1);
+    }
+    else if(k === 'ArrowUp' || k === 'PageUp' || (k === ' ' && e.shiftKey)){
+      if(segs[cur].free && window.scrollY > targetFor(cur) + 1) return;
+      e.preventDefault(); go(cur - 1);
+    }
     else if(k === 'Home'){ e.preventDefault(); go(0); }
     else if(k === 'End'){ e.preventDefault(); go(segs.length - 1); }
   });
@@ -527,9 +684,13 @@
   if(pagedMQ.addEventListener) pagedMQ.addEventListener('change', applyMode);
   window.addEventListener('resize', function(){
     setBar(); relayout();
-    if(pagedMQ.matches && !animating) window.scrollTo(0, targetFor(cur));   // stay on the same segment
+    if(pagedMQ.matches && !animating){                                       // stay on the same segment
+      var lo = targetFor(cur), hi = segs[cur].free ? bottomFor(cur) : lo;
+      window.scrollTo(0, Math.max(lo, Math.min(hi, window.scrollY)));
+    }
   });
 
+  freeSets.forEach(buildFree);
   markDots();
   applyMode();
   requestAnimationFrame(relayout);

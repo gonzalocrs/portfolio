@@ -156,10 +156,9 @@
   .logo{display:block;width:100%;height:100%}
   .logo .ring{stroke:var(--ring)}
   .logo .marks{stroke:currentColor}
-  /* the ring fills white on hover: counterclockwise from the top-right tack round to the bar */
-  .logo .grow{stroke:currentColor;stroke-width:1.3;stroke-dasharray:100;stroke-dashoffset:100;transition:stroke-dashoffset 3.2s cubic-bezier(.45,0,.2,1)}   /* traces the grey ring (same radius), a touch wider so it fully covers it */
-  .logo-link:hover .grow,
-  .logo-link:focus-visible .grow{stroke-dashoffset:0}
+  /* hovering the logo turns it a quarter turn stitch by stitch (script below): each stitch fades out and comes back in
+     its turned place, the way the loading logo fills in. The stitches turn about the centre of the logo. */
+  .logo .marks path{transform-origin:100px 100px;transform-box:view-box}
   /* the text ends where the degree column ends (full width minus the place/year column and its gap) */
   .bio{margin:0;padding-top:.9rem;text-align:justify;hyphens:auto;max-width:calc(100% - 11rem - 1.5rem);font-size:.95rem;line-height:1.5;letter-spacing:-.005em;color:var(--mute)}
   .exp-wrap{margin-top:clamp(2.5rem,7vw,5rem);max-width:min(100%,900px)}
@@ -263,15 +262,17 @@
       <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" role="img" aria-label="GCV">
         <circle class="ring" cx="100" cy="100" r="70" stroke-width="0.9"/>
         <g class="marks" stroke-width="5">
-          <path d="M122.09 57.28 L 134.29 45.08"/>
-          <path d="M65.71 45.08 L 77.91 57.28"/>
-          <path d="M122.09 142.72 L 134.29 154.92"/>
-          <path d="M65.71 154.92 L 77.91 142.72"/>
-          <path d="M147.75 100 H 165"/>
-          <path d="M38.09 108.59 A 62.5 62.5 0 0 1 38.09 91.41"/>
+          <!-- every stitch moved 4 units (of 200) towards the centre, away from the ring; lengths unchanged.
+               Original values: tacks 122.09 57.28 L 134.29 45.08 | 65.71 45.08 L 77.91 57.28 |
+               122.09 142.72 L 134.29 154.92 | 65.71 154.92 L 77.91 142.72; bar H 147.75 to 165;
+               sliver M38.09 108.59 A 62.5 62.5 0 0 1 38.09 91.41 -->
+          <path d="M120.09 60.74 L 132.29 48.54"/>
+          <path d="M67.71 48.54 L 79.91 60.74"/>
+          <path d="M120.09 139.26 L 132.29 151.46"/>
+          <path d="M67.71 151.46 L 79.91 139.26"/>
+          <path d="M143.75 100 H 161"/>
+          <path d="M42.13 108.55 A 58.5 58.5 0 0 1 42.13 91.45"/>
         </g>
-        <!-- on hover the grey ring itself fills in white, counterclockwise: it starts level with the top-right tack, runs up and round the ring (top, left, bottom) and stops level with the bar, like the outline of a G. Same circle as the ring above (r=70) -->
-        <path class="grow" pathLength="100" d="M136.89 40.51 A 70 70 0 1 0 170 100"/>
       </svg>
       </a>
   </div>
@@ -310,6 +311,88 @@
       sync();
     });
   }catch(e){}
+})();
+</script>
+
+<script>
+// the logo: hover and the old stitches start to disappear, clockwise from the top right, the first two at once so there
+// is room to see what follows; then, one at a time and a beat behind, a new stitch appears a quarter turn round after
+// each old one has gone. A gap sweeps round the circle with the new set following the old one out.
+// Let go early and the stitches that changed change back, quickly; stay for a moment (1.5 s) and the turn is committed,
+// so it finishes even if you leave. Hover again and it keeps turning.
+(function(){
+  var link = document.querySelector('.logo-link');
+  var orig = Array.prototype.slice.call(document.querySelectorAll('.logo .marks path'));
+  if(!link || orig.length !== 6) return;
+  var marks = orig[0].parentNode;
+  // a second, hidden copy of the stitches: the "new" set (they swap roles after every turn)
+  var copies = orig.map(function(p){ var c = p.cloneNode(false); c.style.opacity = '0'; marks.appendChild(c); return c; });
+  // the stitches in the markup are: top right, top left, bottom right, bottom left, right, left. Clockwise from the top right:
+  var ORDER = [0, 4, 2, 3, 5, 1];
+  var sets = [ORDER.map(function(i){ return orig[i]; }), ORDER.map(function(i){ return copies[i]; })];
+  // this logo's own pace (slower than the loaders elsewhere on the site). LEAD: how many stitches go before the first new one appears
+  var LEAD = 2, STEP = 640, FADE = 380, COMMIT = 2000, BACK = 160;
+  var active = 0, base = 0, committed = false, commitTimer = null, cfg = null;
+  var gen = ORDER.map(function(){ return 0; });
+  var oldGone = ORDER.map(function(){ return false; }), newShown = ORDER.map(function(){ return false; });
+
+  function fade(el, to){ el.style.transition = 'opacity ' + FADE + 'ms ease'; el.style.opacity = String(to); }
+  function set(el, to){ el.style.transition = 'none'; el.style.opacity = String(to); }
+  function place(el, angle){ el.style.transition = 'none'; el.style.transform = 'rotate(' + angle + 'deg)'; void el.getBoundingClientRect(); }
+
+  // a turn that was committed but is still running: finish it at once, so the next one starts from a clean state
+  function finishNow(){
+    if(!cfg) return;
+    ORDER.forEach(function(_, k){
+      gen[k]++;
+      if(!oldGone[k]){ set(sets[cfg.from][k], 0); oldGone[k] = true; }
+      if(!newShown[k]){ set(sets[cfg.to][k], 1); newShown[k] = true; }
+    });
+    cfg = null;
+  }
+  function start(){
+    clearTimeout(commitTimer);
+    finishNow();
+    committed = false;
+    var from = active, to = 1 - active, target = base + 90;
+    cfg = {from: from, to: to, target: target};
+    // The new set waits, hidden, a quarter turn round. New stitch j is the old stitch just before j in the clockwise order
+    // (j + 5), turned: the quarter turn lands it halfway between the first two stitches to go, so the first new stitch
+    // appears between them and reads as filling that gap.
+    sets[to].forEach(function(el, j){
+      el.setAttribute('d', sets[from][(j + 5) % 6].getAttribute('d'));
+      place(el, target);
+      el.style.opacity = '0';
+    });
+    ORDER.forEach(function(_, k){
+      oldGone[k] = false; newShown[k] = false;
+      var g = ++gen[k];
+      // the old stitch goes first: stitches 1 and 2 together at once, then one more every STEP
+      setTimeout(function(){ if(gen[k] === g){ fade(sets[from][k], 0); oldGone[k] = true; } }, Math.max(0, k - (LEAD - 1)) * STEP);
+      // its new stitch appears a beat after that, in the gap that has opened up
+      setTimeout(function(){ if(gen[k] === g){ fade(sets[to][k], 1); newShown[k] = true; } }, (k + 1) * STEP);
+    });
+    commitTimer = setTimeout(function(){ committed = true; active = to; base = target; }, COMMIT);
+  }
+  function stop(){
+    if(committed || !cfg) return;               // committed: it carries on and finishes by itself
+    clearTimeout(commitTimer);
+    var c = cfg, wait = 0;
+    cfg = null;
+    ORDER.forEach(function(_, k){
+      var g = ++gen[k];                         // cancels the changes that have not happened yet
+      if(!oldGone[k] && !newShown[k]) return;
+      setTimeout(function(){                    // the ones that changed change back, quickly, in the same order
+        if(gen[k] !== g) return;
+        fade(sets[c.to][k], 0); fade(sets[c.from][k], 1); oldGone[k] = false; newShown[k] = false;
+      }, wait);
+      wait += BACK;
+    });
+  }
+  link.addEventListener('mouseenter', start);
+  link.addEventListener('mouseleave', stop);
+  link.addEventListener('focus', start);
+  link.addEventListener('blur', stop);
 })();
 </script>
 

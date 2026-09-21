@@ -11,6 +11,8 @@
     text      a short second paragraph
     gallery   { drawings: [...], physical: [...] (the physical models), photos: [...] }
               each item: { src: "img/...", caption: "Ground floor plan" }
+              photos & renders are laid out freely, without frames and at each picture's own proportions,
+              in a long section you scroll through; drawings are shown all at once, and click to enlarge
               physical models can also carry a paragraph shown under the model:
               { src: "img/...", caption: "Massing model", text: "Basswood, 1:200" }
 

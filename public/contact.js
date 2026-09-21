@@ -51,6 +51,31 @@
     });
   });
 
+  // pressing Send shows the loading logo in the button: the circle is drawn clockwise over one cycle and the
+  // stitches appear one at a time as it passes them. It always runs at least one full cycle, and repeats while waiting.
+  var CYCLE = 1500, loading = false, loadTimers = [];
+  var logo = send.querySelector('.send__logo');
+  var ring = logo && logo.querySelector('.ring');
+  var stitches = logo ? Array.prototype.slice.call(logo.querySelectorAll('.st')) : [];
+  function cycle(){
+    if(!ring) return;
+    loadTimers.forEach(clearTimeout); loadTimers = [];
+    ring.style.transition = 'none'; ring.style.strokeDashoffset = '100';
+    stitches.forEach(function(s){ s.classList.remove('on'); });
+    void ring.getBoundingClientRect();
+    ring.style.transition = 'stroke-dashoffset ' + CYCLE + 'ms linear'; ring.style.strokeDashoffset = '0';
+    stitches.forEach(function(s, k){ loadTimers.push(setTimeout(function(){ s.classList.add('on'); }, CYCLE * (k * 2 + 1) / 12)); });
+    loadTimers.push(setTimeout(function(){ if(loading) cycle(); }, CYCLE + 300));
+  }
+  function startLoading(){ loading = true; send.disabled = true; send.classList.add('loading'); cycle(); }
+  function stopLoading(){
+    loading = false;
+    loadTimers.forEach(clearTimeout); loadTimers = [];
+    if(ring){ ring.style.transition = ''; ring.style.strokeDashoffset = ''; }       // back to the complete, greyed logo shown on hover
+    stitches.forEach(function(s){ s.classList.remove('on'); });
+    send.classList.remove('loading'); send.disabled = false;
+  }
+
   function say(msg, err){ status.textContent = msg; status.classList.toggle('error', !!err); }
 
   form.addEventListener('submit', function(e){
@@ -71,22 +96,28 @@
 
     function done(){ flow.classList.add('sent'); }
 
+    say('');
+    startLoading();
+    var shown = new Promise(function(r){ setTimeout(r, CYCLE + 300); });   // the loader always gets to show a full cycle
+
     if(ENDPOINT){
-      send.disabled = true; say('Sending…');
-      fetch(ENDPOINT, {
+      var request = fetch(ENDPOINT, {
         method: 'POST',
         headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
         body: JSON.stringify({topic: t.join(', '), name: name, contact: how, message: msg, subject: subject, _subject: subject, _template: 'table'})
-      }).then(function(r){
-        if(!r.ok) throw new Error(r.status);
-        done();
+      }).then(function(r){ if(!r.ok) throw new Error(r.status); });
+      Promise.all([request, shown]).then(function(){
+        stopLoading(); done();
       }).catch(function(){
-        send.disabled = false;
+        stopLoading();
         say('Something went wrong. Please try again.', true);
       });
     } else {
-      location.href = 'mailto:' + EMAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
-      done();
+      shown.then(function(){
+        stopLoading();
+        location.href = 'mailto:' + EMAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+        done();
+      });
     }
   });
 })();

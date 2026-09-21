@@ -98,13 +98,12 @@
   #introveil{position:fixed;inset:0;z-index:100;background:var(--paper);display:none;pointer-events:none}
   html.intro-on{overflow:hidden}
   html.intro-on #introveil{display:block;animation:introSafety 0s 7s forwards}   /* if the script ever fails, the veil goes by itself */
-  html.intro-on .gv-mark{position:relative;z-index:101}
   @keyframes introSafety{to{opacity:0;visibility:hidden}}
-  html.intro-on .gv-mark__line > span:not(.gv-mark__gap){display:inline-block;transform:scaleX(-1);opacity:0}   /* each letter is absent until its own flip begins */
-  /* keep the name and every letter on their own stable layers while the intro runs: the text is drawn once and only
-     scaled, instead of being re-drawn (and re-snapped to the pixel grid) on every frame of a flip, which showed as a slight shake */
-  html.intro-on .gv-mark,
-  html.intro-on .gv-mark__line > span{will-change:transform;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  /* The real signature waits, invisible, in the header. The intro shows a copy of it drawn at its real, large size (see the
+     script), so the text is always sharp; that copy is then shrunk into the header. Nothing is ever enlarged by a transform,
+     and no layer tricks are used: those made the name pixelated on Retina screens and in Safari. */
+  html.intro-on .gv-mark:not(.introname){visibility:hidden}
+  .introname{position:fixed;left:0;top:0;z-index:101;pointer-events:none;transform-origin:0 0;margin:0}
   /* during the intro the pointer is the logo: the ring is drawn clockwise and the stitches appear as it passes them */
   html.intro-on, html.intro-on *{cursor:none !important}
   .introcur{position:fixed;left:0;top:0;width:46px;height:46px;margin:-23px 0 0 -23px;z-index:200;pointer-events:none;opacity:0;transition:opacity .3s ease;color:var(--ink)}
@@ -688,20 +687,18 @@
 </script>
 
 <script>
-// The intro, on the real header signature: it is moved to the middle of the screen and enlarged with a transform.
-// The letters are not there at first. At random moments, out of step like the letters on an airport board, each one
-// appears and flips once into its place, every letter upright: nothing is mirrored while the name is in the middle.
-// Meanwhile the pointer is the logo and its grey circle is drawn clockwise, like a clock hand, with the stitches
-// appearing as it passes them. Then the name holds a moment, glides and shrinks back to its place, and only there,
-// as the veil fades and the page appears, N, R and L flip round to mirrored, the signature's own resting look.
+// The intro. A copy of the signature, drawn at its real large size (so it is always sharp, on Retina screens and in Safari
+// too), sits in the middle of an empty screen. The letters are not there at first: at random moments, out of step like an
+// airport board, each one appears and flips once into its place, every letter upright. Meanwhile the pointer is the logo,
+// its grey circle drawn clockwise with the stitches appearing as it passes them. Then the name holds a moment and shrinks
+// and glides into the header, exactly onto the real signature, where N, R and L flip round to mirrored as they always do.
 (function(){
   var root = document.documentElement;
   if(!root.classList.contains('intro-on')) return;
   var veil = document.getElementById('introveil'), mark = document.querySelector('.gv-mark');
   if(!veil || !mark){ root.classList.remove('intro-on'); return; }
-  var letters = Array.prototype.slice.call(mark.querySelectorAll('.gv-mark__line > span:not(.gv-mark__gap)'));
   var FLIP = 950, SPREAD = 950, HOLD = 380, MOVE = 1200;    // each flip takes 0.95 s: half a second slower than the 0.45 s hover flip
-  var timers = [], cursor = null, ring = null;
+  var timers = [], cursor = null, ring = null, big = null;
   function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
   function rnd(a, b){ return a + Math.random() * (b - a); }
 
@@ -739,41 +736,51 @@
     }, 250);
   }
 
+  // hand over to the real signature. N, R and L are upright for a moment, then flip to mirrored by the signature's own transition.
   function finish(){
     timers.forEach(clearTimeout);
+    var flippers = Array.prototype.slice.call(mark.querySelectorAll('.gv-mark__flip'));
+    flippers.forEach(function(sp){ sp.style.transition = 'none'; sp.style.transform = 'scaleX(1)'; });
     root.classList.remove('intro-on');
-    mark.style.cssText = '';
-    letters.forEach(function(s){ s.style.cssText = ''; });
+    if(big){ big.remove(); big = null; }
     veil.style.cssText = '';
     if(cursor){ cursor.remove(); cursor = null; }
+    void mark.offsetWidth;
+    setTimeout(function(){ flippers.forEach(function(sp){ sp.style.transition = ''; sp.style.transform = ''; }); }, 60);
   }
 
   function run(){
     var r = mark.getBoundingClientRect(), vw = window.innerWidth, vh = window.innerHeight;
+    var baseFont = parseFloat(window.getComputedStyle(mark).fontSize);
     var s = Math.min(2.6, (vw * .62) / r.width);                                   // big, but not that big
-    var dx = vw / 2 - (r.left + r.width / 2), dy = vh / 2 - (r.top + r.height / 2);
-    mark.style.transformOrigin = '50% 50%';
-    mark.style.transition = 'none';
-    mark.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(' + s + ')';
 
-    // the letters: absent, then at its own random moment each one appears and flips once into place: they all come in
-    // mirrored and turn upright, N, R and L too. (When the intro ends, clearing the styles lets N, R and L flip to
-    // their mirrored resting look by the signature's own transition.)
+    // the full-size copy of the signature: real width and real font size, never scaled up
+    big = mark.cloneNode(true);
+    big.removeAttribute('id'); big.removeAttribute('href');
+    big.setAttribute('aria-hidden', 'true'); big.tabIndex = -1;
+    big.classList.add('introname');
+    big.style.width = (r.width * s) + 'px';
+    big.style.fontSize = (baseFont * s) + 'px';
+    document.body.appendChild(big);
+    var br = big.getBoundingClientRect();
+    big.style.transform = 'translate(' + Math.round(vw / 2 - br.width / 2) + 'px,' + Math.round(vh / 2 - br.height / 2) + 'px)';
+
+    // the letters: absent, then at its own random moment each one appears and flips once into place (all mirrored -> upright)
+    var letters = Array.prototype.slice.call(big.querySelectorAll('.gv-mark__line > span:not(.gv-mark__gap)'));
     var flipsEnd = 0;
     letters.forEach(function(sp){
-      var from = -1, to = 1;
       sp.style.transition = 'none';
       sp.style.opacity = '0';
-      sp.style.transform = 'scaleX(' + from + ')';
+      sp.style.transform = 'scaleX(-1)';
       var t = 60 + rnd(0, SPREAD);
       later(function(){
         sp.style.transition = 'transform ' + FLIP + 'ms cubic-bezier(.2,.8,.2,1), opacity 140ms ease';
         sp.style.opacity = '1';
-        sp.style.transform = 'scaleX(' + to + ')';
+        sp.style.transform = 'scaleX(1)';
       }, t);
       flipsEnd = Math.max(flipsEnd, t + FLIP);
     });
-    void mark.offsetWidth;                                     // settle the starting states first
+    void big.offsetWidth;                                     // settle the starting states first
 
     // the clock: the circle is drawn clockwise over the whole build, and each stitch appears as it passes
     var total = flipsEnd + HOLD;
@@ -785,16 +792,17 @@
 
     later(function(){
       if(cursor) cursor.classList.remove('on');
-      mark.style.transition = 'transform ' + MOVE + 'ms cubic-bezier(.65,0,.2,1)';
-      mark.style.transform = 'translate(0px,0px) scale(1)';
+      var tr = mark.getBoundingClientRect();                   // where the real signature sits in the header
+      big.style.transition = 'transform ' + MOVE + 'ms cubic-bezier(.65,0,.2,1)';
+      big.style.transform = 'translate(' + tr.left + 'px,' + tr.top + 'px) scale(' + (tr.width / br.width) + ')';
       veil.style.transition = 'opacity ' + Math.round(MOVE * .8) + 'ms ease ' + Math.round(MOVE * .15) + 'ms';
       veil.style.opacity = '0';
       later(finish, MOVE + 250);
     }, total);
   }
-  // wait for the fonts (the signature's size depends on them), but never for long
+  // wait for the fonts (the signature's size depends on them), but never for long; if anything goes wrong, just show the page
   var go = false;
-  function start(){ if(go) return; go = true; run(); }
+  function start(){ if(go) return; go = true; try{ run(); }catch(e){ finish(); } }
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(start);
   setTimeout(start, 900);
 })();

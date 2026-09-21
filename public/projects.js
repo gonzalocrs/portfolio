@@ -9,8 +9,10 @@
     hero      path to the main image, e.g. "img/sierra-hotel/hero.jpg"
     lede      one or two sentences under the title
     text      a short second paragraph
-    gallery   { drawings: [...], physical: [...], photos: [...] }
+    gallery   { drawings: [...], physical: [...] (the physical models), photos: [...] }
               each item: { src: "img/...", caption: "Ground floor plan" }
+              physical models can also carry a paragraph shown under the model:
+              { src: "img/...", caption: "Massing model", text: "Basswood, 1:200" }
 
   Drop image files into public/img/<slug>/ and reference them here.
 */

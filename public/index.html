@@ -209,14 +209,15 @@
   .work:last-child{border-bottom:1px solid var(--rule)}
   .work a{
     display:flex;
+    flex-wrap:wrap;
     justify-content:space-between;
     align-items:baseline;
-    gap:1.5rem;
+    gap:.2rem 1.5rem;
     padding:.55rem 0;
     transition:padding-left .25s cubic-bezier(.2,.7,.2,1),color .2s;
   }
   .work a.current{color:var(--live);padding-left:.6rem}
-  .work .name{font-weight:500;font-size:clamp(1rem,2.2vw,1.3rem);letter-spacing:-.015em}
+  .work .name{font-weight:500;font-size:clamp(.85rem,1.87vw,1.11rem);letter-spacing:-.015em;white-space:nowrap}
   .work .meta{font-family:var(--mono);color:var(--mute);font-size:.72rem;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
   .work a.current .meta{color:var(--live)}
   .work .tag{
@@ -240,7 +241,8 @@
   /* ---------- collage ---------- */
   .collage{
     position:absolute;
-    inset:0 0 0 37%;   /* the first column of tiles lands at the golden section: 38.2% empty on the left, 61.8% tiles */
+    inset:0 0 0 var(--collage-x, 37%);   /* the golden section by default (38.2% empty on the left, 61.8% tiles), pushed
+                                            right instead whenever a title runs wider than that, so tiles never crowd the text */
     overflow:hidden;     /* the wall can be taller than this area; it must never make the page scroll */
     pointer-events:none;
     z-index:0;
@@ -289,6 +291,7 @@
     .index{max-width:none}
     .collage{display:none}
     .works{max-width:none}
+    .work .name{white-space:normal}   /* a very long title may still need two lines on a phone; let it wrap normally there */
   }
   @media (prefers-reduced-motion:reduce){
     *{transition-duration:.01ms !important}
@@ -431,6 +434,30 @@
   document.addEventListener('keydown', function(e){
     if(e.key === 'Escape') setOpen(null, false);
   });
+
+  // the titles are nowrap, so a long one (or the big open size) can run wider than the golden-section
+  // 37% split the collage starts at; when it does, push the collage right just enough to clear it, with
+  // a fixed gutter. Re-measured whenever a title's own box changes size: on open/close, hover (both animate
+  // via CSS transition), window resize, or the web font swapping in.
+  var GUTTER = 48;
+  function fitCollage(){
+    var goldenX = window.innerWidth * .37;
+    var maxRight = 0;
+    groups.forEach(function(g){
+      var r = g.querySelector('.head').getBoundingClientRect();
+      if(r.right > maxRight) maxRight = r.right;
+    });
+    var x = Math.max(goldenX, maxRight + GUTTER);
+    document.documentElement.style.setProperty('--collage-x', Math.round(x) + 'px');
+  }
+  if(window.ResizeObserver){
+    var ro = new ResizeObserver(fitCollage);
+    groups.forEach(function(g){ ro.observe(g.querySelector('.head')); });
+  } else {
+    window.addEventListener('resize', fitCollage);
+  }
+  fitCollage();
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitCollage);
 
   // the name in the header doubles as a home link: collapses everything
   // back to the plain index, ready to also mean "back" once individual

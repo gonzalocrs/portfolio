@@ -385,9 +385,13 @@
       if(noteText) noteGap = note.offsetHeight + rem * 1.5;
     }
     var availH = Math.max(120, H - noteGap);
+    // on desktop paging, the model is capped narrower so the models waiting either side have room to sit
+    // just off-frame; without paging (touch, or a tab too narrow/coarse for it) there's no neighbour to
+    // leave room for, so the model can run almost edge to edge, with just enough margin for the arrows
+    var capFrac = pagedMQ.matches ? .64 : .92;
     items.forEach(function(it){
       var h = availH * .94, w = it.a * h;
-      if(w > W * .64){ w = W * .64; h = w / it.a; }     // a very wide one can't take over the screen
+      if(w > W * capFrac){ w = W * capFrac; h = w / it.a; }     // a very wide one can't take over the screen
       boxes.push({w: w, h: h});
     });
     var lefts = [];

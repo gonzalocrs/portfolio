@@ -67,9 +67,32 @@
     text-transform:uppercase;
     letter-spacing:.04em;
   }
-  .bar nav{display:flex;align-items:center;gap:1.25rem}
+  .bar nav{position:relative;display:flex;align-items:center;gap:1.25rem}
   .bar a:hover{color:var(--live)}
   .bar a[aria-current="page"]{color:var(--live)}
+  /* the mobile-only settings icon and its popover (dark mode + language); hidden on desktop, where the
+     plain labelled switch above is already clear enough on its own */
+  .settings-btn{display:none;color:var(--ink)}
+  .settings-btn svg circle{fill:var(--paper)}
+  .settings-panel{
+    display:none;
+    position:absolute;right:0;top:calc(100% + .7rem);
+    min-width:11rem;
+    background:var(--paper);
+    border:1px solid var(--rule);
+    padding:.9rem 1rem;
+    z-index:30;
+    box-shadow:0 10px 28px rgba(0,0,0,.14);
+  }
+  .settings-panel.on{display:block}
+  .settings-row{display:flex;align-items:center;justify-content:space-between;gap:1.25rem}
+  .settings-row + .settings-row{margin-top:.85rem}
+  .lang-toggle{display:flex;border:1px solid var(--rule)}
+  .lang-opt{
+    font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;
+    padding:.3rem .6rem;color:var(--mute);transition:background .2s,color .2s;
+  }
+  .lang-opt.is-on{background:var(--ink);color:var(--paper)}
 
   .gv-mark{
     display:block;
@@ -246,11 +269,12 @@
 
   @media (max-width:640px){
     .gv-mark{width:170px;font-size:10.5px}
-    /* the dark-mode label takes real width and isn't needed to understand a toggle switch; dropping
-       it on narrow screens frees up enough room for a real gap between the signature and About */
-    .switch-label{display:none}
     .bar{gap:1.75rem}
     .bar nav{gap:.85rem}
+    /* the labelled switch is a header-bar item on desktop; on mobile it moves into the settings icon's
+       popover instead, where there's room for its label and for language alongside it */
+    .bar > nav > .switch{display:none}
+    .settings-btn{display:flex;align-items:center;justify-content:center;padding:.3rem}
   }
   @media (prefers-reduced-motion:reduce){
     *{transition-duration:.01ms !important}
@@ -273,10 +297,34 @@
   <nav>
     <a href="about.html">About</a>
     <a href="contact.html" aria-current="page">Contact</a>
-    <button class="switch" id="theme" role="switch" aria-checked="false" aria-label="Dark mode">
+    <button class="switch theme-switch" id="theme" role="switch" aria-checked="false" aria-label="Dark mode">
       <span class="switch-label">Dark mode</span>
       <span class="switch-track"><span class="switch-knob"></span></span>
     </button>
+    <!-- mobile only: the desktop switch above is hidden below 640px and replaced by this icon, which opens
+         dark mode + language in one place instead of a bare, unlabelled toggle -->
+    <button class="settings-btn" id="settingsBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Settings">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+        <line x1="3" y1="6" x2="21" y2="6"></line><circle cx="15" cy="6" r="2.1"></circle>
+        <line x1="3" y1="12" x2="21" y2="12"></line><circle cx="9" cy="12" r="2.1"></circle>
+        <line x1="3" y1="18" x2="21" y2="18"></line><circle cx="17" cy="18" r="2.1"></circle>
+      </svg>
+    </button>
+    <div class="settings-panel" id="settingsPanel" hidden>
+      <div class="settings-row">
+        <span class="mono">Dark mode</span>
+        <button class="switch theme-switch" type="button" role="switch" aria-checked="false" aria-label="Dark mode">
+          <span class="switch-track"><span class="switch-knob"></span></span>
+        </button>
+      </div>
+      <div class="settings-row">
+        <span class="mono">Language</span>
+        <div class="lang-toggle" role="group" aria-label="Language">
+          <button type="button" class="lang-opt is-on" data-lang="en">EN</button>
+          <button type="button" class="lang-opt" data-lang="es">ES</button>
+        </div>
+      </div>
+    </div>
   </nav>
 </header>
 
@@ -338,20 +386,22 @@
 <script src="contact.js"></script>
 <script>
 (function(){
-  var btn = document.getElementById('theme');
+  var switches = Array.prototype.slice.call(document.querySelectorAll('.theme-switch'));
   function isDark(){
     var a = document.documentElement.getAttribute('data-theme');
     if(a === 'dark') return true;
     if(a === 'light') return false;
     return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
   }
-  function sync(){ btn.setAttribute('aria-checked', isDark() ? 'true' : 'false'); }
+  function sync(){ switches.forEach(function(b){ b.setAttribute('aria-checked', isDark() ? 'true' : 'false'); }); }
   sync();
-  btn.addEventListener('click', function(){
-    var next = isDark() ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    try{ sessionStorage.setItem('gc-theme', next); }catch(e){}
-    sync();
+  switches.forEach(function(b){
+    b.addEventListener('click', function(){
+      var next = isDark() ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      try{ sessionStorage.setItem('gc-theme', next); }catch(e){}
+      sync();
+    });
   });
 
   // the site follows the system theme; the switch only overrides it for this visit
@@ -363,6 +413,46 @@
       sync();
     });
   }catch(e){}
+
+  // mobile-only settings popover: dark mode (above) and language, behind one icon instead of a bare toggle
+  var settingsBtn = document.getElementById('settingsBtn'), settingsPanel = document.getElementById('settingsPanel');
+  if(settingsBtn && settingsPanel){
+    var closeSettings = function(){
+      settingsPanel.classList.remove('on');
+      settingsBtn.setAttribute('aria-expanded', 'false');
+      setTimeout(function(){ if(!settingsPanel.classList.contains('on')) settingsPanel.hidden = true; }, 0);
+    };
+    settingsBtn.addEventListener('click', function(e){
+      e.stopPropagation();
+      if(settingsPanel.classList.contains('on')){ closeSettings(); return; }
+      settingsPanel.hidden = false;
+      settingsPanel.classList.add('on');
+      settingsBtn.setAttribute('aria-expanded', 'true');
+    });
+    document.addEventListener('click', function(e){
+      if(settingsPanel.classList.contains('on') && !settingsPanel.contains(e.target) && e.target !== settingsBtn) closeSettings();
+    });
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeSettings(); });
+  }
+
+  // language: EN / ES. Remembers the choice for next time; there is no translated copy anywhere on the
+  // site yet, so for now this only changes which button is marked on — it doesn't change any page text.
+  var langBtns = Array.prototype.slice.call(document.querySelectorAll('.lang-opt'));
+  if(langBtns.length){
+    var syncLang = function(lang){
+      langBtns.forEach(function(b){ b.classList.toggle('is-on', b.getAttribute('data-lang') === lang); });
+    };
+    var savedLang = 'en';
+    try{ savedLang = localStorage.getItem('gc-lang') || 'en'; }catch(e){}
+    syncLang(savedLang);
+    langBtns.forEach(function(b){
+      b.addEventListener('click', function(){
+        var lang = b.getAttribute('data-lang');
+        syncLang(lang);
+        try{ localStorage.setItem('gc-lang', lang); }catch(e){}
+      });
+    });
+  }
 })();
 </script>
 

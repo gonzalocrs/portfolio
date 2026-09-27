@@ -508,11 +508,6 @@
        centres its content meant real (tall) text overflowed the box equally above and below, landing right
        on top of the previous section. Sizing to content instead removes the overflow at its source. */
     .seg{height:auto;min-height:calc(100svh - var(--bar-h,4rem))}
-    /* the very last section (whichever gallery that happens to be) has nothing after it but the footer,
-       so forcing it to a full screen height the same as every other section just leaves dead space below
-       a centred image before the footer arrives — it only needs the base floor from .seg above, not a
-       full screen's worth, so the footer follows right after its actual content instead */
-    .seg:last-child{min-height:26rem}
     /* without desktop paging, a gallery's next section starts right where this one's own content ends —
        a little more room here means the next section's header doesn't feel like it's already crowding in
        while you're still scrolling through this one */

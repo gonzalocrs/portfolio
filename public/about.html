@@ -146,11 +146,11 @@
   .switch[aria-checked="true"] .switch-knob{transform:translateX(14px)}
 
   main{
-    --band:clamp(1rem,3vh,2.5rem);   /* the empty band between the last section and the footer */
+    --band:clamp(3rem,8vh,6rem);   /* the empty band between the last section and the footer */
     display:flex;
     flex-direction:column;
     flex:1 0 auto;
-    padding:clamp(.75rem,2.5vh,1.75rem) var(--pad) 0;
+    padding:clamp(1.5rem,6vh,4rem) var(--pad) 0;
   }
   main > *{flex:none}
   .mono{
@@ -166,30 +166,11 @@
     line-height:.9;
     letter-spacing:-.02em;
   }
-  .about-min{max-width:760px}
-  .about-min + .about-min{margin-top:clamp(1rem,3vh,1.6rem)}
-  /* caps belong to the mono label font only, never to Archivo (see the home/project titles) */
-  .about-min__h{margin:0 0 .55rem}
-  /* same paragraph treatment as a project page's Details text: muted, not full-contrast ink */
-  .about-min p{margin:0 0 clamp(.4rem,1.3vh,.7rem);max-width:78ch;font-size:clamp(.82rem,1.55vh,.95rem);line-height:1.45;color:var(--mute)}
-  .about-min p:last-child{margin-bottom:0}
-  /* rows styled like a project page's credits (dt/dd): a plain, capped-size name — never bigger
-     than this — with a small mono tag beside it, a muted mono meta on the right, a rule between rows */
-  .about-list{list-style:none;margin:0;padding:0}
-  .about-list li{border-top:1px solid var(--rule)}
-  .about-list li:last-child{border-bottom:1px solid var(--rule)}
-  .about-list .row{
-    display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;
-    gap:.2rem 1.5rem;padding:.25rem 0;
-  }
-  .about-list .name{font-weight:500;font-size:1rem;letter-spacing:-.01em}
-  .about-list .tag{
-    margin-left:.8rem;
-    font-family:var(--mono);font-weight:400;font-size:.66rem;
-    text-transform:uppercase;letter-spacing:.05em;
-    color:var(--mute);vertical-align:.1em;
-  }
-  .about-list .meta{font-family:var(--mono);color:var(--mute);font-size:.72rem;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
+  /* label, rule, paragraph: the block is as tall as the old title + gap, so the rest of the page stays put */
+  .about{min-height:calc(clamp(1.9rem,7.4vw,6.5rem)*.9 + clamp(2.5rem,7vw,5rem));max-width:min(100%,900px)}
+  .about h2{margin:0;padding-bottom:1.1rem;border-bottom:1px solid var(--rule);font-weight:400;color:var(--mute)}
+  .about + .exp-wrap{margin-top:0}
+  .about-row{position:relative}
   /* the band under the last section is a spacer: at least --band tall, and it grows to fill a taller window.
      The logo is centred between the rule under the last row and the footer text, so it always sits
      halfway; its size comes from the band, so it never adds height to the page */
@@ -201,6 +182,23 @@
   /* hovering the logo (script below): the stitches fade out together, turn a sixth of a turn about the centre while
      invisible, and fade back in there. The ring stays exactly where it is throughout. */
   .logo .marks{transform-origin:100px 100px;transform-box:view-box}
+  /* the text ends where the degree column ends (full width minus the place/year column and its gap) */
+  .bio{margin:0;padding-top:.9rem;text-align:justify;hyphens:auto;max-width:calc(100% - 11rem - 1.5rem);font-size:.95rem;line-height:1.5;letter-spacing:-.005em;color:var(--mute)}
+  .exp-wrap{margin-top:clamp(2.5rem,7vw,5rem);max-width:min(100%,900px)}
+  .exp-wrap h2{margin:0 0 1.1rem;font-weight:400;color:var(--mute)}
+  .exp{margin:0;padding:0;list-style:none;border-bottom:1px solid var(--rule)}
+  .exp li{
+    display:grid;
+    grid-template-columns:minmax(0,1fr) minmax(0,1.7fr) 11rem;
+    gap:1.5rem;
+    align-items:baseline;
+    padding:.8rem 0;
+    border-top:1px solid var(--rule);
+  }
+  .exp b{font-weight:500;font-size:1.05rem}
+  .exp span{color:var(--mute);font-size:.95rem}
+  .exp .mono{text-align:right;white-space:nowrap}
+
   footer{
     display:flex;
     justify-content:space-between;
@@ -221,6 +219,9 @@
        popover instead, where there's room for its label and for language alongside it */
     .bar > nav > .switch{display:none}
     .settings-btn{display:flex;align-items:center;justify-content:center;padding:.3rem}
+    .bio{max-width:none;text-align:left}
+    .exp li{grid-template-columns:1fr auto}
+    .exp li > span:nth-child(2){grid-column:1 / -1;order:3}
   }
   @media (prefers-reduced-motion:reduce){
     *{transition-duration:.01ms !important}
@@ -275,30 +276,37 @@
 </header>
 
 <main>
-  <section class="about-min">
-    <h2 class="about-min__h mono">About</h2>
-    <p>I came to architecture through engineering and real estate development. These backgrounds continue to shape the way I approach design: as an intersection of structure, material, form, economics, and culture.</p>
-    <p>My work has evolved alongside my background. Engineering taught me to approach problems through systems, mathematics, and technical constraints; real estate development introduced questions of efficiency, economics, and performance; and architecture opened a more <u>exploratory</u> space through digital tools and form-making. More recently, physical models have become a way of bringing these ways of thinking together, an intuitive space where structure, material, form, and performance can be tested simultaneously.</p>
-    <p>I&rsquo;m particularly interested in the relationship between structural efficiency, aesthetics and in how material and construction can become sources of architectural expression. I&rsquo;m drawn to projects where technical decisions are not separated from the cultural and social questions architecture inevitably carries.</p>
-    <p>I&rsquo;m currently based in New York, pursuing a Master of Architecture at Columbia University.</p>
+  <section class="about">
+    <h2 class="mono">About</h2>
+    <div class="about-row">
+      <p class="bio">My work explores the relationship between structure, materiality, and form, drawing on my background in engineering to investigate how technical possibilities can generate architectural expression. I am interested in using material and structure not only to shape space, but also to engage with cultural and political ideas.</p>
+    </div>
   </section>
 
-  <section class="about-min">
-    <h2 class="about-min__h mono">Education</h2>
-    <ul class="about-list">
-      <li><div class="row"><span class="name">M.Arch + M.S. Real Estate Development</span><span class="meta">Columbia University</span></div></li>
-      <li><div class="row"><span class="name">MBA</span><span class="meta">INCAE Business School</span></div></li>
-      <li><div class="row"><span class="name">Civil Engineering</span><span class="meta">PUCP</span></div></li>
+  <section class="exp-wrap">
+    <h2 class="mono">Education</h2>
+    <ul class="exp">
+      <li><b>Columbia University</b><span>Dual degree: Master of Architecture and M.S. Real Estate Development (candidate)</span><span class="mono">New York &middot; 2027</span></li>
+      <li><b>INCAE</b><span>Master in Business Administration</span><span class="mono">Costa Rica &middot; 2019</span></li>
+      <li><b>PUCP</b><span>B.S., Civil Engineering</span><span class="mono">Peru &middot; 2015</span></li>
     </ul>
   </section>
 
-  <section class="about-min">
-    <h2 class="about-min__h mono">Selected Experience</h2>
-    <ul class="about-list">
-      <li><div class="row"><span class="name">Robert Marino Architects<span class="tag">Architecture</span></span><span class="meta">Residential + Research</span></div></li>
-      <li><div class="row"><span class="name">Urba Inmobiliaria<span class="tag">Design + Development</span></span><span class="meta">Multifamily Housing + Hospitality</span></div></li>
-      <li><div class="row"><span class="name">Inversiones Menorca<span class="tag">Real Estate Development</span></span><span class="meta">Social Housing</span></div></li>
-      <li><div class="row"><span class="name">Marcan<span class="tag">Real Estate Development</span></span><span class="meta">Office + Medical Office</span></div></li>
+  <section class="exp-wrap">
+    <h2 class="mono">Experience</h2>
+    <ul class="exp">
+      <li><b>Robert Marino Architects</b><span>Architectural Intern, Residential and Research</span><span class="mono">New York &middot; 2026</span></li>
+      <li><b>Urba Inmobiliaria</b><span>Co-founder and Project Manager, Multifamily Housing and Hospitality</span><span class="mono">Cusco &middot; 2021&ndash;2024</span></li>
+      <li><b>Inversiones Menorca</b><span>Project Controller, Social Housing</span><span class="mono">Peru &middot; 2020&ndash;2021</span></li>
+      <li><b>Marcan</b><span>Senior Analyst, Office Buildings and Medical Offices</span><span class="mono">Peru &middot; 2015&ndash;2018</span></li>
+      <li><b>Gra&ntilde;a y Montero</b><span>Internship Program, Office Building</span><span class="mono">Peru &middot; 2015</span></li>
+    </ul>
+  </section>
+
+  <section class="exp-wrap">
+    <h2 class="mono">Recognition</h2>
+    <ul class="exp">
+      <li><b>Finalist</b><span>Design and Development Case Competition, Miami Herbert Business School</span><span class="mono">2026</span></li>
     </ul>
   </section>
 

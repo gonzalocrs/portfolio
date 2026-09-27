@@ -146,11 +146,11 @@
   .switch[aria-checked="true"] .switch-knob{transform:translateX(14px)}
 
   main{
-    --band:clamp(3rem,8vh,6rem);   /* the empty band between the last section and the footer */
+    --band:clamp(1rem,3vh,2.5rem);   /* the empty band between the last section and the footer */
     display:flex;
     flex-direction:column;
     flex:1 0 auto;
-    padding:clamp(1.5rem,6vh,4rem) var(--pad) 0;
+    padding:clamp(.75rem,2.5vh,1.75rem) var(--pad) 0;
   }
   main > *{flex:none}
   .mono{
@@ -166,23 +166,23 @@
     line-height:.9;
     letter-spacing:-.02em;
   }
-  .about-min{max-width:640px}
-  .about-min + .about-min{margin-top:clamp(2.5rem,7vw,4rem)}
+  .about-min{max-width:760px}
+  .about-min + .about-min{margin-top:clamp(1rem,3vh,1.6rem)}
   /* caps belong to the mono label font only, never to Archivo (see the home/project titles) */
-  .about-min__h{margin:0 0 1.3rem}
+  .about-min__h{margin:0 0 .55rem}
   /* same paragraph treatment as a project page's Details text: muted, not full-contrast ink */
-  .about-min p{margin:0 0 1.3rem;max-width:60ch;font-size:1rem;line-height:1.6;color:var(--mute)}
+  .about-min p{margin:0 0 clamp(.4rem,1.3vh,.7rem);max-width:78ch;font-size:clamp(.82rem,1.55vh,.95rem);line-height:1.45;color:var(--mute)}
   .about-min p:last-child{margin-bottom:0}
-  /* rows styled exactly like the home page's project list (.work): a bold name with a small
-     mono tag beside it on the left, a muted mono meta on the right, a rule between each row */
+  /* rows styled like a project page's credits (dt/dd): a plain, capped-size name — never bigger
+     than this — with a small mono tag beside it, a muted mono meta on the right, a rule between rows */
   .about-list{list-style:none;margin:0;padding:0}
   .about-list li{border-top:1px solid var(--rule)}
   .about-list li:last-child{border-bottom:1px solid var(--rule)}
   .about-list .row{
     display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;
-    gap:.2rem 1.5rem;padding:.55rem 0;
+    gap:.2rem 1.5rem;padding:.25rem 0;
   }
-  .about-list .name{font-weight:500;font-size:clamp(1rem,2.2vw,1.3rem);letter-spacing:-.015em}
+  .about-list .name{font-weight:500;font-size:1rem;letter-spacing:-.01em}
   .about-list .tag{
     margin-left:.8rem;
     font-family:var(--mono);font-weight:400;font-size:.66rem;

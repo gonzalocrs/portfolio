@@ -355,7 +355,14 @@
   .lightbox{position:fixed;inset:0;z-index:40;background:var(--paper);display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;transition:opacity .3s ease;cursor:zoom-out}
   .lightbox.on{opacity:1}
   .lightbox__frame{position:relative;aspect-ratio:var(--a);width:min(94vw,calc(var(--a) * (100svh - 7rem)))}
-  .lightbox__cap{margin-top:1rem;color:var(--mute)}
+  .lightbox__cap{
+    position:absolute;left:.6rem;bottom:.6rem;
+    padding:.25em .55em;
+    background:var(--paper);
+    color:var(--mute);
+    max-width:calc(100% - 1.2rem);
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
 
   .stage{position:relative;flex:1 1 0;min-height:0}
   .fig{

@@ -514,9 +514,9 @@
       art.style.setProperty('--h', it.hue);
       frame.appendChild(art);
     }
-    lb.appendChild(frame);
     var capText = it.num != null ? two(it.num) + '  ' + it.caption : it.caption;
-    if(capText) lb.appendChild(el('span', 'lightbox__cap mono', capText));
+    if(capText) frame.appendChild(el('span', 'lightbox__cap mono', capText));
+    lb.appendChild(frame);
   }
   function openLightbox(list, i){
     closeLightbox();

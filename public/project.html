@@ -200,10 +200,10 @@
      fast swipe can otherwise skip straight past this section to the next one's own snap point, never letting
      it become current — this forces every swipe to stop here first, however much momentum it had */
   .seg{position:relative;height:calc(100svh - var(--bar-h,4rem));min-height:26rem;scroll-snap-align:start;scroll-snap-stop:always;scroll-margin-top:var(--bar-h,4rem)}
-  /* on mobile there's no JS paging (see project.js: pagedMQ), so a plain scroll must do the work — mandatory
-     (not proximity) means a normal scroll gesture always settles cleanly on one full-height section, never
-     stops halfway with two sections' content visible at once */
-  html:not(.paged){scroll-snap-type:y mandatory}
+  /* on mobile there's no JS paging (see project.js: pagedMQ), so a plain scroll does the work —
+     no snapping: a normal free scroll, since a gallery like Drawings can be taller than the screen
+     and shouldn't force-stop before you've seen the rest of it */
+  html:not(.paged){scroll-snap-type:none}
   .intro.seg{scroll-margin-top:calc(var(--bar-h,4rem) + .35rem)}
   html.paged{scrollbar-width:none}
   html.paged::-webkit-scrollbar{display:none}

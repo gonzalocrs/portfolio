@@ -318,9 +318,16 @@
 
   @media (max-width:900px){
     .index{max-width:none}
-    .collage{display:none}
     .works{max-width:none}
     .work .name{white-space:normal}   /* a very long title may still need two lines on a phone; let it wrap normally there */
+    /* no room beside the titles here, so instead of hiding the wall, it drops below them, full width —
+       still position:relative (not static): .wall inside it is positioned absolute and needs this as its
+       containing block, it just no longer needs to be lifted out of the flow to sit beside the text */
+    .collage{
+      position:relative;inset:auto;z-index:0;
+      display:block;width:100%;aspect-ratio:1;
+      margin-top:clamp(2.5rem,10vw,4rem);
+    }
   }
   @media (prefers-reduced-motion:reduce){
     *{transition-duration:.01ms !important}

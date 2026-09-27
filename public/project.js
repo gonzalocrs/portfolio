@@ -150,7 +150,7 @@
       // tap/click to see it full screen, like every other picture on the page
       dfig.addEventListener('click', function(){
         var a = (dimg.naturalWidth && dimg.naturalHeight) ? dimg.naturalWidth / dimg.naturalHeight : 4 / 3;
-        openLightbox([{src: p.diagram.src, alt: dimg.alt, a: a, caption: p.diagram.caption || ''}], 0);
+        openLightbox([{src: p.diagram.src, alt: dimg.alt, a: a, caption: ''}], 0);
       });
     } else {
       dfig.classList.add('placeholder');

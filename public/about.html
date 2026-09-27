@@ -181,7 +181,7 @@
   /* hovering the logo (script below): the stitches fade out together, turn a sixth of a turn about the centre while
      invisible, and fade back in there. The ring stays exactly where it is throughout. */
   .logo .marks{transform-origin:100px 100px;transform-box:view-box}
-  .bio{margin:0;padding-top:clamp(.3rem,1.2vh,.6rem);max-width:42rem;font-size:.92rem;line-height:1.4;letter-spacing:-.005em;color:var(--mute)}
+  .bio{margin:0;padding-top:clamp(.3rem,1.2vh,.6rem);max-width:42rem;font-size:clamp(.78rem,1vw,.9rem);line-height:1.6;letter-spacing:-.005em;color:var(--mute)}
   .exp-wrap{margin-top:clamp(.75rem,3vh,1.5rem);max-width:min(100%,900px)}
   .exp-wrap h2{margin:0 0 .7rem;font-weight:400;color:var(--mute)}
   .exp{margin:0;padding:0;list-style:none;border-bottom:1px solid var(--rule)}
@@ -197,12 +197,11 @@
   .exp span{color:var(--mute);font-size:.95rem}
   .exp .mono{text-align:right;white-space:nowrap}
   /* one flowing inline line per row — bold name, small dot, then one or more mono-caps parts —
-     instead of a grid. Just the rule right under the heading, none between rows, none closing it. */
-  .exp--flow{border-bottom:0}
-  .exp--flow li{display:block;border-top:0}
-  .exp--flow li:first-child{border-top:1px solid var(--rule)}
-  .exp--flow b{margin-right:.4em}
-  .exp--flow span{margin-left:.4em;font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--mute)}
+     instead of a grid. Font sizes and the rule between rows match a project page's credits list
+     (.credits-panel dt/dd): .66rem for the mono part, .85rem for the name. */
+  .exp--flow li{display:block}
+  .exp--flow b{margin-right:.4em;font-size:.85rem}
+  .exp--flow span{margin-left:.4em;font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.04em;color:var(--mute)}
   .exp--flow span + span::before{content:"\00b7";margin-right:.4em}
 
   footer{

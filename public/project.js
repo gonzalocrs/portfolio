@@ -256,7 +256,16 @@
         img.src = it.src; img.alt = it.caption || p.title; img.loading = 'lazy';
         img.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
         img.addEventListener('load', function(){
-          if(!it.aspect && img.naturalWidth && img.naturalHeight){ item.a = img.naturalWidth / img.naturalHeight; layoutStage(stage); }
+          // lbEntry.a started out as the same placeholder shape ratio as item.a (the real drawings in
+          // projects.js carry no aspect of their own); item.a gets corrected here once the image is
+          // actually loaded, and lbEntry.a is a separate copy, not a reference, so it needs the same fix
+          // — otherwise the lightbox keeps using the placeholder ratio forever and object-fit:cover
+          // crops the real image to match that wrong box.
+          if(!it.aspect && img.naturalWidth && img.naturalHeight){
+            item.a = img.naturalWidth / img.naturalHeight;
+            lbEntry.a = item.a;
+            layoutStage(stage);
+          }
         });
         frame.appendChild(img);
         item.img = img;
@@ -268,7 +277,8 @@
       fig.appendChild(frame);
       var cap = el('span', 'cap mono', two(n) + '  ' + (it.caption || ''));
       fig.appendChild(cap);
-      lbItems.push({src: it.src, alt: it.caption || p.title, a: item.a, kind: s.kind, hue: hue, num: n, caption: it.caption || ''});
+      var lbEntry = {src: it.src, alt: it.caption || p.title, a: item.a, kind: s.kind, hue: hue, num: n, caption: it.caption || ''};
+      lbItems.push(lbEntry);
       if(stage._mode !== 'strip') fig.addEventListener('click', function(e){
         e.stopPropagation();
         if(!pagedMQ.matches){ openLightbox(lbItems, i); return; }

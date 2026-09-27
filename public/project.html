@@ -466,10 +466,12 @@
        centres its content meant real (tall) text overflowed the box equally above and below, landing right
        on top of the previous section. Sizing to content instead removes the overflow at its source. */
     .seg{height:auto;min-height:calc(100svh - var(--bar-h,4rem))}
-    .intro{height:auto;min-height:calc(100svh - var(--bar-h,4rem) - .35rem)}
-    /* .intro .hero normally fills whatever space is left in a fixed-height flex column (flex:1, no aspect
-       ratio); with .intro now auto-height that space is undefined, so it goes back to a plain aspect ratio */
-    .intro .hero{flex:none;aspect-ratio:16/9;max-height:60vh}
+    /* .intro itself was never the overlap bug — its own content already fit its box exactly — so it keeps
+       the desktop behaviour untouched: a fixed-height column, the hero flexing to fill whatever space is
+       left above the title, title and kicker landing at the bottom with the same spacing as desktop. That's
+       also exactly "image fills the gap between the header and the title" with no separate rule needed. */
+    .bar{gap:1.5rem}
+    .bar nav{gap:.85rem}
     .seg--info{align-items:flex-start;padding-block:clamp(2rem,8vh,4rem)}
     .info,.info.has-diagram{grid-template-columns:1fr;height:auto}
     .info.has-diagram > .left,.info.has-diagram .diagram{grid-column:1;align-self:auto}

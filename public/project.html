@@ -470,8 +470,6 @@
        the desktop behaviour untouched: a fixed-height column, the hero flexing to fill whatever space is
        left above the title, title and kicker landing at the bottom with the same spacing as desktop. That's
        also exactly "image fills the gap between the header and the title" with no separate rule needed. */
-    .bar{gap:1.5rem}
-    .bar nav{gap:.85rem}
     .seg--info{align-items:flex-start;padding-block:clamp(2rem,8vh,4rem)}
     .info,.info.has-diagram{grid-template-columns:1fr;height:auto}
     .info.has-diagram > .left,.info.has-diagram .diagram{grid-column:1;align-self:auto}
@@ -482,6 +480,11 @@
   }
   @media (max-width:640px){
     .gv-mark{width:170px;font-size:10.5px}
+    /* the dark-mode label takes real width and isn't needed to understand a toggle switch; dropping
+       it on narrow screens frees up enough room for a real gap between the signature and About */
+    .switch-label{display:none}
+    .bar{gap:1.75rem}
+    .bar nav{gap:.85rem}
     .s8,.s6,.s4{grid-column:span 12}
     .credits div{grid-template-columns:6.5rem minmax(0,1fr)}
   }

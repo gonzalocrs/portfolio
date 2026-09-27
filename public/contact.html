@@ -246,6 +246,11 @@
 
   @media (max-width:640px){
     .gv-mark{width:170px;font-size:10.5px}
+    /* the dark-mode label takes real width and isn't needed to understand a toggle switch; dropping
+       it on narrow screens frees up enough room for a real gap between the signature and About */
+    .switch-label{display:none}
+    .bar{gap:1.75rem}
+    .bar nav{gap:.85rem}
   }
   @media (prefers-reduced-motion:reduce){
     *{transition-duration:.01ms !important}

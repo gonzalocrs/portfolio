@@ -190,6 +190,11 @@
 
   @media (max-width:640px){
     .gv-mark{width:170px;font-size:10.5px}
+    /* the dark-mode label takes real width and isn't needed to understand a toggle switch; dropping
+       it on narrow screens frees up enough room for a real gap between the signature and About */
+    .switch-label{display:none}
+    .bar{gap:1.75rem}
+    .bar nav{gap:.85rem}
     .bio{max-width:none;text-align:left}
     .exp li{grid-template-columns:1fr auto}
     .exp li > span:nth-child(2){grid-column:1 / -1;order:3}

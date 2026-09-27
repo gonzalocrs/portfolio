@@ -77,7 +77,12 @@
   // size the segments to the screen below the header
   function setBar(){ document.documentElement.style.setProperty('--bar-h', bar.offsetHeight + 'px'); }
   setBar();
-  if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ setBar(); relayout(); });
+  // on mobile, the very last section leaves just enough room below it for the footer to land in the
+  // same screen once you've scrolled it into its resting position — see .seg:last-child in project.html
+  var footerEl = document.querySelector('footer');
+  function setFooter(){ if(footerEl) document.documentElement.style.setProperty('--footer-h', footerEl.offsetHeight + 'px'); }
+  setFooter();
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ setBar(); setFooter(); relayout(); });
 
   // ---- 2. details: description + credits ---------------------------------
   var info = el('div', 'info');
@@ -817,7 +822,7 @@
   }
   if(pagedMQ.addEventListener) pagedMQ.addEventListener('change', applyMode);
   window.addEventListener('resize', function(){
-    setBar(); relayout();
+    setBar(); setFooter(); relayout();
     if(pagedMQ.matches && !animating){                                       // stay on the same segment
       var lo = targetFor(cur), hi = segs[cur].free ? bottomFor(cur) : lo;
       window.scrollTo(0, Math.max(lo, Math.min(hi, window.scrollY)));

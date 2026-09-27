@@ -288,6 +288,11 @@
         });
         stage.appendChild(btn);
         stage._nav[dir] = btn;
+        // a quiet, non-interactive mark near the edge for wherever the buttons above are hidden (see the
+        // CSS): the only thing on screen that says there's more to see and how to reach it
+        var hint = el('span', 'strip-hint strip-hint--' + dir);
+        hint.setAttribute('aria-hidden', 'true');
+        stage.appendChild(hint);
       });
     }
     // clicking the empty part of a zoomed stage puts the image back

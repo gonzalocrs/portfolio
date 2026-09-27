@@ -414,6 +414,32 @@
   .stage--strip.at-start .strip-nav--left,
   .stage--strip.at-end .strip-nav--right,
   .stage--strip.zoomed .strip-nav{opacity:0;pointer-events:none}
+  /* on mobile the buttons above are gone (tapping the model steps through it instead — see stripZone in
+     project.js) but nothing on screen said so; this is just a quiet reference mark near the edge, not a
+     button — decorative, so taps pass straight through it to the model underneath */
+  .strip-hint{
+    position:absolute;top:50%;transform:translateY(-50%);
+    width:1.4rem;height:1.4rem;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--ink);opacity:.5;
+    pointer-events:none;
+    z-index:2;
+    transition:opacity .3s;
+  }
+  @media (min-width:900px) and (hover:hover) and (pointer:fine){
+    .strip-hint{display:none}
+  }
+  .strip-hint--left{left:.6rem}
+  .strip-hint--right{right:.6rem}
+  .strip-hint::before{
+    content:"";display:block;width:.55rem;height:.55rem;
+    border-right:2px solid currentColor;border-top:2px solid currentColor;
+  }
+  .strip-hint--left::before{transform:rotate(-135deg)}
+  .strip-hint--right::before{transform:rotate(45deg)}
+  .stage--strip.at-start .strip-hint--left,
+  .stage--strip.at-end .strip-hint--right,
+  .stage--strip.zoomed .strip-hint{opacity:0}
   /* the strip has its own note under the model instead — the numbered
      "n  caption" overlay is for the grid/free galleries only, and would just
      repeat "Physical models" here, maximized or not */
@@ -496,6 +522,10 @@
        centres its content meant real (tall) text overflowed the box equally above and below, landing right
        on top of the previous section. Sizing to content instead removes the overflow at its source. */
     .seg{height:auto;min-height:calc(100svh - var(--bar-h,4rem))}
+    /* without desktop paging, a gallery's next section starts right where this one's own content ends —
+       a little more room here means the next section's header doesn't feel like it's already crowding in
+       while you're still scrolling through this one */
+    .seg--gal{padding-bottom:clamp(2.5rem,10vh,4.5rem)}
     /* .intro itself was never the overlap bug — its own content already fit its box exactly — so it keeps
        the desktop behaviour untouched: a fixed-height column, the hero flexing to fill whatever space is
        left above the title, title and kicker landing at the bottom with the same spacing as desktop. That's

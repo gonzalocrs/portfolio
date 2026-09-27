@@ -387,11 +387,14 @@
   /* visible left/right arrows to step through the models, on every device including touch.
      Positioned by JS (see layoutStrip) halfway across the empty margin beside
      the model, not flush against the edge of the stage; left/right transition
-     alongside it since that margin changes with each model's own proportions */
+     alongside it since that margin changes with each model's own proportions.
+     Sized small by default so the margin it sits in — and the model itself —
+     can stay as narrow/wide as possible; only grows once desktop paging
+     (see layoutStrip's capFrac) frees up real room beside the model. */
   .strip-nav{
     display:flex;
     position:absolute;top:50%;transform:translateY(-50%);
-    width:2.75rem;height:2.75rem;
+    width:1.7rem;height:1.7rem;
     align-items:center;justify-content:center;
     background:none;border:0;padding:0;cursor:pointer;
     color:var(--mute);opacity:.55;
@@ -402,11 +405,17 @@
   .strip-nav--left{left:0}
   .strip-nav--right{right:0}
   .strip-nav::before{
-    content:"";display:block;width:.75rem;height:.75rem;
+    content:"";display:block;width:.5rem;height:.5rem;
     border-right:2px solid currentColor;border-top:2px solid currentColor;
   }
-  .strip-nav--left::before{transform:rotate(-135deg);margin-left:.35rem}
-  .strip-nav--right::before{transform:rotate(45deg);margin-right:.35rem}
+  .strip-nav--left::before{transform:rotate(-135deg);margin-left:.3rem}
+  .strip-nav--right::before{transform:rotate(45deg);margin-right:.3rem}
+  @media (min-width:900px) and (hover:hover) and (pointer:fine){
+    .strip-nav{width:2.75rem;height:2.75rem}
+    .strip-nav::before{width:.75rem;height:.75rem}
+    .strip-nav--left::before{margin-left:.35rem}
+    .strip-nav--right::before{margin-right:.35rem}
+  }
   .stage--strip.at-start .strip-nav--left,
   .stage--strip.at-end .strip-nav--right,
   .stage--strip.zoomed .strip-nav{opacity:0;pointer-events:none}

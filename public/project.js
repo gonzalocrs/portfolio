@@ -386,9 +386,10 @@
       if(noteText) noteGap = note.offsetHeight + rem * 1.5;
     }
     var availH = Math.max(120, H - noteGap);
-    // capped narrower than the stage so the models waiting either side have room to sit just off-frame,
-    // and the left/right arrow buttons have room beside the model without covering it
-    var capFrac = .64;
+    // on desktop paging, the model is capped narrower so the models waiting either side have room to sit
+    // just off-frame, with the (bigger, desktop-only-sized) arrow buttons beside it; elsewhere the arrow
+    // buttons are small enough that the model can run almost edge to edge and still leave them room
+    var capFrac = pagedMQ.matches ? .64 : .88;
     items.forEach(function(it){
       var h = availH * .94, w = it.a * h;
       if(w > W * capFrac){ w = W * capFrac; h = w / it.a; }     // a very wide one can't take over the screen

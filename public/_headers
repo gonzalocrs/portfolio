@@ -1,0 +1,32 @@
+/
+  Cache-Control: no-cache
+
+/index.html
+  Cache-Control: no-cache
+
+/about
+  Cache-Control: no-cache
+
+/about.html
+  Cache-Control: no-cache
+
+/contact
+  Cache-Control: no-cache
+
+/contact.html
+  Cache-Control: no-cache
+
+/project
+  Cache-Control: no-cache
+
+/project.html
+  Cache-Control: no-cache
+
+/project.js
+  Cache-Control: no-cache
+
+/projects.js
+  Cache-Control: no-cache
+
+/signature.js
+  Cache-Control: no-cache

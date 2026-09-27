@@ -196,7 +196,10 @@
   .kicker a{transition:color .2s}
   .kicker a:hover{color:var(--live)}
   /* every part of a project is one full-screen segment */
-  .seg{position:relative;height:calc(100svh - var(--bar-h,4rem));min-height:26rem;scroll-snap-align:start;scroll-margin-top:var(--bar-h,4rem)}
+  /* scroll-snap-stop:always matters specifically on mobile's mandatory snap (see html:not(.paged) below): a
+     fast swipe can otherwise skip straight past this section to the next one's own snap point, never letting
+     it become current — this forces every swipe to stop here first, however much momentum it had */
+  .seg{position:relative;height:calc(100svh - var(--bar-h,4rem));min-height:26rem;scroll-snap-align:start;scroll-snap-stop:always;scroll-margin-top:var(--bar-h,4rem)}
   /* on mobile there's no JS paging (see project.js: pagedMQ), so a plain scroll must do the work — mandatory
      (not proximity) means a normal scroll gesture always settles cleanly on one full-height section, never
      stops halfway with two sections' content visible at once */
@@ -429,8 +432,8 @@
   @media (min-width:900px) and (hover:hover) and (pointer:fine){
     .strip-hint{display:none}
   }
-  .strip-hint--left{left:.6rem}
-  .strip-hint--right{right:.6rem}
+  .strip-hint--left{left:.3rem}
+  .strip-hint--right{right:.3rem}
   .strip-hint::before{
     content:"";display:block;width:.55rem;height:.55rem;
     border-right:2px solid currentColor;border-top:2px solid currentColor;

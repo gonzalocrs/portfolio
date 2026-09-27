@@ -288,11 +288,6 @@
         });
         stage.appendChild(btn);
         stage._nav[dir] = btn;
-        // a quiet, non-interactive mark near the edge for wherever the buttons above are hidden (see the
-        // CSS): the only thing on screen that says there's more to see and how to reach it
-        var hint = el('span', 'strip-hint strip-hint--' + dir);
-        hint.setAttribute('aria-hidden', 'true');
-        stage.appendChild(hint);
       });
     }
     // clicking the empty part of a zoomed stage puts the image back
@@ -346,29 +341,16 @@
 
   // ---- the horizontal gallery (physical models) ----------------------------
   // One model is centred and the others wait either side; the row slides along.
-  // With desktop paging (room enough for the model to sit narrower, with the visible arrow buttons beside
-  // it — see layoutStrip's capFrac): click anywhere on the model to zoom in or out, centred on wherever you
-  // clicked. Without paging (touch, or any tab too narrow/coarse for it) the model runs edge to edge instead,
-  // so there's no room beside it for those buttons — tapping its own left / right / middle third steps back,
-  // steps forward, or zooms instead, the way this gallery always worked on a phone.
-  function stripZone(stage, e){
-    var r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width;
-    if(x < .33) return stage._cur > 0 ? 'left' : 'edge';
-    if(x > .67) return stage._cur < stage._items.length - 1 ? 'right' : 'edge';
-    return 'mid';
-  }
+  // The model sits narrower than the stage, with room either side for the visible
+  // left/right arrow buttons (see layoutStrip's capFrac) on every device, touch
+  // included. Click or tap anywhere on the model itself to zoom in or out, centred
+  // on wherever you clicked.
   function stripClick(stage, e){
     if(stage._zoom !== null){
       var was = stage._items[stage._zoom];
       if(was && was.img) was.img.style.objectPosition = '';
       setZoom(stage, null);
       return;
-    }
-    if(!pagedMQ.matches){
-      var zone = stripZone(stage, e);
-      if(zone === 'left'){ stepStrip(stage, -1); return; }
-      if(zone === 'right'){ stepStrip(stage, 1); return; }
-      if(zone === 'edge') return;
     }
     var it = stage._items[stage._cur];
     if(it && it.img && e){
@@ -404,10 +386,9 @@
       if(noteText) noteGap = note.offsetHeight + rem * 1.5;
     }
     var availH = Math.max(120, H - noteGap);
-    // on desktop paging, the model is capped narrower so the models waiting either side have room to sit
-    // just off-frame; without paging (touch, or a tab too narrow/coarse for it) there's no neighbour to
-    // leave room for, so the model can run almost edge to edge, with just enough margin for the arrows
-    var capFrac = pagedMQ.matches ? .64 : .86;
+    // capped narrower than the stage so the models waiting either side have room to sit just off-frame,
+    // and the left/right arrow buttons have room beside the model without covering it
+    var capFrac = .64;
     items.forEach(function(it){
       var h = availH * .94, w = it.a * h;
       if(w > W * capFrac){ w = W * capFrac; h = w / it.a; }     // a very wide one can't take over the screen

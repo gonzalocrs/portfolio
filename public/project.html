@@ -384,16 +384,12 @@
   }
   .note__text{margin:0;color:var(--mute);font-size:inherit;line-height:inherit}
   .stage--strip.zoomed .note{opacity:0}
-  /* visible left/right arrows to step through the models, in addition to the
-     click zones — clearer than the cursor hint alone, and usable on touch.
+  /* visible left/right arrows to step through the models, on every device including touch.
      Positioned by JS (see layoutStrip) halfway across the empty margin beside
      the model, not flush against the edge of the stage; left/right transition
      alongside it since that margin changes with each model's own proportions */
   .strip-nav{
-    display:none;   /* re-enabled below only where there's room to sit beside the model without covering it —
-                        see layoutStrip's capFrac in project.js, which frees up that same room only there.
-                        Elsewhere (touch, or any tab too narrow) tapping the model's own left/right/middle
-                        third steps or zooms instead, so no overlapping button is needed. */
+    display:flex;
     position:absolute;top:50%;transform:translateY(-50%);
     width:2.75rem;height:2.75rem;
     align-items:center;justify-content:center;
@@ -401,9 +397,6 @@
     color:var(--mute);opacity:.55;
     transition:opacity .2s,color .2s,left .55s cubic-bezier(.2,.7,.2,1),right .55s cubic-bezier(.2,.7,.2,1);
     z-index:2;
-  }
-  @media (min-width:900px) and (hover:hover) and (pointer:fine){
-    .strip-nav{display:flex}
   }
   .strip-nav:hover{opacity:1;color:var(--ink)}
   .strip-nav--left{left:0}
@@ -417,32 +410,6 @@
   .stage--strip.at-start .strip-nav--left,
   .stage--strip.at-end .strip-nav--right,
   .stage--strip.zoomed .strip-nav{opacity:0;pointer-events:none}
-  /* on mobile the buttons above are gone (tapping the model steps through it instead — see stripZone in
-     project.js) but nothing on screen said so; this is just a quiet reference mark near the edge, not a
-     button — decorative, so taps pass straight through it to the model underneath */
-  .strip-hint{
-    position:absolute;top:50%;transform:translateY(-50%);
-    width:1.4rem;height:1.4rem;
-    display:flex;align-items:center;justify-content:center;
-    color:var(--ink);opacity:.5;
-    pointer-events:none;
-    z-index:2;
-    transition:opacity .3s;
-  }
-  @media (min-width:900px) and (hover:hover) and (pointer:fine){
-    .strip-hint{display:none}
-  }
-  .strip-hint--left{left:.3rem}
-  .strip-hint--right{right:.3rem}
-  .strip-hint::before{
-    content:"";display:block;width:.55rem;height:.55rem;
-    border-right:2px solid currentColor;border-top:2px solid currentColor;
-  }
-  .strip-hint--left::before{transform:rotate(-135deg)}
-  .strip-hint--right::before{transform:rotate(45deg)}
-  .stage--strip.at-start .strip-hint--left,
-  .stage--strip.at-end .strip-hint--right,
-  .stage--strip.zoomed .strip-hint{opacity:0}
   /* the strip has its own note under the model instead — the numbered
      "n  caption" overlay is for the grid/free galleries only, and would just
      repeat "Physical models" here, maximized or not */

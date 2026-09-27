@@ -239,11 +239,18 @@
       stage._count = head.lastChild;
       stage._count.textContent = two(1) + ' / ' + two(items.length);
     }
+    // grid mode also needs a lightbox-ready list alongside stage._items: on a page with no JS paging
+    // (see pagedMQ below), the stage can be only half-scrolled into view when you tap something, and
+    // setZoom's in-place expand is sized to the stage's own box — off the top of the screen at that
+    // point, so it reads as cropped. The lightbox is a fixed full-screen overlay instead, immune to
+    // that. Desktop paging keeps the in-place expand, since there the section is always fully in view.
+    var lbItems = [];
     items.forEach(function(it, i){
       n += 1;
       var fig = el('figure', 'fig');
       var frame = el('div', 'frame');
       var item = {fig: fig, a: it.aspect || s.shapes[i % s.shapes.length]};
+      var hue = (p.hue + i * 40) % 360;
       if(it.src){
         var img = el('img');
         img.src = it.src; img.alt = it.caption || p.title; img.loading = 'lazy';
@@ -255,14 +262,16 @@
         item.img = img;
       } else {
         var art = el('div', 'art art--' + s.kind);
-        art.style.setProperty('--h', (p.hue + i * 40) % 360);
+        art.style.setProperty('--h', hue);
         frame.appendChild(art);
       }
       fig.appendChild(frame);
       var cap = el('span', 'cap mono', two(n) + '  ' + (it.caption || ''));
       fig.appendChild(cap);
+      lbItems.push({src: it.src, alt: it.caption || p.title, a: item.a, kind: s.kind, hue: hue, num: n, caption: it.caption || ''});
       if(stage._mode !== 'strip') fig.addEventListener('click', function(e){
         e.stopPropagation();
+        if(!pagedMQ.matches){ openLightbox(lbItems, i); return; }
         setZoom(stage, stage._zoom === i ? null : i);
       });
       stage._items.push(item);

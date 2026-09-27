@@ -198,8 +198,11 @@
   .exp .mono{text-align:right;white-space:nowrap}
   /* one flowing inline line per row — bold name, small dot, then one or more mono-caps parts —
      instead of a grid. Font sizes and the rule between rows match a project page's credits list
-     (.credits-panel dt/dd): .66rem for the mono part, .85rem for the name. */
-  .exp--flow li{display:block}
+     (.credits-panel dt/dd): .66rem for the mono part, .85rem for the name. width:fit-content on
+     both the list and each row means every rule (the one between rows and the closing one) is
+     only as long as that row's own text, not stretched to the full column width. */
+  .exp--flow{width:fit-content}
+  .exp--flow li{display:block;width:fit-content}
   .exp--flow b{margin-right:.4em;font-size:.85rem}
   .exp--flow span{margin-left:.4em;font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.04em;color:var(--mute)}
   .exp--flow span + span::before{content:"\00b7";margin-right:.4em}
@@ -302,10 +305,10 @@
   <section class="exp-wrap">
     <h2 class="mono">Selected Experience</h2>
     <ul class="exp exp--flow">
-      <li><b>Robert Marino Architects</b> &middot; <span>Architecture</span><span>Residential + Research</span></li>
-      <li><b>Urba Inmobiliaria</b> &middot; <span>Design and Development</span><span>Multifamily Housing + Hospitality</span></li>
-      <li><b>Inversiones Menorca</b> &middot; <span>Real Estate Development</span><span>Social Housing</span></li>
-      <li><b>Marcan</b> &middot; <span>Real Estate Development</span><span>Office + Medical Office</span></li>
+      <li><b>Robert Marino Architects</b> &middot; <span>Residential + Research</span></li>
+      <li><b>Urba Inmobiliaria</b> &middot; <span>Multifamily Housing + Hospitality</span></li>
+      <li><b>Inversiones Menorca</b> &middot; <span>Social Housing</span></li>
+      <li><b>Marcan</b> &middot; <span>Office + Medical Office</span></li>
     </ul>
   </section>
 

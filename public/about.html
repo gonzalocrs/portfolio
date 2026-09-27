@@ -169,7 +169,6 @@
   /* label, rule, paragraph: the block is as tall as the old title + gap, so the rest of the page stays put */
   .about{min-height:calc(clamp(1.9rem,7.4vw,6.5rem)*.9 + clamp(2.5rem,7vw,5rem));max-width:min(100%,900px)}
   .about h2{margin:0;padding-bottom:1.1rem;border-bottom:1px solid var(--rule);font-weight:400;color:var(--mute)}
-  .about + .exp-wrap{margin-top:0}
   .about-row{position:relative}
   /* the band under the last section is a spacer: at least --band tall, and it grows to fill a taller window.
      The logo is centred between the rule under the last row and the footer text, so it always sits
@@ -198,6 +197,15 @@
   .exp b{font-weight:500;font-size:1.05rem}
   .exp span{color:var(--mute);font-size:.95rem}
   .exp .mono{text-align:right;white-space:nowrap}
+  /* education: same row grid, spacing and gap as experience (.exp li) — just the rule only right
+     under the heading, none between rows, none closing the list */
+  .exp--edu{border-bottom:0}
+  /* only two columns here (no third place/year column), so the degree gets the room the unused
+     third column would have wasted — enough to keep it on one line — while the gap to the school
+     name stays exactly the same as every other row's column gap */
+  .exp--edu li{border-top:0;grid-template-columns:minmax(0,24rem) minmax(0,1fr)}
+  .exp--edu li:first-child{border-top:1px solid var(--rule)}
+  .exp--edu span{font-family:var(--mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;color:var(--mute)}
 
   footer{
     display:flex;
@@ -222,6 +230,7 @@
     .bio{max-width:none;text-align:left}
     .exp li{grid-template-columns:1fr auto}
     .exp li > span:nth-child(2){grid-column:1 / -1;order:3}
+    .exp--edu li{grid-template-columns:1fr auto}
   }
   @media (prefers-reduced-motion:reduce){
     *{transition-duration:.01ms !important}
@@ -279,16 +288,19 @@
   <section class="about">
     <h2 class="mono">About</h2>
     <div class="about-row">
-      <p class="bio">My work explores the relationship between structure, materiality, and form, drawing on my background in engineering to investigate how technical possibilities can generate architectural expression. I am interested in using material and structure not only to shape space, but also to engage with cultural and political ideas.</p>
+      <p class="bio">I came to architecture through engineering and real estate development. These backgrounds continue to shape the way I approach design: as an intersection of structure, material, form, economics, and culture.</p>
+      <p class="bio">My work has evolved alongside my background. Engineering taught me to approach problems through systems, mathematics, and technical constraints; real estate development introduced questions of efficiency, economics, and performance; and architecture opened a more exploratory space through digital tools and form-making. More recently, physical models have become a way of bringing these ways of thinking together, an intuitive space where structure, material, form, and performance can be tested simultaneously.</p>
+      <p class="bio">I&rsquo;m particularly interested in the relationship between structural efficiency, aesthetics and in how material and construction can become sources of architectural expression. I&rsquo;m drawn to projects where technical decisions are not separated from the cultural and social questions architecture inevitably carries.</p>
+      <p class="bio">I&rsquo;m currently based in New York, pursuing a Master of Architecture at Columbia University.</p>
     </div>
   </section>
 
   <section class="exp-wrap">
     <h2 class="mono">Education</h2>
-    <ul class="exp">
-      <li><b>Columbia University</b><span>Dual degree: Master of Architecture and M.S. Real Estate Development (candidate)</span><span class="mono">New York &middot; 2027</span></li>
-      <li><b>INCAE</b><span>Master in Business Administration</span><span class="mono">Costa Rica &middot; 2019</span></li>
-      <li><b>PUCP</b><span>B.S., Civil Engineering</span><span class="mono">Peru &middot; 2015</span></li>
+    <ul class="exp exp--edu">
+      <li><b>M.Arch + M.S. Real Estate Development</b><span>Columbia University</span></li>
+      <li><b>MBA</b><span>INCAE Business School</span></li>
+      <li><b>Civil Engineering</b><span>PUCP</span></li>
     </ul>
   </section>
 

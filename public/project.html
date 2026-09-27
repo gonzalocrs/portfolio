@@ -11,23 +11,12 @@
   try{var s=sessionStorage.getItem('gc-theme');if(s)document.documentElement.setAttribute('data-theme',s)}catch(e){}
 </script>
 <style>
-  @font-face{
-    font-family:"Futura Lt BT";
-    src:url("/fonts/FuturaLtBT-Light.ttf") format("truetype");
-    font-weight:400 700;
-    font-style:normal;
-    font-display:swap;
-  }
-
   :root{
     --paper:#ffffff;
     --ink:#0f1216;
     --rule:#d8d6d1;
     --mute:#7b7d80;
     --live:#1a2ce0;
-    /* the pointer arrows on the physical models: black on the light page, white on the dark one */
-    --cur-left:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32' fill='none' stroke-linecap='butt' stroke-linejoin='miter' stroke-miterlimit='8'%3E%3Cpath d='M21 5L8.5 16L21 27' stroke='%23fff' stroke-width='4'/%3E%3Cpath d='M21 5L8.5 16L21 27' stroke='%23000' stroke-width='2'/%3E%3C/svg%3E") 16 16, w-resize;
-    --cur-right:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32' fill='none' stroke-linecap='butt' stroke-linejoin='miter' stroke-miterlimit='8'%3E%3Cpath d='M11 5L23.5 16L11 27' stroke='%23fff' stroke-width='4'/%3E%3Cpath d='M11 5L23.5 16L11 27' stroke='%23000' stroke-width='2'/%3E%3C/svg%3E") 16 16, e-resize;
     --font:"Archivo","Helvetica Neue",Arial,sans-serif;
     --mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
     --pad:clamp(1rem,4vw,2.5rem);
@@ -39,8 +28,6 @@
       --rule:#2b2d30;
       --mute:#8b8d90;
       --live:#7d8bff;
-      --cur-left:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32' fill='none' stroke-linecap='butt' stroke-linejoin='miter' stroke-miterlimit='8'%3E%3Cpath d='M21 5L8.5 16L21 27' stroke='%23000' stroke-width='4'/%3E%3Cpath d='M21 5L8.5 16L21 27' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E") 16 16, w-resize;
-      --cur-right:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32' fill='none' stroke-linecap='butt' stroke-linejoin='miter' stroke-miterlimit='8'%3E%3Cpath d='M11 5L23.5 16L11 27' stroke='%23000' stroke-width='4'/%3E%3Cpath d='M11 5L23.5 16L11 27' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E") 16 16, e-resize;
     }
   }
   :root[data-theme="dark"]{
@@ -49,8 +36,6 @@
     --rule:#2b2d30;
     --mute:#8b8d90;
     --live:#7d8bff;
-    --cur-left:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32' fill='none' stroke-linecap='butt' stroke-linejoin='miter' stroke-miterlimit='8'%3E%3Cpath d='M21 5L8.5 16L21 27' stroke='%23000' stroke-width='4'/%3E%3Cpath d='M21 5L8.5 16L21 27' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E") 16 16, w-resize;
-    --cur-right:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32' fill='none' stroke-linecap='butt' stroke-linejoin='miter' stroke-miterlimit='8'%3E%3Cpath d='M11 5L23.5 16L11 27' stroke='%23000' stroke-width='4'/%3E%3Cpath d='M11 5L23.5 16L11 27' stroke='%23fff' stroke-width='2'/%3E%3C/svg%3E") 16 16, e-resize;
   }
 
   *{box-sizing:border-box}
@@ -107,8 +92,8 @@
   .gv-mark{
     display:block;
     width:230px;
-    font-family:"Futura Lt BT",'Futura','Century Gothic',sans-serif;
-    font-weight:400;
+    font-family:'Archivo',sans-serif;
+    font-weight:300;
     font-size:14px;
     color:var(--ink);
     text-decoration:none;
@@ -180,16 +165,19 @@
   .title{
     margin:clamp(2rem,5vw,3.5rem) 0 0;
     font-weight:800;
-    font-size:clamp(1.5rem,4.6vw,3.6rem);   /* same size as the contact-page titles */
+    font-size:clamp(1.35rem,4.14vw,3.24rem);   /* same size as the contact-page titles, -10% */
     line-height:1;
     letter-spacing:-.02em;
   }
-  .kicker{margin:1rem 0 0;color:var(--mute)}
+  .kicker{margin:.9rem 0 0;color:var(--mute)}   /* -10%, matching the title's smaller size */
   .kicker a{transition:color .2s}
   .kicker a:hover{color:var(--live)}
   /* every part of a project is one full-screen segment */
   .seg{position:relative;height:calc(100svh - var(--bar-h,4rem));min-height:26rem;scroll-snap-align:start;scroll-margin-top:var(--bar-h,4rem)}
-  html:not(.paged){scroll-snap-type:y proximity}
+  /* on mobile there's no JS paging (see project.js: pagedMQ), so a plain scroll must do the work — mandatory
+     (not proximity) means a normal scroll gesture always settles cleanly on one full-height section, never
+     stops halfway with two sections' content visible at once */
+  html:not(.paged){scroll-snap-type:y mandatory}
   .intro.seg{scroll-margin-top:calc(var(--bar-h,4rem) + .35rem)}
   html.paged{scrollbar-width:none}
   html.paged::-webkit-scrollbar{display:none}
@@ -211,6 +199,24 @@
   }
   .seg--info{display:flex;align-items:center}
   .info.solo{grid-template-columns:minmax(0,38rem)}
+  /* a project with a diagram: text + credits stack in one column on the left,
+     vertically centred; the diagram permanently fills the full segment height
+     on the right, right next to the text. Every other project keeps the plain
+     two-column layout above, completely untouched. */
+  .info.has-diagram{
+    grid-template-columns:minmax(0,1.4fr) minmax(0,1.3fr);
+    align-items:stretch;
+    height:100%;
+  }
+  .info.has-diagram > .left{grid-column:1;align-self:center;min-width:0}
+  .info.has-diagram .diagram{grid-column:2;height:calc(100% - 1.1rem)}  /* same bottom margin as .intro / .seg--gal */
+  /* both scale down together on a narrower screen, same as the plain layout's
+     .lede below — keeps the block (and the credits under it) from ever
+     needing more width than the column actually has, without losing the
+     vertical centering on .left */
+  .info.has-diagram .lede{max-width:46ch;font-size:clamp(.95rem,1.53vw,1.35rem)}
+  .info.has-diagram .text{max-width:68ch;font-size:clamp(.78rem,1vw,.9rem);margin:0 0 1.1rem}
+  .info.has-diagram .text:last-of-type{margin-bottom:0}
   .lede.placeholder,.text.placeholder{font-style:italic;font-weight:400;color:var(--mute)}
   .lede{
     margin:0 0 1.4rem;
@@ -222,6 +228,53 @@
   }
   .text{margin:0;max-width:52ch;font-size:1rem;line-height:1.6;color:var(--mute)}
 
+  /* an optional sketch/diagram, full bleed (no frame, no caption), shown whole
+     (contain, never cropped) next to the text — sized a little short of the
+     full column height, like the next page peeking through underneath */
+  .diagram{margin:0;display:flex;flex-direction:column}
+  .diagram img{display:block;width:100%;flex:1 1 0;min-height:0;object-fit:contain;object-position:center top}
+  /* before the real artwork exists, reserve the slot with the same roadmap
+     placeholder pattern used for pending gallery images */
+  .diagram.placeholder{position:relative}
+
+  /* credits, for a diagram project, collapse into a small dropdown overlay
+     below the text instead of taking up their own column */
+  .info.has-diagram .credits-wrap{position:relative;max-width:68ch;margin-top:1.6rem}
+  .credits-toggle{
+    display:flex;align-items:center;gap:.5rem;
+    background:none;border:0;padding:0;
+    color:var(--mute);cursor:pointer;transition:color .2s;
+  }
+  .credits-toggle:hover{color:var(--ink)}
+  .credits-toggle::after{
+    content:"";width:.4rem;height:.4rem;
+    border-right:1px solid currentColor;border-bottom:1px solid currentColor;
+    transform:rotate(45deg) translateY(-2px);
+    transition:transform .25s ease;
+  }
+  .info.has-diagram.credits-open .credits-toggle::after{transform:rotate(-135deg) translateY(1px)}
+  .credits-panel{
+    position:absolute;top:calc(100% + .8rem);left:0;
+    /* shrinks to fit its content, but never past the column — and, as a hard
+       floor under that, never past the viewport itself, however narrow */
+    width:max-content;max-width:min(100%, calc(100vw - 2 * var(--pad, 1.5rem)));
+    background:var(--paper);
+    padding:.2rem 0;
+    opacity:0;visibility:hidden;transform:translateY(-6px);
+    transition:opacity .22s ease,transform .22s ease,visibility 0s linear .22s;
+    z-index:5;
+  }
+  .info.has-diagram.credits-open .credits-panel{
+    opacity:1;visibility:visible;transform:translateY(0);
+    transition:opacity .22s ease,transform .22s ease;
+  }
+  /* compact rows, flush with the panel's edges so each row's underline lines
+     up with the text above (same left/right edge, no inset) */
+  .credits-panel .credits{border-bottom:0}
+  .credits-panel .credits div{padding:.45rem 0}
+  .credits-panel dd{overflow-wrap:break-word}
+  .credits-panel dt{font-size:.66rem}
+  .credits-panel dd{font-size:.85rem}
   .credits{margin:0;border-bottom:1px solid var(--rule)}
   .credits div{
     display:grid;
@@ -243,7 +296,7 @@
     padding:.8rem 0 1rem;
     border-top:1px solid var(--rule);
   }
-  .gal__head span:last-child{color:var(--mute)}
+  .gal__head span:last-child{color:var(--mute);transition:opacity .3s}
   /* photos & renders: free layout, no frames, no fixed height (see buildFree in project.js) */
   .seg--free{display:block;height:auto;min-height:calc(100svh - var(--bar-h,4rem));scroll-snap-align:none;padding-bottom:clamp(4rem,12vh,9rem)}
   .free{--maxh:calc(100svh - var(--bar-h,4rem) - 5rem);padding-top:clamp(2rem,7vh,5rem)}
@@ -290,24 +343,51 @@
   .stage--strip .fig{cursor:inherit;opacity:0;pointer-events:none}
   .stage--strip .fig.is-current{opacity:1}
   .stage--strip{cursor:zoom-in;overflow-x:clip}   /* the waiting models sit off to the side; they must not widen the page */
-  .stage--strip[data-zone="left"]{cursor:var(--cur-left)}
-  .stage--strip[data-zone="right"]{cursor:var(--cur-right)}
-  .stage--strip[data-zone="edge"]{cursor:default}
   .stage--strip.zoomed{cursor:zoom-out}
   .stage--strip.zoomed .fig:not(.is-zoomed){opacity:0}
-  /* a note under each model: small monospace text, always centred on the model and the page */
-  .stage--strip .fig .note{
-    position:absolute;left:50%;top:100%;transform:translateX(-50%);
+  /* a note under the strip: small monospace text. It's a single element shared
+     by every photo (not one per model, see layoutStrip), so it never fades in
+     or out between them — it just glides to sit right under whichever model
+     is current, the same fixed distance below it every time */
+  .stage--strip > .note{
+    position:absolute;left:50%;transform:translateX(-50%);
     width:max-content;max-width:min(64ch,90vw);
-    margin-top:1.5rem;text-align:center;
+    text-align:center;
     font-family:var(--mono);font-size:.72rem;line-height:1.7;letter-spacing:.01em;
-    transition:opacity .3s;
+    transition:opacity .3s,top .55s cubic-bezier(.2,.7,.2,1);
   }
-  .note__title{display:block;color:var(--mute)}
   .note__text{margin:0;color:var(--mute);font-size:inherit;line-height:inherit}
-  .note__text.placeholder{font-style:italic}
   .stage--strip.zoomed .note{opacity:0}
-  .stage--strip .fig:not(.is-zoomed) .cap{display:none}
+  /* visible left/right arrows to step through the models, in addition to the
+     click zones — clearer than the cursor hint alone, and usable on touch.
+     Positioned by JS (see layoutStrip) halfway across the empty margin beside
+     the model, not flush against the edge of the stage; left/right transition
+     alongside it since that margin changes with each model's own proportions */
+  .strip-nav{
+    position:absolute;top:50%;transform:translateY(-50%);
+    width:2.75rem;height:2.75rem;
+    display:flex;align-items:center;justify-content:center;
+    background:none;border:0;padding:0;cursor:pointer;
+    color:var(--mute);opacity:.55;
+    transition:opacity .2s,color .2s,left .55s cubic-bezier(.2,.7,.2,1),right .55s cubic-bezier(.2,.7,.2,1);
+    z-index:2;
+  }
+  .strip-nav:hover{opacity:1;color:var(--ink)}
+  .strip-nav--left{left:0}
+  .strip-nav--right{right:0}
+  .strip-nav::before{
+    content:"";display:block;width:.75rem;height:.75rem;
+    border-right:2px solid currentColor;border-top:2px solid currentColor;
+  }
+  .strip-nav--left::before{transform:rotate(-135deg);margin-left:.35rem}
+  .strip-nav--right::before{transform:rotate(45deg);margin-right:.35rem}
+  .stage--strip.at-start .strip-nav--left,
+  .stage--strip.at-end .strip-nav--right,
+  .stage--strip.zoomed .strip-nav{opacity:0;pointer-events:none}
+  /* the strip has its own note under the model instead — the numbered
+     "n  caption" overlay is for the grid/free galleries only, and would just
+     repeat "Physical models" here, maximized or not */
+  .stage--strip .fig .cap{display:none}
   .fig .cap{opacity:0;transition:opacity .2s}
   .fig:hover .cap,.fig.is-zoomed .cap{opacity:1}
 
@@ -381,9 +461,22 @@
   }
 
   @media (max-width:900px){
-    .info{grid-template-columns:1fr}
-    .lede{max-width:none}
-    .text{max-width:none}
+    /* there's no JS paging on mobile (see project.js: pagedMQ) — a segment only needs to be exactly one
+       screen tall for the desktop paging animation. Here, forcing that same fixed height while .seg--info
+       centres its content meant real (tall) text overflowed the box equally above and below, landing right
+       on top of the previous section. Sizing to content instead removes the overflow at its source. */
+    .seg{height:auto;min-height:calc(100svh - var(--bar-h,4rem))}
+    .intro{height:auto;min-height:calc(100svh - var(--bar-h,4rem) - .35rem)}
+    /* .intro .hero normally fills whatever space is left in a fixed-height flex column (flex:1, no aspect
+       ratio); with .intro now auto-height that space is undefined, so it goes back to a plain aspect ratio */
+    .intro .hero{flex:none;aspect-ratio:16/9;max-height:60vh}
+    .seg--info{align-items:flex-start;padding-block:clamp(2rem,8vh,4rem)}
+    .info,.info.has-diagram{grid-template-columns:1fr;height:auto}
+    .info.has-diagram > .left,.info.has-diagram .diagram{grid-column:1;align-self:auto}
+    .info.has-diagram .diagram{height:22rem;margin-top:1.4rem}
+    .lede,.info.has-diagram .lede{max-width:none}
+    .text,.info.has-diagram .text{max-width:none}
+    .info.has-diagram .credits-wrap{max-width:none}
   }
   @media (max-width:640px){
     .gv-mark{width:170px;font-size:10.5px}

@@ -26,7 +26,7 @@
   // (which already shows it big), like the product name in Apple's sticky bar; click to go back to the start
   var ptitle = el('a', 'ptitle', p.title);
   ptitle.href = '#';
-  ptitle.setAttribute('aria-label', p.title + ' \u2014 back to the overview');
+  ptitle.setAttribute('aria-label', p.title + ' — back to the overview');
   ptitle.addEventListener('click', function(e){ e.preventDefault(); go(0); });
   bar.appendChild(ptitle);
 
@@ -48,14 +48,19 @@
   if(p.hero){
     var himg = el('img');
     himg.src = p.hero; himg.alt = p.title;
-    himg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover';
+    // most projects want a plain centred crop; a few need the crop shifted, or
+    // (when the frame's own aspect leaves little room to shift) a touch of extra
+    // zoom, so the subject isn't cut off by the frame — see projects.js:
+    // heroPosition / heroZoom
+    himg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;' +
+      'object-position:' + (p.heroPosition || 'center') +
+      (p.heroZoom ? ';transform:scale(' + p.heroZoom + ');transform-origin:' + (p.heroZoomOrigin || 'center') : '');
     hero.appendChild(himg);
   } else {
     var ha = el('div', 'art art--photo');
     ha.style.setProperty('--h', p.hue);
     hero.appendChild(ha);
   }
-  hero.appendChild(el('span', 'cap mono', p.title));
   intro.appendChild(hero);
 
   intro.appendChild(el('h1', 'title', p.title));
@@ -76,11 +81,16 @@
 
   // ---- 2. details: description + credits ---------------------------------
   var info = el('div', 'info');
-  var left = el('div');
+  var left = el('div', 'left');
   if(p.lede) left.appendChild(el('p', 'lede', p.lede));
   else if(showLayout) left.appendChild(el('p', 'lede placeholder', 'A short description of the project goes here.'));
-  if(p.text) left.appendChild(el('p', 'text', p.text));
-  else if(showLayout) left.appendChild(el('p', 'text placeholder', 'A second, shorter paragraph can add context, such as the site, the brief or the approach.'));
+  // p.text is usually one short paragraph, but can be an array when a project
+  // needs several (each rendered as its own <p class="text">)
+  if(p.text){
+    (Array.isArray(p.text) ? p.text : [p.text]).forEach(function(t){
+      left.appendChild(el('p', 'text', t));
+    });
+  } else if(showLayout) left.appendChild(el('p', 'text placeholder', 'A second, shorter paragraph can add context, such as the site, the brief or the approach.'));
   if(left.children.length) info.appendChild(left); else info.classList.add('solo');
   var dl = el('dl', 'credits');
   var rows = (p.credits || []).slice();
@@ -103,7 +113,48 @@
     d.appendChild(el('dd', null, row[1]));
     dl.appendChild(d);
   });
-  info.appendChild(dl);
+  // an optional diagram (a sketch, a study drawing) — see projects.js:
+  // diagram: {src, caption}. A project with one gets it permanently at full
+  // segment height next to the text, with a small margin at the bottom (like
+  // the next page peeking through); the credits move into a small dropdown
+  // below the text. Every other project keeps the plain two-column info,
+  // credits on the right, untouched. A project can also reserve the slot
+  // before the real artwork exists — diagram: {} — which shows the same
+  // roadmap placeholder pattern used elsewhere until it's ready.
+  if(p.diagram && (p.diagram.src || showLayout)){
+    info.classList.add('has-diagram');
+    var creditsToggle = el('button', 'credits-toggle mono', 'Credits');
+    creditsToggle.type = 'button';
+    creditsToggle.setAttribute('aria-expanded', 'false');
+    var creditsPanel = el('div', 'credits-panel');
+    creditsPanel.appendChild(dl);
+    creditsToggle.addEventListener('click', function(){
+      var open = info.classList.toggle('credits-open');
+      creditsToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    document.addEventListener('click', function(e){
+      if(!info.classList.contains('credits-open')) return;
+      if(creditsToggle.contains(e.target) || creditsPanel.contains(e.target)) return;
+      info.classList.remove('credits-open');
+      creditsToggle.setAttribute('aria-expanded', 'false');
+    });
+    var creditsWrap = el('div', 'credits-wrap');
+    creditsWrap.appendChild(creditsToggle);
+    creditsWrap.appendChild(creditsPanel);
+    left.appendChild(creditsWrap);
+    var dfig = el('figure', 'diagram');
+    if(p.diagram.src){
+      var dimg = el('img');
+      dimg.src = p.diagram.src; dimg.alt = p.diagram.caption || p.title; dimg.loading = 'lazy';
+      dfig.appendChild(dimg);
+    } else {
+      dfig.classList.add('placeholder');
+      dfig.appendChild(el('div', 'art art--drawing'));
+    }
+    info.appendChild(dfig);
+  } else {
+    info.appendChild(dl);
+  }
   var infoSeg = el('section', 'seg seg--info');
   infoSeg.appendChild(info);
   app.appendChild(infoSeg);
@@ -196,6 +247,7 @@
           if(!it.aspect && img.naturalWidth && img.naturalHeight){ item.a = img.naturalWidth / img.naturalHeight; layoutStage(stage); }
         });
         frame.appendChild(img);
+        item.img = img;
       } else {
         var art = el('div', 'art art--' + s.kind);
         art.style.setProperty('--h', (p.hue + i * 40) % 360);
@@ -204,14 +256,6 @@
       fig.appendChild(frame);
       var cap = el('span', 'cap mono', two(n) + '  ' + (it.caption || ''));
       fig.appendChild(cap);
-      if(s.mode === 'strip'){
-        // a note under the model: a title line, and an optional paragraph (item.text in projects.js)
-        var note = el('figcaption', 'note');
-        note.appendChild(el('span', 'note__title', two(i + 1) + '  ' + (it.caption || '')));
-        if(it.text) note.appendChild(el('p', 'note__text', it.text));
-        else if(showLayout) note.appendChild(el('p', 'note__text placeholder', 'A short note about this model can go here.'));
-        fig.appendChild(note);
-      }
       if(stage._mode !== 'strip') fig.addEventListener('click', function(e){
         e.stopPropagation();
         setZoom(stage, stage._zoom === i ? null : i);
@@ -219,14 +263,37 @@
       stage._items.push(item);
       stage.appendChild(fig);
     });
+    if(stage._mode === 'strip'){
+      // one optional line under the model — a single element shared by every
+      // photo (not one per figure), so it never fades or shifts as you step
+      // through the strip; only its text changes, and only if it actually
+      // differs (an individual item's own text in projects.js overrides the
+      // shared physicalNote for that one photo)
+      stage._data = items;
+      var note = el('figcaption', 'note');
+      note.appendChild(el('p', 'note__text'));
+      stage.appendChild(note);
+      stage._note = note;
+      // visible left/right arrows to step through the models — the cursor
+      // hint alone (an arrow-shaped cursor over each half of the image)
+      // wasn't obvious enough, and touch devices never see a cursor at all
+      stage._nav = {};
+      ['left', 'right'].forEach(function(dir){
+        var btn = el('button', 'strip-nav strip-nav--' + dir);
+        btn.type = 'button';
+        btn.setAttribute('aria-label', dir === 'left' ? 'Previous model' : 'Next model');
+        btn.addEventListener('click', function(e){
+          e.stopPropagation();
+          stepStrip(stage, dir === 'left' ? -1 : 1);
+        });
+        stage.appendChild(btn);
+        stage._nav[dir] = btn;
+      });
+    }
     // clicking the empty part of a zoomed stage puts the image back
     stage.addEventListener('click', function(e){
       if(stage._mode === 'strip'){ stripClick(stage, e); return; }
       if(stage._zoom !== null) setZoom(stage, null);
-    });
-    stage.addEventListener('mousemove', function(e){
-      if(stage._mode !== 'strip') return;
-      stage.setAttribute('data-zone', stripZone(stage, e));
     });
     seg.appendChild(stage);
     app.appendChild(seg);
@@ -274,21 +341,24 @@
 
   // ---- the horizontal gallery (physical models) ----------------------------
   // One model is centred and the others wait either side; the row slides along.
-  // Click the right third for the next one, the left third for the previous one,
-  // the middle to zoom.
-  function stripZone(stage, e){
-    if(stage._zoom !== null) return 'zoom';
-    var r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width;
-    if(x < .33) return stage._cur > 0 ? 'left' : 'edge';
-    if(x > .67) return stage._cur < stage._items.length - 1 ? 'right' : 'edge';
-    return 'mid';
-  }
+  // Stepping is only the arrow buttons now — click anywhere on the model
+  // itself to zoom in (or out again), no left/right/middle zones. Zooming in
+  // centres on wherever you clicked, not always the middle of the photo.
   function stripClick(stage, e){
-    var z = stripZone(stage, e);
-    if(z === 'zoom') setZoom(stage, null);
-    else if(z === 'left') stepStrip(stage, -1);
-    else if(z === 'right') stepStrip(stage, 1);
-    else if(z === 'mid') setZoom(stage, stage._cur);
+    if(stage._zoom !== null){
+      var was = stage._items[stage._zoom];
+      if(was && was.img) was.img.style.objectPosition = '';
+      setZoom(stage, null);
+      return;
+    }
+    var it = stage._items[stage._cur];
+    if(it && it.img && e){
+      var r = it.fig.getBoundingClientRect();
+      var x = Math.max(0, Math.min(100, (e.clientX - r.left) / r.width * 100));
+      var y = Math.max(0, Math.min(100, (e.clientY - r.top) / r.height * 100));
+      it.img.style.objectPosition = x.toFixed(1) + '% ' + y.toFixed(1) + '%';
+    }
+    setZoom(stage, stage._cur);
   }
   function stepStrip(stage, dir){
     var n2 = Math.max(0, Math.min(stage._items.length - 1, stage._cur + dir));
@@ -300,8 +370,21 @@
     var W = stage.clientWidth, H = stage.clientHeight, items = stage._items, c = stage._cur;
     if(!W || !H || !items.length) return;
     var gap = Math.round(W * .12), boxes = [];
-    var noteH = 116;                                   // room under the model for its centred note
-    var availH = Math.max(120, H - noteH);
+    var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    // the note under the model: a single element shared by every photo (so it
+    // never fades between them), holding whichever text the current photo
+    // wants — the same string for every photo unless an item overrides it
+    var note = stage._note, noteGap = 0;
+    if(note){
+      var noteText = (stage._data[c] && stage._data[c].text) || p.physicalNote || '';
+      if(note._text !== noteText){
+        note._text = noteText;
+        note.firstChild.textContent = noteText;
+      }
+      note.style.display = noteText ? '' : 'none';
+      if(noteText) noteGap = note.offsetHeight + rem * 1.5;
+    }
+    var availH = Math.max(120, H - noteGap);
     items.forEach(function(it){
       var h = availH * .94, w = it.a * h;
       if(w > W * .64){ w = W * .64; h = w / it.a; }     // a very wide one can't take over the screen
@@ -311,16 +394,34 @@
     lefts[c] = (W - boxes[c].w) / 2;
     for(var k = c + 1; k < items.length; k++) lefts[k] = lefts[k - 1] + boxes[k - 1].w + gap;
     for(var j = c - 1; j >= 0; j--) lefts[j] = lefts[j + 1] - gap - boxes[j].w;
+    if(stage._nav){
+      // three-quarters of the way across the empty margin on each side
+      // (closer to the model than to the edge of the stage) — that margin is
+      // the same on both sides (the model is centred), so both arrows use it
+      var navOffset = Math.max(0, lefts[c] * .75 - 22);   // 22 = half the arrow's own width
+      stage._nav.left.style.left = navOffset + 'px';
+      stage._nav.right.style.right = navOffset + 'px';
+    }
     items.forEach(function(it, k){
       var s = it.fig.style, b = boxes[k];
       it.fig.classList.toggle('is-current', k === c);
       if(stage._zoom === k){
-        var zw = Math.min(W, H * it.a), zh = zw / it.a;
-        s.left = ((W - zw) / 2) + 'px'; s.top = ((H - zh) / 2) + 'px';
-        s.width = zw + 'px'; s.height = zh + 'px';
+        // full bleed: the whole width, and the same maximum height as the
+        // diagram image in Details (the segment height minus that same small
+        // bottom margin) — the photo covers it (see its object-fit:cover),
+        // no letterboxing
+        var zh = H - rem * 1.1;
+        s.left = '0px'; s.top = '0px';
+        s.width = W + 'px'; s.height = zh + 'px';
       } else {
-        s.left = lefts[k] + 'px'; s.top = ((availH - b.h) / 2) + 'px';
+        // the model and its note, as one block, centred as a whole on the
+        // segment — a shorter (e.g. width-capped) model leaves even space
+        // above and below the whole block, but the gap to the note itself
+        // stays the same fixed distance every time
+        var top = (H - (b.h + noteGap)) / 2;
+        s.left = lefts[k] + 'px'; s.top = top + 'px';
         s.width = b.w + 'px'; s.height = b.h + 'px';
+        if(k === c && note && noteGap) note.style.top = (top + b.h + rem * 1.5) + 'px';
       }
     });
     if(stage._count) stage._count.textContent = two(c + 1) + ' / ' + two(items.length);
@@ -445,6 +546,9 @@
     stage._zoom = i;
     stage.classList.toggle('zoomed', i !== null);
     stage._items.forEach(function(it, k){ it.fig.classList.toggle('is-zoomed', k === i); });
+    // maximized, a strip photo fills the frame on its own — hide the "n / total"
+    // count so it doesn't sit on top of it
+    if(stage._count) stage._count.style.opacity = i !== null ? '0' : '';
     layoutStage(stage);
   }
   function currentStage(){ var s = segs[cur]; return s && s.stage; }

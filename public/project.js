@@ -147,6 +147,11 @@
       var dimg = el('img');
       dimg.src = p.diagram.src; dimg.alt = p.diagram.caption || p.title; dimg.loading = 'lazy';
       dfig.appendChild(dimg);
+      // tap/click to see it full screen, like every other picture on the page
+      dfig.addEventListener('click', function(){
+        var a = (dimg.naturalWidth && dimg.naturalHeight) ? dimg.naturalWidth / dimg.naturalHeight : 4 / 3;
+        openLightbox([{src: p.diagram.src, alt: dimg.alt, a: a, caption: p.diagram.caption || ''}], 0);
+      });
     } else {
       dfig.classList.add('placeholder');
       dfig.appendChild(el('div', 'art art--drawing'));
@@ -501,7 +506,8 @@
       frame.appendChild(art);
     }
     lb.appendChild(frame);
-    lb.appendChild(el('span', 'lightbox__cap mono', two(it.num) + '  ' + it.caption));
+    var capText = it.num != null ? two(it.num) + '  ' + it.caption : it.caption;
+    if(capText) lb.appendChild(el('span', 'lightbox__cap mono', capText));
   }
   function openLightbox(list, i){
     closeLightbox();

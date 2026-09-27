@@ -166,15 +166,30 @@
     line-height:.9;
     letter-spacing:-.02em;
   }
-  /* a plain stack of sections: a heading and a few lines of text each, nothing else — no rules, no grid,
-     no muted secondary color. Every section is spaced the same generous amount apart. */
   .about-min{max-width:640px}
   .about-min + .about-min{margin-top:clamp(2.5rem,7vw,4rem)}
   /* caps belong to the mono label font only, never to Archivo (see the home/project titles) */
   .about-min__h{margin:0 0 1.3rem}
-  .about-min p{margin:0 0 1.3rem;font-size:1rem;line-height:1.6}
+  /* same paragraph treatment as a project page's Details text: muted, not full-contrast ink */
+  .about-min p{margin:0 0 1.3rem;max-width:60ch;font-size:1rem;line-height:1.6;color:var(--mute)}
   .about-min p:last-child{margin-bottom:0}
-  .about-min__co{font-family:var(--mono);text-transform:uppercase;letter-spacing:.02em}
+  /* rows styled exactly like the home page's project list (.work): a bold name with a small
+     mono tag beside it on the left, a muted mono meta on the right, a rule between each row */
+  .about-list{list-style:none;margin:0;padding:0}
+  .about-list li{border-top:1px solid var(--rule)}
+  .about-list li:last-child{border-bottom:1px solid var(--rule)}
+  .about-list .row{
+    display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;
+    gap:.2rem 1.5rem;padding:.55rem 0;
+  }
+  .about-list .name{font-weight:500;font-size:clamp(1rem,2.2vw,1.3rem);letter-spacing:-.015em}
+  .about-list .tag{
+    margin-left:.8rem;
+    font-family:var(--mono);font-weight:400;font-size:.66rem;
+    text-transform:uppercase;letter-spacing:.05em;
+    color:var(--mute);vertical-align:.1em;
+  }
+  .about-list .meta{font-family:var(--mono);color:var(--mute);font-size:.72rem;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
   /* the band under the last section is a spacer: at least --band tall, and it grows to fill a taller window.
      The logo is centred between the rule under the last row and the footer text, so it always sits
      halfway; its size comes from the band, so it never adds height to the page */
@@ -270,17 +285,21 @@
 
   <section class="about-min">
     <h2 class="about-min__h mono">Education</h2>
-    <p>M.Arch + M.S. Real Estate Development &middot; Columbia University</p>
-    <p>MBA &middot; INCAE Business School</p>
-    <p>Civil Engineering &middot; PUCP</p>
+    <ul class="about-list">
+      <li><div class="row"><span class="name">M.Arch + M.S. Real Estate Development</span><span class="meta">Columbia University</span></div></li>
+      <li><div class="row"><span class="name">MBA</span><span class="meta">INCAE Business School</span></div></li>
+      <li><div class="row"><span class="name">Civil Engineering</span><span class="meta">PUCP</span></div></li>
+    </ul>
   </section>
 
   <section class="about-min">
     <h2 class="about-min__h mono">Selected Experience</h2>
-    <p><span class="about-min__co">Robert Marino Architects</span> Architecture &middot; Residential + Research</p>
-    <p><span class="about-min__co">Urba Inmobiliaria</span> Design and Development &middot; Multifamily Housing + Hospitality</p>
-    <p><span class="about-min__co"><u>Inversiones Menorca</u></span> Real Estate Development &middot; Social Housing</p>
-    <p><span class="about-min__co">Marcan</span> Real Estate Development &middot; Office + Medical Office</p>
+    <ul class="about-list">
+      <li><div class="row"><span class="name">Robert Marino Architects<span class="tag">Architecture</span></span><span class="meta">Residential + Research</span></div></li>
+      <li><div class="row"><span class="name">Urba Inmobiliaria<span class="tag">Design + Development</span></span><span class="meta">Multifamily Housing + Hospitality</span></div></li>
+      <li><div class="row"><span class="name">Inversiones Menorca<span class="tag">Real Estate Development</span></span><span class="meta">Social Housing</span></div></li>
+      <li><div class="row"><span class="name">Marcan<span class="tag">Real Estate Development</span></span><span class="meta">Office + Medical Office</span></div></li>
+    </ul>
   </section>
 
   <div class="end-mark">

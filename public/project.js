@@ -341,15 +341,29 @@
 
   // ---- the horizontal gallery (physical models) ----------------------------
   // One model is centred and the others wait either side; the row slides along.
-  // Stepping is only the arrow buttons now — click anywhere on the model
-  // itself to zoom in (or out again), no left/right/middle zones. Zooming in
-  // centres on wherever you clicked, not always the middle of the photo.
+  // With desktop paging (room enough for the model to sit narrower, with the visible arrow buttons beside
+  // it — see layoutStrip's capFrac): click anywhere on the model to zoom in or out, centred on wherever you
+  // clicked. Without paging (touch, or any tab too narrow/coarse for it) the model runs edge to edge instead,
+  // so there's no room beside it for those buttons — tapping its own left / right / middle third steps back,
+  // steps forward, or zooms instead, the way this gallery always worked on a phone.
+  function stripZone(stage, e){
+    var r = stage.getBoundingClientRect(), x = (e.clientX - r.left) / r.width;
+    if(x < .33) return stage._cur > 0 ? 'left' : 'edge';
+    if(x > .67) return stage._cur < stage._items.length - 1 ? 'right' : 'edge';
+    return 'mid';
+  }
   function stripClick(stage, e){
     if(stage._zoom !== null){
       var was = stage._items[stage._zoom];
       if(was && was.img) was.img.style.objectPosition = '';
       setZoom(stage, null);
       return;
+    }
+    if(!pagedMQ.matches){
+      var zone = stripZone(stage, e);
+      if(zone === 'left'){ stepStrip(stage, -1); return; }
+      if(zone === 'right'){ stepStrip(stage, 1); return; }
+      if(zone === 'edge') return;
     }
     var it = stage._items[stage._cur];
     if(it && it.img && e){

@@ -24,38 +24,45 @@ window.PROJECTS = {
   "sierra-hotel": {
     title: "Sierra Hotel", group: "Built", hue: 18,
     kicker: "Cusco · 2023",
-    credits: [["Type", "Hospitality"], ["Location", "Cusco, Peru"], ["Year", "2023"], ["Studio", "Urba"], ["Design", "Gonzalo Cáceres Valcárcel"]]
+    credits: [["Type", "Hospitality"], ["Location", "Cusco, Peru"], ["Year", "2023"], ["Studio", "Urba"], ["Design", "Gonzalo Cáceres Valcárcel"]],
+    diagram: {}
   },
   "edificio-murano": {
     title: "Edificio Murano", group: "Built", hue: 210,
     kicker: "Cusco · 2021",
-    credits: [["Type", "Residential"], ["Location", "Cusco, Peru"], ["Year", "2021"], ["Studio", "Urba"], ["Design", "Gonzalo Cáceres Valcárcel"]]
+    credits: [["Type", "Residential"], ["Location", "Cusco, Peru"], ["Year", "2021"], ["Studio", "Urba"], ["Design", "Gonzalo Cáceres Valcárcel"]],
+    diagram: {}
   },
   "urba-branding": {
     title: "Urba Inmobiliaria", group: "Built", hue: 96,
     kicker: "Lima · 2020",
-    credits: [["Type", "Graphic / Branding"], ["Location", "Lima, Peru"], ["Year", "2020"], ["Studio", "Cirkel"], ["Design", "Gonzalo Cáceres Valcárcel"]]
+    credits: [["Type", "Graphic / Branding"], ["Location", "Lima, Peru"], ["Year", "2020"], ["Studio", "Cirkel"], ["Design", "Gonzalo Cáceres Valcárcel"]],
+    diagram: {}
   },
 
   "the-outermost-dock": {
     title: "Outer Dock", group: "Unbuilt", hue: 200,
     kicker: "Columbia GSAPP · 2026",
-    credits: [["School", "Columbia GSAPP"], ["Year", "2026"], ["Design", "Gonzalo Cáceres Valcárcel"]]
+    credits: [["School", "Columbia GSAPP"], ["Year", "2026"], ["Design", "Gonzalo Cáceres Valcárcel"]],
+    diagram: {}
   },
   "social-sanctuary": {
     title: "East 5th", group: "Unbuilt", hue: 42,
     kicker: "Columbia GSAPP · 2025",
-    credits: [["School", "Columbia GSAPP"], ["Year", "2025"], ["Design", "Gonzalo Cáceres Valcárcel"]]
+    credits: [["School", "Columbia GSAPP"], ["Year", "2025"], ["Design", "Gonzalo Cáceres Valcárcel"]],
+    diagram: {}
   },
   "permanent-impermanence": {
     title: "Joint", group: "Unbuilt", hue: 330,
     kicker: "Columbia GSAPP · 2025",
-    credits: [["School", "Columbia GSAPP"], ["Year", "2025"], ["Design", "Gonzalo Cáceres Valcárcel"]]
+    credits: [["School", "Columbia GSAPP"], ["Year", "2025"], ["Design", "Gonzalo Cáceres Valcárcel"]],
+    diagram: {}
   },
   "intra-urban-forestation": {
     title: "Aftergrowth", group: "Unbuilt", hue: 150,
     kicker: "Columbia GSAPP · 2024",
-    credits: [["School", "Columbia GSAPP"], ["Year", "2024"], ["Design", "Gonzalo Cáceres Valcárcel"]]
+    credits: [["School", "Columbia GSAPP"], ["Year", "2024"], ["Design", "Gonzalo Cáceres Valcárcel"]],
+    diagram: {}
   },
 
   "anticlastic-roof-structure": {

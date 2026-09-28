@@ -32,34 +32,34 @@ window.PROJECTS = {
     credits: [["Type", "Residential"], ["Location", "Cusco, Peru"], ["Year", "2021"], ["Studio", "Urba"], ["Design", "Gonzalo Cáceres Valcárcel"]]
   },
   "urba-branding": {
-    title: "Urba Branding", group: "Built", hue: 96,
+    title: "Urba Inmobiliaria", group: "Built", hue: 96,
     kicker: "Lima · 2020",
     credits: [["Type", "Graphic / Branding"], ["Location", "Lima, Peru"], ["Year", "2020"], ["Studio", "Cirkel"], ["Design", "Gonzalo Cáceres Valcárcel"]]
   },
 
   "the-outermost-dock": {
-    title: "The Outermost Dock", group: "Unbuilt", hue: 200,
+    title: "Outer Dock", group: "Unbuilt", hue: 200,
     kicker: "Columbia GSAPP · 2026",
     credits: [["School", "Columbia GSAPP"], ["Year", "2026"], ["Design", "Gonzalo Cáceres Valcárcel"]]
   },
   "social-sanctuary": {
-    title: "Social Sanctuary", group: "Unbuilt", hue: 42,
+    title: "East 5th", group: "Unbuilt", hue: 42,
     kicker: "Columbia GSAPP · 2025",
     credits: [["School", "Columbia GSAPP"], ["Year", "2025"], ["Design", "Gonzalo Cáceres Valcárcel"]]
   },
   "permanent-impermanence": {
-    title: "Permanent Impermanence", group: "Unbuilt", hue: 330,
+    title: "Joint", group: "Unbuilt", hue: 330,
     kicker: "Columbia GSAPP · 2025",
     credits: [["School", "Columbia GSAPP"], ["Year", "2025"], ["Design", "Gonzalo Cáceres Valcárcel"]]
   },
   "intra-urban-forestation": {
-    title: "Intra-Urban Forestation", group: "Unbuilt", hue: 150,
+    title: "Aftergrowth", group: "Unbuilt", hue: 150,
     kicker: "Columbia GSAPP · 2024",
     credits: [["School", "Columbia GSAPP"], ["Year", "2024"], ["Design", "Gonzalo Cáceres Valcárcel"]]
   },
 
   "anticlastic-roof-structure": {
-    title: "Anticlastic Roof Structure", group: "Research", hue: 8,
+    title: "Anticlastic Surfaces", group: "Research", hue: 8,
     kicker: "Robert Marino · 2026",
     lede: "How can a double-curved surface emerge from a system of flat, developable elements?",
     text: [
@@ -93,7 +93,7 @@ window.PROJECTS = {
     }
   },
   "vaulted-shell-structure": {
-    title: "Vaulted Shell Structure", group: "Research", hue: 260,
+    title: "Lean Shells", group: "Research", hue: 260,
     kicker: "Robert Marino · 2026",
     lede: "A physical study of vaulted plywood shell structures, investigating efficient, structurally sound and expressive roof systems that can accommodate insulation.",
     credits: [["Type", "Structural Form-Finding"], ["Practice", "Robert Marino Architects"], ["Year", "2026"], ["Design", "Gonzalo Cáceres Valcárcel"]],
@@ -102,7 +102,7 @@ window.PROJECTS = {
     diagram: {}
   },
   "modular-living-architecture": {
-    title: "Modular Living Architecture", group: "Research", hue: 120,
+    title: "Open Assembly", group: "Research", hue: 120,
     kicker: "2025",
     lede: "A modular system for sphere-like structures, built from the fewest possible parts that assemble with one another, like an organic system.",
     credits: [["Type", "Modular Systems"], ["Year", "2025"], ["Design", "Gonzalo Cáceres Valcárcel"]],

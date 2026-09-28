@@ -50,7 +50,7 @@ window.PROJECTS = {
     title: "East 5th", group: "Unbuilt", hue: 42,
     kicker: "Columbia GSAPP · 2025",
     credits: [["School", "Columbia GSAPP"], ["Year", "2025"], ["Design", "Gonzalo Cáceres Valcárcel"]],
-    diagram: {}
+    diagram: {src: "img/social-sanctuary/hand-drawing.jpg"}
   },
   "permanent-impermanence": {
     title: "Joint", group: "Unbuilt", hue: 330,

@@ -168,7 +168,7 @@
   }
   /* label, rule, paragraph: the block is as tall as the old title + gap, so the rest of the page stays put */
   .about{min-height:calc(clamp(1.9rem,7.4vw,6.5rem)*.9 + clamp(2.5rem,7vw,5rem));max-width:min(100%,900px)}
-  .about h2{margin:0;padding-bottom:1.1rem;border-bottom:1px solid var(--rule);font-weight:400;color:var(--mute)}
+  .about h2{display:block;width:fit-content;margin:0;padding-bottom:1.1rem;border-bottom:1px solid var(--rule);font-weight:400;color:var(--mute)}
   .about-row{position:relative}
   /* the band under the last section is a spacer: at least --band tall, and it grows to fill a taller window.
      The logo is centred between the rule under the last row and the footer text, so it always sits

@@ -199,10 +199,10 @@
   /* one flowing inline line per row — bold name, small dot, then one or more mono-caps parts —
      instead of a grid. Font sizes and the rule between rows match a project page's credits list
      (.credits-panel dt/dd): .66rem for the mono part, .85rem for the name. width:fit-content on
-     both the list and each row means every rule (the one between rows and the closing one) is
-     only as long as that row's own text, not stretched to the full column width. */
-  .exp--flow{width:fit-content}
-  .exp--flow li{display:block;width:fit-content}
+     the list shrinks it (and every row's rule, since each li is a plain full-width block within
+     it) down to the width of its widest row, instead of stretching to the full column width. */
+  .exp--flow{width:fit-content;border-bottom:0}
+  .exp--flow li{display:block}
   .exp--flow b{margin-right:.4em;font-size:.85rem}
   .exp--flow span{margin-left:.4em;font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.04em;color:var(--mute)}
   .exp--flow span + span::before{content:"\00b7";margin-right:.4em}

@@ -146,11 +146,11 @@
   .switch[aria-checked="true"] .switch-knob{transform:translateX(14px)}
 
   main{
-    --band:clamp(2rem,5vh,3.5rem);   /* the empty band between the last section and the footer */
+    --band:clamp(3rem,8vh,5.5rem);   /* the empty band between the last section and the footer */
     display:flex;
     flex-direction:column;
     flex:1 0 auto;
-    padding:clamp(1rem,4vh,2rem) var(--pad) 0;
+    padding:clamp(1.5rem,5vh,3rem) var(--pad) 0;
   }
   main > *{flex:none}
   .mono{
@@ -181,16 +181,16 @@
   /* hovering the logo (script below): the stitches fade out together, turn a sixth of a turn about the centre while
      invisible, and fade back in there. The ring stays exactly where it is throughout. */
   .logo .marks{transform-origin:100px 100px;transform-box:view-box}
-  .bio{margin:0;padding-top:clamp(.3rem,1.2vh,.6rem);max-width:42rem;font-size:clamp(.78rem,1vw,.9rem);line-height:1.6;letter-spacing:-.005em;color:var(--mute)}
-  .exp-wrap{margin-top:clamp(.75rem,3vh,1.5rem);max-width:min(100%,900px)}
-  .exp-wrap h2{margin:0 0 .7rem;font-weight:400;color:var(--mute)}
+  .bio{margin:0;padding-top:clamp(.6rem,2vh,1.1rem);max-width:42rem;font-size:clamp(.78rem,1vw,.9rem);line-height:1.6;letter-spacing:-.005em;color:var(--mute)}
+  .exp-wrap{margin-top:clamp(2rem,5vh,3rem);max-width:min(100%,900px)}
+  .exp-wrap h2{margin:0 0 1.1rem;font-weight:400;color:var(--mute)}
   .exp{margin:0;padding:0;list-style:none;border-bottom:1px solid var(--rule)}
   .exp li{
     display:grid;
     grid-template-columns:minmax(0,1fr) minmax(0,1.7fr) 11rem;
     gap:1.5rem;
     align-items:baseline;
-    padding:.6rem 0;
+    padding:.8rem 0;
     border-top:1px solid var(--rule);
   }
   .exp b{font-weight:500;font-size:1.05rem}

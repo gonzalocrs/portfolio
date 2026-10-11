@@ -28,7 +28,8 @@ window.PROJECTS = {
     diagram: {},
     gallery: {
       drawings: [
-        {src: "img/sierra-hotel/facade.webp", caption: "Facade"}
+        {src: "img/sierra-hotel/facade.webp", caption: "Facade"},
+        {src: "img/sierra-hotel/floor-plans.webp", caption: "Floor plans"}
       ]
     }
   },

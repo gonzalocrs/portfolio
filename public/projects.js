@@ -31,7 +31,8 @@ window.PROJECTS = {
         {src: "img/sierra-hotel/facade-2.png", caption: "Facade"},
         {src: "img/sierra-hotel/facade-1.png", caption: "Facade"},
         {src: "img/sierra-hotel/facade-3.jpg", caption: "Facade"},
-        {src: "img/sierra-hotel/facade-4.webp", caption: "Facade"}
+        {src: "img/sierra-hotel/facade-4.webp", caption: "Facade"},
+        {src: "img/sierra-hotel/facade-5.webp", caption: "Facade"}
       ]
     }
   },

@@ -126,7 +126,7 @@
   /* ---------- intro ---------- */
   #introveil{position:fixed;inset:0;z-index:100;background:var(--paper);display:none;pointer-events:none}
   html.intro-on{overflow:hidden}
-  html.intro-on #introveil{display:block;animation:introSafety 0s 4s forwards}   /* if the script ever fails, the veil goes by itself */
+  html.intro-on #introveil{display:block;animation:introSafety 0s 7s forwards}   /* if the script ever fails, the veil goes by itself */
   @keyframes introSafety{to{opacity:0;visibility:hidden}}
   /* The real signature waits, invisible, in the header. The intro shows a copy of it drawn at its real, large size (see the
      script), so the text is always sharp; that copy is then shrunk into the header. Nothing is ever enlarged by a transform,
@@ -819,7 +819,7 @@
   if(!root.classList.contains('intro-on')) return;
   var veil = document.getElementById('introveil'), mark = document.querySelector('.gv-mark');
   if(!veil || !mark){ root.classList.remove('intro-on'); return; }
-  var FLIP = 500, SPREAD = 450, MOVE = 700;     // each flip takes 0.5 s, all letters land within ~1 s, then 0.7 s to the header
+  var FLIP = 950, SPREAD = 950, MOVE = 1200;    // each flip takes 0.95 s: half a second slower than the 0.45 s hover flip
   var timers = [], big = null;
   function later(fn, ms){ timers.push(setTimeout(fn, ms)); }
   function rnd(a, b){ return a + Math.random() * (b - a); }
@@ -859,7 +859,7 @@
       sp.style.transition = 'none';
       sp.style.opacity = '0';
       sp.style.transform = 'scaleX(-1)';
-      var t = 40 + rnd(0, SPREAD);
+      var t = 60 + rnd(0, SPREAD);
       later(function(){
         sp.style.transition = 'transform ' + FLIP + 'ms cubic-bezier(.2,.8,.2,1), opacity 140ms ease';
         sp.style.opacity = '1';
@@ -876,14 +876,14 @@
       big.style.transform = 'translate(' + tr.left + 'px,' + tr.top + 'px) scale(' + (tr.width / br.width) + ')';
       veil.style.transition = 'opacity ' + Math.round(MOVE * .8) + 'ms ease ' + Math.round(MOVE * .15) + 'ms';
       veil.style.opacity = '0';
-      later(finish, MOVE + 100);
+      later(finish, MOVE + 250);
     }, flipsEnd);
   }
   // wait for the fonts (the signature's size depends on them), but never for long; if anything goes wrong, just show the page
   var go = false;
   function start(){ if(go) return; go = true; try{ run(); }catch(e){ finish(); } }
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(start);
-  setTimeout(start, 500);
+  setTimeout(start, 900);
 })();
 </script>
 

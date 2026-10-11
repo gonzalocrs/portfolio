@@ -30,7 +30,8 @@ window.PROJECTS = {
       drawings: [
         {src: "img/sierra-hotel/facade.webp", caption: "Facade"},
         {src: "img/sierra-hotel/floor-plans.webp", caption: "Floor plans"},
-        {src: "img/sierra-hotel/floor-plans-2.webp", caption: "Floor plans"}
+        {src: "img/sierra-hotel/floor-plans-2.webp", caption: "Floor plans"},
+        {src: "img/sierra-hotel/floor-plans-3.webp", caption: "Floor plans"}
       ]
     }
   },

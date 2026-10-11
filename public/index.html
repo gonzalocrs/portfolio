@@ -278,7 +278,7 @@
     border:1px solid var(--rule);
     overflow:hidden;
     opacity:0;
-    transition:opacity 1.6s ease;
+    transition:opacity 1.84s ease;
     background:var(--paper);
   }
   .tile.on{opacity:1}
@@ -287,6 +287,9 @@
   .tile.preview{
     z-index:2;
   }
+  .tile.ambient.on{pointer-events:auto;cursor:pointer}
+  .tile.ambient .cap{opacity:0;transition:opacity .25s ease}
+  .tile.ambient:hover .cap{opacity:1}
   .tile .cap{
     position:absolute;left:.6rem;bottom:.6rem;
     font-family:var(--mono);font-size:.68rem;
@@ -460,6 +463,7 @@
   <span>© 2026</span>
 </footer>
 
+<script src="projects.js"></script>
 <script>
 (function(){
   var groups = Array.prototype.slice.call(document.querySelectorAll('.group'));
@@ -526,6 +530,49 @@
     return 'repeating-linear-gradient(135deg, hsl('+h+' 30% 62%) 0 6px, hsl('+h+' 30% 68%) 6px 12px)';
   }
 
+  // every picture on the site (heroes, diagrams, drawings, models, photos & renders), from projects.js, cropped (cover) to
+  // each opening. Pictures are grouped by project and section (e.g. "anticlastic-roof-structure / physical"); the wall
+  // picks the group with the fewest pictures on screen right now (ties random, never the one just shown), then a picture
+  // from that group's shuffled bag. So the mix stays varied: a big section never fills the wall, and nothing repeats
+  // until its whole group has been seen.
+  var GROUPS = {}, shown = [];      // GROUPS: key -> {all: [src], bag: [src]}; shown: the group keys on screen now
+  Object.keys(window.PROJECTS || {}).forEach(function(slug){
+    var pr = window.PROJECTS[slug], g = pr.gallery || {};
+    function add(sec, src){ if(!src) return; var k = slug + '/' + sec; (GROUPS[k] = GROUPS[k] || {all: [], bag: []}).all.push(src); }
+    add('hero', pr.hero);
+    if(pr.diagram) add('diagram', pr.diagram.src);
+    ['drawings', 'physical', 'photos'].forEach(function(sec){ (g[sec] || []).forEach(function(it){ add(sec, it.src); }); });
+  });
+  var IMG_BY_SLUG = {}, lastGroup = '';
+  Object.keys(GROUPS).forEach(function(k){ var slug = k.split('/')[0]; IMG_BY_SLUG[slug] = (IMG_BY_SLUG[slug] || []).concat(GROUPS[k].all); });
+  function shuffle(a){ for(var i = a.length - 1; i > 0; i--){ var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function nextImage(){      // returns {src, group}
+    var keys = Object.keys(GROUPS);
+    if(!keys.length) return null;
+    function count(k){ return shown.filter(function(x){ return x === k; }).length; }
+    var pool = keys.filter(function(k){ return k !== lastGroup; });
+    if(!pool.length) pool = keys;
+    var min = Math.min.apply(null, pool.map(count));
+    pool = pool.filter(function(k){ return count(k) === min; });
+    var key = pool[Math.floor(Math.random() * pool.length)], g = GROUPS[key];
+    if(!g.bag.length) g.bag = shuffle(g.all.slice());
+    lastGroup = key;
+    return {src: g.bag.pop(), group: key};
+  }
+
+  // put a picture in a tile's fill once it has loaded (cropped to fit); show the stripes meanwhile or if it fails
+  function setFill(fill, src, hue, done){
+    fill.style.background = swatch(hue);
+    if(!src){ if(done) done(); return; }
+    var im = new Image();
+    im.onload = function(){
+      fill.style.background = 'url("' + src + '") center / cover no-repeat';
+      if(done) done();
+    };
+    im.onerror = function(){ if(done) done(); };
+    im.src = src;
+  }
+
   var links = Array.prototype.slice.call(document.querySelectorAll('.work a'));
   var hues = links.map(function(a){ return a.getAttribute('data-hue'); });
 
@@ -558,21 +605,54 @@
     var fill = document.createElement('span');
     fill.className = 'fill on';
     tile.appendChild(fill);
-    return { tile: tile, fill: fill, timer: null, paused: false, slot: -1 };
+    var cap = document.createElement('span');     // the project's name, shown while the pointer is over the picture
+    cap.className = 'cap';
+    tile.appendChild(cap);
+    var st = { tile: tile, fill: fill, cap: cap, timer: null, paused: false, slot: -1, hover: false };
+    tile.addEventListener('mouseenter', function(){ st.hover = true; });
+    tile.addEventListener('mouseleave', function(){ st.hover = false; });
+    return st;
   });
+  AMBIENT_SLOTS.forEach(function(sl){ var q = sl.aspect.split('/'); sl.ratio = q[0] / q[1]; });
+
+  // aspect (width / height) of each picture, known once it has loaded
+  var aspectOf = {};
+  function loadAspect(src, cb){
+    if(!src){ cb(null); return; }
+    if(aspectOf[src]){ cb(aspectOf[src]); return; }
+    var im = new Image();
+    im.onload = function(){ aspectOf[src] = im.naturalWidth / im.naturalHeight; cb(aspectOf[src]); };
+    im.onerror = function(){ cb(null); };
+    im.src = src;
+  }
+
+  // a picture first (balanced across sections, see nextImage), then the free opening whose proportions are closest to
+  // the picture's: the most vertical picture goes to the most vertical opening, a wide one to a wide opening, and so on.
+  // A little jitter keeps it from being perfectly predictable.
+  function bestSlot(a, s){
+    var best = -1, bestScore = 1e9;
+    for(var k = 0; k < AMBIENT_SLOTS.length; k++){
+      if(slotTaken[k] || k === s.slot) continue;
+      var sc = a ? Math.abs(Math.log(AMBIENT_SLOTS[k].ratio / a)) + Math.random() * .12 : Math.random();
+      if(sc < bestScore){ bestScore = sc; best = k; }
+    }
+    return best;
+  }
 
   function ambientCycle(s){
     if(s.paused) return;
-    var candidates = [];
-    for(var k = 0; k < AMBIENT_SLOTS.length; k++){
-      if(!slotTaken[k] && k !== s.slot) candidates.push(k);
-    }
-    if(candidates.length === 0){
-      // every slot is in use right now: wait a beat rather than overlap
-      s.timer = setTimeout(function(){ ambientCycle(s); }, 500 + Math.random() * 600);
+    var token = s.token = (s.token || 0) + 1, pick = nextImage();
+    if(pick){ s.group = pick.group; shown.push(pick.group); }
+    loadAspect(pick ? pick.src : null, function(a){ place(s, token, pick, a); });
+  }
+  function place(s, token, pick, a){
+    if(s.token !== token || s.paused) return;
+    var i = bestSlot(a, s);
+    if(i === -1){
+      // every opening is in use right now: wait a beat rather than overlap
+      s.timer = setTimeout(function(){ place(s, token, pick, a); }, 500 + Math.random() * 600);
       return;
     }
-    var i = candidates[Math.floor(Math.random() * candidates.length)];
     s.slot = i;
     slotTaken[i] = true;
     var slot = AMBIENT_SLOTS[i];
@@ -582,20 +662,36 @@
     s.tile.style.aspectRatio = slot.aspect;
 
     var h = hues[Math.floor(Math.random() * hues.length)];
-    s.fill.style.background = slot.dot ? 'var(--ink)' : swatch(h);
+    if(slot.dot) s.fill.style.background = 'var(--ink)';
+    else setFill(s.fill, pick && pick.src, h);
+    var pr = pick && window.PROJECTS && window.PROJECTS[pick.group.split('/')[0]];
+    s.src = pick ? pick.src : null;
+    s.cap.textContent = pr ? pr.title : '';
     s.tile.classList.add('on');
-    var visibleFor = 3200 + Math.random() * 3200;
+    hideLater(s, 3680 + Math.random() * 3680);
+  }
+  // fade a tile out after a while (not while the pointer is on it), then start its next round after a pause
+  function hideLater(s, ms){
     s.timer = setTimeout(function(){
+      if(s.hover || s.holding){ hideLater(s, 600); return; }
       s.tile.classList.remove('on');
       slotTaken[s.slot] = false;
-      var gap = 1400 + Math.random() * 2600;
+      releaseGroup(s);
+      var gap = 1610 + Math.random() * 2990;
       s.timer = setTimeout(function(){ ambientCycle(s); }, gap);
-    }, visibleFor);
+    }, ms);
+  }
+  function releaseGroup(s){
+    if(!s.group) return;
+    var i = shown.indexOf(s.group); if(i !== -1) shown.splice(i, 1);
+    s.group = null;
   }
   function ambientPause(s){
     s.paused = true;
+    s.holding = false;
     clearTimeout(s.timer);
     s.tile.classList.remove('on');
+    releaseGroup(s);
     if(s.slot !== -1){ slotTaken[s.slot] = false; s.slot = -1; }
   }
   function ambientResume(s){
@@ -634,16 +730,28 @@
     return PREVIEW_SLOTS[i];
   }
 
-  function popIn(p, a){
-    var slot = nextSlot();
+  function popIn(p, a, custom){
+    var slot = custom || nextSlot();     // custom: the picture that was clicked on the wall, grown from where it was
+    if(custom){
+      p.tile.style.transition = 'none';
+      p.tile.style.top = custom.from.top;
+      p.tile.style.left = custom.from.left;
+      p.tile.style.width = custom.from.width;
+      p.tile.style.aspectRatio = custom.from.aspect;
+      p.fill.style.background = 'url("' + custom.src + '") center / cover no-repeat';   // already loaded: no flash
+      p.tile.classList.add('on');
+      void p.tile.offsetWidth;
+      var ease = ' .7s cubic-bezier(.2,.7,.2,1)';
+      p.tile.style.transition = 'top' + ease + ', left' + ease + ', width' + ease + ', aspect-ratio' + ease + ', opacity .18s ease';
+    }
     p.tile.style.top = slot.top;
     p.tile.style.left = slot.left;
     p.tile.style.width = slot.width;
     p.tile.style.aspectRatio = slot.aspect;
-    p.fill.style.background = swatch(a.getAttribute('data-hue'));
+    var slug = (a.getAttribute('href').match(/[?&]p=([^&]+)/) || [])[1], own = IMG_BY_SLUG[slug] || [];
+    if(!custom) setFill(p.fill, own.length ? own[Math.floor(Math.random() * own.length)] : null, a.getAttribute('data-hue'));
     p.cap.textContent = a.querySelector('.name').firstChild.textContent.trim();
-    p.tile.style.transition = 'opacity .18s ease';
-    p.tile.classList.add('on');
+    if(!custom){ p.tile.style.transition = 'opacity .18s ease'; p.tile.classList.add('on'); }
   }
   function fadeOut(p){
     p.tile.style.transition = 'opacity 1.6s ease';
@@ -652,7 +760,15 @@
 
   // selects a project's preview directly (not just as an event side-effect),
   // so it can be triggered reliably from hover, focus, or the scroll wheel
-  function selectProject(a){
+  var openTimers = [];
+  function cancelOpen(){
+    if(!openTimers.length) return;
+    openTimers.forEach(clearTimeout);
+    openTimers = [];
+    links.forEach(function(l){ if(l !== currentLink) l.classList.remove('current'); });
+  }
+  function selectProject(a, custom){
+    cancelOpen();
     clearTimeout(leaveTimer);
     ambientState.forEach(ambientPause);
     if(currentLink === a) return;
@@ -662,7 +778,7 @@
 
     var outgoingIndex = activeIndex;
     activeIndex = activeIndex === 0 ? 1 : 0;
-    popIn(previews[activeIndex], a);
+    popIn(previews[activeIndex], a, custom);
     if(outgoingIndex !== -1) fadeOut(previews[outgoingIndex]);
   }
 
@@ -682,6 +798,74 @@
     a.addEventListener('focus', show);
     a.addEventListener('mouseleave', hide);
     a.addEventListener('blur', hide);
+  });
+
+  // close the menu and start the wall over: the selection and previews go, the ambient pictures resume
+  function closeAll(){
+    cancelOpen();
+    clearTimeout(leaveTimer);
+    setOpen(null, false);
+    if(currentLink){ currentLink.classList.remove('current'); currentLink = null; }
+    activeIndex = -1;
+    previews.forEach(fadeOut);
+    ambientState.forEach(ambientResume);
+  }
+  // a click anywhere on the background (not on the menu, the header or a link) closes it
+  document.addEventListener('click', function(e){
+    if(!document.body.classList.contains('is-open')) return;
+    if(e.target.closest('a, button, header, .index, .tile')) return;
+    closeAll();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && document.body.classList.contains('is-open')) closeAll();
+  });
+
+  // clicking a picture on the wall opens that project's category and "scrolls" down its list to the project. In order, so
+  // nothing fights over the layout: the wall clears, the menu opens (its own 0.45 s animation), then the highlight steps
+  // down the list to the project, and only then does the project's preview picture come in.
+  function openProject(a, st){
+    cancelOpen();
+    clearTimeout(leaveTimer);
+    var g = a.closest('.group'), list = Array.prototype.slice.call(g.querySelectorAll('.work a')), idx = list.indexOf(a);
+    var wasOpen = g.getAttribute('data-open') === 'true';
+    // the clicked picture stays put until its bigger version is ready; everything else on the wall clears
+    var custom = null;
+    if(st && st.src){
+      // the picture grows from its box to as large as the wall area allows, uncropped (its own proportions), centred there
+      var cr = document.getElementById('collage').getBoundingClientRect(), r = st.tile.getBoundingClientRect();
+      var ar = aspectOf[st.src] || (r.width / r.height);
+      var w = Math.min(cr.width * .96, cr.height * .96 * ar), h = w / ar;
+      var x = (cr.width - w) / 2, y = (cr.height - h) / 2;
+      custom = {top: y + 'px', left: x + 'px', width: w + 'px', aspect: String(ar), src: st.src,
+                from: {top: (r.top - cr.top) + 'px', left: (r.left - cr.left) + 'px', width: r.width + 'px', aspect: st.tile.style.aspectRatio}};
+      st.holding = true;
+    }
+    ambientState.forEach(function(o){ if(o !== st) ambientPause(o); });
+    previews.forEach(fadeOut);
+    activeIndex = -1;
+    if(currentLink){ currentLink.classList.remove('current'); currentLink = null; }
+    setOpen(g, true);
+    var t = wasOpen ? 0 : 480, prev = null;
+    list.slice(0, idx).forEach(function(l, i){
+      openTimers.push(setTimeout(function(){
+        if(prev) prev.classList.remove('current');
+        l.classList.add('current'); prev = l;
+      }, t + i * 130));
+    });
+    openTimers.push(setTimeout(function(){
+      if(prev) prev.classList.remove('current');
+      openTimers = [];
+      if(st){ st.tile.style.transition = 'opacity .18s ease'; setTimeout(function(){ st.tile.style.transition = ''; }, 400); }
+      selectProject(a, custom);
+      a.focus({preventScroll:true});
+    }, t + idx * 130 + (idx ? 130 : 0)));
+  }
+  ambientState.forEach(function(st){
+    st.tile.addEventListener('click', function(){
+      var slug = st.group && st.group.split('/')[0];
+      var a = slug && links.filter(function(l){ return (l.getAttribute('href').match(/[?&]p=([^&]+)/) || [])[1] === slug; })[0];
+      if(a) openProject(a, st);
+    });
   });
 
   // while a project is hovered, the scroll wheel steps the selection up/down

@@ -25,7 +25,7 @@ window.PROJECTS = {
     title: "Sierra Hotel", group: "Built", hue: 18,
     kicker: "Cusco · 2023",
     credits: [["Type", "Hospitality"], ["Location", "Cusco, Peru"], ["Year", "2023"], ["Studio", "Urba"], ["Design", "Gonzalo Cáceres Valcárcel"]],
-    diagram: {src: "img/sierra-hotel/exploded-diagram.png", caption: "Exploded axonometric"},
+    diagram: {src: "img/sierra-hotel/exploded-diagram.jpg", caption: "Exploded axonometric"},
     hero: "img/sierra-hotel/hero.jpg",
     heroPosition: "center",
     gallery: {

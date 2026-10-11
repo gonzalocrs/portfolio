@@ -347,6 +347,11 @@
   .row--duo .ffig--small{width:min(31cqw,calc(var(--a) * var(--maxh) * .8))}
   .duo--top{align-items:flex-start}
   .duo--bottom{align-items:flex-end}
+  /* grid layout for photos & renders (see buildGrid): three columns, pictures top-aligned in their row */
+  .grow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:clamp(1rem,2.8vw,2.5rem);align-items:start;margin-top:clamp(3rem,9vh,6rem)}
+  .grow:first-child{margin-top:0}
+  .gfig--full{margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);width:100vw}
+  @media (max-width:900px){ .grow{display:block;margin-top:2.5rem} .grow .gfig{width:100% !important;margin:0 0 2rem !important} }
   @media (max-width:900px){
     .free__row{display:block;margin-top:2.5rem}
     .free .ffig{width:100% !important;margin:0 0 2rem !important}

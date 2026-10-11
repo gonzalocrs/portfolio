@@ -34,10 +34,21 @@ window.PROJECTS = {
     hero: "img/sierra-hotel/hero.jpg",
     heroPosition: "center",
     gallery: {
+      photosLayout: "grid",
       drawings: [
         {src: "img/sierra-hotel/facade.webp", caption: "Facade"},
         {src: "img/sierra-hotel/floor-plans-3.webp", caption: "Floor plans"},
         {src: "img/sierra-hotel/facade-details.webp", caption: "Facade details"}
+      ],
+      photos: [
+        {src: "img/sierra-hotel/photo-1.jpg", caption: ""},
+        {src: "img/sierra-hotel/photo-2.jpg", caption: ""},
+        {src: "img/sierra-hotel/photo-3.jpg", caption: ""},
+        {src: "img/sierra-hotel/photo-4.jpg", caption: ""},
+        {src: "img/sierra-hotel/photo-5.jpg", caption: ""},
+        {src: "img/sierra-hotel/photo-6.jpg", caption: ""},
+        {src: "img/sierra-hotel/photo-7.jpg", caption: ""},
+        {src: "img/sierra-hotel/render-facade.jpg", caption: ""}
       ]
     }
   },

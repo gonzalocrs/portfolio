@@ -229,7 +229,7 @@
       });
       seg.appendChild(free);
       app.appendChild(seg);
-      freeSets.push({el: free, items: fitems});
+      freeSets.push({el: free, items: fitems, grid: G.photosLayout === 'grid'});
       segs.push({el: seg, name: s.name, free: true});
       return;
     }
@@ -473,6 +473,7 @@
   // Pictures keep their own proportions; the sides alternate; a row needing two pictures with only one left is a single.
   var ROWS = ['stagger', 'single', 'duo', 'wide'];
   function buildFree(set){
+    if(set.grid){ buildGrid(set); return; }
     var box = set.el, items = set.items, r = 0, i = 0, side = 0, oneSide = 1;   // 'side' alternates the pairs, 'oneSide' alternates the single pictures
     box.textContent = '';
     function place(row, it, cls){
@@ -506,6 +507,58 @@
       box.appendChild(row);
       r += 1;
     }
+  }
+  // ---- the grid layout (photos & renders, when gallery.photosLayout is "grid") ---------------------------------
+  // After snohetta.com/projects/pavilia-farm-clubhouses: three equal columns with a gutter; a picture covers one or two
+  // columns (or the full bleed, for a landscape one), is top-aligned in its row, and its caption sits under it. Where each
+  // picture goes is random and decided once per page load; add ?seed=N to the URL to repeat a particular arrangement.
+  var gridSeed = (function(){
+    var m = /[?&]seed=(\d+)/.exec(location.search);
+    return m ? +m[1] : Math.floor(Math.random() * 1e9);
+  })();
+  if(window.console) console.log('photo grid seed:', gridSeed);
+  function planGrid(items){
+    var s = gridSeed >>> 0;
+    function rand(){ s = (s + 0x6D2B79F5) >>> 0; var t = s; t = Math.imul(t ^ t >>> 15, t | 1); t ^= t + Math.imul(t ^ t >>> 7, t | 61); return ((t ^ t >>> 14) >>> 0) / 4294967296; }
+    function pick(a){ return a[Math.floor(rand() * a.length)]; }
+    var order = items.map(function(_, i){ return i; });
+    for(var i = order.length - 1; i > 0; i--){ var j = Math.floor(rand() * (i + 1)), t = order[i]; order[i] = order[j]; order[j] = t; }
+    var rows = [], k = 0;
+    while(k < order.length){
+      var left = order.length - k, a = items[order[k]].a, kind;
+      var opts = [];
+      if(left >= 3) opts.push('thirds', 'thirds');
+      if(left >= 2) opts.push('wide-small', 'small-wide', 'pair-gap');
+      opts.push('single');
+      if(a > 1.2) opts.push('full');
+      kind = pick(opts);
+      var row = [];
+      if(kind === 'thirds'){ for(var c = 0; c < 3; c++) row.push({i: order[k++], col: c, span: 1}); }
+      else if(kind === 'wide-small'){ row.push({i: order[k++], col: 0, span: 2}, {i: order[k++], col: 2, span: 1}); }
+      else if(kind === 'small-wide'){ row.push({i: order[k++], col: 0, span: 1}, {i: order[k++], col: 1, span: 2}); }
+      else if(kind === 'pair-gap'){ var cols = pick([[0, 2], [0, 1], [1, 2]]); row.push({i: order[k++], col: cols[0], span: 1}, {i: order[k++], col: cols[1], span: 1}); }
+      else if(kind === 'full'){ row.push({i: order[k++], col: 0, span: 3, full: true}); }
+      else { var span = pick([1, 2]); row.push({i: order[k++], col: Math.floor(rand() * (4 - span)), span: span}); }
+      rows.push(row);
+    }
+    return rows;
+  }
+  function buildGrid(set){
+    var box = set.el, items = set.items;
+    if(!set.plan) set.plan = planGrid(items);
+    box.textContent = '';
+    box.classList.add('free--grid');
+    set.plan.forEach(function(row){
+      var r = el('div', 'grow');
+      row.forEach(function(slot){
+        var it = items[slot.i];
+        it.fig.className = 'ffig gfig' + (slot.full ? ' gfig--full' : '');
+        it.fig.style.setProperty('--a', it.a.toFixed(4));
+        it.fig.style.gridColumn = (slot.col + 1) + ' / span ' + slot.span;
+        r.appendChild(it.fig);
+      });
+      box.appendChild(r);
+    });
   }
   var freeQueued = false;
   function scheduleFree(){

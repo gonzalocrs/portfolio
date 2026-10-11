@@ -25,7 +25,13 @@ window.PROJECTS = {
     title: "Sierra Hotel", group: "Built", hue: 18,
     kicker: "Cusco · 2023",
     credits: [["Type", "Hospitality"], ["Location", "Cusco, Peru"], ["Year", "2023"], ["Studio", "Urba"], ["Design", "Gonzalo Cáceres Valcárcel"]],
-    diagram: {}
+    diagram: {},
+    gallery: {
+      drawings: [
+        {src: "img/sierra-hotel/facade-2.png", caption: "Facade"},
+        {src: "img/sierra-hotel/facade-1.png", caption: "Facade"}
+      ]
+    }
   },
   "edificio-murano": {
     title: "Edificio Murano", group: "Built", hue: 210,

@@ -51,6 +51,14 @@ Tool notes: `sips -c` ignores the crop offset and always crops from the centre. 
 `ffmpeg -vf crop=W:H:X:Y` for a crop anchored somewhere else. There is no ImageMagick or Pillow.
 ffmpeg and cwebp are at `/opt/homebrew/bin`.
 
+## Drawings from CAD
+
+Plans and elevations are generated from the CAD files as SVG by `tools/drawings/` (not deployed): one project
+file per building in `tools/drawings/projects/` says which layer is what and holds any hand edits, then
+`python tools/drawings/build.py sierra-hotel` writes `public/img/<slug>/*.svg`. The line-weight language and
+how to feed in a new DWG are in `tools/drawings/README.md`. Edit the project file and rebuild rather than
+editing the SVGs.
+
 ## Preview locally
 
 ```bash

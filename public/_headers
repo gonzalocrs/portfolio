@@ -30,3 +30,12 @@
 
 /signature.js
   Cache-Control: no-cache
+
+/work
+  Cache-Control: no-cache
+
+/work.html
+  Cache-Control: no-cache
+
+/sphere.js
+  Cache-Control: no-cache

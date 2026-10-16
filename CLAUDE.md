@@ -10,6 +10,12 @@ https://portfolio.gonzalo-crs.workers.dev. GitHub: `gonzalocrs/portfolio`, branc
 - `public/project.html` + `public/project.js`: one template for every project, filled from `?p=<slug>`.
 - `public/projects.js`: **all project content** (one entry per project). This is the file you edit most.
 - `public/about.html`, `contact.html`, `contact.js`, `signature.js`: other pages.
+- `public/work.html` + `public/sphere.js`: every project on one slowly turning 3D sphere of pictures (drag to spin,
+  scroll to step back, Ctrl/⌘ + scroll or pinch to zoom), rebuilt from the Framer "Sphere Gallery" on adamjakubowski.pl
+  with the same settings. It reads `projects.js`, so new pictures appear there automatically; projects with no pictures
+  show as their colour with their name. Linked as "Work" in the header.
+- `public/img/thumbs/`: light WebP previews (720 px) used by the sphere. Run `python3 tools/thumbs.py` after adding or
+  replacing images (it only redoes changed ones); until then the sphere falls back to the heavy original.
 - `public/img/<slug>/`: images for each project.
 - `public/_headers`: `no-cache` on the HTML and JS files, so edits show up right away.
 - `wrangler.toml`: Worker config. `.wrangler/` is local cache and is not committed.
@@ -45,7 +51,8 @@ Source files are in Google Drive, under
    - Drawings: WebP or PNG, up to about 3000 px wide. Over about 4500 px is far too heavy (the first Sierra PNGs were
      7200 x 10800 and loaded very slowly).
    - Use files that are already small as they are; do not recompress them twice.
-4. Preview locally, then deploy (below).
+4. Run `python3 tools/thumbs.py` so the Work sphere gets a light preview of the new image.
+5. Preview locally, then deploy (below).
 
 Tool notes: `sips -c` ignores the crop offset and always crops from the centre. Use
 `ffmpeg -vf crop=W:H:X:Y` for a crop anchored somewhere else. There is no ImageMagick or Pillow.

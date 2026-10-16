@@ -284,6 +284,8 @@
   }
   .tile.on{opacity:1}
   .tile .fill{position:absolute;inset:0;opacity:0;transition:opacity .6s ease}
+  /* a little larger than the opening, so it can slide with the eye (see drawView) without showing an edge */
+  .tile.ambient .fill{inset:-4%;transform:translate(var(--look-x,0),var(--look-y,0))}
   .tile .fill.on{opacity:1}
   /* the drawn openings behind the pictures (see drawFacade); they step back while a project's preview is up */
   .facade{position:absolute;inset:0;width:100%;height:100%;overflow:visible;transition:opacity .6s ease}
@@ -590,20 +592,18 @@
   // slots (three well-spaced rows), so the collage shifts over time without
   // sprawling into fully free-form chaos
   var AMBIENT_SLOTS = [
-    // big openings of different sizes and proportions on one square 'wall', loosely
-    // after the Ronchamp window pattern, so an image is actually readable in each.
-    // None overlap. Eight large openings that use the upper ~88% of the wall; still more than enough for the six tiles
-    // to keep moving around.
-    // glass: where the small pane at the back of the splayed reveal sits, as [x, y, w, h] fractions of the
-    // opening (drawn while no picture is in it, see the facade below)
-    {top:'1%', left:'1%', width:'33%', aspect:'10/11', glass:[.36,.12,.26,.2]},
-    {top:'3%', left:'38%', width:'30%', aspect:'4/3', glass:[.08,.55,.3,.3]},
-    {top:'1%', left:'72%', width:'26%', aspect:'3/4', glass:[.6,.1,.28,.16]},
-    {top:'41%', left:'1%', width:'33%', aspect:'3/2', glass:[.1,.15,.7,.16]},
-    {top:'29%', left:'38%', width:'30%', aspect:'1/1', glass:[.42,.58,.26,.28]},
-    {top:'39%', left:'72%', width:'26%', aspect:'4/5', glass:[.22,.12,.2,.62]},
-    {top:'67%', left:'3%', width:'28%', aspect:'4/3', glass:[.62,.16,.22,.6]},
-    {top:'63%', left:'37%', width:'31%', aspect:'3/2', glass:[.12,.62,.5,.22]}
+    // big openings of different sizes and proportions on one square 'wall', after the Ronchamp south wall, so an image
+    // is actually readable in each. None overlap; their edges deliberately don't line up into columns. Eight openings
+    // over the upper ~88% of the wall: more than enough for the six tiles to keep moving around.
+    // glass: the size of the small pane at the back of the splayed reveal, as [w, h] fractions of the opening
+    {top:'1%', left:'1%', width:'33%', aspect:'10/11', glass:[.26,.2]},
+    {top:'6%', left:'39%', width:'28%', aspect:'4/3', glass:[.3,.3]},
+    {top:'0%', left:'72%', width:'24%', aspect:'3/4', glass:[.28,.16]},
+    {top:'44%', left:'5%', width:'30%', aspect:'3/2', glass:[.6,.18]},
+    {top:'31%', left:'41%', width:'27%', aspect:'1/1', glass:[.26,.28]},
+    {top:'37%', left:'74%', width:'25%', aspect:'4/5', glass:[.2,.55]},
+    {top:'67%', left:'1%', width:'27%', aspect:'4/3', glass:[.22,.5]},
+    {top:'66%', left:'33%', width:'31%', aspect:'3/2', glass:[.45,.24]}
   ];
   // tracks which slots are currently occupied so two tiles never land on
   // the same rectangle at once
@@ -611,19 +611,24 @@
   AMBIENT_SLOTS.forEach(function(sl){ var q = sl.aspect.split('/'); sl.ratio = q[0] / q[1]; });
 
   // The facade: every opening is always drawn on the wall as a splayed reveal (four lines from the outer corners to a
-  // small pane set off-centre), as in the Ronchamp south wall, so the wall reads as a whole even while most openings
-  // are empty. A picture fills its whole opening when it comes in, so it is never small. The little openings in
-  // ACCENTS never hold a picture; they are only there for the play of sizes.
+  // small pane at the back), as in the Ronchamp south wall, so the wall reads as a whole even while most openings are
+  // empty. A picture fills its whole opening when it comes in, so it is never small. The little openings in ACCENTS
+  // never hold a picture; they are only there for the play of sizes.
+  // The reveals are deep, so they react to where you look from: the pane at the back shifts towards the pointer (as
+  // the back of a real window does when you step to one side) and the pictures shift a little the other way. With no
+  // pointer (a phone) the eye drifts slowly by itself.
   var ACCENTS = [
-    {x:35.3, y:44, w:1.4, h:12, glass:[.15,.1,.7,.8]},
-    {x:69.3, y:5, w:1.4, h:16, glass:[.15,.55,.7,.35]},
-    {x:74, y:76, w:6, h:6, glass:[.3,.25,.4,.4]},
-    {x:82.5, y:74, w:2.2, h:11, glass:[.2,.15,.6,.5]},
-    {x:87, y:77, w:4, h:3, glass:[.2,.2,.6,.6]},
-    {x:92.5, y:75, w:4.5, h:4.5, glass:[.5,.15,.35,.35]},
-    {x:88, y:83, w:9, h:4, glass:[.12,.3,.5,.4]},
-    {x:75, y:85, w:3, h:3, glass:[.25,.25,.5,.5]}
+    {x:37.5, y:40, w:1.6, h:14, glass:[.7,.6]},
+    {x:68.8, y:6, w:1.4, h:16, glass:[.7,.4]},
+    {x:14, y:39.6, w:9, h:2.2, glass:[.6,.45]},
+    {x:70, y:73, w:6, h:6, glass:[.4,.4]},
+    {x:78.5, y:71, w:2.2, h:11, glass:[.6,.5]},
+    {x:83, y:74, w:4, h:3, glass:[.5,.5]},
+    {x:89, y:72, w:4.5, h:4.5, glass:[.35,.35]},
+    {x:84, y:81, w:9, h:4, glass:[.5,.4]},
+    {x:71, y:82, w:3, h:3, glass:[.5,.5]}
   ];
+  var reveals = [];
   (function drawFacade(){
     var NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('class', 'facade');
@@ -636,12 +641,12 @@
       return e;
     }
     function opening(x, y, w, h, g){
-      var gx = x + g[0] * w, gy = y + g[1] * h, gw = g[2] * w, gh = g[3] * h, grp = el('g', {'class': 'reveal'});
+      var grp = el('g', {'class': 'reveal'});
       el('rect', {x: x, y: y, width: w, height: h, 'class': 'splay'}, grp);
-      [[x, y, gx, gy], [x + w, y, gx + gw, gy], [x + w, y + h, gx + gw, gy + gh], [x, y + h, gx, gy + gh]].forEach(function(l){
-        el('line', {x1: l[0], y1: l[1], x2: l[2], y2: l[3]}, grp);
-      });
-      el('rect', {x: gx, y: gy, width: gw, height: gh, 'class': 'pane'}, grp);
+      var r = {x: x, y: y, w: w, h: h, gw: g[0] * w, gh: g[1] * h, lines: [], pane: null};
+      for(var i = 0; i < 4; i++) r.lines.push(el('line', {}, grp));
+      r.pane = el('rect', {width: r.gw, height: r.gh, 'class': 'pane'}, grp);
+      reveals.push(r);
     }
     AMBIENT_SLOTS.forEach(function(sl){
       var x = parseFloat(sl.left), y = parseFloat(sl.top), w = parseFloat(sl.width);
@@ -651,6 +656,51 @@
     var wall = document.querySelector('.wall');
     wall.insertBefore(svg, wall.firstChild);
   })();
+
+  // where the eye is, in wall units (0 to 100 across); eased towards the pointer every frame
+  var eye = {x: 50, y: 44}, eyeTarget = {x: 50, y: 44}, pointerSeen = false, viewRaf = null;
+  function clampV(v, a, b){ return Math.max(a, Math.min(b, v)); }
+  function drawView(){
+    reveals.forEach(function(r){
+      // how far the eye is to the side of this opening, -1 to 1; the pane moves that way, up to a small margin
+      var dx = clampV((eye.x - (r.x + r.w / 2)) / 45, -1, 1), dy = clampV((eye.y - (r.y + r.h / 2)) / 45, -1, 1);
+      var m = Math.min(r.w, r.h) * .07;
+      var gx = r.x + (r.w - r.gw) / 2 + dx * Math.max(0, (r.w - r.gw) / 2 - m);
+      var gy = r.y + (r.h - r.gh) / 2 + dy * Math.max(0, (r.h - r.gh) / 2 - m);
+      r.pane.setAttribute('x', gx); r.pane.setAttribute('y', gy);
+      [[r.x, r.y, gx, gy], [r.x + r.w, r.y, gx + r.gw, gy], [r.x + r.w, r.y + r.h, gx + r.gw, gy + r.gh], [r.x, r.y + r.h, gx, gy + r.gh]]
+        .forEach(function(l, i){
+          var e = r.lines[i];
+          e.setAttribute('x1', l[0]); e.setAttribute('y1', l[1]); e.setAttribute('x2', l[2]); e.setAttribute('y2', l[3]);
+        });
+    });
+    // the pictures: seen through the opening, they slide a little against the eye
+    var px = clampV((eye.x - 50) / 50, -1, 1), py = clampV((eye.y - 44) / 50, -1, 1);
+    collageEl.style.setProperty('--look-x', (-px * 3).toFixed(2) + '%');
+    collageEl.style.setProperty('--look-y', (-py * 3).toFixed(2) + '%');
+  }
+  var reducedView = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function viewFrame(t){
+    if(!pointerSeen){      // no pointer: a slow figure-of-eight drift
+      eyeTarget.x = 50 + Math.sin(t / 5200) * 40;
+      eyeTarget.y = 44 + Math.sin(t / 3700) * 30;
+    }
+    eye.x += (eyeTarget.x - eye.x) * .08;
+    eye.y += (eyeTarget.y - eye.y) * .08;
+    drawView();
+    viewRaf = requestAnimationFrame(viewFrame);
+  }
+  drawView();
+  if(!reducedView){
+    window.addEventListener('mousemove', function(e){
+      var r = document.querySelector('.wall').getBoundingClientRect();
+      if(!r.width) return;
+      pointerSeen = true;
+      eyeTarget.x = (e.clientX - r.left) / r.width * 100;
+      eyeTarget.y = (e.clientY - r.top) / r.height * 100;
+    }, {passive: true});
+    viewRaf = requestAnimationFrame(viewFrame);
+  }
 
   var ambientTiles = Array.prototype.slice.call(document.querySelectorAll('.tile.ambient'));
   var ambientState = ambientTiles.map(function(tile){

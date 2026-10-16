@@ -122,6 +122,12 @@
     .bar > nav > .switch{display:none}
     .settings-btn{display:flex;align-items:center;justify-content:center;padding:.3rem}
   }
+  /* the smallest phones (320 to 380 px): with Work in the menu the header no longer fits at the sizes above */
+  @media (max-width:380px){
+    .gv-mark{width:146px;font-size:9px}
+    .bar{gap:.9rem;font-size:.7rem}
+    .bar nav{gap:.6rem}
+  }
 
   /* ---------- intro ---------- */
   #introveil{position:fixed;inset:0;z-index:100;background:var(--paper);display:none;pointer-events:none}

@@ -1,7 +1,7 @@
 # Drawings from CAD
 
 Turns CAD plans and elevations (DWG or DXF) into SVG drawings in the portfolio's drawing language. The output is
-vector, so it stays sharp at any size, and its line weights stay constant on screen.
+vector, so it stays sharp at any size; line weights scale with the drawing, like ink on a sheet.
 
 ```
 python tools/drawings/build.py sierra-hotel            # every drawing of a project
@@ -18,16 +18,19 @@ Without AutoCAD, save the DWG as DXF by hand and point the project at the `.dxf`
 
 ## The drawing language
 
-Set in `style.py`, after Gonzalo's reference (pen weights in pt):
+Set in `style.py`, after Gonzalo's reference (pen weights in pt). Widths are in drawing units: one unit is one
+pixel of the sheet at full size (plans 3000 wide, elevations 2000 wide).
 
 | weight | what | how it is drawn |
 |---|---|---|
 | 1 3/8 | section cuts: walls, columns | solid black |
-| 7/8 | outer perimeter, secondary structure (low walls, parapets) | `perimeter`, 1 px black |
-| 5/8, 3/8 | windows, curtain walls, stairs | `line`, 0.7 px black |
-| 1/8 | bathroom fixtures, kitchen counters, islands | `fixture`, faint grey |
-| thinnest | closets | `closet`, fainter grey |
-| 1/16 | hatches (pool water) | light grey fill |
+| 7/8 | outer perimeter, secondary structure (low walls, parapets) | `perimeter`, 1.4, black |
+| 5/8, 3/8 | windows, curtain walls, stairs | `line`, 1.0, black |
+| 1/8 | bathroom fixtures, kitchen counters, islands | `fixture`, 0.8, grey 178 |
+| thinnest | closets | `closet`, 0.6, grey 205 |
+| 1/16 | hatches (pool water) | light grey fill (240) |
+
+Elevations: outline 2.0, lines and frames 1.0, cladding and railings 1.0 in grey 150, ground line 4.0.
 
 Rules in plans: no furniture, no bought-in appliances (cookers, fridges, sink bowls: the kitchen is its counters,
 island and the spaces between), no door swings (the gap in the wall is the door), no stair walk lines, arrows or

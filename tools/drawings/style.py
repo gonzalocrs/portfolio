@@ -8,9 +8,9 @@ Line weights follow Gonzalo's hierarchy (pen weights in pt in his reference):
             closets: the thinnest line of the set -> 'closet'
     1/16    hatches                 -> 'water' (pool) and other light fills
 
-Strokes are 'non-scaling': their width is in screen pixels whatever size the drawing is shown at, so a thin
-line stays thin when the image is enlarged and stays visible when it is small. Sub-pixel widths draw as
-lighter lines, which is what carries the hierarchy at small sizes.
+Widths are in drawing units and scale with the drawing, like ink on a sheet: one unit is one pixel of the
+sheet at full size (plans 3000 wide, elevations 2000 wide), which is the weight the earlier PNG drawings had.
+Shown smaller on the page, the lines get finer in proportion, so the hierarchy is the ratio between them.
 
 Elevations: nothing is cut, so nothing is solid black. Outlines in black, cladding and railings in grey,
 glass a very light grey, shadows darken what they fall on (a translucent black, like a multiply).
@@ -18,10 +18,10 @@ glass a very light grey, shadows darken what they fall on (a translucent black, 
 
 PLAN = {
     'cut':       {'fill': '#000'},
-    'perimeter': {'stroke': '#000', 'width': 1.0},
-    'line':      {'stroke': '#000', 'width': 0.7},
-    'fixture':   {'stroke': '#8c8c8c', 'width': 0.55},
-    'closet':    {'stroke': '#b4b4b4', 'width': 0.45},
+    'perimeter': {'stroke': '#000', 'width': 1.4},
+    'line':      {'stroke': '#000', 'width': 1.0},
+    'fixture':   {'stroke': '#b2b2b2', 'width': 0.8},      # grey 178
+    'closet':    {'stroke': '#cdcdcd', 'width': 0.6},      # grey 205
     'fixfill':   {'fill': '#e4e4e4'},
     'water':     {'fill': '#f0f0f0'},
 }
@@ -32,19 +32,18 @@ ELEVATION = {
     'glass':     {'fill': '#f9f9f9'},
     'frame':     {'fill': '#d8d8d8'},
     'greyfill':  {'fill': '#969696'},
-    'grey':      {'stroke': '#969696', 'width': 0.45},
+    'grey':      {'stroke': '#969696', 'width': 1.0},      # grey 150
     'shadow':    {'fill': '#000', 'opacity': 0.2},
-    'line':      {'stroke': '#000', 'width': 0.6},
-    'frameline': {'stroke': '#000', 'width': 0.6},
-    'outline':   {'stroke': '#000', 'width': 1.0},
-    'ground':    {'stroke': '#000', 'width': 2.0},
+    'line':      {'stroke': '#000', 'width': 1.0},
+    'frameline': {'stroke': '#000', 'width': 1.0},
+    'outline':   {'stroke': '#000', 'width': 2.0},
+    'ground':    {'stroke': '#000', 'width': 4.0},
 }
 ELEVATION_ORDER = ['glass', 'frame', 'greyfill', 'grey', 'shadow', 'line', 'frameline', 'outline', 'ground']
 
 
 def css(style):
-    rules = ['path{fill:none;stroke:none;stroke-linecap:round;stroke-linejoin:round;'
-             'vector-effect:non-scaling-stroke;fill-rule:evenodd}']
+    rules = ['path{fill:none;stroke:none;stroke-linecap:round;stroke-linejoin:round;fill-rule:evenodd}']
     for name, s in style.items():
         r = []
         if 'fill' in s:
@@ -52,6 +51,6 @@ def css(style):
         if 'opacity' in s:
             r.append(f"fill-opacity:{s['opacity']}")
         if 'stroke' in s:
-            r.append(f"stroke:{s['stroke']};stroke-width:{s['width']}px")
+            r.append(f"stroke:{s['stroke']};stroke-width:{s['width']}")
         rules.append(f".{name}{{{';'.join(r)}}}")
     return '\n'.join(rules)

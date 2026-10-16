@@ -191,9 +191,9 @@ def solids(P, cfg):
     for s in segs:
         cs = list(s.coords)
         for (ax, ay), (bx, by) in zip(cs, cs[1:]):
-            if abs(ay - by) < 0.005 and abs(ax - bx) >= 0.08:
+            if abs(ay - by) < 0.012 and abs(ax - bx) >= 0.08:
                 hz.append(((ay + by) / 2, min(ax, bx), max(ax, bx)))
-            elif abs(ax - bx) < 0.005 and abs(ay - by) >= 0.08:
+            elif abs(ax - bx) < 0.012 and abs(ay - by) >= 0.08:
                 vt.append(((ax + bx) / 2, min(ay, by), max(ay, by)))
     strips = []
     for lines_, horiz in ((hz, True), (vt, False)):
@@ -246,10 +246,13 @@ def window_weights(items):
     """Split window lines into glass (the middle lines of a window) and frame (its outer edges).
     A window or curtain wall is drawn as several parallel lines a few centimetres apart: the outermost two
     of each group are the frame, the ones between are the glass. Lone or diagonal lines count as glass."""
-    segs = []
+    segs, seen = [], set()
     for it in items:
         for a, b in zip(it['pts'], it['pts'][1:]):
-            segs.append((a, b))
+            k = tuple(sorted(((round(a[0], 3), round(a[1], 3)), (round(b[0], 3), round(b[1], 3)))))
+            if k not in seen:                             # the CAD repeats some lines: drawn twice they read heavier
+                seen.add(k)
+                segs.append((a, b))
     groups = {'h': [], 'v': []}
     other = []
     for (ax, ay), (bx, by) in segs:
@@ -322,7 +325,14 @@ def build(cfg, sources):
             return ox + x * S, top + (b[3] - y) * S
 
         def tl(items_):
-            return [[T(x, y) for x, y in it['pts']] for it in items_]
+            out, seen = [], set()
+            for it in items_:
+                k = tuple(sorted([tuple(round(v, 3) for v in it['pts'][0]), tuple(round(v, 3) for v in it['pts'][-1])])) + (len(it['pts']),)
+                if k in seen:
+                    continue                              # duplicate line in the CAD
+                seen.add(k)
+                out.append([T(x, y) for x, y in it['pts']])
+            return out
 
         if P['pool']:                                     # pool water: the smallest closed ring of the pool
             pl = [Polygon(it['pts']) for it in P['pool'] if it['closed'] and len(it['pts']) >= 3]

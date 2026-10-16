@@ -31,7 +31,8 @@ PROJECT = {
         'pool': {2: (['ARQ SANITARIOS'], (79.5, 37.75, 85.4, 42.3))},   # the pool and the L of steps up to it
         'small_on_layer': {'01VENT': 0.3},                           # ventilation grilles
         'drop': {2: [(80.15, 22.2, 81.1, 23.32),                      # skylight curb and line on the terrace: gone
-                     (81.35, 28.2, 83.25, 28.32)]},                   # threshold at the foot of the corridor
+                     (81.35, 28.2, 83.25, 28.32),                     # threshold at the foot of the corridor
+                     (85.2, 25.40, 87.2, 27.9)]},                     # lounge kitchenette lines: incomplete, say nothing
         'cut_solids': {2: [(80.2, 28.2, 80.5, 28.6)]},               # column trimmed to align with the one above
         # the ground-floor entrance as approved: the facade file's entrance plan, 11.0 m wide like the main
         # plan, placed by the side walls' outer faces and the street line

@@ -613,7 +613,7 @@
   // The facade: every opening is always drawn on the wall as a splayed reveal (four lines from the outer corners to a
   // small pane set off-centre), as in the Ronchamp south wall, so the wall reads as a whole even while most openings
   // are empty. A picture fills its whole opening when it comes in, so it is never small. The little openings in
-  // ACCENTS never hold a picture; their panes are coloured glass in the projects' hues, for the play of sizes.
+  // ACCENTS never hold a picture; they are only there for the play of sizes.
   var ACCENTS = [
     {x:35.3, y:44, w:1.4, h:12, glass:[.15,.1,.7,.8]},
     {x:69.3, y:5, w:1.4, h:16, glass:[.15,.55,.7,.35]},
@@ -635,23 +635,19 @@
       (parent || svg).appendChild(e);
       return e;
     }
-    function opening(x, y, w, h, g, colour){
+    function opening(x, y, w, h, g){
       var gx = x + g[0] * w, gy = y + g[1] * h, gw = g[2] * w, gh = g[3] * h, grp = el('g', {'class': 'reveal'});
       el('rect', {x: x, y: y, width: w, height: h, 'class': 'splay'}, grp);
       [[x, y, gx, gy], [x + w, y, gx + gw, gy], [x + w, y + h, gx + gw, gy + gh], [x, y + h, gx, gy + gh]].forEach(function(l){
         el('line', {x1: l[0], y1: l[1], x2: l[2], y2: l[3]}, grp);
       });
-      var pane = el('rect', {x: gx, y: gy, width: gw, height: gh, 'class': 'pane'}, grp);
-      if(colour) pane.style.fill = colour;
+      el('rect', {x: gx, y: gy, width: gw, height: gh, 'class': 'pane'}, grp);
     }
     AMBIENT_SLOTS.forEach(function(sl){
       var x = parseFloat(sl.left), y = parseFloat(sl.top), w = parseFloat(sl.width);
       opening(x, y, w, w / sl.ratio, sl.glass);
     });
-    ACCENTS.forEach(function(a, i){
-      var h = hues[(i * 3) % hues.length];
-      opening(a.x, a.y, a.w, a.h, a.glass, 'hsl(' + h + ' 45% 58%)');
-    });
+    ACCENTS.forEach(function(a){ opening(a.x, a.y, a.w, a.h, a.glass); });
     var wall = document.querySelector('.wall');
     wall.insertBefore(svg, wall.firstChild);
   })();

@@ -242,6 +242,48 @@ def solids(P, cfg):
     return sol
 
 
+def window_weights(items):
+    """Split window lines into glass (the middle lines of a window) and frame (its outer edges).
+    A window or curtain wall is drawn as several parallel lines a few centimetres apart: the outermost two
+    of each group are the frame, the ones between are the glass. Lone or diagonal lines count as glass."""
+    segs = []
+    for it in items:
+        for a, b in zip(it['pts'], it['pts'][1:]):
+            segs.append((a, b))
+    groups = {'h': [], 'v': []}
+    other = []
+    for (ax, ay), (bx, by) in segs:
+        if abs(ay - by) < 0.005 and abs(ax - bx) > 0.05:
+            groups['h'].append(((ay + by) / 2, min(ax, bx), max(ax, bx)))
+        elif abs(ax - bx) < 0.005 and abs(ay - by) > 0.05:
+            groups['v'].append(((ax + bx) / 2, min(ay, by), max(ay, by)))
+        else:
+            other.append([(ax, ay), (bx, by)])
+    glass, frame = list(other), []
+    for orient, lines in groups.items():
+        lines.sort()
+        used = [False] * len(lines)
+        for i in range(len(lines)):
+            if used[i]:
+                continue
+            # this line and every parallel line within 30 cm that overlaps it along most of its length
+            grp = [i]
+            for j in range(i + 1, len(lines)):
+                if lines[j][0] - lines[i][0] > 0.30:
+                    break
+                lo, hi = max(lines[i][1], lines[j][1]), min(lines[i][2], lines[j][2])
+                if not used[j] and hi - lo > 0.5 * min(lines[i][2] - lines[i][1], lines[j][2] - lines[j][1]):
+                    grp.append(j)
+            for j in grp:
+                used[j] = True
+            grp.sort(key=lambda j: lines[j][0])
+            for n, j in enumerate(grp):
+                c, a, b = lines[j]
+                seg = [(a, c), (b, c)] if orient == 'h' else [(c, a), (c, b)]
+                (frame if len(grp) >= 3 and n in (0, len(grp) - 1) else glass).append(seg)
+    return glass, frame
+
+
 def _rings(g):
     out = []
     for p in getattr(g, 'geoms', [g]):
@@ -291,7 +333,10 @@ def build(cfg, sources):
         sheet.rings('fixfill', [[[T(x, y) for x, y in p] for p in it.get('paths', [it['pts']])] for it in P['fixfill']])
         sheet.lines('fixture', tl(P['fix']))
         sheet.lines('closet', tl(P['closet']))
-        sheet.lines('line', tl(P['win'] + P['stair'] + P['extra'] + P['pool']))
+        glass, frame = window_weights(P['win'])
+        sheet.lines('glass', [[T(x, y) for x, y in s] for s in glass])
+        sheet.lines('frame', [[T(x, y) for x, y in s] for s in frame])
+        sheet.lines('line', tl(P['stair'] + P['extra'] + P['pool']))
         sheet.lines('perimeter', tl(P['wall']))           # wall-layer lines left uncovered: low walls, parapets
         sheet.rings('cut', [[[T(x, y) for x, y in p] for p in it.get('paths', [it['pts']])] for it in P['fills']])
         sol = solids(P, cfg)

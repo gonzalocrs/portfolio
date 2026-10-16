@@ -19,14 +19,16 @@ glass a very light grey, shadows darken what they fall on (a translucent black, 
 PLAN = {
     'cut':       {'fill': '#000'},
     'perimeter': {'stroke': '#000', 'width': 1.4},
-    'line':      {'stroke': '#000', 'width': 1.0},
+    'line':      {'stroke': '#000', 'width': 1.0},          # stairs, steps, pool
+    'glass':     {'stroke': '#000', 'width': 0.6},          # windows, curtain walls: the middle lines
+    'frame':     {'stroke': '#000', 'width': 0.35},         # windows, curtain walls: the outer edges
     'fixture':   {'stroke': '#b2b2b2', 'width': 0.8},      # grey 178
     'closet':    {'stroke': '#cdcdcd', 'width': 0.6},      # grey 205
     'fixfill':   {'fill': '#e4e4e4'},
     'water':     {'fill': '#f0f0f0'},
 }
 # drawing order, back to front
-PLAN_ORDER = ['water', 'fixfill', 'fixture', 'closet', 'line', 'perimeter', 'cut']
+PLAN_ORDER = ['water', 'fixfill', 'fixture', 'closet', 'frame', 'glass', 'line', 'perimeter', 'cut']
 
 ELEVATION = {
     'glass':     {'fill': '#f9f9f9'},

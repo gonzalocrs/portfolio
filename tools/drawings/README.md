@@ -25,7 +25,9 @@ pixel of the sheet at full size (plans 3000 wide, elevations 2000 wide).
 |---|---|---|
 | 1 3/8 | section cuts: walls, columns | solid black |
 | 7/8 | outer perimeter, secondary structure (low walls, parapets) | `perimeter`, 1.4, black |
-| 5/8, 3/8 | windows, curtain walls, stairs | `line`, 1.0, black |
+| 5/8 | windows, curtain walls: the middle (glass) lines | `glass`, 0.6, black |
+| 3/8 | windows, curtain walls: the outer (frame) lines | `frame`, 0.35, black |
+| | stairs, steps, pool | `line`, 1.0, black |
 | 1/8 | bathroom fixtures, kitchen counters, islands | `fixture`, 0.8, grey 178 |
 | thinnest | closets | `closet`, 0.6, grey 205 |
 | 1/16 | hatches (pool water) | light grey fill (240) |

@@ -344,6 +344,8 @@
     z-index:2;
   }
   .tile.ambient.on{pointer-events:auto;cursor:pointer}
+  .tile.ambient{transition:opacity .5s ease}
+  .tile.ambient.on.dim{opacity:.12;pointer-events:none}
   .tile.preview.on{pointer-events:auto;cursor:pointer}   /* clicking the large picture opens its project in its place */
   .tile.ambient .cap{opacity:0;transition:opacity .25s ease}
   .tile.ambient:hover .cap{opacity:1}
@@ -850,6 +852,11 @@
     return cx > c.left && cx < c.right && cy > c.top && cy < c.bottom;
   }
 
+  // one picture tile per opening on the wall, so every window holds a picture for good
+  (function(){
+    var wallEl = document.querySelector('.wall'), have = wallEl.querySelectorAll('.tile.ambient').length;
+    for(var k = have; k < AMBIENT_SLOTS.length; k++){ var d = document.createElement('div'); d.className = 'tile ambient'; wallEl.appendChild(d); }
+  })();
   var ambientTiles = Array.prototype.slice.call(document.querySelectorAll('.tile.ambient'));
   var ambientState = ambientTiles.map(function(tile){
     var fill = document.createElement('span');
@@ -875,90 +882,46 @@
     im.src = src;
   }
 
-  // a picture first (balanced across sections, see nextImage), then the free opening whose proportions are closest to
-  // the picture's: the most vertical picture goes to the most vertical opening, a wide one to a wide opening, and so on.
-  // A little jitter keeps it from being perfectly predictable.
-  function bestSlot(a, s){
-    var best = -1, bestScore = 1e9;
-    for(var k = 0; k < AMBIENT_SLOTS.length; k++){
-      if(slotTaken[k] || k === s.slot) continue;
-      var sc = a ? Math.abs(Math.log(AMBIENT_SLOTS[k].ratio / a)) + Math.random() * .12 : Math.random();
-      if(!inView(AMBIENT_SLOTS[k])) sc += 2;      // an opening out of view only if none in view is free
-      if(sc < bestScore){ bestScore = sc; best = k; }
-    }
-    return best;
-  }
 
-  function ambientCycle(s){
-    if(s.paused) return;
-    var token = s.token = (s.token || 0) + 1, pick = nextImage();
-    if(pick){ s.group = pick.group; shown.push(pick.group); }
-    loadAspect(pick ? pick.src : null, function(a){ place(s, token, pick, a); });
-  }
-  function place(s, token, pick, a){
-    if(s.token !== token || s.paused) return;
-    var i = bestSlot(a, s);
-    if(i === -1){
-      // every opening is in use right now: wait a beat rather than overlap
-      s.timer = setTimeout(function(){ place(s, token, pick, a); }, 500 + Math.random() * 600);
-      return;
+  // The pictures are hung once and stay: every opening gets one, the most vertical picture in the most vertical opening,
+  // a wide one in a wide opening, and so on (a little jitter so it is not the same wall every visit). Nothing comes and
+  // goes on its own; moving across the wall shows the pictures already hanging there.
+  // Each picture hangs once (no repeats); if there are more openings than pictures, the spare ones stay empty.
+  function hang(){
+    var seen = {}, picks = [];
+    Object.keys(GROUPS).forEach(function(k){ GROUPS[k].all.forEach(function(src){ if(!seen[src]){ seen[src] = 1; picks.push({src: src, group: k}); } }); });
+    picks = shuffle(picks).slice(0, AMBIENT_SLOTS.length);
+    if(!picks.length) return;
+    var left = picks.length;
+    picks.forEach(function(p){ loadAspect(p.src, function(a){ p.a = a || 1; if(--left === 0) pair(); }); });
+    function pair(){
+      // the openings in the first view are filled first, so any empty ones are further along the wall
+      var slots = shuffle(AMBIENT_SLOTS.map(function(sl, k){ return k; })).sort(function(x, y){ return inView(AMBIENT_SLOTS[y]) - inView(AMBIENT_SLOTS[x]); }).slice(0, picks.length);
+      var bySlot = slots.map(function(k){ return {k: k, r: Math.log(AMBIENT_SLOTS[k].ratio) + (Math.random() - .5) * .25}; }).sort(function(x, y){ return x.r - y.r; });
+      var byPic = picks.slice().sort(function(x, y){ return Math.log(x.a) - Math.log(y.a); });
+      bySlot.forEach(function(o, n){ place(ambientState[o.k], o.k, byPic[n]); });
     }
+  }
+  function place(s, i, pick){
     s.slot = i;
-    slotTaken[i] = true;
     var slot = AMBIENT_SLOTS[i];
     s.tile.style.top = slot.top;
     s.tile.style.left = slot.left;
     s.tile.style.width = slot.width;
     s.tile.style.aspectRatio = slot.aspect;
-
-    var h = hues[Math.floor(Math.random() * hues.length)];
     if(slot.dot) s.fill.style.background = 'var(--ink)';
-    else setFill(s.fill, pick && pick.src, h);
+    else setFill(s.fill, pick && pick.src, hues[Math.floor(Math.random() * hues.length)]);
     var pr = pick && window.PROJECTS && window.PROJECTS[pick.group.split('/')[0]];
     s.src = pick ? pick.src : null;
+    s.group = pick ? pick.group : null;
     s.cap.textContent = pr ? pr.title : '';
     s.tile.classList.add('on');
-    hideLater(s, 3680 + Math.random() * 3680);
   }
-  // fade a tile out after a while (not while the pointer is on it), then start its next round after a pause
-  function hideLater(s, ms){
-    s.timer = setTimeout(function(){
-      if(s.hover || s.holding){ hideLater(s, 600); return; }
-      s.tile.classList.remove('on');
-      slotTaken[s.slot] = false;
-      releaseGroup(s);
-      var gap = 1610 + Math.random() * 2990;
-      s.timer = setTimeout(function(){ ambientCycle(s); }, gap);
-    }, ms);
-  }
-  // after a move across the wall, the pictures left behind out of view go, and come back in the openings now in view
-  function bringIntoView(){
-    ambientState.forEach(function(s){
-      if(s.paused || s.hover || s.holding || s.slot === -1 || !s.tile.classList.contains('on')) return;
-      if(inView(AMBIENT_SLOTS[s.slot])) return;
-      clearTimeout(s.timer);
-      hideLater(s, Math.random() * 400);
-    });
-  }
-  function releaseGroup(s){
-    if(!s.group) return;
-    var i = shown.indexOf(s.group); if(i !== -1) shown.splice(i, 1);
-    s.group = null;
-  }
-  function ambientPause(s){
-    s.paused = true;
-    s.holding = false;
-    clearTimeout(s.timer);
-    s.tile.classList.remove('on');
-    releaseGroup(s);
-    if(s.slot !== -1){ slotTaken[s.slot] = false; s.slot = -1; }
-  }
-  function ambientResume(s){
-    if(!s.paused) return;
-    s.paused = false;
-    s.timer = setTimeout(function(){ ambientCycle(s); }, rand(0, 900));
-  }
-  ambientState.forEach(function(s){ s.timer = setTimeout(function(){ ambientCycle(s); }, rand(0, 3000)); });
+  function bringIntoView(){}
+  // while a project's own picture is up, the others step back (dimmed, not taken down)
+  function ambientPause(s){ s.paused = true; s.holding = false; s.tile.classList.add('dim'); }
+  function ambientResume(s){ s.paused = false; s.tile.classList.remove('dim'); }
+  hang();
 
   // hover preview: appears only while hovering a project, cycling through a
   // few curated positions so each new project lands somewhere different;

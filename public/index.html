@@ -173,38 +173,35 @@
 
   /* ---------- index ---------- */
   /* the top margin equals the small 'Reaching out about' line above the titles on the contact page, so the titles sit at the same height there */
-  .index{list-style:none;margin:2.05rem 0 0;padding:0;max-width:40vw;position:relative;z-index:1}
-  .group + .group{margin-top:.1em}
+  .index{list-style:none;margin:2.05rem 0 0;padding:0;width:min(19rem,100%);position:relative;z-index:1}
+  .group + .group{margin-top:.35rem}
 
   .head{
     display:block;
     width:100%;
     text-align:left;
-    font-weight:800;
-    font-size:clamp(1.7rem,6vw,5rem);   /* halfway between the old size (up to 104px) and the contact-page size (57.6px) */
-    line-height:1;
-    letter-spacing:-.02em;
+    /* a quiet index: the three groups are small mono labels, so the wall (and an open project) carry the page */
+    font-family:var(--mono);
+    font-weight:500;
+    font-size:.78rem;
+    line-height:1.6;
+    text-transform:uppercase;
+    letter-spacing:.08em;
     white-space:nowrap;
-    transition:
-      font-weight .3s ease,
-      letter-spacing .4s cubic-bezier(.2,.8,.2,1),
-      font-size .4s cubic-bezier(.2,.8,.2,1),
-      color .2s;
+    transition:color .2s;
   }
-  /* the hovered (or open) title spreads out and takes the highlight color */
   body:not(.is-open) .head:hover,
   body:not(.is-open) .head:focus-visible,
   .group[data-open="true"] .head{
-    letter-spacing:.048em;
     color:var(--live);
   }
   /* the small + after each title (a - once its list is open), as on the contact page */
   .head::after{
     content:"+";
     display:inline-block;
-    margin-left:1rem;
+    margin-left:.6rem;
     font-family:var(--mono);
-    font-size:1.1rem;
+    font-size:.78rem;
     font-weight:400;
     letter-spacing:0;
     color:var(--mute);
@@ -213,10 +210,7 @@
   body:not(.is-open) .head:hover::after,
   body:not(.is-open) .head:focus-visible::after{color:var(--live)}
   .group[data-open="true"] .head::after{content:"−";color:var(--live)}
-  body.is-open .group[data-open="false"] .head{
-    font-size:clamp(1.6rem,4.5vw,3rem);   /* the unselected titles keep their original size (up to 48px) */
-    color:var(--mute);
-  }
+  body.is-open .group[data-open="false"] .head{color:var(--mute)}
 
   .panel{
     display:grid;
@@ -226,7 +220,7 @@
   .group[data-open="true"] .panel{grid-template-rows:1fr}
   .panel > div{overflow:hidden}
 
-  .works{list-style:none;margin:.9rem 0 2rem;padding:0;max-width:62ch}
+  .works{list-style:none;margin:.5rem 0 1.4rem;padding:0}
   .work{border-top:1px solid var(--rule)}
   .work:last-child{border-bottom:1px solid var(--rule)}
   .work a{
@@ -234,13 +228,13 @@
     flex-wrap:wrap;
     justify-content:space-between;
     align-items:baseline;
-    gap:.2rem 1.5rem;
-    padding:.55rem 0;
+    gap:.1rem 1rem;
+    padding:.4rem 0;
     transition:padding-left .25s cubic-bezier(.2,.7,.2,1),color .2s;
   }
   .work a.current{color:var(--live);padding-left:.6rem}
-  .work .name{font-weight:500;font-size:clamp(1rem,2.2vw,1.3rem);letter-spacing:-.015em;white-space:nowrap}
-  .work .meta{font-family:var(--mono);color:var(--mute);font-size:.72rem;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
+  .work .name{font-weight:400;font-size:.95rem;letter-spacing:-.005em;white-space:nowrap}
+  .work .meta{font-family:var(--mono);color:var(--mute);font-size:.64rem;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
   .work a.current .meta{color:var(--live)}
   .work .tag{
     margin-left:.8rem;
@@ -353,7 +347,7 @@
   }
 
   @media (max-width:900px){
-    .index{max-width:none}
+    .index{width:auto;max-width:none}
     .works{max-width:none}
     .work .name{white-space:normal}   /* a very long title may still need two lines on a phone; let it wrap normally there */
     /* no room beside the titles here, so instead of hiding the wall, it drops below them, full width —
@@ -588,12 +582,8 @@
   // via CSS transition), window resize, or the web font swapping in.
   var GUTTER = 48;
   function fitCollage(){
-    var goldenX = window.innerWidth * .37;
-    var maxRight = 0;
-    groups.forEach(function(g){
-      var r = g.querySelector('.head').getBoundingClientRect();
-      if(r.right > maxRight) maxRight = r.right;
-    });
+    var goldenX = window.innerWidth * .26;   // the index is a narrow column now, so the wall takes most of the width
+    var maxRight = document.getElementById('index').getBoundingClientRect().right;
     var x = Math.max(goldenX, maxRight + GUTTER);
     document.documentElement.style.setProperty('--collage-x', Math.round(x) + 'px');
   }

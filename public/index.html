@@ -175,41 +175,17 @@
   /* the top margin equals the small 'Reaching out about' line above the titles on the contact page, so the titles sit at the same height there */
   .index{list-style:none;margin:2.05rem 0 0;padding:0;width:min(19rem,100%);position:relative;z-index:1}
   .group + .group{margin-top:.35rem}
-  /* on a wide screen the wall takes the whole width and Built / Unbuilt / Research are tabs along the top, between the
-     signature and the links, each dropping its projects down in a small panel over the wall; on a phone the list
-     stays in the page above the wall, as before */
-  @media (min-width:901px){
-    .index{
-      position:fixed;top:0;left:24vw;right:28vw;height:63px;margin:0;padding:0;width:auto;
-      display:flex;justify-content:space-around;align-items:center;
-      z-index:46;   /* above an open project, so another one can be picked from the tabs */
-    }
-    .group + .group{margin-top:0}
-    .group{position:relative}
-    .head::after{display:none}
-    .panel{
-      position:absolute;top:calc(100% + 1.1rem);left:50%;width:20rem;transform:translateX(-50%);
-      padding:0 1.1rem;background:var(--paper);
-      border:1px solid var(--rule);box-shadow:0 10px 40px rgba(0,0,0,.08);
-      opacity:0;visibility:hidden;transition:grid-template-rows .45s cubic-bezier(.2,.7,.2,1),opacity .25s ease,visibility 0s .45s;
-    }
-    .group[data-open="true"] .panel{opacity:1;visibility:visible;transition:grid-template-rows .45s cubic-bezier(.2,.7,.2,1),opacity .25s ease}
-    .works{margin:.6rem 0 .7rem}
-    .work:first-child{border-top:0}
-    .work:last-child{border-bottom:0}
-  }
 
   .head{
     display:block;
     width:100%;
     text-align:left;
-    /* a quiet index: the three groups are small mono labels, so the wall (and an open project) carry the page */
-    font-family:var(--mono);
-    font-weight:500;
-    font-size:.78rem;
-    line-height:1.6;
-    text-transform:uppercase;
-    letter-spacing:.08em;
+    /* the project pages' title face (Archivo 800, tight), at a size that leaves the wall the main thing */
+    font-family:var(--font);
+    font-weight:800;
+    font-size:clamp(1.35rem,2.1vw,1.9rem);
+    line-height:1.15;
+    letter-spacing:-.02em;
     white-space:nowrap;
     transition:color .2s;
   }
@@ -224,7 +200,7 @@
     display:inline-block;
     margin-left:.6rem;
     font-family:var(--mono);
-    font-size:.78rem;
+    font-size:1rem;
     font-weight:400;
     letter-spacing:0;
     color:var(--mute);
@@ -256,7 +232,7 @@
     transition:padding-left .25s cubic-bezier(.2,.7,.2,1),color .2s;
   }
   .work a.current{color:var(--live);padding-left:.6rem}
-  .work .name{font-weight:400;font-size:.95rem;letter-spacing:-.005em;white-space:nowrap}
+  .work .name{font-weight:500;font-size:1.02rem;letter-spacing:-.01em;white-space:nowrap}
   .work .meta{font-family:var(--mono);color:var(--mute);font-size:.64rem;text-transform:uppercase;letter-spacing:.03em;white-space:nowrap}
   .work a.current .meta{color:var(--live)}
   .work .tag{
@@ -612,8 +588,7 @@
   // via CSS transition), window resize, or the web font swapping in.
   var GUTTER = 48;
   function fitCollage(){
-    if(DESK.matches){ document.documentElement.style.setProperty('--collage-x', '0px'); return; }   // the list floats over the wall
-    var goldenX = window.innerWidth * .26;   // the index is a narrow column now, so the wall takes most of the width
+    var goldenX = window.innerWidth * .26;   // the index is a narrow column under the name; the wall starts past it
     var maxRight = document.getElementById('index').getBoundingClientRect().right;
     var x = Math.max(goldenX, maxRight + GUTTER);
     document.documentElement.style.setProperty('--collage-x', Math.round(x) + 'px');
@@ -1117,12 +1092,7 @@
       // the picture grows from its box to as large as the wall area allows, uncropped (its own proportions), centred there
       var cr = document.getElementById('collage').getBoundingClientRect(), r = st.tile.getBoundingClientRect();
       var ar = aspectOf[st.src] || (r.width / r.height);
-      // on a wide screen it keeps to the wider side of the dropdown that opens for it
       var lo = 0, hi = cr.width;
-      if(DESK.matches){
-        var pr = g.querySelector('.panel').getBoundingClientRect();
-        if(pr.left - cr.left > cr.right - pr.right) hi = pr.left - 24 - cr.left; else lo = pr.right + 24 - cr.left;
-      }
       var w = Math.min((hi - lo) * .96, cr.height * .96 * ar), h = w / ar;
       var x = lo + (hi - lo - w) / 2, y = (cr.height - h) / 2;
       custom = {top: y + 'px', left: x + 'px', width: w + 'px', aspect: String(ar), src: st.src,
@@ -1281,7 +1251,7 @@
   }
   // where a project opened from its title grows out of: the picture showing for it, if any
   window.gcPreviewRect = function(){ return activeIndex === -1 ? null : previews[activeIndex].tile.getBoundingClientRect(); };
-  window.gcHideIndex = function(){ if(DESK.matches) closeAll(); };   // the dropdown folds away as a project opens
+  window.gcHideIndex = function(){};   // the list stays beside an open project, to pick another
 })();
 </script>
 

@@ -34,6 +34,11 @@ pixel of the sheet at full size (plans 3000 wide, elevations 2000 wide).
 
 Elevations: outline 2.0, lines and frames 1.0, cladding and railings 1.0 in grey 150, ground line 4.0.
 
+With `'poche': 'structure'` in the plans config, only the structure is solid black: columns (the `column`
+layers), any wall layers listed in `structure_layers`, and any boxes in `structure_boxes` (per floor, e.g. a
+concrete core drawn on the same layer as the partitions). Every other wall is a heavy outline (`wall`, 1.6),
+white inside. Without it, all cut walls are solid black.
+
 Rules in plans: no furniture, no bought-in appliances (cookers, fridges, sink bowls: the kitchen is its counters,
 island and the spaces between), no door swings (the gap in the wall is the door), no stair walk lines, arrows or
 dots, no grid axes, labels, plants or void crosses, no ventilation grilles.
@@ -58,6 +63,7 @@ grey, shadows as a translucent black that darkens what it falls on (darker than 
 
 Plans:
 - `drop`: remove everything inside these boxes on a floor (things no longer in the project).
+- `structure_boxes`: with `'poche': 'structure'`, walls inside these boxes on a floor are drawn black too.
 - `cut_solids`: carve these boxes out of the solid walls (e.g. trim a column).
 - `small_on_layer`: drop items smaller than this on a layer (grilles, light fittings).
 - `layers_by_plan`: extra layers for one floor only (e.g. counters on the top floor).

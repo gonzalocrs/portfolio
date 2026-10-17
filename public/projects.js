@@ -9,6 +9,9 @@
     hero      path to the main image, e.g. "img/sierra-hotel/hero.jpg"
     lede      one or two sentences under the title
     text      a short second paragraph
+    flow      optional: rows of image paths, e.g. [["a.jpg"], ["b.jpg", "c.webp"], ...]. Makes the project one
+              continuous page (no paging, the hero at its own proportions) with these rows after the text instead of
+              the separate galleries; the pictures in a row share one height and fill the width
     gallery   { drawings: [...], physical: [...] (the physical models), photos: [...] }
               each item: { src: "img/...", caption: "Ground floor plan" }
               photos & renders are laid out freely, without frames and at each picture's own proportions,
@@ -33,6 +36,14 @@ window.PROJECTS = {
     diagram: {src: "img/sierra-hotel/exploded-diagram.jpg", caption: "Exploded axonometric"},
     hero: "img/sierra-hotel/hero.jpg",
     heroPosition: "center",
+    // one continuous page: after the text, drawings and photos mixed in rows (see project.js: flow)
+    flow: [
+      ["img/sierra-hotel/floor-plans-3.webp"],
+      ["img/sierra-hotel/render-facade.jpg", "img/sierra-hotel/facade-details.webp"],
+      ["img/sierra-hotel/photo-1.jpg", "img/sierra-hotel/photo-2.jpg", "img/sierra-hotel/photo-3.jpg"],
+      ["img/sierra-hotel/facade.webp", "img/sierra-hotel/photo-5.jpg", "img/sierra-hotel/photo-6.jpg", "img/sierra-hotel/photo-7.jpg"],
+      ["img/sierra-hotel/photo-4-crop.jpg"]
+    ],
     gallery: {
       photosLayout: "grid",
       drawings: [

@@ -45,7 +45,13 @@
   var hero = el('div', 'hero');
   hero.setAttribute('role', 'img');
   hero.setAttribute('aria-label', p.title);
-  if(p.hero){
+  // a project with flow (see projects.js) is one continuous page: no paging, the hero at its own proportions
+  if(p.flow) document.documentElement.classList.add('flow');
+  if(p.hero && p.flow){
+    var fimg = el('img');
+    fimg.src = p.hero; fimg.alt = p.title;
+    hero.appendChild(fimg);
+  } else if(p.hero){
     var himg = el('img');
     himg.src = p.hero; himg.alt = p.title;
     // most projects want a plain centred crop; a few need the crop shifted, or
@@ -187,8 +193,38 @@
      mode: 'free', shapes: [1/1, 3/4, 4/3, 3/4, 4/3, 16/9]}   // free layout: a long section you scroll through normally
   ];
 
+  // flow: drawings, models and photos mixed in rows, as listed in projects.js (one wide picture, then two or three,
+  // then smaller ones). Every picture in a row gets the same height and the row fills the width: each one grows in
+  // proportion to its own width / height
+  if(p.flow){
+    var fseg = el('section', 'seg seg--flow');
+    var fitems = [];
+    p.flow.forEach(function(row){
+      var r = el('div', 'frow');
+      row.forEach(function(it){
+        if(typeof it === 'string') it = {src: it};
+        var fig = el('figure');
+        fig.style.setProperty('--a', it.a || 1.333);
+        var img = el('img');
+        img.src = it.src; img.alt = it.caption || p.title; img.loading = 'lazy'; img.decoding = 'async';
+        var item = {src: it.src, alt: img.alt, a: it.a || 1.333, caption: it.caption || ''};
+        var k = fitems.push(item) - 1;
+        img.addEventListener('load', function(){
+          item.a = img.naturalWidth / img.naturalHeight;
+          fig.style.setProperty('--a', item.a);
+        });
+        fig.appendChild(img);
+        fig.addEventListener('click', function(){ openLightbox(fitems, k); });
+        r.appendChild(fig);
+      });
+      fseg.appendChild(r);
+    });
+    app.appendChild(fseg);
+    segs.push({el: fseg, name: 'Pictures', free: true});
+  }
+
   var n = 0;
-  SECTIONS.forEach(function(s){
+  if(!p.flow) SECTIONS.forEach(function(s){
     var items = G[s.key];
     if(!items || !items.length) return;
     var seg = el('section', 'seg seg--gal');
@@ -643,7 +679,7 @@
   function unzoomAll(){ stages.forEach(function(st){ if(st._zoom !== null) setZoom(st, null); }); }
 
   // ---- paging with resistance ---------------------------------------------
-  var pagedMQ = window.matchMedia('(min-width:900px) and (hover:hover) and (pointer:fine)');
+  var pagedMQ = p.flow ? {matches: false} : window.matchMedia('(min-width:900px) and (hover:hover) and (pointer:fine)');
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var THRESH = 360;            // how far you have to push before the page lets go (about four wheel clicks)
   var EXIT_THRESH = 720;       // past the last segment it is heavier still: this takes you back to the home page

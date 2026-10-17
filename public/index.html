@@ -394,8 +394,11 @@
   body.has-sheet .sheet{opacity:1;transform:none}
   .sheet.from-picture{
     margin:0;right:auto;bottom:auto;transform:none;
-    transition:opacity .3s ease,top .6s cubic-bezier(.2,.8,.2,1),height .6s cubic-bezier(.2,.8,.2,1);
+    border:0;box-shadow:none;
+    transition:opacity .3s ease,left .6s cubic-bezier(.2,.8,.2,1),width .6s cubic-bezier(.2,.8,.2,1),
+               top .6s cubic-bezier(.2,.8,.2,1),height .6s cubic-bezier(.2,.8,.2,1);
   }
+  body.sheet-in-wall .sheet-back{display:none}
   @media (max-width:600px){ .sheet{width:100%;height:100%;border:0} }
   @media (prefers-reduced-motion:reduce){
     *{transition-duration:.01ms !important}
@@ -1363,7 +1366,12 @@
   function embedUrl(href){ return href + (href.indexOf('?') === -1 ? '?' : '&') + 'embed=1'; }
   // from: the large picture the project was opened from; the sheet grows out of it, keeping its left edge and width
   function open(href, fromHistory, from){
-    if(sheet){ frame.src = embedUrl(href); }
+    if(sheet){
+      // another project while one is up: swap it in place, so Back (or closing) still goes straight to the home page
+      try{ frame.contentWindow.location.replace(embedUrl(href)); }catch(e){ frame.src = embedUrl(href); }   // src would add a step to Back
+      if(!fromHistory) history.replaceState({sheet: href}, '', '/?show=' + encodeURIComponent(href));
+      return;
+    }
     else{
       back = document.createElement('div'); back.className = 'sheet-back';
       sheet = document.createElement('div'); sheet.className = 'sheet';
@@ -1381,7 +1389,7 @@
       back.addEventListener('click', function(){ close(); });
       void sheet.offsetWidth;
       document.body.classList.add('has-sheet');
-      if(sheet.from){ sheet.style.top = '5vh'; sheet.style.height = '90vh'; }
+      if(sheet.from) setRect(wallRect());
       frame.addEventListener('load', function(){ syncTheme(); try{ frame.contentWindow.focus(); }catch(e){} });
     }
     if(!fromHistory){
@@ -1389,28 +1397,39 @@
       pushed = true;
     }
   }
-  function placeAt(r){
-    // a small picture would give a sheet too narrow to read: below 560px it widens about its middle, kept on screen
-    var w = Math.max(r.width, Math.min(560, innerWidth - 32)), l = r.left + (r.width - w) / 2;
-    l = Math.max(16, Math.min(l, innerWidth - 16 - w));
-    r = {left: l, width: w, top: r.top, height: r.height};
-    sheet.from = r;
-    sheet.classList.add('from-picture');
+  function setRect(r){
     sheet.style.left = r.left + 'px'; sheet.style.width = r.width + 'px';
     sheet.style.top = r.top + 'px'; sheet.style.height = r.height + 'px';
   }
+  // the whole area the wall of pictures takes up; the sheet grows out of the picture to fill it, covering the wall
+  // while the list, the header and the footer stay as they are
+  function wallRect(){ return document.getElementById('collage').getBoundingClientRect(); }
+  function placeAt(r){
+    sheet.from = r;
+    sheet.classList.add('from-picture');
+    document.body.classList.add('sheet-in-wall');
+    setRect(r);
+  }
+  window.addEventListener('resize', function(){ if(sheet && sheet.from) setRect(wallRect()); });
+  // in the wall the list stays usable: a title swaps the project in the sheet, a click anywhere else closes it
+  document.addEventListener('click', function(e){
+    if(!sheet || !sheet.from || e.defaultPrevented) return;
+    if(e.target.closest('.sheet, a, button, header, .tile')) return;
+    close();
+  });
   function remove(){
     if(!sheet) return;
     document.body.classList.remove('has-sheet');
-    if(sheet.from){ sheet.style.top = sheet.from.top + 'px'; sheet.style.height = sheet.from.height + 'px'; }
+    if(sheet.from){ setRect(sheet.from); document.body.classList.remove('sheet-in-wall'); }
     var b = back, sh = sheet;
     back = sheet = frame = null;
     setTimeout(function(){ b.remove(); sh.remove(); }, 500);
   }
   function close(){
     if(!sheet) return;
-    if(pushed){ pushed = false; history.back(); }          // popstate below removes it
-    else{ history.replaceState(null, '', '/'); remove(); }
+    // not history.back(): pages followed inside the sheet add their own steps, and Back would only undo those
+    pushed = false;
+    history.replaceState(null, '', '/'); remove();
   }
   window.addEventListener('popstate', function(e){
     if(e.state && e.state.sheet){ pushed = true; open(e.state.sheet, true); }

@@ -311,9 +311,9 @@
   .tile .fill.on{opacity:1}
   /* the drawn openings behind the pictures (see drawFacade); they step back while a project's preview is up */
   .facade{position:absolute;inset:0;width:100%;height:100%;overflow:visible;transition:opacity .6s ease}
-  .facade .splay{fill:color-mix(in srgb,var(--ink) 4%,var(--paper));stroke:var(--rule)}
+  .facade .splay{fill:none;stroke:var(--rule)}
   .facade line{stroke:var(--rule)}
-  .facade .pane{fill:var(--ink);stroke:var(--ink)}   /* solid: black on the light wall, white on the dark one */
+  .facade .pane{fill:none;stroke:var(--rule)}
   .facade *{vector-effect:non-scaling-stroke;stroke-width:1}
   .collage.is-previewing .facade{opacity:.25}
   .tile.ambient.on{pointer-events:auto;cursor:pointer}

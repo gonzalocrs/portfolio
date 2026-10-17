@@ -644,6 +644,9 @@
 
   // ---- paging with resistance ---------------------------------------------
   var pagedMQ = window.matchMedia('(min-width:900px) and (hover:hover) and (pointer:fine)');
+  // the page used to turn segment by segment with resistance (a magnet); now it scrolls freely and the code below
+  // only runs when MAGNET is true. The dots still show where you are and still glide to a segment when clicked
+  var MAGNET = false;
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var THRESH = 360;            // how far you have to push before the page lets go (about four wheel clicks)
   var EXIT_THRESH = 720;       // past the last segment it is heavier still: this takes you back to the home page
@@ -792,6 +795,15 @@
     if(!pagedMQ.matches) return;
     if(lb){ e.preventDefault(); return; }
     var now = performance.now();
+    if(!MAGNET){
+      var sst = currentStage();
+      if(sst && sst._mode === 'strip' && Math.abs(e.deltaX) > Math.abs(e.deltaY)){   // a sideways swipe moves along the models
+        e.preventDefault();
+        stripSwipe += e.deltaX;
+        if(Math.abs(stripSwipe) > 70 && now - stripAt > 450){ stepStrip(sst, stripSwipe > 0 ? 1 : -1); stripSwipe = 0; stripAt = now; }
+      }
+      return;
+    }
     var s0 = segs[cur];
     if(s0.free && !exiting && !lockQuiet && !animating && e.deltaY){
       var y0 = window.scrollY, topY = targetFor(cur), botY = bottomFor(cur);
@@ -845,7 +857,7 @@
       setZoom(st, (st._zoom + (e.key === 'ArrowRight' ? 1 : len - 1)) % len);
       e.preventDefault(); return;
     }
-    if(!pagedMQ.matches || tag === 'input' || tag === 'textarea') return;
+    if(!MAGNET || !pagedMQ.matches || tag === 'input' || tag === 'textarea') return;
     var k = e.key;
     if(k === ' ' && (tag === 'button' || tag === 'a')) return;
     if(k === 'ArrowDown' || k === 'PageDown' || (k === ' ' && !e.shiftKey)){
@@ -876,7 +888,7 @@
   if(pagedMQ.addEventListener) pagedMQ.addEventListener('change', applyMode);
   window.addEventListener('resize', function(){
     setBar(); setFooter(); relayout();
-    if(pagedMQ.matches && !animating){                                       // stay on the same segment
+    if(MAGNET && pagedMQ.matches && !animating){                             // stay on the same segment
       var lo = targetFor(cur), hi = segs[cur].free ? bottomFor(cur) : lo;
       window.scrollTo(0, Math.max(lo, Math.min(hi, window.scrollY)));
     }

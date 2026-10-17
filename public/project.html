@@ -206,8 +206,13 @@
      and shouldn't force-stop before you've seen the rest of it */
   html:not(.paged){scroll-snap-type:none}
   .intro.seg{scroll-margin-top:calc(var(--bar-h,4rem) + .35rem)}
-  html.paged{scrollbar-width:none}
-  html.paged::-webkit-scrollbar{display:none}
+  /* a quiet scrollbar: a thin square bar in the rule colour on no track, no arrows */
+  html{scrollbar-width:thin;scrollbar-color:var(--rule) transparent}
+  html::-webkit-scrollbar{width:6px;height:6px}
+  html::-webkit-scrollbar-track{background:transparent}
+  html::-webkit-scrollbar-thumb{background:var(--rule);border-radius:0}
+  html::-webkit-scrollbar-thumb:hover{background:var(--mute)}
+  html::-webkit-scrollbar-button{display:none}
   .intro{
     display:flex;flex-direction:column;
     height:calc(100svh - var(--bar-h,4rem) - .35rem);

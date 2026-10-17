@@ -14,7 +14,9 @@ Widths are in drawing units and scale with the drawing, like ink on a sheet: one
 sheet at full size (plans 3000 wide, elevations 2000 wide), which is the weight the earlier PNG drawings had.
 Shown smaller on the page, the lines get finer in proportion, so the hierarchy is the ratio between them.
 
-Elevations: nothing is cut, so nothing is solid black. Outlines in black, cladding and railings in grey,
+Elevations: nothing is cut, so nothing is solid black. The silhouette (the line that wraps the building) and the
+ground line are heaviest; inside it the lines get thinner by importance: volume edges, then slab edges and openings,
+then window frames, then cladding and railings in grey,
 glass a very light grey, shadows darken what they fall on (a translucent black, like a multiply).
 """
 
@@ -37,14 +39,15 @@ ELEVATION = {
     'glass':     {'fill': '#f9f9f9'},
     'frame':     {'fill': '#d8d8d8'},
     'greyfill':  {'fill': '#969696'},
-    'grey':      {'stroke': '#969696', 'width': 1.0},      # grey 150
+    'grey':      {'stroke': '#969696', 'width': 0.35},     # cladding slats, railings (grey 150): finest
     'shadow':    {'fill': '#000', 'opacity': 0.2},
-    'line':      {'stroke': '#000', 'width': 1.0},
-    'frameline': {'stroke': '#000', 'width': 1.0},
-    'outline':   {'stroke': '#000', 'width': 2.0},
-    'ground':    {'stroke': '#000', 'width': 4.0},
+    'frameline': {'stroke': '#000', 'width': 0.4},          # window and door frames
+    'line':      {'stroke': '#000', 'width': 0.6},          # slab edges, bays, openings
+    'outline':   {'stroke': '#000', 'width': 1.0},          # volume edges inside the building
+    'bound':     {'stroke': '#000', 'width': 2.2},          # the silhouette: the one line that wraps the building
+    'ground':    {'stroke': '#000', 'width': 2.2},
 }
-ELEVATION_ORDER = ['glass', 'frame', 'greyfill', 'grey', 'shadow', 'line', 'frameline', 'outline', 'ground']
+ELEVATION_ORDER = ['glass', 'frame', 'greyfill', 'grey', 'shadow', 'frameline', 'line', 'outline', 'ground', 'bound']
 
 
 def css(style):

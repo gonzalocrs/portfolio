@@ -32,7 +32,9 @@ pixel of the sheet at full size (plans 3000 wide, elevations 2000 wide).
 | thinnest | closets | `closet`, 0.6, grey 205 |
 | 1/16 | hatches (pool water) | light grey fill (240) |
 
-Elevations: outline 2.0, lines and frames 1.0, cladding and railings 1.0 in grey 150, ground line 4.0.
+Elevations: the silhouette (the one line that wraps the building, found from the outline, line and ground layers,
+bridging CAD gaps under 20 cm) and the ground line 2.2; inside it, thinner by importance: volume edges (`outline`)
+1.0, slab edges and openings (`line`) 0.6, window and door frames 0.4, cladding and railings 0.35 in grey 150.
 
 With `'poche': 'structure'` in the plans config, only the structure is solid black: columns (the `column`
 layers), any wall layers listed in `structure_layers`, and any boxes in `structure_boxes` (per floor, e.g. a

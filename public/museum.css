@@ -1,0 +1,135 @@
+/* TEST: a visit to a project, the way you walk up to a painting in a museum (see museum.js).
+   1. the wall (the home page)   2. click a picture: it comes up close   3. scroll a little: its wall label
+   4. scroll on: a new room with the rest of the project, in one of three hangs (walk / salon / spotlight) */
+
+.museum{
+  position:fixed;left:0;right:0;bottom:0;top:var(--m-top,64px);z-index:60;
+  overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;
+  background:var(--paper);color:var(--ink);
+  opacity:0;transition:opacity .45s ease;
+  scrollbar-width:thin;scrollbar-color:var(--rule) transparent;
+}
+.museum.on{opacity:1}
+body.museum-on{overflow:hidden}
+.m-close{
+  position:fixed;z-index:62;right:clamp(1rem,4vw,2.5rem);top:calc(var(--m-top,64px) + .9rem);
+  width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;color:var(--mute);background:var(--paper);border-radius:50%;
+  opacity:0;transition:opacity .4s ease .2s,color .2s
+}
+.museum.on ~ .m-close,.m-close.on{opacity:1}
+.m-close:hover{color:var(--live)}
+.m-close svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.3;fill:none}
+
+/* ---------- 2 + 3: the picture close up, then its label beside it ---------- */
+.m-stage{position:relative}
+.m-room{position:sticky;top:0;height:var(--m-h);overflow:hidden}
+.m-pic{position:absolute;margin:0;border:1px solid var(--rule);background:var(--paper);will-change:left,top,width,height}
+.m-pic img{display:block;width:100%;height:100%}
+.m-pic.fly{transition:left .7s cubic-bezier(.2,.7,.2,1),top .7s cubic-bezier(.2,.7,.2,1),width .7s cubic-bezier(.2,.7,.2,1),height .7s cubic-bezier(.2,.7,.2,1)}
+
+/* the wall label, as in a museum: a card with the name and the facts, a second card with the text */
+.m-label{position:absolute;width:min(21rem,30vw);opacity:0;pointer-events:none}
+.m-label.on{pointer-events:auto}
+.m-card{
+  background:color-mix(in srgb,var(--ink) 3%,var(--paper));
+  box-shadow:0 1px 0 color-mix(in srgb,var(--ink) 10%,transparent),0 6px 18px -10px rgba(0,0,0,.25);
+  padding:1.35rem 1.4rem 1.45rem;
+}
+.m-card + .m-card{margin-top:1rem}
+.m-card h2{margin:0;font-weight:400;font-size:clamp(1.45rem,2vw,1.9rem);line-height:1.1;letter-spacing:-.01em}
+.m-card .sub{margin:.35rem 0 0;font-size:.95rem}
+.m-card .work-line{margin:1rem 0 0;font-size:.95rem}
+.m-card .work-line b{font-weight:600}
+.m-card .line{margin:.15rem 0 0;font-size:.95rem}
+.m-card .line span{color:var(--mute)}
+.m-card p.text{margin:0;font-size:.9rem;line-height:1.5}
+.m-card p.text + p.text{margin-top:.7rem}
+
+.m-hint{
+  position:absolute;left:50%;bottom:1.1rem;transform:translateX(-50%);
+  display:flex;flex-direction:column;align-items:center;gap:.2rem;
+  font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);
+  transition:opacity .3s ease;pointer-events:none;white-space:nowrap
+}
+.m-hint svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.1;animation:m-nudge 2.2s ease-in-out infinite}
+@keyframes m-nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
+
+/* ---------- 4: the room with the rest of the project ---------- */
+.m-gallery{position:relative}
+.m-walltext h3{margin:0;font-weight:800;font-size:clamp(1.8rem,3.4vw,3.2rem);line-height:1;letter-spacing:-.02em}
+.m-walltext .k{display:block;margin-bottom:1rem;font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute)}
+.m-walltext p{margin:1rem 0 0;font-size:.95rem;line-height:1.6;color:var(--mute)}
+.m-tag{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute)}
+.m-tag b{font-weight:400;color:var(--ink);margin-inline-end:.6em}
+.m-end{display:flex;justify-content:space-between;align-items:baseline;gap:2rem;flex-wrap:wrap}
+.m-end button{font-weight:800;font-size:clamp(1.2rem,2vw,1.8rem);letter-spacing:-.02em;text-align:left}
+.m-end button:hover{color:var(--live)}
+.m-end .m-tag{display:block;margin-bottom:.4rem}
+
+/* walk: you walk along one long wall; scrolling down moves you sideways past the work, hung on one eye line */
+.m-walk{position:relative}
+.m-walk-view{position:sticky;top:0;height:var(--m-h);overflow:hidden}
+.m-walk-view::after{   /* the floor */
+  content:"";position:absolute;left:0;right:0;bottom:0;height:9%;
+  background:color-mix(in srgb,var(--ink) 4%,var(--paper));border-top:1px solid var(--rule)
+}
+.m-walk-track{position:absolute;left:0;top:0;height:91%;display:flex;align-items:center;gap:7vw;padding:0 12vw 0 clamp(1rem,4vw,2.5rem);will-change:transform}
+.m-walk .m-walltext{flex:0 0 auto;width:min(27rem,80vw)}
+.m-walk .m-group{flex:0 0 auto;display:flex;align-items:center;gap:5vw}
+.m-walk .m-group > .m-tag{writing-mode:vertical-rl;transform:rotate(180deg);align-self:center}
+.m-work{display:flex;align-items:flex-end;gap:.9rem;flex:0 0 auto;margin:0}
+.m-work img{display:block;width:auto;border:1px solid var(--rule);background:var(--paper)}
+.m-work figcaption{width:7.5rem;padding-bottom:.2rem;font-family:var(--mono);font-size:.62rem;line-height:1.5;text-transform:uppercase;letter-spacing:.04em;color:var(--mute)}
+.m-work figcaption b{display:block;font-weight:400;color:var(--ink)}
+.m-walk .m-end{flex:0 0 auto;flex-direction:column;align-items:flex-start;width:22rem}
+
+/* salon: the whole project hung at once, edge to edge, as in a salon hang */
+.m-salon{padding:clamp(3rem,10vh,6rem) clamp(1rem,4vw,2.5rem) 4rem;background:color-mix(in srgb,var(--ink) 3%,var(--paper));border-top:1px solid var(--rule)}
+.m-salon .m-walltext{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:2rem 4rem;margin-bottom:clamp(2rem,6vh,4rem)}
+.m-salon .m-walltext p:first-child{margin-top:0}
+.m-salon-rows{display:flex;flex-direction:column;gap:14px}
+.m-row{display:flex;gap:14px}
+.m-row figure{position:relative;margin:0;flex:0 0 auto;cursor:zoom-in}
+.m-row img{display:block;width:100%;height:100%;border:1px solid var(--rule);background:var(--paper)}
+.m-row .cap{position:absolute;left:.6rem;bottom:.6rem;font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;
+  padding:.25em .55em;background:var(--paper);color:var(--mute);opacity:0;transition:opacity .25s ease;white-space:nowrap;max-width:calc(100% - 1.2rem);overflow:hidden;text-overflow:ellipsis}
+.m-row figure:hover .cap{opacity:1}
+.m-salon .m-end{margin-top:4rem}
+.m-zoom{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;padding:4vh 4vw;
+  background:color-mix(in srgb,var(--paper) 94%,transparent);cursor:zoom-out;opacity:0;transition:opacity .3s ease}
+.m-zoom.on{opacity:1}
+.m-zoom img{max-width:100%;max-height:100%;border:1px solid var(--rule)}
+
+/* spotlight: a dark room, one work at a time, each lit as you come to it */
+.m-spot{background:#0b0b0c;color:#ecebe8;--mute:#8b8d90;--rule:#2b2d30;--ink:#ecebe8;--paper:#0b0b0c}
+.museum:has(.m-spot){scroll-snap-type:y proximity}
+.m-slide{position:relative;height:var(--m-h);scroll-snap-align:start;display:flex;align-items:center;justify-content:center}
+.m-slide img{max-width:84vw;max-height:78%;opacity:.12;transform:scale(.985);transition:opacity .9s ease,transform 1.2s cubic-bezier(.2,.7,.2,1);
+  box-shadow:0 30px 80px -30px rgba(0,0,0,.9)}
+.m-slide.lit img{opacity:1;transform:none}
+.m-slide .m-tag{position:absolute;left:clamp(1rem,4vw,2.5rem);bottom:1.4rem;opacity:0;transition:opacity .6s ease .2s}
+.m-slide .count{left:auto;right:clamp(1rem,4vw,2.5rem)}
+.m-slide.lit .m-tag{opacity:1}
+.m-spot .m-walltext{width:min(34rem,86vw)}
+.m-spot .m-end{padding:6rem clamp(1rem,4vw,2.5rem) 5rem}
+
+/* the test switch between the three rooms */
+.m-switch{position:fixed;z-index:62;left:clamp(1rem,4vw,2.5rem);bottom:1rem;display:flex;gap:.2rem;padding:.3rem;
+  background:color-mix(in srgb,var(--paper) 88%,transparent);border:1px solid var(--rule);
+  font-family:var(--mono);font-size:.64rem;text-transform:uppercase;letter-spacing:.05em}
+.m-switch span{padding:.25rem .4rem;color:var(--mute)}
+.m-switch button{padding:.25rem .5rem;color:var(--mute)}
+.m-switch button:hover{color:var(--ink)}
+.m-switch button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+
+@media (max-width:700px){
+  .m-label{position:static;width:auto;opacity:1;padding:0 1rem 2rem}
+  .m-room{position:relative;height:auto;overflow:visible}
+  .m-pic{position:relative;left:auto !important;top:auto !important;width:auto !important;height:auto !important;margin:1rem}
+  .m-pic img{height:auto}
+  .m-hint{display:none}
+  .m-salon .m-walltext{grid-template-columns:1fr}
+  .m-switch{bottom:.6rem}
+  .m-slide .m-tag{bottom:3.6rem}
+}
+@media (prefers-reduced-motion:reduce){ .museum *{transition-duration:.01ms !important;animation:none !important} }

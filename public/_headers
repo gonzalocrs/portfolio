@@ -34,20 +34,8 @@
 /embed.js
   Cache-Control: no-cache
 
-/horizontal
+/museum.css
   Cache-Control: no-cache
 
-/horizontal.html
-  Cache-Control: no-cache
-
-/horizontal.js
-  Cache-Control: no-cache
-
-/ribbon
-  Cache-Control: no-cache
-
-/ribbon.html
-  Cache-Control: no-cache
-
-/ribbon.js
+/museum.js
   Cache-Control: no-cache

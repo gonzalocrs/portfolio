@@ -116,7 +116,9 @@
   // credits on the right, untouched. A project can also reserve the slot
   // before the real artwork exists — diagram: {} — which shows the same
   // roadmap placeholder pattern used elsewhere until it's ready.
-  if(p.diagram && (p.diagram.src || showLayout)){
+  // not next to the text when the grid below already has it
+  var diagramInGrid = p.diagram && p.grid && p.grid.some(function(g){ return g.src === p.diagram.src; });
+  if(p.diagram && (p.diagram.src || showLayout) && !diagramInGrid){
     info.classList.add('has-diagram');
     var creditsToggle = el('button', 'credits-toggle mono', 'Credits');
     creditsToggle.type = 'button';

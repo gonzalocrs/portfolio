@@ -82,9 +82,24 @@
   // p.text is usually one short paragraph, but can be an array when a project
   // needs several (each rendered as its own <p class="text">)
   if(p.text){
-    (Array.isArray(p.text) ? p.text : [p.text]).forEach(function(t){
-      left.appendChild(el('p', 'text', t));
-    });
+    // only the first paragraph shows; the rest opens under a "Read more" link
+    var paras = Array.isArray(p.text) ? p.text : [p.text];
+    left.appendChild(el('p', 'text', paras[0]));
+    if(paras.length > 1){
+      var more = el('div', 'more');
+      paras.slice(1).forEach(function(t){ more.appendChild(el('p', 'text', t)); });
+      more.hidden = true;
+      left.appendChild(more);
+      var moreBtn = el('button', 'more-toggle mono', 'Read more');
+      moreBtn.type = 'button';
+      moreBtn.setAttribute('aria-expanded', 'false');
+      moreBtn.addEventListener('click', function(){
+        more.hidden = !more.hidden;
+        moreBtn.textContent = more.hidden ? 'Read more' : 'Read less';
+        moreBtn.setAttribute('aria-expanded', more.hidden ? 'false' : 'true');
+      });
+      left.appendChild(moreBtn);
+    }
   } else if(showLayout) left.appendChild(el('p', 'text placeholder', 'A second, shorter paragraph can add context, such as the site, the brief or the approach.'));
   if(left.children.length) info.appendChild(left); else info.classList.add('solo');
   var dl = el('dl', 'credits');

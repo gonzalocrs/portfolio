@@ -263,7 +263,11 @@
     letter-spacing:-.015em;
   }
   .text{margin:0;max-width:52ch;font-size:1rem;line-height:1.6;color:var(--mute)}
-  .text + .text{margin-top:1rem}
+  .text + .text,.more .text{margin-top:1rem}
+  .more-toggle{display:inline-flex;align-items:center;gap:.5rem;margin-top:1rem;color:var(--mute);cursor:pointer;transition:color .2s}
+  .more-toggle:hover{color:var(--ink)}
+  .more-toggle::after{content:"";width:.4rem;height:.4rem;border-right:1px solid currentColor;border-bottom:1px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform .25s ease}
+  .more-toggle[aria-expanded="true"]::after{transform:rotate(-135deg) translateY(1px)}
 
   /* an optional sketch/diagram, full bleed (no frame, no caption), shown whole
      (contain, never cropped) next to the text — sized a little short of the

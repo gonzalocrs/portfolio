@@ -82,7 +82,9 @@ PROJECT = {
         },
         'axis_only': ['WINDOW'],                                     # no window-opening diagonals
         'drop_short_diagonals': 0.3,                                 # door-opening arrows
-        'drop_in_box': [('RAILING', (1219.0, -44.8, 1230.2, -42.6))],   # top-floor railings: no longer in the project
+        'drop_in_box': [('RAILING', (1219.0, -44.8, 1230.2, -42.6)),    # top-floor railings: no longer in the project
+                        ('a_muros', (1224.15, -59.29, 1224.35, -59.20)),   # entrance door handles (two short dashes):
+                        ('a_muros', (1224.77, -59.29, 1224.97, -59.20))],  # noise at this scale
         # the central volume's shadow down its left side (sun from the upper right, 45 degrees), 0.35 m wide
         'extra_shadows': [[(1221.766, -44.761), (1221.416, -45.111), (1221.416, -57.962), (1221.766, -57.962)]],
     }],

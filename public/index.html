@@ -394,10 +394,12 @@
     transition:opacity .3s ease,left .6s cubic-bezier(.2,.8,.2,1),width .6s cubic-bezier(.2,.8,.2,1),
                top .6s cubic-bezier(.2,.8,.2,1),height .6s cubic-bezier(.2,.8,.2,1);
   }
-  /* opened from a picture: the sheet takes almost the whole screen, leaving the page's own margins on both sides, where
-     the home page still shows faintly behind it so you can tell there is somewhere to go back to */
-  body.sheet-in-wall .sheet-back{background:color-mix(in srgb,var(--paper) 88%,transparent)}
-  body.sheet-in-wall .sheet{border:1px solid var(--rule)}
+  /* opened from a picture: the sheet settles in the middle, wide, and the home page behind it (under the header),
+     back at its start, blurs */
+  body.sheet-in-wall .sheet-back{
+    background:color-mix(in srgb,var(--paper) 30%,transparent);
+    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  }
   @media (max-width:600px){ .sheet{width:100%;height:100%;border:0} }
   @media (prefers-reduced-motion:reduce){
     *{transition-duration:.01ms !important}
@@ -1087,6 +1089,7 @@
     shrinkBig();
     filterWall();
   }
+  window.gcCloseAll = closeAll;
   // a click anywhere on the background (not on the menu, the header or a link) closes it
   document.addEventListener('click', function(e){
     if(!document.body.classList.contains('is-open') && !document.body.classList.contains('index-on')) return;
@@ -1354,7 +1357,11 @@
       back.addEventListener('click', function(){ close(); });
       void sheet.offsetWidth;
       document.body.classList.add('has-sheet');
-      if(sheet.from) setRect(wallRect());
+      if(sheet.from){
+        setRect(wallRect());
+        // behind it the home page goes back to its start: the large picture goes, the whole wall and the index return
+        if(window.gcCloseAll) gcCloseAll();
+      }
       frame.addEventListener('load', function(){ syncTheme(); try{ frame.contentWindow.focus(); }catch(e){} });
     }
     if(!fromHistory){
@@ -1366,13 +1373,12 @@
     sheet.style.left = r.left + 'px'; sheet.style.width = r.width + 'px';
     sheet.style.top = r.top + 'px'; sheet.style.height = r.height + 'px';
   }
-  // where the sheet settles: from the left edge of the index (where "Built" starts) to the same margin on the right,
-  // and from under the header to the bottom of the window
+  // where the sheet settles: centred, about three quarters of the width, from under the header to the bottom of the
+  // window; everything behind it but the header is blurred
   function wallRect(){
-    var top = document.querySelector('header.bar').getBoundingClientRect().bottom;
-    var m = Math.round(document.getElementById('index').getBoundingClientRect().left);
+    var top = document.querySelector('header.bar').getBoundingClientRect().bottom, w = Math.round(innerWidth * .76);
     if(back) back.style.top = top + 'px';
-    return {left: m, width: innerWidth - 2 * m, top: top, height: innerHeight - top};
+    return {left: Math.round((innerWidth - w) / 2), width: w, top: top, height: innerHeight - top};
   }
   function placeAt(r){
     sheet.from = r;

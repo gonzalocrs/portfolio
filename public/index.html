@@ -394,7 +394,11 @@
     transition:opacity .3s ease,left .6s cubic-bezier(.2,.8,.2,1),width .6s cubic-bezier(.2,.8,.2,1),
                top .6s cubic-bezier(.2,.8,.2,1),height .6s cubic-bezier(.2,.8,.2,1);
   }
-  body.sheet-in-wall .sheet-back{display:none}
+  /* opened from a picture: the sheet settles in the middle, wide, and the page behind it (under the header) blurs */
+  body.sheet-in-wall .sheet-back{
+    background:color-mix(in srgb,var(--paper) 30%,transparent);
+    -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  }
   @media (max-width:600px){ .sheet{width:100%;height:100%;border:0} }
   @media (prefers-reduced-motion:reduce){
     *{transition-duration:.01ms !important}
@@ -1363,9 +1367,13 @@
     sheet.style.left = r.left + 'px'; sheet.style.width = r.width + 'px';
     sheet.style.top = r.top + 'px'; sheet.style.height = r.height + 'px';
   }
-  // the whole area the wall of pictures takes up; the sheet grows out of the picture to fill it, covering the wall
-  // while the list, the header and the footer stay as they are
-  function wallRect(){ return document.getElementById('collage').getBoundingClientRect(); }
+  // where the sheet settles: centred, about three quarters of the width, from under the header to the bottom of the
+  // window; everything behind it but the header is blurred
+  function wallRect(){
+    var top = document.querySelector('header.bar').getBoundingClientRect().bottom, w = Math.round(innerWidth * .76);
+    if(back) back.style.top = top + 'px';
+    return {left: Math.round((innerWidth - w) / 2), width: w, top: top, height: innerHeight - top};
+  }
   function placeAt(r){
     sheet.from = r;
     sheet.classList.add('from-picture');

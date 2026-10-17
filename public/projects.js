@@ -118,6 +118,19 @@ window.PROJECTS = {
     hero: "img/anticlastic-roof-structure/hero.jpg",
     heroPosition: "center",
     physicalNote: "Physical Form-Finding · Plywood · 1:12 Scale",
+    // all the pictures in one grid after the text (see project.js: grid)
+    grid: [
+      {src: "img/anticlastic-roof-structure/physical/web/IMG_9760.jpg", size: "full"},
+      {src: "img/anticlastic-roof-structure/physical/web/IMG_9768.jpg", size: "big"}, {src: "img/anticlastic-roof-structure/physical/web/IMG_9801.jpg"}, {src: "img/anticlastic-roof-structure/physical/web/IMG_9865-Edit.jpg"},
+      {src: "img/anticlastic-roof-structure/elevation.png", drawing: true, caption: "Front elevation"},
+      {src: "img/anticlastic-roof-structure/plan.png", drawing: true, caption: "Floor plan"},
+      {src: "img/anticlastic-roof-structure/section.png", drawing: true, caption: "Section"},
+      {src: "img/anticlastic-roof-structure/physical/web/IMG_9868.jpg", size: "full"},
+      {src: "img/anticlastic-roof-structure/hand-drawing.jpg", size: "tall", drawing: true, caption: "Spherical vs. hyperbolic curvature study"},
+      {src: "img/anticlastic-roof-structure/physical/web/IMG_9872.jpg", size: "big"},
+      {src: "img/anticlastic-roof-structure/physical/web/IMG_9906.jpg"}, {src: "img/anticlastic-roof-structure/physical/web/IMG_9909-Edit.jpg"}, {src: "img/anticlastic-roof-structure/physical/web/IMG_9919.jpg"},
+      {src: "img/anticlastic-roof-structure/physical/web/IMG_9921.jpg", size: "full"}
+    ],
     gallery: {
       drawings: [
         {src: "img/anticlastic-roof-structure/elevation.png", caption: "Front elevation"},

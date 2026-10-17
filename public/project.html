@@ -217,17 +217,6 @@
   .intro .hero{flex:1 1 0;min-height:0;aspect-ratio:auto;max-height:none}
   .intro .title{margin-top:clamp(.9rem,2.4vh,1.6rem)}
 
-  /* flow (see project.js): one continuous page, nothing snaps; the hero keeps its own proportions */
-  html.flow .intro{height:auto;min-height:0}
-  html.flow .intro .hero{flex:none;aspect-ratio:auto;max-height:none}
-  html.flow .intro .hero img{display:block;width:100%;height:auto}
-  html.flow .seg{scroll-snap-align:none;scroll-snap-stop:normal}
-  .seg--flow{height:auto;min-height:0;display:flex;flex-direction:column;gap:var(--fgap);padding-block:clamp(1rem,4vh,3rem) clamp(4rem,12vh,9rem);--fgap:clamp(.6rem,1.2vw,1.1rem)}
-  .frow{display:flex;gap:var(--fgap)}
-  .frow figure{margin:0;flex:var(--a) 1 0;min-width:0;cursor:zoom-in}
-  .frow img{display:block;width:100%;height:auto;border:1px solid var(--rule)}
-  @media (max-width:600px){ .frow{flex-direction:column} }
-
   .info{
     display:grid;
     grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);

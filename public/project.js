@@ -773,7 +773,7 @@
     cueLabel.textContent = '';
     document.body.style.transition = 'opacity .45s ease';
     document.body.style.opacity = '0';
-    setTimeout(function(){ location.href = backHref; }, 420);
+    setTimeout(function(){ if(window.gcClose) gcClose(); else location.href = backHref; }, 420);
   }
 
   // dots and keys: a plain, smooth glide

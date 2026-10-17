@@ -30,3 +30,6 @@
 
 /signature.js
   Cache-Control: no-cache
+
+/embed.js
+  Cache-Control: no-cache

@@ -364,6 +364,33 @@
       margin-top:clamp(2.5rem,10vw,4rem);
     }
   }
+
+  /* ---------- a project opened on top of the home page ---------- */
+  /* the project's own page (embed mode, see embed.js) in a tall sheet over everything, the home page dimmed behind */
+  .sheet-back{
+    position:fixed;inset:0;z-index:40;
+    background:color-mix(in srgb,var(--paper) 72%,transparent);
+    opacity:0;transition:opacity .45s ease;
+  }
+  .sheet{
+    position:fixed;z-index:41;top:0;bottom:0;left:25vw;width:57vw;
+    background:var(--paper);
+    border-left:1px solid var(--rule);border-right:1px solid var(--rule);
+    box-shadow:0 0 60px rgba(0,0,0,.12);
+    opacity:0;transform:translateY(3%);
+    transition:opacity .45s ease,transform .55s cubic-bezier(.2,.8,.2,1);
+  }
+  .sheet iframe{display:block;width:100%;height:100%;border:0;background:var(--paper)}
+  .sheet-close{
+    position:absolute;top:.8rem;right:.8rem;z-index:2;
+    width:2rem;height:2rem;display:flex;align-items:center;justify-content:center;
+    background:var(--paper);color:var(--mute);
+  }
+  .sheet-close:hover{color:var(--live)}
+  .sheet-close svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.3}
+  body.has-sheet .sheet-back{opacity:1}
+  body.has-sheet .sheet{opacity:1;transform:none}
+  @media (max-width:900px){ .sheet{left:0;width:100%;border:0} }
   @media (prefers-reduced-motion:reduce){
     *{transition-duration:.01ms !important}
   }
@@ -375,7 +402,7 @@
   try{
     var q = location.search;
     var force = /[?&]intro(=|&|$)/.test(q);
-    var skip = /[?&]open=/.test(q) || sessionStorage.getItem('gc-intro') === '1' ||
+    var skip = /[?&](open|show)=/.test(q) || sessionStorage.getItem('gc-intro') === '1' ||
                (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     if(force || !skip){
       document.documentElement.classList.add('intro-on');
@@ -766,6 +793,7 @@
   });
   document.addEventListener('keydown', function(e){
     if(e.metaKey || e.ctrlKey || e.altKey || /input|textarea/i.test(e.target.tagName)) return;
+    if(window.gcSheetOpen && gcSheetOpen()) return;
     var dir = {ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down'}[e.key];
     if(!dir || !arrows[dir].classList.contains('on')) return;
     e.preventDefault();
@@ -1292,6 +1320,90 @@
 })();
 </script>
 
+<script>
+// Opening a project: instead of leaving the home page, its page comes up in a sheet on top of everything (the same
+// project page, in embed mode: see embed.js). The address changes to /?show=..., so Back closes it, and that address
+// opens the home page with the project already up. Closes with the ×, Esc, a click outside it, or Back.
+(function(){
+  var back = null, sheet = null, frame = null, pushed = false;
+  function embedUrl(href){ return href + (href.indexOf('?') === -1 ? '?' : '&') + 'embed=1'; }
+  function open(href, fromHistory){
+    if(sheet){ frame.src = embedUrl(href); }
+    else{
+      back = document.createElement('div'); back.className = 'sheet-back';
+      sheet = document.createElement('div'); sheet.className = 'sheet';
+      sheet.setAttribute('role', 'dialog'); sheet.setAttribute('aria-modal', 'true');
+      var x = document.createElement('button');
+      x.className = 'sheet-close'; x.type = 'button'; x.setAttribute('aria-label', 'Close project');
+      x.innerHTML = '<svg viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13"/></svg>';
+      frame = document.createElement('iframe');
+      frame.title = 'Project';
+      frame.src = embedUrl(href);
+      sheet.appendChild(x); sheet.appendChild(frame);
+      document.body.appendChild(back); document.body.appendChild(sheet);
+      x.addEventListener('click', function(){ close(); });
+      back.addEventListener('click', function(){ close(); });
+      void sheet.offsetWidth;
+      document.body.classList.add('has-sheet');
+      frame.addEventListener('load', function(){ syncTheme(); try{ frame.contentWindow.focus(); }catch(e){} });
+    }
+    if(!fromHistory){
+      history.pushState({sheet: href}, '', '/?show=' + encodeURIComponent(href));
+      pushed = true;
+    }
+  }
+  function remove(){
+    if(!sheet) return;
+    document.body.classList.remove('has-sheet');
+    var b = back, sh = sheet;
+    back = sheet = frame = null;
+    setTimeout(function(){ b.remove(); sh.remove(); }, 500);
+  }
+  function close(){
+    if(!sheet) return;
+    if(pushed){ pushed = false; history.back(); }          // popstate below removes it
+    else{ history.replaceState(null, '', '/'); remove(); }
+  }
+  window.addEventListener('popstate', function(e){
+    if(e.state && e.state.sheet){ pushed = true; open(e.state.sheet, true); }
+    else{ pushed = false; remove(); }
+  });
+  window.addEventListener('message', function(e){
+    if(e.origin === location.origin && e.data && e.data.gc === 'close') close();
+  });
+  document.addEventListener('keydown', function(e){
+    if(sheet && e.key === 'Escape'){ e.stopImmediatePropagation(); close(); }
+  }, true);
+  // the theme switch on the home page also turns the project in the sheet
+  function syncTheme(){
+    try{
+      var t = document.documentElement.getAttribute('data-theme'), d = frame && frame.contentDocument.documentElement;
+      if(!d) return;
+      if(t) d.setAttribute('data-theme', t); else d.removeAttribute('data-theme');
+    }catch(e){}
+  }
+  new MutationObserver(syncTheme).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+
+  document.addEventListener('click', function(e){
+    if(e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.button > 0) return;   // new-tab clicks stay as they are
+    var a = e.target.closest && e.target.closest('.work a[href]');
+    if(!a) return;
+    e.preventDefault();
+    open(a.getAttribute('href'));
+  });
+  window.gcSheetOpen = function(){ return !!sheet; };
+
+  var m = /[?&]show=([^&]+)/.exec(location.search);
+  if(m){
+    var href = decodeURIComponent(m[1]);
+    if(/^project(-oma)?\.html\?p=[\w-]+$/.test(href)){
+      history.replaceState(null, '', '/');
+      history.pushState({sheet: href}, '', '/?show=' + encodeURIComponent(href));
+      open(href, true); pushed = true;
+    }
+  }
+})();
+</script>
 <script src="signature.js"></script>
 </body>
 </html>

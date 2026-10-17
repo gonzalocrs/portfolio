@@ -33,3 +33,12 @@
 
 /embed.js
   Cache-Control: no-cache
+
+/horizontal
+  Cache-Control: no-cache
+
+/horizontal.html
+  Cache-Control: no-cache
+
+/horizontal.js
+  Cache-Control: no-cache

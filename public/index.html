@@ -310,6 +310,10 @@
   .tile .fill{position:absolute;inset:0;opacity:0;transition:opacity .6s ease}
   .tile .fill.on{opacity:1}
   /* the drawn openings behind the pictures (see drawFacade); they step back while a project's preview is up */
+  .facade{position:absolute;inset:0;width:100%;height:100%;overflow:visible;transition:opacity .6s ease}
+  .facade .frame{fill:none;stroke:var(--rule)}
+  .facade *{vector-effect:non-scaling-stroke;stroke-width:1}
+  .collage.is-previewing .facade,.collage.has-big .facade{opacity:.25}
   .tile.ambient.on{pointer-events:auto;cursor:pointer}
   .tile.ambient{transition:opacity .5s ease}
   .tile.ambient.on.off{opacity:0;pointer-events:none}   /* not in the open category / not the project pointed at */
@@ -710,6 +714,24 @@
   // tracks which slots are currently occupied so two tiles never land on
   // the same rectangle at once
   var slotTaken = AMBIENT_SLOTS.map(function(){ return false; });
+
+  // The only drawn openings are the thin vertical slots, as quiet separators between the pictures; the empty squares
+  // are not drawn.
+  (function drawFacade(){
+    var NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('class', 'facade');
+    svg.setAttribute('viewBox', '0 0 ' + WALL_W + ' ' + WALL_H);
+    svg.setAttribute('preserveAspectRatio', 'none');     // the wall has the same proportions, so nothing is stretched
+    ACCENTS.forEach(function(r){
+      if(r.h < r.w * 2) return;                          // only the tall, narrow ones
+      var e = document.createElementNS(NS, 'rect');
+      e.setAttribute('x', r.x); e.setAttribute('y', r.y); e.setAttribute('width', r.w); e.setAttribute('height', r.h);
+      e.setAttribute('class', 'frame');
+      svg.appendChild(e);
+    });
+    var wall = document.querySelector('.wall');
+    wall.insertBefore(svg, wall.firstChild);
+  })();
 
   // Moving across the wall: it stands still until you step to the next part of it with the small arrows at the edges of
   // the area (or the arrow keys, or a swipe on a touch screen); then it glides there in one calm move. The stops are the

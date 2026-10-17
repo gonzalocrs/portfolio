@@ -1,7 +1,9 @@
 """Elevations from CAD layers, drawn in the portfolio's language (see style.py), as one SVG.
 
 Layer roles (named in the project config):
-  outline   the building's outer outline: heavier black
+  outline   volume edges inside the building: medium black
+  (the silhouette, the one line that wraps the whole building, is found from the outline, line and ground
+  layers and drawn heaviest; everything inside it is thinner, by importance: see style.py)
   line      frames, slab edges, bays: thin black (on 'axis_only' layers only horizontal/vertical pieces are kept,
             which drops window-opening diagonals)
   grey      cladding, railings: thin grey (their solid fills become grey fills)
@@ -15,7 +17,7 @@ Nothing is solid black: an elevation cuts nothing.
 import functools
 import math
 
-from shapely.geometry import Polygon
+from shapely.geometry import LineString, Polygon, box
 from shapely.ops import unary_union
 
 import cadio
@@ -37,6 +39,24 @@ def _rings(g):
         if p.geom_type == 'Polygon' and p.area > 0:
             out.append([list(p.exterior.coords)] + [list(r.coords) for r in p.interiors])
     return out
+
+
+def silhouette(segs, ground_y=None, gap=0.2):
+    """The line that wraps the building: the outer edge of all its lines, taken as one shape.
+    CAD lines often stop short of each other (a side wall not closed to the bays beside it, a roof screen
+    standing just clear of the parapet), so gaps up to 'gap' (metres) are bridged: every line is thickened
+    by half the gap, the outer ring of the result taken, and that ring brought back in by the same amount."""
+    r = gap / 2
+    lines = unary_union([LineString(q) for q in segs if LineString(q).length > 0])
+    if lines.is_empty:
+        return None
+    blob = lines.buffer(r, join_style=2)
+    parts = [g for g in getattr(blob, 'geoms', [blob]) if g.geom_type == 'Polygon']
+    u = unary_union([Polygon(g.exterior).buffer(-r, join_style=2) for g in parts])
+    if ground_y is not None:                              # nothing below the ground line
+        u = u.intersection(box(-1e9, ground_y, 1e9, 1e9))
+    parts = [g for g in getattr(u, 'geoms', [u]) if g.geom_type == 'Polygon' and g.area > 0]
+    return max(parts, key=lambda g: g.area) if parts else None
 
 
 def build(cfg, sources):
@@ -101,5 +121,10 @@ def build(cfg, sources):
                     ground = ((ax, ay), (bx, by))
     if ground:
         sheet.lines('ground', [tp(ground)])
+    segs = [s for it in items if it['kind'] == 'line' and it['layer'] in L['outline'] | L['line']
+            for s in segments(it, it['layer'] in axis_only)]
+    sil = silhouette(segs + ([list(ground)] if ground else []), ground[0][1] if ground else None)
+    if sil is not None:
+        sheet.lines('bound', [tp(list(sil.exterior.coords))])
     print(f"  elevation: {len(items)} elements, scale {S:.1f} units/m")
     return sheet.render(style.css(style.ELEVATION), style.ELEVATION_ORDER)

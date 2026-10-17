@@ -37,7 +37,9 @@ PROJECT = {
         'drop': {2: [(80.15, 22.2, 81.1, 23.32),                      # skylight curb and line on the terrace: gone
                      (81.35, 28.2, 83.25, 28.32),                     # threshold at the foot of the corridor
                      (85.2, 25.40, 87.2, 27.9)]},                     # lounge kitchenette lines: incomplete, say nothing
-        'cut_solids': {2: [(80.2, 28.2, 80.5, 28.6)]},               # column trimmed to align with the one above
+        'cut_solids': {1: [(59.55, 42.092, 59.90, 42.30),             # typical floor: the two corner columns ran
+                           (70.35, 42.092, 70.70, 42.30)],            # 9-10 cm past the facade; trimmed to its face
+                       2: [(80.2, 28.2, 80.5, 28.6)]},               # column trimmed to align with the one above
         # the ground-floor entrance as approved: the facade file's entrance plan, 11.0 m wide like the main
         # plan, placed by the side walls' outer faces and the street line
         'splices': [{
@@ -82,7 +84,9 @@ PROJECT = {
         },
         'axis_only': ['WINDOW'],                                     # no window-opening diagonals
         'drop_short_diagonals': 0.3,                                 # door-opening arrows
-        'drop_in_box': [('RAILING', (1219.0, -44.8, 1230.2, -42.6))],   # top-floor railings: no longer in the project
+        'drop_in_box': [('RAILING', (1219.0, -44.8, 1230.2, -42.6)),    # top-floor railings: no longer in the project
+                        ('a_muros', (1224.15, -59.29, 1224.35, -59.20)),   # entrance door handles (two short dashes):
+                        ('a_muros', (1224.77, -59.29, 1224.97, -59.20))],  # noise at this scale
         # the central volume's shadow down its left side (sun from the upper right, 45 degrees), 0.35 m wide
         'extra_shadows': [[(1221.766, -44.761), (1221.416, -45.111), (1221.416, -57.962), (1221.766, -57.962)]],
     }],

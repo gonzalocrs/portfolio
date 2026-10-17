@@ -122,8 +122,8 @@ window.PROJECTS = {
     // all the pictures in one grid after the text (see project.js: grid)
     grid: [
       {src: "img/anticlastic-roof-structure/physical/web/IMG_9768.jpg", size: "full"},
-      [{src: "img/anticlastic-roof-structure/hand-drawing.jpg", a: 0.768, drawing: true, caption: "Spherical vs. hyperbolic curvature study"},
-       {src: "img/anticlastic-roof-structure/physical/web/IMG_9868.jpg", a: 1.5}],
+      [{src: "img/anticlastic-roof-structure/physical/web/IMG_9868.jpg", a: 1.5},
+       {src: "img/anticlastic-roof-structure/hand-drawing.jpg", a: 0.768, drawing: true, caption: "Spherical vs. hyperbolic curvature study"}],
       // each drawing beside the photo of the same view: the section with the arch seen end-on
       {src: "img/anticlastic-roof-structure/section.png", drawing: true, caption: "Section"},
       {src: "img/anticlastic-roof-structure/physical/web/IMG_9865-Edit.jpg", size: "big"},

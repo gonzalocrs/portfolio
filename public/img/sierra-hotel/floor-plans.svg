@@ -1,14 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3000 1500" width="3000" height="1500">
 <title>Sierra Hotel: ground, typical and top floor plans</title>
-<style>path{fill:none;stroke:none;stroke-linecap:round;stroke-linejoin:round;fill-rule:evenodd;vector-effect:non-scaling-stroke}
+<style>path{fill:none;stroke:none;stroke-linecap:round;stroke-linejoin:round;fill-rule:evenodd}
 .cut{fill:#000}
-.wall{fill:#fff;stroke:#8c8c8c;stroke-width:1}
-.perimeter{stroke:#222;stroke-width:1}
-.line{stroke:#555;stroke-width:1}
-.glass{stroke:#8c8c8c;stroke-width:1}
-.frame{stroke:#ababab;stroke-width:1}
-.fixture{stroke:#c8c8c8;stroke-width:1}
-.closet{stroke:#dcdcdc;stroke-width:1}
+.wall{fill:#fff;stroke:#9a9a9a;stroke-width:0.8}
+.perimeter{stroke:#000;stroke-width:1.4}
+.line{stroke:#000;stroke-width:1.0}
+.glass{stroke:#000;stroke-width:0.6}
+.frame{stroke:#000;stroke-width:0.35}
+.fixture{stroke:#b2b2b2;stroke-width:0.8}
+.closet{stroke:#cdcdcd;stroke-width:0.6}
 .fixfill{fill:#e4e4e4}
 .water{fill:#f0f0f0}</style>
 <rect width="3000" height="1500" fill="#fff"/>

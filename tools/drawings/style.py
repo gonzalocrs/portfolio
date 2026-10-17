@@ -10,11 +10,9 @@ Line weights follow Gonzalo's hierarchy (pen weights in pt in his reference):
             closets: the thinnest line of the set -> 'closet'
     1/16    hatches                 -> 'water' (pool) and other light fills
 
-Widths are in screen pixels and do not scale with the drawing (vector-effect: non-scaling-stroke). The drawings
-are shown at about 0.4 of their sheet size on the site, where lines that scaled with the sheet came out thinner
-than a pixel and rendered uneven (some faded, slanted ones dashed). Now every line is at least one pixel wherever
-it is shown, and the hierarchy is carried by grey value: the more important a line, the darker (and the
-heaviest ones wider).
+Widths are in drawing units and scale with the drawing, like ink on a sheet: one unit is one pixel of the
+sheet at full size (plans 3000 wide, elevations 2000 wide), which is the weight the earlier PNG drawings had.
+Shown smaller on the page, the lines get finer in proportion, so the hierarchy is the ratio between them.
 
 Elevations: nothing is cut, so nothing is solid black. The silhouette (the line that wraps the building) and the
 ground line are heaviest; inside it the lines get thinner by importance: volume edges, then slab edges and openings,
@@ -24,13 +22,13 @@ glass a very light grey, shadows darken what they fall on (a translucent black, 
 
 PLAN = {
     'cut':       {'fill': '#000'},
-    'wall':      {'fill': '#fff', 'stroke': '#8c8c8c', 'width': 1},   # non-structural walls ('poche': 'structure')
-    'perimeter': {'stroke': '#222', 'width': 1},            # low walls, parapets
-    'line':      {'stroke': '#555', 'width': 1},            # stairs, steps, pool
-    'glass':     {'stroke': '#8c8c8c', 'width': 1},         # windows, curtain walls: the middle lines
-    'frame':     {'stroke': '#ababab', 'width': 1},         # windows, curtain walls: the outer edges
-    'fixture':   {'stroke': '#c8c8c8', 'width': 1},         # bathroom fixtures, counters
-    'closet':    {'stroke': '#dcdcdc', 'width': 1},         # closets: faintest
+    'wall':      {'fill': '#fff', 'stroke': '#9a9a9a', 'width': 0.8},   # non-structural walls ('poche': 'structure')
+    'perimeter': {'stroke': '#000', 'width': 1.4},
+    'line':      {'stroke': '#000', 'width': 1.0},          # stairs, steps, pool
+    'glass':     {'stroke': '#000', 'width': 0.6},          # windows, curtain walls: the middle lines
+    'frame':     {'stroke': '#000', 'width': 0.35},         # windows, curtain walls: the outer edges
+    'fixture':   {'stroke': '#b2b2b2', 'width': 0.8},      # grey 178
+    'closet':    {'stroke': '#cdcdcd', 'width': 0.6},      # grey 205
     'fixfill':   {'fill': '#e4e4e4'},
     'water':     {'fill': '#f0f0f0'},
 }
@@ -41,20 +39,19 @@ ELEVATION = {
     'glass':     {'fill': '#f9f9f9'},
     'frame':     {'fill': '#d8d8d8'},
     'greyfill':  {'fill': '#969696'},
-    'grey':      {'stroke': '#c4c4c4', 'width': 1},         # cladding slats, railings: faintest
+    'grey':      {'stroke': '#969696', 'width': 0.35},     # cladding slats, railings (grey 150): finest
     'shadow':    {'fill': '#000', 'opacity': 0.2},
-    'frameline': {'stroke': '#888', 'width': 1},            # window and door frames
-    'line':      {'stroke': '#555', 'width': 1},            # slab edges, bays, openings
-    'outline':   {'stroke': '#222', 'width': 1},            # volume edges inside the building
-    'bound':     {'stroke': '#000', 'width': 2},            # the silhouette: the one line that wraps the building
-    'ground':    {'stroke': '#000', 'width': 2},
+    'frameline': {'stroke': '#000', 'width': 0.4},          # window and door frames
+    'line':      {'stroke': '#000', 'width': 0.6},          # slab edges, bays, openings
+    'outline':   {'stroke': '#000', 'width': 1.0},          # volume edges inside the building
+    'bound':     {'stroke': '#000', 'width': 2.2},          # the silhouette: the one line that wraps the building
+    'ground':    {'stroke': '#000', 'width': 2.2},
 }
 ELEVATION_ORDER = ['glass', 'frame', 'greyfill', 'grey', 'shadow', 'frameline', 'line', 'outline', 'ground', 'bound']
 
 
 def css(style):
-    rules = ['path{fill:none;stroke:none;stroke-linecap:round;stroke-linejoin:round;fill-rule:evenodd;'
-             'vector-effect:non-scaling-stroke}']
+    rules = ['path{fill:none;stroke:none;stroke-linecap:round;stroke-linejoin:round;fill-rule:evenodd}']
     for name, s in style.items():
         r = []
         if 'fill' in s:

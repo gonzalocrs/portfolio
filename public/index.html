@@ -732,13 +732,17 @@
       (parent || svg).appendChild(e);
       return e;
     }
+    // the pane at the back of every opening is coloured glass in one of the projects' hues, as at Ronchamp: it shows
+    // wherever no picture hangs (the small openings, the spare ones, and the ones whose picture steps out)
+    var n = 0;
     function opening(r){
       var gw = r.glass[0] * r.w, gh = r.glass[1] * r.h, gx = r.x + (r.w - gw) / 2, gy = r.y + (r.h - gh) / 2;
       var grp = el('g', {'class': 'reveal'});
       el('rect', {x: r.x, y: r.y, width: r.w, height: r.h, 'class': 'splay'}, grp);
       [[r.x, r.y, gx, gy], [r.x + r.w, r.y, gx + gw, gy], [r.x + r.w, r.y + r.h, gx + gw, gy + gh], [r.x, r.y + r.h, gx, gy + gh]]
         .forEach(function(l){ el('line', {x1: l[0], y1: l[1], x2: l[2], y2: l[3]}, grp); });
-      el('rect', {x: gx, y: gy, width: gw, height: gh, 'class': 'pane'}, grp);
+      var pane = el('rect', {x: gx, y: gy, width: gw, height: gh, 'class': 'pane'}, grp);
+      pane.style.fill = 'hsl(' + hues[(n++ * 3) % hues.length] + ' 45% 58%)';
     }
     AMBIENT_SLOTS.forEach(opening);
     ACCENTS.forEach(opening);

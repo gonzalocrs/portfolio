@@ -795,6 +795,36 @@
   Object.keys(arrows).forEach(function(dir){
     arrows[dir].addEventListener('click', function(e){ e.stopPropagation(); move(dir); });
   });
+  // Scrolling over the wall steps across it, one bay per gesture, the same calm glide as the arrows. A trackpad goes the
+  // way the fingers swipe (sideways or up/down); a mouse wheel goes down/up, and with Shift held, right/left. The deltas
+  // add up until they clearly mean a move, and the rest of that gesture (a trackpad's coasting) is let go before the next.
+  var acc = {x: 0, y: 0}, wheelLock = false, lockTimer = null, stepAt = 0;
+  function release(){
+    clearTimeout(lockTimer);
+    lockTimer = setTimeout(function(){
+      if(performance.now() - stepAt < 1100){ release(); return; }   // still gliding
+      wheelLock = false; acc.x = acc.y = 0;
+    }, 180);
+  }
+  document.addEventListener('wheel', function(e){
+    if(document.body.classList.contains('has-sheet')) return;
+    var c = collageEl.getBoundingClientRect();
+    if(e.clientX < c.left || e.clientX > c.right || e.clientY < c.top || e.clientY > c.bottom) return;
+    if(e.target.closest && e.target.closest('.index')) return;
+    e.preventDefault();
+    if(wheelLock){ release(); return; }
+    var k = e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? 600 : 1;
+    var dx = e.deltaX * k, dy = e.deltaY * k;
+    if(e.shiftKey && !dx){ dx = dy; dy = 0; }
+    acc.x += dx; acc.y += dy;
+    var ax = Math.abs(acc.x), ay = Math.abs(acc.y);
+    if(Math.max(ax, ay) < 50) return;
+    var dir = ax > ay ? (acc.x > 0 ? 'right' : 'left') : (acc.y > 0 ? 'down' : 'up');
+    var before = stop.x + ',' + stop.y;
+    move(dir);
+    acc.x = acc.y = 0;
+    if(stop.x + ',' + stop.y !== before){ wheelLock = true; stepAt = performance.now(); release(); }
+  }, {passive: false});
   document.addEventListener('keydown', function(e){
     if(e.metaKey || e.ctrlKey || e.altKey || /input|textarea/i.test(e.target.tagName)) return;
     if(window.gcSheetOpen && gcSheetOpen()) return;
@@ -1085,7 +1115,7 @@
   // through that group's list; hitting the end opens the next (or previous)
   // category and continues into it, instead of just scrolling the page
   document.addEventListener('wheel', function(e){
-    if(!currentLink) return;
+    if(!currentLink || !e.target.closest || !e.target.closest('.index')) return;   // only over the list; over the wall it pans (above)
     var group = currentLink.closest('.group');
     var worksEl = currentLink.closest('.works');
     if(!group || !worksEl) return;

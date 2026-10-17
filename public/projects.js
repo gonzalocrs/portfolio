@@ -129,14 +129,11 @@ window.PROJECTS = {
       {src: "img/anticlastic-roof-structure/physical/web/IMG_9865-Edit.jpg", size: "big"},
       {src: "img/anticlastic-roof-structure/physical/web/IMG_9909-Edit.jpg"},
       // the plan with the model seen from above
-      {src: "img/anticlastic-roof-structure/physical/web/IMG_9801.jpg", size: "big"},
-      {src: "img/anticlastic-roof-structure/plan.png", drawing: true, caption: "Floor plan"},
-      {src: "img/anticlastic-roof-structure/physical/web/IMG_9906.jpg"},
+      [{src: "img/anticlastic-roof-structure/physical/web/IMG_9801.jpg", a: 1.5}, {src: "img/anticlastic-roof-structure/plan.png", a: 1.5, drawing: true, caption: "Floor plan"}],
       // the elevation with the model's side profile
       {src: "img/anticlastic-roof-structure/elevation.png", drawing: true, caption: "Front elevation"},
       {src: "img/anticlastic-roof-structure/physical/web/IMG_9760.jpg", size: "big"},
       {src: "img/anticlastic-roof-structure/physical/web/IMG_9872.jpg"},
-      {src: "img/anticlastic-roof-structure/physical/web/IMG_9919.jpg", size: "full"},
       {src: "img/anticlastic-roof-structure/physical/web/IMG_9921.jpg", size: "full"}
     ],
     gallery: {
@@ -152,9 +149,7 @@ window.PROJECTS = {
         {src: "img/anticlastic-roof-structure/physical/IMG_9865-Edit.jpg", caption: "Physical model"},
         {src: "img/anticlastic-roof-structure/physical/IMG_9868.jpg", caption: "Physical model"},
         {src: "img/anticlastic-roof-structure/physical/IMG_9872.jpg", caption: "Physical model"},
-        {src: "img/anticlastic-roof-structure/physical/IMG_9906.jpg", caption: "Physical model"},
         {src: "img/anticlastic-roof-structure/physical/IMG_9909-Edit.jpg", caption: "Physical model"},
-        {src: "img/anticlastic-roof-structure/physical/IMG_9919.jpg", caption: "Physical model"},
         {src: "img/anticlastic-roof-structure/physical/IMG_9921.jpg", caption: "Physical model"}
       ]
     }

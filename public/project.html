@@ -325,6 +325,16 @@
 
   /* ---------- galleries: a full-screen stage that shows every image at once ---------- */
   .seg--gal{display:flex;flex-direction:column;padding-bottom:1.1rem}
+
+  /* the text sits right under the title and the pictures start right after it: the info section is only as tall as
+     its content, the text at the top of it, the diagram beside it at most a screen tall */
+  .intro.has-hero-img{padding-bottom:0}
+  .seg.seg--info{height:auto;min-height:0;align-items:flex-start;padding-block:clamp(1.2rem,3vh,2rem) clamp(3rem,8vh,5rem)}
+  .info.has-diagram{height:auto}
+  .info.has-diagram > .left{align-self:start}
+  .info.has-diagram .diagram{height:calc(100svh - var(--bar-h,4rem) - 3rem)}
+  .seg.seg--fit{height:auto;min-height:0;padding-bottom:clamp(3rem,8vh,5rem)}
+  .seg--fit .stage{flex:none}
   .gal__head{
     display:flex;
     justify-content:space-between;

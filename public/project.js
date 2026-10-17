@@ -60,12 +60,7 @@
 
   intro.appendChild(el('h1', 'title', p.title));
 
-  var kicker = el('p', 'kicker mono');
-  kicker.appendChild(document.createTextNode(p.kicker + ' · '));
-  var kgroup = el('a', null, p.group);
-  kgroup.href = backHref;
-  kicker.appendChild(kgroup);
-  intro.appendChild(kicker);
+  // no subtitle line (place · year · group) under the title any more: the text follows right after it
   app.appendChild(intro);
   segs.push({el: intro, name: 'Overview'});
 
@@ -234,6 +229,7 @@
     stage._zoom = null;
     stage._mode = s.mode || 'grid';
     stage._cur = 0;
+    if(stage._mode === 'grid'){ seg.classList.add('seg--fit'); stage._head = head; }   // only as tall as its pictures
     if(stage._mode === 'strip'){
       stage.classList.add('stage--strip');
       stage._count = head.lastChild;
@@ -348,7 +344,7 @@
       heights.push(h); sumH += h;
     });
     var scale = Math.min(1, (H - gaps) / sumH), boxes = [], area = 0;
-    var y = (H - (sumH * scale + gaps)) / 2;
+    var y = 0;   // packed from the top
     rowsArr.forEach(function(row, r){
       var h = heights[r] * scale, rowW = gap * (row.length - 1);
       row.forEach(function(it){ rowW += it.a * h; });
@@ -605,6 +601,9 @@
   function layoutStage(stage){
     if(stage._mode === 'strip'){ layoutStrip(stage); return; }
     var W = stage.clientWidth, H = stage.clientHeight, items = stage._items;
+    // a grid gallery packs its pictures into at most one screen below its header, then shrinks to them, so the
+    // pictures start right under the header and the next section follows right after
+    if(stage._head) H = Math.max(240, window.innerHeight - bar.offsetHeight - stage._head.offsetHeight - 24);
     if(!W || !H || !items.length) return;
     var gap = Math.max(10, Math.round(W * .012)), best = null;
     for(var k = 1; k <= items.length; k++){
@@ -622,6 +621,11 @@
         s.left = b.x + 'px'; s.top = b.y + 'px'; s.width = b.w + 'px'; s.height = b.h + 'px';
       }
     });
+    if(stage._head){
+      var bottom = 0;
+      best.boxes.forEach(function(b){ bottom = Math.max(bottom, b.y + b.h); });
+      stage.style.height = (stage._zoom !== null ? H : bottom) + 'px';
+    }
   }
   function relayout(){ stages.forEach(layoutStage); }
 

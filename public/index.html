@@ -311,9 +311,7 @@
   .tile .fill.on{opacity:1}
   /* the drawn openings behind the pictures (see drawFacade); they step back while a project's preview is up */
   .facade{position:absolute;inset:0;width:100%;height:100%;overflow:visible;transition:opacity .6s ease}
-  .facade .splay{fill:none;stroke:var(--rule)}
-  .facade line{stroke:var(--rule)}
-  .facade .pane{fill:none;stroke:var(--rule)}
+  .facade .frame{fill:none;stroke:var(--rule)}
   .facade *{vector-effect:non-scaling-stroke;stroke-width:1}
   .collage.is-previewing .facade{opacity:.25}
   .tile.ambient.on{pointer-events:auto;cursor:pointer}
@@ -732,14 +730,8 @@
       (parent || svg).appendChild(e);
       return e;
     }
-    function opening(r){
-      var gw = r.glass[0] * r.w, gh = r.glass[1] * r.h, gx = r.x + (r.w - gw) / 2, gy = r.y + (r.h - gh) / 2;
-      var grp = el('g', {'class': 'reveal'});
-      el('rect', {x: r.x, y: r.y, width: r.w, height: r.h, 'class': 'splay'}, grp);
-      [[r.x, r.y, gx, gy], [r.x + r.w, r.y, gx + gw, gy], [r.x + r.w, r.y + r.h, gx + gw, gy + gh], [r.x, r.y + r.h, gx, gy + gh]]
-        .forEach(function(l){ el('line', {x1: l[0], y1: l[1], x2: l[2], y2: l[3]}, grp); });
-      el('rect', {x: gx, y: gy, width: gw, height: gh, 'class': 'pane'}, grp);
-    }
+    // each opening is just its frame, a thin outline, like a pin-up wall of different sizes
+    function opening(r){ el('rect', {x: r.x, y: r.y, width: r.w, height: r.h, 'class': 'frame'}); }
     AMBIENT_SLOTS.forEach(opening);
     ACCENTS.forEach(opening);
     var wall = document.querySelector('.wall');

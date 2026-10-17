@@ -2,6 +2,8 @@
 
 Line weights follow Gonzalo's hierarchy (pen weights in pt in his reference):
     1 3/8   section cuts            -> walls and columns cut by the plan: solid black fill
+                                       (or, with 'poche': 'structure', only the structure black and the
+                                       other walls a heavy outline, white inside -> 'wall')
     7/8     outer perimeter, secondary structure (low walls, parapets) -> 'perimeter'
     5/8-3/8 windows, doors, stairs  -> 'line'
     1/8     islands, counters, bathroom fixtures -> 'fixture' (grey, faint)
@@ -18,6 +20,7 @@ glass a very light grey, shadows darken what they fall on (a translucent black, 
 
 PLAN = {
     'cut':       {'fill': '#000'},
+    'wall':      {'fill': '#fff', 'stroke': '#9a9a9a', 'width': 0.8},   # non-structural walls ('poche': 'structure')
     'perimeter': {'stroke': '#000', 'width': 1.4},
     'line':      {'stroke': '#000', 'width': 1.0},          # stairs, steps, pool
     'glass':     {'stroke': '#000', 'width': 0.6},          # windows, curtain walls: the middle lines
@@ -28,7 +31,7 @@ PLAN = {
     'water':     {'fill': '#f0f0f0'},
 }
 # drawing order, back to front
-PLAN_ORDER = ['water', 'fixfill', 'fixture', 'closet', 'frame', 'glass', 'line', 'perimeter', 'cut']
+PLAN_ORDER = ['water', 'fixfill', 'fixture', 'closet', 'frame', 'glass', 'line', 'perimeter', 'wall', 'cut']
 
 ELEVATION = {
     'glass':     {'fill': '#f9f9f9'},

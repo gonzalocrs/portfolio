@@ -15,6 +15,10 @@ PROJECT = {
         'output': 'floor-plans.svg',
         'title': 'Sierra Hotel: ground, typical and top floor plans',
         'source': 'main',
+        'poche': 'structure',          # only the structure solid black; the other walls outlined, white inside
+        'align': 'model',              # floors on one grid: the columns line up across the sheet
+        'scale': 45,                   # sheet units per metre: each floor about 500 wide on the 3000 x 1500 sheet
+        'gap': 250,                    # (as in floor-plans-3.webp, Gonzalo's own export)
         # ground floor, typical floor, top floor with the pool (left to right on the sheet)
         'regions': [(33.5, 15.5, 46.5, 43.0), (58.5, 17.5, 71.5, 43.5), (76.0, 17.5, 88.5, 43.5)],
         'layers': {
@@ -44,7 +48,7 @@ PROJECT = {
             'keep_side_walls': (34.85, 45.15),
             'extra_solids': [(34.488, 16.388, 34.734, 20.4), (45.238, 16.388, 45.496, 20.4)],
             'small_on_layer': {'a_lineas': 0.3},                     # light fittings
-            'map': {'470': 'wall', 'estructura': 'wall', 'a_muros': 'col', 'ARQ- COLUMNAS': 'col',
+            'map': {'470': 'wall', 'estructura': 'col', 'a_muros': 'col', 'ARQ- COLUMNAS': 'col',
                     'a_ventana': 'win', 'HD_0.05': 'win', 'a_lineas': 'win', 'a_pisos': 'win', '01VENT': 'win',
                     'arq gradas': 'stair', 'a-railing': 'stair', 'a_proyec_puertas': 'door'},
         }],

@@ -3,6 +3,8 @@
 What it does with each kind of layer (named in the project config):
   wall, column   cut: filled solid. Closed outlines, faces between parallel lines, and parallel pairs of lines
                  a wall's thickness apart all become solid; small square pieces where walls meet windows too.
+                 With 'poche': 'structure' only the structure is solid black (columns, plus 'structure_layers'
+                 and 'structure_boxes'); the other walls are drawn as a heavy outline, white inside.
   window         thin black lines (the CAD window blocks).
   stair          thin black lines, with walk lines, their dots, arrows and start marks taken out.
   door           not drawn: the gap in the wall reads as the door.
@@ -242,6 +244,39 @@ def solids(P, cfg):
     return sol
 
 
+def structure(P, cfg, pi, sol):
+    """The structural part of the solid walls: column sections (closed outlines, faces closed mostly by
+    column lines, column fills), walls on 'structure_layers', and any 'structure_boxes' of this plan."""
+    s_layers = set(cfg.get('structure_layers', ()))
+    s_items = P['col'] + [it for it in P['wall'] if it['layer'] in s_layers]
+    max_area = cfg.get('structure_max_area', 2.0)
+    parts = []
+    for it in s_items:
+        if it['closed'] and len(it['pts']) >= 3:
+            g = Polygon(it['pts'])
+            if g.is_valid and 0 < g.area < max_area:
+                parts.append(g)
+    s_segs = [LineString(it['pts']) for it in s_items if LineString(it['pts']).length > 0]
+    s_lines = unary_union(s_segs).buffer(0.006) if s_segs else None
+    segs = [LineString(it['pts']) for it in P['wall'] + P['col'] if LineString(it['pts']).length > 0]
+    for f in polygonize(unary_union(segs)):               # a column drawn open, closed by the wall lines
+        if 0 < f.area < max_area and s_lines is not None:
+            if f.exterior.intersection(s_lines).length > 0.5 * f.exterior.length:
+                parts.append(f)
+    parts += [_fill_poly(it) for it in P['fills'] if it['layer'] in set(cfg['layers'].get('column', ())) | s_layers]
+    parts += [box(*b) for b in cfg.get('structure_boxes', {}).get(pi, ())]
+    parts = [g for g in parts if g is not None]
+    if not parts:
+        return Polygon()
+    return sol.intersection(unary_union(parts).buffer(0.006, join_style=2))
+
+
+def _fill_poly(it):
+    paths = it.get('paths', [it['pts']])
+    g = Polygon(paths[0], [q for q in paths[1:] if len(q) >= 3]).buffer(0)
+    return g if g.area > 0 else None
+
+
 def window_weights(items):
     """Split window lines into glass (the middle lines of a window) and frame (its outer edges).
     A window or curtain wall is drawn as several parallel lines a few centimetres apart: the outermost two
@@ -310,8 +345,18 @@ def build(cfg, sources):
     for P in per:
         pts = [q for k in ('wall', 'col', 'win', 'stair', 'extra') for it in P[k] for q in it['pts']]
         bbs.append(cadio.bbox(pts))
-    Hm = max(b[3] - b[1] for b in bbs)
-    S = cfg.get('plan_height', 1300) / Hm
+    if cfg.get('align') == 'model':
+        # the floors keep their model y, so the structural grid lines up across the sheet (the CAD draws the
+        # floors side by side on one grid); 'y_shift' per floor corrects one that is drawn out of register
+        sh = cfg.get('y_shift', {})
+        bbs = [(b[0], b[1] + sh.get(i, 0), b[2], b[3] + sh.get(i, 0)) for i, b in enumerate(bbs)]
+        y_lo, y_hi = min(b[1] for b in bbs), max(b[3] for b in bbs)
+        bbs = [(b[0], b[1], b[2], y_hi) for b in bbs]
+        Hm = y_hi - y_lo
+    else:
+        sh = {}
+        Hm = max(b[3] - b[1] for b in bbs)
+    S = cfg.get('scale') or cfg.get('plan_height', 1300) / Hm   # sheet units per model unit
     gap = cfg.get('gap', 200)
     x_at = (W - (sum((b[2] - b[0]) * S for b in bbs) + gap * (len(bbs) - 1))) / 2
     top = (H - Hm * S) / 2
@@ -321,8 +366,8 @@ def build(cfg, sources):
         ox = x_at - b[0] * S
         x_at += (b[2] - b[0]) * S + gap
 
-        def T(x, y, ox=ox, b=b):
-            return ox + x * S, top + (b[3] - y) * S
+        def T(x, y, ox=ox, b=b, dy=sh.get(pi, 0)):
+            return ox + x * S, top + (b[3] - y - dy) * S
 
         def tl(items_):
             out, seen = [], set()
@@ -348,9 +393,20 @@ def build(cfg, sources):
         sheet.lines('frame', [[T(x, y) for x, y in s] for s in frame])
         sheet.lines('line', tl(P['stair'] + P['extra'] + P['pool']))
         sheet.lines('perimeter', tl(P['wall']))           # wall-layer lines left uncovered: low walls, parapets
-        sheet.rings('cut', [[[T(x, y) for x, y in p] for p in it.get('paths', [it['pts']])] for it in P['fills']])
         sol = solids(P, cfg)
-        sheet.rings('cut', [[[T(x, y) for x, y in r] for r in rings] for rings in _rings(sol)])
+        if cfg.get('poche', 'all') == 'structure':
+            # structure solid black; every other wall a heavy outline, white inside (CAD wall fills join it)
+            wall_fills = [_fill_poly(it) for it in P['fills'] if it['layer'] in set(cfg['layers']['wall'])
+                          and it['layer'] not in set(cfg.get('structure_layers', ()))]
+            walls = unary_union([sol] + [g for g in wall_fills if g is not None])
+            black = structure(P, cfg, pi, walls)
+            other_fills = [it for it in P['fills'] if it['layer'] not in set(cfg['layers']['wall'])]
+            sheet.rings('wall', [[[T(x, y) for x, y in r] for r in rings] for rings in _rings(walls)])
+            sheet.rings('cut', [[[T(x, y) for x, y in p] for p in it.get('paths', [it['pts']])] for it in other_fills])
+            sheet.rings('cut', [[[T(x, y) for x, y in r] for r in rings] for rings in _rings(black)])
+        else:
+            sheet.rings('cut', [[[T(x, y) for x, y in p] for p in it.get('paths', [it['pts']])] for it in P['fills']])
+            sheet.rings('cut', [[[T(x, y) for x, y in r] for r in rings] for rings in _rings(sol)])
         print(f"  plan {pi + 1}: walls {len(P['wall'])}, columns {len(P['col'])}, windows {len(P['win'])}, "
               f"stairs {len(P['stair'])}, fixtures {len(P['fix'])}, closets {len(P['closet'])}")
     return sheet.render(style.css(style.PLAN), style.PLAN_ORDER)

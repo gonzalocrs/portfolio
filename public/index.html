@@ -668,34 +668,30 @@
   // across it (see the panning below). It is made of four bays, each the same block of openings flipped a different
   // way, so it never repeats visibly. Coordinates are in wall units: a bay is 100 across, the wall 200 x 180.
   var WALL_W = 200, WALL_H = 180;
-  // one bay: big openings of different sizes and proportions, so an image is actually readable in each (none overlap,
-  // and their edges deliberately don't line up into columns); glass is the size of the small pane at the back of the
-  // splayed reveal, as [w, h] fractions of the opening
-  var BAY = [
-    {x:1, y:1, w:33, aspect:'10/11', glass:[.26,.2]},
-    {x:39, y:6, w:28, aspect:'4/3', glass:[.3,.3]},
-    {x:72, y:0, w:24, aspect:'3/4', glass:[.28,.16]},
-    {x:5, y:44, w:30, aspect:'3/2', glass:[.6,.18]},
-    {x:41, y:31, w:27, aspect:'1/1', glass:[.26,.28]},
-    {x:74, y:37, w:25, aspect:'4/5', glass:[.2,.55]},
-    {x:1, y:67, w:27, aspect:'4/3', glass:[.22,.5]},
-    {x:33, y:66, w:31, aspect:'3/2', glass:[.45,.24]}
+  // one bay: three columns of pictures of different widths, separated by gutters of the same width, so the columns
+  // run straight down the whole wall like an invisible grid. Each column stacks its pictures (by proportion) and spreads
+  // them over the bay's height with an even gap; the bays leave half a gap at top and bottom so stacked bays continue it
+  var GUTTER = 6, BAY_H = 90;
+  var COLUMNS = [
+    {x: 3, w: 30, aspects: ['10/11', '3/2', '4/3']},
+    {x: 39, w: 28, aspects: ['4/3', '4/5', '3/2']},
+    {x: 73, w: 24, aspects: ['3/5', '3/4']}
   ];
-  // the little openings never hold a picture; they are only there for the play of sizes
-  var BAY_ACCENTS = [
-    {x:37.5, y:40, w:1.6, h:14, glass:[.7,.6]},
-    {x:68.8, y:6, w:1.4, h:16, glass:[.7,.4]},
-    {x:14, y:39.6, w:9, h:2.2, glass:[.6,.45]},
-    {x:70, y:73, w:6, h:6, glass:[.4,.4]},
-    {x:78.5, y:71, w:2.2, h:11, glass:[.6,.5]},
-    {x:83, y:74, w:4, h:3, glass:[.5,.5]},
-    {x:89, y:72, w:4.5, h:4.5, glass:[.35,.35]},
-    {x:84, y:81, w:9, h:4, glass:[.5,.4]},
-    {x:71, y:82, w:3, h:3, glass:[.5,.5]}
-  ];
-  // the four bays: [x offset, y offset, flip across, flip down]. Neighbours side by side are flipped down, neighbours
-  // above each other are flipped across, so no two meet as a mirror image
-  var BAYS = [[0, 0, false, false], [100, 0, false, true], [0, 90, true, false], [100, 90, true, true]];
+  var BAY = [];
+  COLUMNS.forEach(function(c){
+    var hs = c.aspects.map(function(a){ return c.w / ratioOf(a); });
+    var sum = hs.reduce(function(t, h){ return t + h; }, 0);
+    var gap = (BAY_H - sum) / c.aspects.length, y = gap / 2;
+    c.aspects.forEach(function(a, i){ BAY.push({x: c.x, y: y, w: c.w, aspect: a}); y += hs[i] + gap; });
+  });
+  // the thin vertical slots stand in the gutters, centred, at different heights: they mark the grid without drawing it
+  var BAY_ACCENTS = [[0, 30, 14], [1, 8, 16], [1, 58, 12], [2, 44, 13]].map(function(g){
+    var w = 1.8, gx = g[0] < 2 ? COLUMNS[g[0]].x + COLUMNS[g[0]].w + GUTTER / 2 : 100;
+    return {x: gx - w / 2, y: g[1], w: w, h: g[2], glass: [.7, .55]};
+  });
+  // the four bays: [x offset, y offset, flip across, flip down]. Only flipped down, never across, so the columns and
+  // gutters stay in line all the way down; every neighbour is flipped the other way, so no two meet as a copy
+  var BAYS = [[0, 0, false, false], [100, 0, false, true], [0, 90, false, true], [100, 90, false, false]];
   function ratioOf(aspect){ var q = aspect.split('/'); return q[0] / q[1]; }
   var AMBIENT_SLOTS = [], ACCENTS = [];
   BAYS.forEach(function(b){

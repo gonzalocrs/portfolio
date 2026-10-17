@@ -37,7 +37,9 @@ PROJECT = {
         'drop': {2: [(80.15, 22.2, 81.1, 23.32),                      # skylight curb and line on the terrace: gone
                      (81.35, 28.2, 83.25, 28.32),                     # threshold at the foot of the corridor
                      (85.2, 25.40, 87.2, 27.9)]},                     # lounge kitchenette lines: incomplete, say nothing
-        'cut_solids': {2: [(80.2, 28.2, 80.5, 28.6)]},               # column trimmed to align with the one above
+        'cut_solids': {1: [(59.55, 42.092, 59.90, 42.30),             # typical floor: the two corner columns ran
+                           (70.35, 42.092, 70.70, 42.30)],            # 9-10 cm past the facade; trimmed to its face
+                       2: [(80.2, 28.2, 80.5, 28.6)]},               # column trimmed to align with the one above
         # the ground-floor entrance as approved: the facade file's entrance plan, 11.0 m wide like the main
         # plan, placed by the side walls' outer faces and the street line
         'splices': [{

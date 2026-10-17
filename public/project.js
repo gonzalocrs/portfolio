@@ -28,7 +28,7 @@
   ptitle.href = '#';
   ptitle.setAttribute('aria-label', p.title + ' — back to the overview');
   ptitle.addEventListener('click', function(e){ e.preventDefault(); go(0); });
-  bar.appendChild(ptitle);
+  // not shown any more: the header stays just the name, the links and the switch
 
   // The page is a stack of full-screen segments: overview, details, then one per
   // gallery (drawings, physical models, photos & renders).

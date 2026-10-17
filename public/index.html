@@ -319,6 +319,11 @@
   .tile.ambient.on{pointer-events:auto;cursor:pointer}
   .tile.ambient{transition:opacity .5s ease}
   .tile.ambient.on.off{opacity:0;pointer-events:none}   /* not in the open category / not the project pointed at */
+  /* a clicked picture, grown large over the wall; clicking it opens the project */
+  .tile.big{z-index:3;transition:opacity .25s ease}
+  .tile.big.on{pointer-events:auto;cursor:pointer}
+  .collage.has-big .tile.ambient.on{opacity:0;pointer-events:none}
+  .collage.has-big .facade{opacity:.25}
   .tile.ambient .cap{opacity:0;transition:opacity .25s ease}
   .tile.ambient:hover .cap{opacity:1}
   .tile .cap{
@@ -506,6 +511,7 @@
   </ul>
 
   <div class="collage" id="collage" aria-hidden="true">
+    <div class="tile big" id="bigTile"><span class="fill on"></span><span class="cap"></span></div>
     <div class="wall">
       <div class="tile ambient"></div>
       <div class="tile ambient"></div>
@@ -906,8 +912,48 @@
     if(currentLink) currentLink.classList.remove('current');
     currentLink = a;
     currentLink.classList.add('current');
+    shrinkBig();
     filterWall();
   }
+
+  // The clicked picture grows from its opening to as large as the wall area allows, uncropped (its own proportions),
+  // centred there; the small ones step out meanwhile. A sharper copy (the original) replaces the small one once loaded.
+  var big = {tile: document.getElementById('bigTile'), st: null};
+  big.fill = big.tile.querySelector('.fill'); big.cap = big.tile.querySelector('.cap');
+  function growBig(st){
+    var cr = collageEl.getBoundingClientRect(), r = st.tile.getBoundingClientRect(), small = thumb(st.src);
+    var ar = aspectOf[small] || (r.width / r.height);
+    var w = Math.min(cr.width * .96, cr.height * .96 * ar), h = w / ar;
+    var t = big.tile, ease = ' .7s cubic-bezier(.2,.7,.2,1)';
+    big.st = st;
+    t.style.transition = 'none';
+    t.style.left = (r.left - cr.left) + 'px'; t.style.top = (r.top - cr.top) + 'px';
+    t.style.width = r.width + 'px'; t.style.aspectRatio = st.tile.style.aspectRatio;
+    big.fill.style.background = 'url("' + small + '") center / cover no-repeat';   // already loaded: no flash
+    big.cap.textContent = st.cap.textContent;
+    t.classList.add('on');
+    collageEl.classList.add('has-big');
+    void t.offsetWidth;
+    t.style.transition = 'top' + ease + ', left' + ease + ', width' + ease + ', aspect-ratio' + ease + ', opacity .25s ease';
+    t.style.left = (cr.width - w) / 2 + 'px'; t.style.top = (cr.height - h) / 2 + 'px';
+    t.style.width = w + 'px'; t.style.aspectRatio = String(ar);
+    if(small !== st.src){
+      var im = new Image(), src = st.src;
+      im.onload = function(){ if(big.st === st) big.fill.style.background = 'url("' + src + '") center / cover no-repeat'; };
+      im.src = src;
+    }
+  }
+  function shrinkBig(){
+    if(!big.st) return;
+    big.st = null;
+    big.tile.classList.remove('on');
+    collageEl.classList.remove('has-big');
+  }
+  big.tile.addEventListener('click', function(e){
+    if(!big.st || !currentLink || !window.gcOpenSheet) return;
+    e.stopPropagation();
+    gcOpenSheet(currentLink.getAttribute('href'), big.tile.getBoundingClientRect());
+  });
 
   // What the wall shows: every picture; with a category open, only that category's projects; with a project pointed
   // at, only that project's pictures. The others fade out of their openings and come back when let go.
@@ -958,7 +1004,7 @@
   document.addEventListener('mousemove', track, {passive: true});
   // the pointer is on one of the project's pictures, or on its way there from the list
   function headingToPreview(){
-    return shownTiles().some(function(s){
+    return (big.st ? [big] : shownTiles()).some(function(s){
       var r = s.tile.getBoundingClientRect();
       if(pointer.x >= r.left && pointer.x <= r.right && pointer.y >= r.top && pointer.y <= r.bottom) return true;
       if(pointer.dx <= 0 || pointer.x > r.left) return false;
@@ -987,6 +1033,7 @@
         if(headingToPreview()){ leaveTimer = setTimeout(later, 120); return; }
         if(currentLink) currentLink.classList.remove('current');
         currentLink = null;
+        shrinkBig();
         filterWall();
       }, 120);
     }
@@ -1004,6 +1051,7 @@
     clearTimeout(leaveTimer);
     setOpen(null, false);
     if(currentLink){ currentLink.classList.remove('current'); currentLink = null; }
+    shrinkBig();
     filterWall();
   }
   // a click anywhere on the background (not on the menu, the header or a link) closes it
@@ -1016,23 +1064,20 @@
     if(e.key === 'Escape' && (document.body.classList.contains('is-open') || document.body.classList.contains('index-on'))) closeAll();
   });
 
-  // clicking a picture on the wall picks its project (its category opens, only its pictures stay); clicking one of them
-  // again opens the project, growing out of that picture (see the sheet script below)
+  // clicking a picture on the wall picks its project (its category opens) and grows the picture large; clicking the
+  // large one opens the project, growing out of it (see the sheet script below)
   ambientState.forEach(function(st){
     st.tile.addEventListener('click', function(e){
       var slug = slugOfTile(st);
       var a = slug && links.filter(function(l){ return slugOf(l) === slug; })[0];
       if(!a) return;
-      if(currentLink && slugOf(currentLink) === slug && window.gcOpenSheet){
-        e.stopPropagation();
-        gcOpenSheet(currentLink.getAttribute('href'), st.tile.getBoundingClientRect());
-        return;
-      }
+      e.stopPropagation();
       cancelOpen(); clearTimeout(intentTimer);
       setOpen(a.closest('.group'), true);
       selectProject(a);
       a.focus({preventScroll: true});
       pinned = a;
+      growBig(st);
     });
   });
 
@@ -1158,7 +1203,7 @@
     });
   }
   // where a project opened from its title grows out of: the picture showing for it, if any
-  window.gcPreviewRect = function(){ var t = shownTiles()[0]; return t ? t.tile.getBoundingClientRect() : null; };
+  window.gcPreviewRect = function(){ var t = big.st ? big : shownTiles()[0]; return t ? t.tile.getBoundingClientRect() : null; };
   window.gcHideIndex = function(){};   // the list stays beside an open project, to pick another
 })();
 </script>

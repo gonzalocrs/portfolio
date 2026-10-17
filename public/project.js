@@ -180,7 +180,7 @@
   ];
 
   // a project with grid (see projects.js) shows all its pictures in one hand-arranged grid after the text instead of
-  // the separate galleries: the layout first tried on the Sierra Hotel TEST page (project-oma.html). Photos are
+  // the separate galleries: after an oma.com-style test page. Photos are
   // cropped to fill their tile, drawings are shown whole
   if(p.grid){
     var gseg = el('section', 'seg seg--grid');

@@ -36,7 +36,7 @@ window.PROJECTS = {
     diagram: {src: "img/sierra-hotel/exploded-diagram.jpg", caption: "Exploded axonometric"},
     hero: "img/sierra-hotel/hero.jpg",
     heroPosition: "center",
-    // all the pictures in one grid after the text, as on the Sierra Hotel TEST page (see project.js: grid)
+    // all the pictures in one grid after the text, (see project.js: grid)
     grid: [
       {src: "img/sierra-hotel/photo-4-crop.jpg", size: "full"},
       {src: "img/sierra-hotel/render-facade.jpg", size: "xl"},

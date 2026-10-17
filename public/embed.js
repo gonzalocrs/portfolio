@@ -15,7 +15,7 @@
     if(!a) return;
     var href = a.getAttribute('href');
     if(href === '/' || /^\/?(index\.html)?\?open=/.test(href)){ e.preventDefault(); e.stopPropagation(); gcClose(); }
-    else if(/^\/?project(-oma)?\.html\?/.test(href) && !/[?&]embed=1/.test(href)) a.setAttribute('href', href + '&embed=1');
+    else if(/^\/?project\.html\?/.test(href) && !/[?&]embed=1/.test(href)) a.setAttribute('href', href + '&embed=1');
   }, true);
   document.addEventListener('keydown', function(e){
     if(e.key === 'Escape' && !document.querySelector('.lightbox')) gcClose();

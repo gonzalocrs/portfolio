@@ -175,6 +175,22 @@
   /* the top margin equals the small 'Reaching out about' line above the titles on the contact page, so the titles sit at the same height there */
   .index{list-style:none;margin:2.05rem 0 0;padding:0;width:min(19rem,100%);position:relative;z-index:1}
   .group + .group{margin-top:.35rem}
+  /* on a wide screen the wall takes the whole width and the list is a small panel over it, opened from Index in the
+     header (or by clicking a picture); on a phone the list stays in the page above the wall, as before */
+  .index-link{display:none}
+  @media (min-width:901px){
+    .bar nav .index-link{display:inline}
+    body.index-on .bar nav .index-link{color:var(--live)}
+    .index{
+      position:absolute;top:1rem;left:clamp(1rem,4vw,2.5rem);margin:0;
+      padding:1rem 1.3rem .3rem;background:var(--paper);
+      border:1px solid var(--rule);box-shadow:0 10px 40px rgba(0,0,0,.08);
+      z-index:45;
+      opacity:0;visibility:hidden;transform:translateY(-6px);
+      transition:opacity .25s ease,transform .3s ease,visibility 0s .3s;
+    }
+    body.index-on .index{opacity:1;visibility:visible;transform:none;transition:opacity .25s ease,transform .3s ease}
+  }
 
   .head{
     display:block;
@@ -429,6 +445,7 @@
     </span>
   </a>
   <nav>
+    <a href="#index" class="index-link" id="indexLink" aria-controls="index" aria-expanded="false">Index</a>
     <a href="about.html">About</a>
     <a href="contact.html">Contact</a>
     <button class="switch theme-switch" id="theme" role="switch" aria-checked="false" aria-label="Dark mode">
@@ -552,7 +569,13 @@
 (function(){
   var groups = Array.prototype.slice.call(document.querySelectorAll('.group'));
 
+  var DESK = window.matchMedia('(min-width:901px)');
+  function showIndex(on){
+    document.body.classList.toggle('index-on', !!on && DESK.matches);
+    var l = document.getElementById('indexLink'); if(l) l.setAttribute('aria-expanded', on ? 'true' : 'false');
+  }
   function setOpen(group, open){
+    if(open) showIndex(true);
     groups.forEach(function(g){
       var on = (g === group) && open;
       g.setAttribute('data-open', on ? 'true' : 'false');
@@ -582,6 +605,7 @@
   // via CSS transition), window resize, or the web font swapping in.
   var GUTTER = 48;
   function fitCollage(){
+    if(DESK.matches){ document.documentElement.style.setProperty('--collage-x', '0px'); return; }   // the list floats over the wall
     var goldenX = window.innerWidth * .26;   // the index is a narrow column now, so the wall takes most of the width
     var maxRight = document.getElementById('index').getBoundingClientRect().right;
     var x = Math.max(goldenX, maxRight + GUTTER);
@@ -594,6 +618,7 @@
     window.addEventListener('resize', fitCollage);
   }
   fitCollage();
+  DESK.addEventListener('change', fitCollage);
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitCollage);
 
   // the name in the header doubles as a home link: collapses everything
@@ -952,9 +977,17 @@
   var leaveTimer = null;
   var currentLink = null;
 
+  // slots the index panel would cover are skipped while it is up
+  function underPanel(slot){
+    if(!document.body.classList.contains('index-on')) return false;
+    var ir = document.getElementById('index').getBoundingClientRect(), cr = collageEl.getBoundingClientRect();
+    return cr.left + parseFloat(slot.left) / 100 * cr.width < ir.right + 24 && cr.top + parseFloat(slot.top) / 100 * cr.height < ir.bottom + 24;
+  }
   function nextSlot(){
-    var i;
-    do { i = Math.floor(Math.random() * PREVIEW_SLOTS.length); } while(i === lastSlot && PREVIEW_SLOTS.length > 1);
+    var ok = [];
+    PREVIEW_SLOTS.forEach(function(sl, i){ if(i !== lastSlot && !underPanel(sl)) ok.push(i); });
+    if(!ok.length) PREVIEW_SLOTS.forEach(function(sl, i){ if(i !== lastSlot) ok.push(i); });
+    var i = ok[Math.floor(Math.random() * ok.length)];
     lastSlot = i;
     return PREVIEW_SLOTS[i];
   }
@@ -1075,6 +1108,7 @@
 
   // close the menu and start the wall over: the selection and previews go, the ambient pictures resume
   function closeAll(){
+    showIndex(false);
     pinned = null; clearTimeout(intentTimer);
     cancelOpen();
     clearTimeout(leaveTimer);
@@ -1087,12 +1121,12 @@
   }
   // a click anywhere on the background (not on the menu, the header or a link) closes it
   document.addEventListener('click', function(e){
-    if(!document.body.classList.contains('is-open')) return;
-    if(e.target.closest('a, button, header, .index, .tile')) return;
+    if(!document.body.classList.contains('is-open') && !document.body.classList.contains('index-on')) return;
+    if(e.target.closest('a, button, header, .index, .tile, .sheet')) return;
     closeAll();
   });
   document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape' && document.body.classList.contains('is-open')) closeAll();
+    if(e.key === 'Escape' && (document.body.classList.contains('is-open') || document.body.classList.contains('index-on'))) closeAll();
   });
 
   // clicking a picture on the wall opens that project's category and "scrolls" down its list to the project. In order, so
@@ -1109,8 +1143,9 @@
       // the picture grows from its box to as large as the wall area allows, uncropped (its own proportions), centred there
       var cr = document.getElementById('collage').getBoundingClientRect(), r = st.tile.getBoundingClientRect();
       var ar = aspectOf[st.src] || (r.width / r.height);
-      var w = Math.min(cr.width * .96, cr.height * .96 * ar), h = w / ar;
-      var x = (cr.width - w) / 2, y = (cr.height - h) / 2;
+      var off = DESK.matches ? Math.max(0, document.getElementById('index').getBoundingClientRect().right + 32 - cr.left) : 0;   // clear of the panel
+      var w = Math.min((cr.width - off) * .96, cr.height * .96 * ar), h = w / ar;
+      var x = off + (cr.width - off - w) / 2, y = (cr.height - h) / 2;
       custom = {top: y + 'px', left: x + 'px', width: w + 'px', aspect: String(ar), src: st.src,
                 from: {top: (r.top - cr.top) + 'px', left: (r.left - cr.left) + 'px', width: r.width + 'px', aspect: st.tile.style.aspectRatio}};
       st.holding = true;
@@ -1265,6 +1300,13 @@
       });
     });
   }
+  document.getElementById('indexLink').addEventListener('click', function(e){
+    e.preventDefault(); e.stopPropagation();
+    if(document.body.classList.contains('index-on')) closeAll(); else showIndex(true);
+  });
+  // where a project opened from its title grows out of: the picture showing for it, if any
+  window.gcPreviewRect = function(){ return activeIndex === -1 ? null : previews[activeIndex].tile.getBoundingClientRect(); };
+  window.gcHideIndex = function(){ showIndex(false); };
 })();
 </script>
 
@@ -1358,6 +1400,7 @@
   function open(href, fromHistory, from){
     if(sheet){
       // another project while one is up: swap it in place, so Back (or closing) still goes straight to the home page
+      if(window.gcHideIndex) gcHideIndex();
       try{ frame.contentWindow.location.replace(embedUrl(href)); }catch(e){ frame.src = embedUrl(href); }   // src would add a step to Back
       if(!fromHistory) history.replaceState({sheet: href}, '', '/?show=' + encodeURIComponent(href));
       return;
@@ -1374,7 +1417,8 @@
       frame.src = embedUrl(href);
       sheet.appendChild(x); sheet.appendChild(frame);
       document.body.appendChild(back); document.body.appendChild(sheet);
-      if(from && innerWidth > 600) placeAt(from);
+      if(from && innerWidth > 900) placeAt(from);
+      if(window.gcHideIndex) gcHideIndex();
       x.addEventListener('click', function(){ close(); });
       back.addEventListener('click', function(){ close(); });
       void sheet.offsetWidth;
@@ -1446,7 +1490,8 @@
     var a = e.target.closest && e.target.closest('.work a[href]');
     if(!a) return;
     e.preventDefault();
-    open(a.getAttribute('href'));
+    var from = (window.gcPreviewRect && gcPreviewRect()) || a.getBoundingClientRect();
+    open(a.getAttribute('href'), false, from);
   });
   window.gcSheetOpen = function(){ return !!sheet; };
   window.gcOpenSheet = function(href, from){ open(href, false, from); };

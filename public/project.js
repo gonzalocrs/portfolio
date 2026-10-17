@@ -132,7 +132,7 @@
   // before the real artwork exists — diagram: {} — which shows the same
   // roadmap placeholder pattern used elsewhere until it's ready.
   // not next to the text when the grid below already has it
-  var diagramInGrid = p.diagram && p.grid && p.grid.some(function(g){ return g.src === p.diagram.src; });
+  var diagramInGrid = p.diagram && p.grid && [].concat.apply([], p.grid).some(function(g){ return g.src === p.diagram.src; });
   if(p.diagram && (p.diagram.src || showLayout) && !diagramInGrid){
     info.classList.add('has-diagram');
     var creditsToggle = el('button', 'credits-toggle mono', 'Credits');
@@ -199,20 +199,34 @@
   // cropped to fill their tile, drawings are shown whole
   if(p.grid){
     var gseg = el('section', 'seg seg--grid');
-    var ggrid = el('div', 'g-grid');
+    var ggrid = null;
     var glist = [];
-    p.grid.forEach(function(it){
-      var fig = el('figure', 'g-fig' + (it.size ? ' g-fig--' + it.size : '') + (it.drawing ? ' is-drawing' : '') + (it.fill ? ' is-fill' : ''));
+    function gfig(it, cls){
+      var fig = el('figure', cls + (it.drawing ? ' is-drawing' : '') + (it.fill ? ' is-fill' : ''));
       var img = el('img');
       img.src = it.src; img.alt = it.caption || p.title; img.loading = 'lazy'; img.decoding = 'async';
-      var item = {src: it.src, alt: img.alt, a: 1.5, caption: it.caption || ''};
-      img.addEventListener('load', function(){ if(img.naturalWidth && img.naturalHeight) item.a = img.naturalWidth / img.naturalHeight; });
+      var item = {src: it.src, alt: img.alt, a: it.a || 1.5, caption: it.caption || ''};
+      fig.style.setProperty('--a', item.a);
+      img.addEventListener('load', function(){
+        if(img.naturalWidth && img.naturalHeight){ item.a = img.naturalWidth / img.naturalHeight; fig.style.setProperty('--a', item.a); }
+      });
       var k = glist.push(item) - 1;
       fig.appendChild(img);
       fig.addEventListener('click', function(){ openLightbox(glist, k); });
-      ggrid.appendChild(fig);
+      return fig;
+    }
+    p.grid.forEach(function(it){
+      // a list of pictures is one row across the width, all the same height, each whole (nothing cropped)
+      if(Array.isArray(it)){
+        var row = el('div', 'g-row');
+        it.forEach(function(r){ row.appendChild(gfig(r, 'g-rowfig')); });
+        gseg.appendChild(row);
+        ggrid = null;
+        return;
+      }
+      if(!ggrid){ ggrid = el('div', 'g-grid'); gseg.appendChild(ggrid); }
+      ggrid.appendChild(gfig(it, 'g-fig' + (it.size ? ' g-fig--' + it.size : '')));
     });
-    gseg.appendChild(ggrid);
     app.appendChild(gseg);
     segs.push({el: gseg, name: 'Pictures', free: true});
   }

@@ -11,7 +11,8 @@
     text      a short second paragraph
     grid      optional: [{src, size, drawing, fill, caption}, ...] shows every picture in one hand-arranged grid after
               the text instead of the galleries. size: small (default) / xl / tower / half / wide / full / big / tall;
-              drawing: shown whole instead of cropped; fill: a drawing that may be cropped to fill its tile
+              drawing: shown whole instead of cropped; fill: a drawing that may be cropped to fill its tile.
+              An entry that is itself a list ([{src, a}, ...]) is one row across the width, every picture whole
     gallery   { drawings: [...], physical: [...] (the physical models), photos: [...] }
               each item: { src: "img/...", caption: "Ground floor plan" }
               photos & renders are laid out freely, without frames and at each picture's own proportions,
@@ -121,8 +122,8 @@ window.PROJECTS = {
     // all the pictures in one grid after the text (see project.js: grid)
     grid: [
       {src: "img/anticlastic-roof-structure/physical/web/IMG_9768.jpg", size: "full"},
-      {src: "img/anticlastic-roof-structure/hand-drawing.jpg", size: "big", drawing: true, caption: "Spherical vs. hyperbolic curvature study"},
-      {src: "img/anticlastic-roof-structure/physical/web/IMG_9868.jpg", size: "tall"},
+      [{src: "img/anticlastic-roof-structure/hand-drawing.jpg", a: 0.768, drawing: true, caption: "Spherical vs. hyperbolic curvature study"},
+       {src: "img/anticlastic-roof-structure/physical/web/IMG_9868.jpg", a: 1.5}],
       // each drawing beside the photo of the same view: the section with the arch seen end-on
       {src: "img/anticlastic-roof-structure/section.png", drawing: true, caption: "Section"},
       {src: "img/anticlastic-roof-structure/physical/web/IMG_9865-Edit.jpg", size: "big"},
@@ -135,7 +136,7 @@ window.PROJECTS = {
       {src: "img/anticlastic-roof-structure/elevation.png", drawing: true, caption: "Front elevation"},
       {src: "img/anticlastic-roof-structure/physical/web/IMG_9760.jpg", size: "big"},
       {src: "img/anticlastic-roof-structure/physical/web/IMG_9872.jpg"},
-      {src: "img/anticlastic-roof-structure/physical/web/IMG_9919.jpg", size: "wide"},
+      {src: "img/anticlastic-roof-structure/physical/web/IMG_9919.jpg", size: "full"},
       {src: "img/anticlastic-roof-structure/physical/web/IMG_9921.jpg", size: "full"}
     ],
     gallery: {

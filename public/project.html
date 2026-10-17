@@ -370,7 +370,14 @@
   .g-fig--xl{grid-column:span 4;grid-row:span 3}
   .g-fig--tower{grid-row:span 3}
   .g-fig--half{grid-column:span 3;grid-row:span 3}
+  .seg--grid > * + *{margin-top:var(--gx,2.35765cqw)}
+  .g-row{display:flex;gap:2.35765cqw}
+  .g-rowfig{margin:0;flex:var(--a) 1 0;min-width:0;cursor:zoom-in;background:var(--rule)}
+  .g-rowfig img{display:block;width:100%;height:auto}
+  .g-rowfig.is-drawing{background:#fff}
   @media (max-width:600px){
+    .g-row{display:block}
+    .g-rowfig{margin-bottom:.8rem}
     /* on a phone, one column, every picture whole at its own proportions */
     .g-grid{display:block}
     .g-fig{margin-bottom:.8rem}

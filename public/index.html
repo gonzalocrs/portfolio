@@ -992,9 +992,23 @@
     if(outgoingIndex !== -1) fadeOut(previews[outgoingIndex]);
   }
 
+  // After a picture on the wall is clicked, its project stays selected while the pointer travels over to the list:
+  // passing over other titles on the way does not switch to them (only resting on one does), and leaving them does
+  // not clear the selection. It is let go once the pointer reaches the selected title, or the menu is closed.
+  var pinned = null, intentTimer = null;
   links.forEach(function(a){
-    function show(){ selectProject(a); }
+    function show(){
+      clearTimeout(intentTimer);
+      if(pinned && pinned !== a){
+        intentTimer = setTimeout(function(){ pinned = null; selectProject(a); }, 400);
+        return;
+      }
+      pinned = null;
+      selectProject(a);
+    }
     function hide(){
+      clearTimeout(intentTimer);
+      if(pinned) return;
       clearTimeout(leaveTimer);
       leaveTimer = setTimeout(function(){
         if(currentLink) currentLink.classList.remove('current');
@@ -1013,6 +1027,7 @@
 
   // close the menu and start the wall over: the selection and previews go, the ambient pictures resume
   function closeAll(){
+    pinned = null; clearTimeout(intentTimer);
     cancelOpen();
     clearTimeout(leaveTimer);
     setOpen(null, false);
@@ -1070,6 +1085,7 @@
       if(st){ st.tile.style.transition = 'opacity .18s ease'; setTimeout(function(){ st.tile.style.transition = ''; }, 400); }
       selectProject(a, custom);
       a.focus({preventScroll:true});
+      pinned = a;
     }, t + idx * 130 + (idx ? 130 : 0)));
   }
   ambientState.forEach(function(st){

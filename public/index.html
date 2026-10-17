@@ -400,9 +400,27 @@
     background:color-mix(in srgb,var(--paper) 30%,transparent);
     -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
   }
-  /* TEST (horizontal strip): the band along the bottom has a hairline on top, and nothing behind it is blurred */
+  /* TEST (ribbon window): the project opens as a long window cut through the wall (ribbon.html in the sheet). Nothing is
+     blurred; the wall's pictures step out and its openings stay, faint, around the window; the index and the project's
+     text stay usable on the left */
   body.sheet-in-wall .sheet-back{background:none;-webkit-backdrop-filter:none;backdrop-filter:none}
-  .sheet.from-picture{border-top:1px solid var(--rule)}
+  body.ribbon-open .collage .tile.ambient{opacity:0 !important;pointer-events:none !important}
+  body.ribbon-open .collage .facade{opacity:.25}
+  body.ribbon-open .collage .pan-arrow,body.ribbon-open .collage .keyplan{opacity:0 !important;pointer-events:none !important}
+  body.ribbon-open .index,body.ribbon-open .ptext{z-index:45}
+  body.ribbon-open .sheet{background:var(--paper)}
+  body.ribbon-open .sheet{overflow:visible}
+  body.ribbon-open .sheet-close{top:-2.2rem;right:.9rem;width:1.8rem;height:1.8rem;background:none}   /* on the wall, just above the window */
+  body.ribbon-open .work a.is-shown{color:var(--live);padding-left:.6rem}
+  body.ribbon-open .work a.is-shown .meta,body.ribbon-open .work a.is-shown .tag{color:var(--live)}
+  .ptext{position:relative;margin:1.6rem 0 0;width:min(19rem,100%);font-size:.92rem;line-height:1.55;color:var(--mute);
+    opacity:0;transition:opacity .4s ease}
+  .ptext.on{opacity:1}
+  .ptext .k{display:block;margin-bottom:.6rem;font-family:var(--mono);font-size:.64rem;text-transform:uppercase;letter-spacing:.04em}
+  .ptext p{margin:0}
+  .ptext p + p{margin-top:.8rem}
+  .ptext .more-btn{display:block;margin-top:.7rem;font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.04em;color:var(--ink)}
+  .ptext .more-btn:hover{color:var(--live)}
   @media (max-width:600px){ .sheet{width:100%;height:100%;border:0} }
   @media (prefers-reduced-motion:reduce){
     *{transition-duration:.01ms !important}
@@ -1092,6 +1110,13 @@
     filterWall();
   }
   window.gcCloseAll = closeAll;
+  // TEST (ribbon window): the open project's category stays open in the index with its title picked
+  window.gcPickProject = function(slug){
+    var a = links.filter(function(l){ return slugOf(l) === slug; })[0];
+    if(!a) return;
+    setOpen(a.closest('.group'), true);
+    selectProject(a);
+  };
   // a click anywhere on the background (not on the menu, the header or a link) closes it
   document.addEventListener('click', function(e){
     if(!document.body.classList.contains('is-open') && !document.body.classList.contains('index-on')) return;
@@ -1115,7 +1140,7 @@
       selectProject(a);
       a.focus({preventScroll: true});
       pinned = a;
-      // TEST (horizontal strip): the picture opens its project at once, as a sideways strip along the bottom
+      // TEST (ribbon window): the picture opens its project at once, as a long window through the wall
       if(window.gcOpenSheet) gcOpenSheet(a.getAttribute('href'), st.tile.getBoundingClientRect());
       else growBig(st);
     });
@@ -1333,18 +1358,60 @@
 // opens the home page with the project already up. Closes with the ×, Esc, a click outside it, or Back.
 (function(){
   var back = null, sheet = null, frame = null, pushed = false;
-  // TEST: a project opens as the sideways strip (horizontal.html) rather than the vertical project page
+  // TEST: on a desk, a project opens as a long window through the wall (ribbon.html), either one window for every
+  // picture or one bay per part (/?look=bays); on a phone, as the sideways page (horizontal.html, a column there)
+  var look = 'strip';
+  try{
+    var lq = /[?&]look=(strip|bays)/.exec(location.search);
+    if(lq) sessionStorage.setItem('gc-look', lq[1]);
+    look = sessionStorage.getItem('gc-look') || 'strip';
+  }catch(e){}
+  function slugIn(href){ var m = /[?&]p=([\w-]+)/.exec(href); return m && m[1]; }
+  function ribbon(){ return innerWidth > 900; }
   function embedUrl(href){
-    var m = /[?&]p=([\w-]+)/.exec(href);
-    if(m) return 'horizontal.html?p=' + m[1] + '&embed=1';
+    var slug = slugIn(href);
+    if(slug) return ribbon() ? 'ribbon.html?p=' + slug + '&look=' + look : 'horizontal.html?p=' + slug + '&embed=1';
     return href + (href.indexOf('?') === -1 ? '?' : '&') + 'embed=1';
   }
+  // the project's text, in the index column under its title: the first paragraph, the rest behind "Read more"
+  var ptext = null;
+  function showText(href){
+    if(ptext){ ptext.remove(); ptext = null; }
+    var pr = href && window.PROJECTS && PROJECTS[slugIn(href)];
+    if(!pr || !ribbon()) return;
+    if(window.gcPickProject) gcPickProject(slugIn(href));
+    Array.prototype.forEach.call(document.querySelectorAll('.work a'), function(l){ l.classList.toggle('is-shown', slugIn(l.getAttribute('href')) === slugIn(href)); });
+    ptext = document.createElement('div'); ptext.className = 'ptext';
+    var k = document.createElement('span'); k.className = 'k'; k.textContent = pr.kicker || ''; ptext.appendChild(k);
+    var paras = pr.text ? (Array.isArray(pr.text) ? pr.text : [pr.text]) : (pr.lede ? [pr.lede] : []);
+    paras.forEach(function(t, i){ var pe = document.createElement('p'); pe.textContent = t; pe.hidden = i > 0; ptext.appendChild(pe); });
+    if(paras.length > 1){
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'more-btn'; b.textContent = 'Read more';
+      b.addEventListener('click', function(e){
+        e.stopPropagation();
+        var open = b.textContent === 'Read more';
+        Array.prototype.slice.call(ptext.querySelectorAll('p')).forEach(function(pe, i){ if(i) pe.hidden = !open; });
+        b.textContent = open ? 'Read less' : 'Read more';
+      });
+      ptext.appendChild(b);
+    }
+    document.getElementById('index').after(ptext);
+    void ptext.offsetWidth; ptext.classList.add('on');
+  }
+  // the wheel anywhere over the wall moves along the window
+  document.addEventListener('wheel', function(e){
+    if(!sheet || !document.body.classList.contains('ribbon-open') || e.ctrlKey) return;
+    if(e.target.closest && e.target.closest('.index, .ptext')) return;
+    e.preventDefault();
+    try{ frame.contentWindow.gcRibbonBy(e.deltaY + e.deltaX); }catch(err){}
+  }, {passive: false});
   // from: the large picture the project was opened from; the sheet grows out of it, keeping its left edge and width
   function open(href, fromHistory, from){
     if(sheet){
       // another project while one is up: swap it in place, so Back (or closing) still goes straight to the home page
       if(window.gcHideIndex) gcHideIndex();
       try{ frame.contentWindow.location.replace(embedUrl(href)); }catch(e){ frame.src = embedUrl(href); }   // src would add a step to Back
+      if(sheet.from) showText(href);
       if(!fromHistory) history.replaceState({sheet: href}, '', '/?show=' + encodeURIComponent(href));
       return;
     }
@@ -1370,6 +1437,8 @@
         setRect(wallRect());
         // behind it the home page goes back to its start: the large picture goes, the whole wall and the index return
         if(window.gcCloseAll) gcCloseAll();
+        document.body.classList.add('ribbon-open');
+        showText(href);
       }
       frame.addEventListener('load', function(){ syncTheme(); try{ frame.contentWindow.focus(); }catch(e){} });
     }
@@ -1384,13 +1453,14 @@
   }
   // where the sheet settles: centred, about three quarters of the width, from under the header to the bottom of the
   // window; everything behind it but the header is blurred
-  // TEST: a full-width band along the bottom, from under the index to the bottom of the window; the wall above it
-  // stays in view, and a picture there swaps the project in the band
+  // TEST: the long window: from just inside the wall's left edge to the edge of the screen, a little over half the
+  // wall's height, centred on it
   function wallRect(){
-    var head = document.querySelector('header.bar').getBoundingClientRect().bottom;
-    var top = Math.round(Math.max(head + 190, innerHeight * .32));
-    if(back) back.style.top = top + 'px';
-    return {left: 0, width: innerWidth, top: top, height: innerHeight - top};
+    var c = document.getElementById('collage').getBoundingClientRect();
+    var h = Math.round(c.height * .6), top = Math.round(c.top + (c.height - h) / 2);
+    if(back) back.style.top = top + 'px', back.style.height = h + 'px', back.style.bottom = 'auto';
+    var left = Math.round(c.left + 14);
+    return {left: left, width: innerWidth - left, top: top, height: h};
   }
   function placeAt(r){
     sheet.from = r;
@@ -1402,13 +1472,17 @@
   // in the wall the list stays usable: a title swaps the project in the sheet, a click anywhere else closes it
   document.addEventListener('click', function(e){
     if(!sheet || !sheet.from || e.defaultPrevented) return;
-    if(e.target.closest('.sheet, a, button, header, .tile')) return;
+    if(e.target.closest('.sheet, a, button, header, .tile, .ptext')) return;
     close();
   });
   function remove(){
     if(!sheet) return;
     document.body.classList.remove('has-sheet');
     if(sheet.from){ setRect(sheet.from); document.body.classList.remove('sheet-in-wall'); }
+    document.body.classList.remove('ribbon-open');
+    if(ptext){ ptext.remove(); ptext = null; }
+    if(window.gcCloseAll) gcCloseAll();
+    Array.prototype.forEach.call(document.querySelectorAll('.work a.is-shown'), function(l){ l.classList.remove('is-shown'); });
     var b = back, sh = sheet;
     back = sheet = frame = null;
     setTimeout(function(){ b.remove(); sh.remove(); }, 500);

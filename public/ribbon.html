@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gonzalo Cáceres — Architecture</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- TEST: a project seen through a long window cut into the home page's wall (index.html opens this in the wall area).
+     ribbon.html?p=<slug>&look=strip   one long opening, every picture in the project's grid order
+     ribbon.html?p=<slug>&look=bays    one opening per part: hero, concept, drawings, physical models, photos & renders
+     The openings are drawn like the wall's: splayed reveals, thin frames, captions on hover, chevrons, a key plan. -->
+<style>
+  :root{
+    --paper:#ffffff; --ink:#0f1216; --rule:#d8d6d1; --mute:#7b7d80; --live:#1a2ce0;
+    --mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
+    --d:30px;      /* depth of the top and bottom splay */
+    --e:26px;      /* depth of the side splays (jambs) */
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){ --paper:#0d0e10; --ink:#f2f1ee; --rule:#2b2d30; --mute:#8b8d90; --live:#7d8bff; }
+  }
+  :root[data-theme="dark"]{ --paper:#0d0e10; --ink:#f2f1ee; --rule:#2b2d30; --mute:#8b8d90; --live:#7d8bff; }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%;background:var(--paper);color:var(--ink);overflow:hidden}
+  button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+
+  .track{position:absolute;inset:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;overscroll-behavior-x:contain}
+  .track::-webkit-scrollbar{display:none}
+  .strip{display:flex;height:100%;width:max-content;padding-right:96px}   /* a stretch of wall after the last jamb */
+  /* one opening: the glass with the pictures, the splayed reveal drawn around it (see ribbon.js) */
+  .opening{position:relative;flex:0 0 auto;height:100%;padding:var(--d) var(--e)}
+  .opening + .opening{margin-left:64px}                 /* the pier of wall between two bays */
+  .opening svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+  .opening svg *{vector-effect:non-scaling-stroke;stroke-width:1}
+  .splay{fill:color-mix(in srgb,var(--ink) 4%,var(--paper));stroke:var(--rule)}
+  .glass{position:relative;display:flex;gap:14px;height:100%;background:color-mix(in srgb,var(--ink) 2%,var(--paper))}
+  .label{position:absolute;left:calc(var(--e) + 2px);top:0;height:var(--d);display:flex;align-items:center;z-index:1;
+    font-family:var(--mono);font-size:.64rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);white-space:nowrap}
+  .label b{font-weight:400;color:var(--ink);margin-right:.7em}
+
+  .fig{position:relative;flex:0 0 auto;height:100%;margin:0;border:1px solid var(--rule);background:var(--paper)}
+  .fig img{display:block;height:100%;width:auto;aspect-ratio:var(--a,1.5)}
+  .fig .cap{position:absolute;left:.6rem;bottom:.6rem;font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;
+    padding:.25em .55em;background:var(--paper);color:var(--mute);max-width:calc(100% - 1.2rem);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    opacity:0;transition:opacity .25s ease}
+  .fig:hover .cap{opacity:1}
+
+  /* the wall's own chevrons and key plan, small, in the bottom splay at the right: ‹ ■□□□ › */
+  .nav{position:fixed;right:calc(var(--e) + 4px);bottom:0;height:var(--d);display:flex;align-items:center;gap:4px;z-index:3}
+  .chev{width:22px;height:22px;display:flex;align-items:center;justify-content:center;color:var(--mute);opacity:.35;transition:opacity .3s ease,color .25s ease}
+  .chev.on{opacity:1}
+  .chev.on:hover{color:var(--ink)}
+  .chev:not(.on){cursor:default}
+  .chev svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.1;transition:transform .3s ease}
+  .chev.l.on:hover svg{transform:translateX(-2px)} .chev.r.on:hover svg{transform:translateX(2px)}
+  .keyplan{display:flex;gap:3px;padding:0 4px}
+  .keyplan button{width:13px;height:11px;border:1px solid var(--mute);opacity:.6;transition:background .25s ease,opacity .25s ease}
+  .keyplan button:hover{opacity:1}
+  .keyplan button.here{background:var(--ink);border-color:var(--ink);opacity:.85}
+</style>
+<script>
+  try{ var t = sessionStorage.getItem('gc-theme'); if(t) document.documentElement.setAttribute('data-theme', t); }catch(e){}
+</script>
+</head>
+<body>
+<div class="track" id="track"><div class="strip" id="strip"></div></div>
+<div class="nav">
+  <button class="chev l" id="prev" type="button" aria-label="Back"><svg viewBox="0 0 22 22"><path d="M14.5 4l-7 7 7 7"/></svg></button>
+  <div class="keyplan" id="keyplan"></div>
+  <button class="chev r" id="next" type="button" aria-label="Forward"><svg viewBox="0 0 22 22"><path d="M7.5 4l7 7-7 7"/></svg></button>
+</div>
+<script src="projects.js"></script>
+<script src="ribbon.js"></script>
+</body>
+</html>

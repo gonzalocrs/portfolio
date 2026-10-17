@@ -42,3 +42,12 @@
 
 /horizontal.js
   Cache-Control: no-cache
+
+/ribbon
+  Cache-Control: no-cache
+
+/ribbon.html
+  Cache-Control: no-cache
+
+/ribbon.js
+  Cache-Control: no-cache

@@ -645,7 +645,7 @@
   // ---- paging with resistance ---------------------------------------------
   var pagedMQ = window.matchMedia('(min-width:900px) and (hover:hover) and (pointer:fine)');
   // the page used to turn segment by segment with resistance (a magnet); now it scrolls freely and the code below
-  // only runs when MAGNET is true. The dots still show where you are and still glide to a segment when clicked
+  // only runs when MAGNET is true (the section dots only show with it)
   var MAGNET = false;
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   var THRESH = 360;            // how far you have to push before the page lets go (about four wheel clicks)
@@ -882,7 +882,7 @@
 
   function applyMode(){
     document.documentElement.classList.toggle('paged', pagedMQ.matches);
-    dots.style.display = pagedMQ.matches ? '' : 'none';
+    dots.style.display = (MAGNET && pagedMQ.matches) ? '' : 'none';   // the dots belonged to the magnet paging
     relayout();
   }
   if(pagedMQ.addEventListener) pagedMQ.addEventListener('change', applyMode);

@@ -36,8 +36,13 @@ Elevations: outline 2.0, lines and frames 1.0, cladding and railings 1.0 in grey
 
 With `'poche': 'structure'` in the plans config, only the structure is solid black: columns (the `column`
 layers), any wall layers listed in `structure_layers`, and any boxes in `structure_boxes` (per floor, e.g. a
-concrete core drawn on the same layer as the partitions). Every other wall is a heavy outline (`wall`, 1.6),
-white inside. Without it, all cut walls are solid black.
+concrete core drawn on the same layer as the partitions). Every other wall is a thin grey outline (`wall`,
+0.8, grey 154), white inside. Without it, all cut walls are solid black.
+
+With `'align': 'model'` the floors keep their model y instead of being top-aligned, so columns and walls that
+stack line up across the sheet (the CAD draws the floors side by side on one grid). `y_shift` (per floor, in
+metres) moves a floor that is drawn out of register. `scale` (sheet units per metre, or `plan_height` for the tallest floor) and `gap` set the
+size and spacing.
 
 Rules in plans: no furniture, no bought-in appliances (cookers, fridges, sink bowls: the kitchen is its counters,
 island and the spaces between), no door swings (the gap in the wall is the door), no stair walk lines, arrows or

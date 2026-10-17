@@ -345,8 +345,18 @@ def build(cfg, sources):
     for P in per:
         pts = [q for k in ('wall', 'col', 'win', 'stair', 'extra') for it in P[k] for q in it['pts']]
         bbs.append(cadio.bbox(pts))
-    Hm = max(b[3] - b[1] for b in bbs)
-    S = cfg.get('plan_height', 1300) / Hm
+    if cfg.get('align') == 'model':
+        # the floors keep their model y, so the structural grid lines up across the sheet (the CAD draws the
+        # floors side by side on one grid); 'y_shift' per floor corrects one that is drawn out of register
+        sh = cfg.get('y_shift', {})
+        bbs = [(b[0], b[1] + sh.get(i, 0), b[2], b[3] + sh.get(i, 0)) for i, b in enumerate(bbs)]
+        y_lo, y_hi = min(b[1] for b in bbs), max(b[3] for b in bbs)
+        bbs = [(b[0], b[1], b[2], y_hi) for b in bbs]
+        Hm = y_hi - y_lo
+    else:
+        sh = {}
+        Hm = max(b[3] - b[1] for b in bbs)
+    S = cfg.get('scale') or cfg.get('plan_height', 1300) / Hm   # sheet units per model unit
     gap = cfg.get('gap', 200)
     x_at = (W - (sum((b[2] - b[0]) * S for b in bbs) + gap * (len(bbs) - 1))) / 2
     top = (H - Hm * S) / 2
@@ -356,8 +366,8 @@ def build(cfg, sources):
         ox = x_at - b[0] * S
         x_at += (b[2] - b[0]) * S + gap
 
-        def T(x, y, ox=ox, b=b):
-            return ox + x * S, top + (b[3] - y) * S
+        def T(x, y, ox=ox, b=b, dy=sh.get(pi, 0)):
+            return ox + x * S, top + (b[3] - y - dy) * S
 
         def tl(items_):
             out, seen = [], set()

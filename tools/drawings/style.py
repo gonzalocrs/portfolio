@@ -20,7 +20,7 @@ glass a very light grey, shadows darken what they fall on (a translucent black, 
 
 PLAN = {
     'cut':       {'fill': '#000'},
-    'wall':      {'fill': '#fff', 'stroke': '#000', 'width': 1.6},   # non-structural walls ('poche': 'structure')
+    'wall':      {'fill': '#fff', 'stroke': '#9a9a9a', 'width': 0.8},   # non-structural walls ('poche': 'structure')
     'perimeter': {'stroke': '#000', 'width': 1.4},
     'line':      {'stroke': '#000', 'width': 1.0},          # stairs, steps, pool
     'glass':     {'stroke': '#000', 'width': 0.6},          # windows, curtain walls: the middle lines

@@ -342,7 +342,10 @@
   /* the hand-arranged grid (project.js: p.grid), after the Sierra Hotel TEST page: a grid of thirds on 6 tracks
      (so halves fit too), each row a third of the width at 3:2. Tile sizes: small 1x1, xl 2x3 (about 1:1),
      tower 1x3, half 1.5x3, wide full x2, full full x3 */
-  .seg.seg--grid{height:auto;min-height:0;container-type:inline-size;padding-bottom:clamp(4rem,12vh,8rem)}
+  /* the grid is narrower than the page, halfway between the full width and the TEST page's 60rem column */
+  .seg.seg--grid{height:auto;min-height:0;container-type:inline-size;padding-bottom:clamp(4rem,12vh,8rem);
+    padding-inline:calc((100% - min(100%, 60rem)) / 4)}
+  @media (max-width:600px){ .seg.seg--grid{padding-inline:0} }
   .g-grid{
     --gx:2.35765cqw;
     display:grid;grid-template-columns:repeat(6,minmax(0,1fr));

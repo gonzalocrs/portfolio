@@ -310,10 +310,6 @@
   .tile .fill{position:absolute;inset:0;opacity:0;transition:opacity .6s ease}
   .tile .fill.on{opacity:1}
   /* the drawn openings behind the pictures (see drawFacade); they step back while a project's preview is up */
-  .facade{position:absolute;inset:0;width:100%;height:100%;overflow:visible;transition:opacity .6s ease}
-  .facade .frame{fill:none;stroke:var(--rule)}
-  .facade *{vector-effect:non-scaling-stroke;stroke-width:1}
-  .collage.is-previewing .facade{opacity:.25}
   .tile.ambient.on{pointer-events:auto;cursor:pointer}
   .tile.ambient{transition:opacity .5s ease}
   .tile.ambient.on.off{opacity:0;pointer-events:none}   /* not in the open category / not the project pointed at */
@@ -321,7 +317,6 @@
   .tile.big{z-index:3;transition:opacity .25s ease}
   .tile.big.on{pointer-events:auto;cursor:pointer}
   .collage.has-big .tile.ambient.on{opacity:0;pointer-events:none}
-  .collage.has-big .facade{opacity:.25}
   .tile.ambient .cap{opacity:0;transition:opacity .25s ease}
   .tile.ambient:hover .cap{opacity:1}
   .tile .cap{
@@ -715,28 +710,6 @@
   // tracks which slots are currently occupied so two tiles never land on
   // the same rectangle at once
   var slotTaken = AMBIENT_SLOTS.map(function(){ return false; });
-
-  // The facade: every opening is always drawn on the wall as a splayed reveal (four lines from the outer corners to a
-  // small pane at the back), so the wall reads as a whole even while most openings are empty. A picture fills its whole
-  // opening when it comes in, so it is never small.
-  (function drawFacade(){
-    var NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg');
-    svg.setAttribute('class', 'facade');
-    svg.setAttribute('viewBox', '0 0 ' + WALL_W + ' ' + WALL_H);
-    svg.setAttribute('preserveAspectRatio', 'none');     // the wall has the same proportions, so nothing is stretched
-    function el(name, attrs, parent){
-      var e = document.createElementNS(NS, name);
-      for(var k in attrs) e.setAttribute(k, attrs[k]);
-      (parent || svg).appendChild(e);
-      return e;
-    }
-    // each opening is just its frame, a thin outline, like a pin-up wall of different sizes
-    function opening(r){ el('rect', {x: r.x, y: r.y, width: r.w, height: r.h, 'class': 'frame'}); }
-    AMBIENT_SLOTS.forEach(opening);
-    ACCENTS.forEach(opening);
-    var wall = document.querySelector('.wall');
-    wall.insertBefore(svg, wall.firstChild);
-  })();
 
   // Moving across the wall: it stands still until you step to the next part of it with the small arrows at the edges of
   // the area (or the arrow keys, or a swipe on a touch screen); then it glides there in one calm move. The stops are the

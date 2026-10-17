@@ -45,7 +45,9 @@ Source files are in Google Drive, under
    - Drawings: WebP or PNG, up to about 3000 px wide. Over about 4500 px is far too heavy (the first Sierra PNGs were
      7200 x 10800 and loaded very slowly).
    - Use files that are already small as they are; do not recompress them twice.
-4. Preview locally, then deploy (below).
+4. For a JPG, run `sh tools/thumbs.sh`: the home page wall uses the small copies in `thumbs/` next to each photo
+   (the full-size photos made it very slow). It falls back to the original if a thumbnail is missing.
+5. Preview locally, then deploy (below).
 
 Tool notes: `sips -c` ignores the crop offset and always crops from the centre. Use
 `ffmpeg -vf crop=W:H:X:Y` for a crop anchored somewhere else. There is no ImageMagick or Pillow.

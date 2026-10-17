@@ -316,13 +316,9 @@
   .facade .pane{fill:var(--paper);stroke:var(--rule)}
   .facade *{vector-effect:non-scaling-stroke;stroke-width:1}
   .collage.is-previewing .facade{opacity:.25}
-  .tile.preview{
-    z-index:2;
-  }
   .tile.ambient.on{pointer-events:auto;cursor:pointer}
   .tile.ambient{transition:opacity .5s ease}
-  .tile.ambient.on.dim{opacity:.12;pointer-events:none}
-  .tile.preview.on{pointer-events:auto;cursor:pointer}   /* clicking the large picture opens its project in its place */
+  .tile.ambient.on.off{opacity:0;pointer-events:none}   /* not in the open category / not the project pointed at */
   .tile.ambient .cap{opacity:0;transition:opacity .25s ease}
   .tile.ambient:hover .cap{opacity:1}
   .tile .cap{
@@ -510,14 +506,6 @@
   </ul>
 
   <div class="collage" id="collage" aria-hidden="true">
-    <div class="tile preview" id="previewA">
-      <span class="fill on" id="previewFillA"></span>
-      <span class="cap" id="previewCapA"></span>
-    </div>
-    <div class="tile preview" id="previewB">
-      <span class="fill on" id="previewFillB"></span>
-      <span class="cap" id="previewCapB"></span>
-    </div>
     <div class="wall">
       <div class="tile ambient"></div>
       <div class="tile ambient"></div>
@@ -559,6 +547,7 @@
   }
   function setOpen(group, open){
     if(open) showIndex(true);
+    setTimeout(function(){ if(window.gcFilterWall) gcFilterWall(); }, 0);
     groups.forEach(function(g){
       var on = (g === group) && open;
       g.setAttribute('data-open', on ? 'true' : 'false');
@@ -647,17 +636,20 @@
     return {src: g.bag.pop(), group: key};
   }
 
+  // The wall shows small copies of the photos (img/<project>/.../thumbs/<name>.jpg, about 1000px wide, made with
+  // tools/thumbs.sh): the full-size ones add up to tens of MB and made the page crawl. Drawings (png/webp) are already light.
+  function thumb(src){ return src && /\.jpe?g$/i.test(src) ? src.replace(/\/([^\/]+)\.jpe?g$/i, '/thumbs/$1.jpg') : src; }
   // put a picture in a tile's fill once it has loaded (cropped to fit); show the stripes meanwhile or if it fails
   function setFill(fill, src, hue, done){
     fill.style.background = swatch(hue);
     if(!src){ if(done) done(); return; }
-    var im = new Image();
+    var im = new Image(), small = thumb(src);
     im.onload = function(){
-      fill.style.background = 'url("' + src + '") center / cover no-repeat';
+      fill.style.background = 'url("' + im.src + '") center / cover no-repeat';
       if(done) done();
     };
-    im.onerror = function(){ if(done) done(); };
-    im.src = src;
+    im.onerror = function(){ if(im.src.indexOf(small) !== -1 && small !== src) im.src = src; else if(done) done(); };   // no small copy yet: the original
+    im.src = small;
   }
 
   var links = Array.prototype.slice.call(document.querySelectorAll('.work a'));
@@ -868,7 +860,7 @@
     picks = shuffle(picks).slice(0, AMBIENT_SLOTS.length);
     if(!picks.length) return;
     var left = picks.length;
-    picks.forEach(function(p){ loadAspect(p.src, function(a){ p.a = a || 1; if(--left === 0) pair(); }); });
+    picks.forEach(function(p){ loadAspect(thumb(p.src), function(a){ p.a = a || 1; if(--left === 0) pair(); }); });
     function pair(){
       // the openings in the first view are filled first, so any empty ones are further along the wall
       var slots = shuffle(AMBIENT_SLOTS.map(function(sl, k){ return k; })).sort(function(x, y){ return inView(AMBIENT_SLOTS[y]) - inView(AMBIENT_SLOTS[x]); }).slice(0, picks.length);
@@ -893,83 +885,12 @@
     s.tile.classList.add('on');
   }
   function bringIntoView(){}
-  // while a project's own picture is up, the others step back (dimmed, not taken down)
-  function ambientPause(s){ s.paused = true; s.holding = false; s.tile.classList.add('dim'); }
-  function ambientResume(s){ s.paused = false; s.tile.classList.remove('dim'); }
   hang();
 
-  // hover preview: appears only while hovering a project, cycling through a
-  // few curated positions so each new project lands somewhere different;
-  // ambient tiles clear out of the way while it's active
-  var PREVIEW_SLOTS = [
-    {top:'6%',  left:'2%',  width:'27%', aspect:'5/4'},
-    {top:'16%', left:'36%', width:'32%', aspect:'4/5'},
-    {top:'8%',  left:'62%', width:'26%', aspect:'4/5'},
-    {top:'52%', left:'10%', width:'28%', aspect:'6/5'},
-    {top:'50%', left:'54%', width:'27%', aspect:'1/1'}
-  ];
-  // two alternating tiles: the incoming one pops in immediately, the
-  // outgoing one lingers and fades out slowly, so switching feels instant
-  // rather than waiting through a fade before the new project shows
-  var previews = [
-    { tile: document.getElementById('previewA'), fill: document.getElementById('previewFillA'), cap: document.getElementById('previewCapA') },
-    { tile: document.getElementById('previewB'), fill: document.getElementById('previewFillB'), cap: document.getElementById('previewCapB') }
-  ];
-  var lastSlot = -1;
-  var activeIndex = -1;
   var leaveTimer = null;
   var currentLink = null;
 
-  // slots the open dropdown would cover are skipped
-  function openPanelRect(){
-    var g = DESK.matches && document.querySelector('.group[data-open="true"]');
-    return g ? g.querySelector('.panel').getBoundingClientRect() : null;
-  }
-  function underPanel(slot){
-    var pr = openPanelRect(); if(!pr) return false;
-    var cr = collageEl.getBoundingClientRect(), a = slot.aspect.split('/');
-    var l = cr.left + parseFloat(slot.left) / 100 * cr.width, w = parseFloat(slot.width) / 100 * cr.width;
-    var t = cr.top + parseFloat(slot.top) / 100 * cr.height, h = w * a[1] / a[0];
-    return l < pr.right + 24 && l + w > pr.left - 24 && t < pr.bottom + 24 && t + h > pr.top - 24;
-  }
-  function nextSlot(){
-    var ok = [];
-    PREVIEW_SLOTS.forEach(function(sl, i){ if(i !== lastSlot && !underPanel(sl)) ok.push(i); });
-    if(!ok.length) PREVIEW_SLOTS.forEach(function(sl, i){ if(i !== lastSlot) ok.push(i); });
-    var i = ok[Math.floor(Math.random() * ok.length)];
-    lastSlot = i;
-    return PREVIEW_SLOTS[i];
-  }
-
-  function popIn(p, a, custom){
-    var slot = custom || nextSlot();     // custom: the picture that was clicked on the wall, grown from where it was
-    if(custom){
-      p.tile.style.transition = 'none';
-      p.tile.style.top = custom.from.top;
-      p.tile.style.left = custom.from.left;
-      p.tile.style.width = custom.from.width;
-      p.tile.style.aspectRatio = custom.from.aspect;
-      p.fill.style.background = 'url("' + custom.src + '") center / cover no-repeat';   // already loaded: no flash
-      p.tile.classList.add('on');
-      void p.tile.offsetWidth;
-      var ease = ' .7s cubic-bezier(.2,.7,.2,1)';
-      p.tile.style.transition = 'top' + ease + ', left' + ease + ', width' + ease + ', aspect-ratio' + ease + ', opacity .18s ease';
-    }
-    p.tile.style.top = slot.top;
-    p.tile.style.left = slot.left;
-    p.tile.style.width = slot.width;
-    p.tile.style.aspectRatio = slot.aspect;
-    var slug = (a.getAttribute('href').match(/[?&]p=([^&]+)/) || [])[1], own = IMG_BY_SLUG[slug] || [];
-    if(!custom) setFill(p.fill, own.length ? own[Math.floor(Math.random() * own.length)] : null, a.getAttribute('data-hue'));
-    p.cap.textContent = a.querySelector('.name').firstChild.textContent.trim();
-    if(!custom){ p.tile.style.transition = 'opacity .18s ease'; p.tile.classList.add('on'); }
-  }
-  function fadeOut(p){
-    p.tile.style.transition = 'opacity 1.6s ease';
-    p.tile.classList.remove('on');
-  }
-
-  // selects a project's preview directly (not just as an event side-effect),
+  // selects a project directly (not just as an event side-effect),
   // so it can be triggered reliably from hover, focus, or the scroll wheel
   var openTimers = [];
   function cancelOpen(){
@@ -978,20 +899,49 @@
     openTimers = [];
     links.forEach(function(l){ if(l !== currentLink) l.classList.remove('current'); });
   }
-  function selectProject(a, custom){
+  function selectProject(a){
     cancelOpen();
     clearTimeout(leaveTimer);
-    ambientState.forEach(ambientPause);
     if(currentLink === a) return;
     if(currentLink) currentLink.classList.remove('current');
     currentLink = a;
     currentLink.classList.add('current');
+    filterWall();
+  }
 
-    var outgoingIndex = activeIndex;
-    activeIndex = activeIndex === 0 ? 1 : 0;
-    popIn(previews[activeIndex], a, custom);
-    collageEl.classList.add('is-previewing');
-    if(outgoingIndex !== -1) fadeOut(previews[outgoingIndex]);
+  // What the wall shows: every picture; with a category open, only that category's projects; with a project pointed
+  // at, only that project's pictures. The others fade out of their openings and come back when let go.
+  function slugOf(a){ return (a.getAttribute('href').match(/[?&]p=([^&]+)/) || [])[1]; }
+  function slugOfTile(s){ return s.group && s.group.split('/')[0]; }
+  function filterWall(){
+    var keep = null, g = document.querySelector('.group[data-open="true"]');
+    if(currentLink) keep = [slugOf(currentLink)];
+    else if(g) keep = Array.prototype.map.call(g.querySelectorAll('.work a'), slugOf);
+    ambientState.forEach(function(s){ s.tile.classList.toggle('off', !!keep && keep.indexOf(slugOfTile(s)) === -1); });
+    if(currentLink) seek(slugOf(currentLink));
+  }
+  window.gcFilterWall = filterWall;
+  // when none of a project's pictures is in view, glide to the part of the wall that holds the most of them
+  function inViewAt(sl, sx, sy){
+    var c = collageEl.getBoundingClientRect(), r = panRange();
+    var cx = -sx * r.mx + (sl.x + sl.w / 2) / WALL_W * wallEl.offsetWidth, cy = -sy * r.my + (sl.y + sl.h / 2) / WALL_H * wallEl.offsetHeight;
+    return cx > 0 && cx < c.width && cy > 0 && cy < c.height;
+  }
+  function mine(slug){ return ambientState.filter(function(s){ return s.slot !== -1 && slugOfTile(s) === slug; }); }
+  function seek(slug){
+    var m = mine(slug);
+    if(!m.length || m.some(function(s){ return inViewAt(AMBIENT_SLOTS[s.slot], stop.x, stop.y); })) return;
+    var best = null, most = 0;
+    [[0, 0], [1, 0], [0, 1], [1, 1]].forEach(function(q){
+      var n = m.filter(function(s){ return inViewAt(AMBIENT_SLOTS[s.slot], q[0], q[1]); }).length;
+      if(n > most){ most = n; best = q; }
+    });
+    if(best) goTo(best[0], best[1]);
+  }
+  // the pictures of the project pointed at that are in view right now
+  function shownTiles(){
+    if(!currentLink) return [];
+    return mine(slugOf(currentLink)).filter(function(s){ return inView(AMBIENT_SLOTS[s.slot]); });
   }
 
   // After a picture on the wall is clicked, its project stays selected while the pointer travels over to the list:
@@ -1006,22 +956,16 @@
     pointer.x = e.clientX; pointer.y = e.clientY;
   }
   document.addEventListener('mousemove', track, {passive: true});
+  // the pointer is on one of the project's pictures, or on its way there from the list
   function headingToPreview(){
-    if(activeIndex === -1) return false;
-    var r = previews[activeIndex].tile.getBoundingClientRect();
-    if(pointer.x >= r.left && pointer.x <= r.right && pointer.y >= r.top && pointer.y <= r.bottom) return true;
-    if(pointer.dx <= 0 || pointer.x > r.left) return false;
-    var y = pointer.y + pointer.dy / pointer.dx * (r.left - pointer.x);   // where the current heading meets the picture
-    return y >= r.top - 60 && y <= r.bottom + 60;
-  }
-  // clicking the large picture opens the project's sheet right where the picture is (see the sheet script below)
-  previews.forEach(function(p, i){
-    p.tile.addEventListener('click', function(e){
-      if(i !== activeIndex || !currentLink || !window.gcOpenSheet) return;
-      e.stopPropagation();
-      gcOpenSheet(currentLink.getAttribute('href'), p.tile.getBoundingClientRect());
+    return shownTiles().some(function(s){
+      var r = s.tile.getBoundingClientRect();
+      if(pointer.x >= r.left && pointer.x <= r.right && pointer.y >= r.top && pointer.y <= r.bottom) return true;
+      if(pointer.dx <= 0 || pointer.x > r.left) return false;
+      var y = pointer.y + pointer.dy / pointer.dx * (r.left - pointer.x);   // where the current heading meets the picture
+      return y >= r.top - 60 && y <= r.bottom + 60;
     });
-  });
+  }
   links.forEach(function(a){
     function show(e){
       clearTimeout(intentTimer);
@@ -1043,10 +987,7 @@
         if(headingToPreview()){ leaveTimer = setTimeout(later, 120); return; }
         if(currentLink) currentLink.classList.remove('current');
         currentLink = null;
-        activeIndex = -1;
-        previews.forEach(fadeOut);
-        collageEl.classList.remove('is-previewing');
-        ambientState.forEach(ambientResume);
+        filterWall();
       }, 120);
     }
     a.addEventListener('mouseenter', show);
@@ -1063,10 +1004,7 @@
     clearTimeout(leaveTimer);
     setOpen(null, false);
     if(currentLink){ currentLink.classList.remove('current'); currentLink = null; }
-    activeIndex = -1;
-    previews.forEach(fadeOut);
-    collageEl.classList.remove('is-previewing');
-    ambientState.forEach(ambientResume);
+    filterWall();
   }
   // a click anywhere on the background (not on the menu, the header or a link) closes it
   document.addEventListener('click', function(e){
@@ -1078,53 +1016,23 @@
     if(e.key === 'Escape' && (document.body.classList.contains('is-open') || document.body.classList.contains('index-on'))) closeAll();
   });
 
-  // clicking a picture on the wall opens that project's category and "scrolls" down its list to the project. In order, so
-  // nothing fights over the layout: the wall clears, the menu opens (its own 0.45 s animation), then the highlight steps
-  // down the list to the project, and only then does the project's preview picture come in.
-  function openProject(a, st){
-    cancelOpen();
-    clearTimeout(leaveTimer);
-    var g = a.closest('.group'), list = Array.prototype.slice.call(g.querySelectorAll('.work a')), idx = list.indexOf(a);
-    var wasOpen = g.getAttribute('data-open') === 'true';
-    // the clicked picture stays put until its bigger version is ready; everything else on the wall clears
-    var custom = null;
-    if(st && st.src){
-      // the picture grows from its box to as large as the wall area allows, uncropped (its own proportions), centred there
-      var cr = document.getElementById('collage').getBoundingClientRect(), r = st.tile.getBoundingClientRect();
-      var ar = aspectOf[st.src] || (r.width / r.height);
-      var lo = 0, hi = cr.width;
-      var w = Math.min((hi - lo) * .96, cr.height * .96 * ar), h = w / ar;
-      var x = lo + (hi - lo - w) / 2, y = (cr.height - h) / 2;
-      custom = {top: y + 'px', left: x + 'px', width: w + 'px', aspect: String(ar), src: st.src,
-                from: {top: (r.top - cr.top) + 'px', left: (r.left - cr.left) + 'px', width: r.width + 'px', aspect: st.tile.style.aspectRatio}};
-      st.holding = true;
-    }
-    ambientState.forEach(function(o){ if(o !== st) ambientPause(o); });
-    previews.forEach(fadeOut);
-    activeIndex = -1;
-    if(currentLink){ currentLink.classList.remove('current'); currentLink = null; }
-    setOpen(g, true);
-    var t = wasOpen ? 0 : 480, prev = null;
-    list.slice(0, idx).forEach(function(l, i){
-      openTimers.push(setTimeout(function(){
-        if(prev) prev.classList.remove('current');
-        l.classList.add('current'); prev = l;
-      }, t + i * 130));
-    });
-    openTimers.push(setTimeout(function(){
-      if(prev) prev.classList.remove('current');
-      openTimers = [];
-      if(st){ st.tile.style.transition = 'opacity .18s ease'; setTimeout(function(){ st.tile.style.transition = ''; }, 400); }
-      selectProject(a, custom);
-      a.focus({preventScroll:true});
-      pinned = a;
-    }, t + idx * 130 + (idx ? 130 : 0)));
-  }
+  // clicking a picture on the wall picks its project (its category opens, only its pictures stay); clicking one of them
+  // again opens the project, growing out of that picture (see the sheet script below)
   ambientState.forEach(function(st){
-    st.tile.addEventListener('click', function(){
-      var slug = st.group && st.group.split('/')[0];
-      var a = slug && links.filter(function(l){ return (l.getAttribute('href').match(/[?&]p=([^&]+)/) || [])[1] === slug; })[0];
-      if(a) openProject(a, st);
+    st.tile.addEventListener('click', function(e){
+      var slug = slugOfTile(st);
+      var a = slug && links.filter(function(l){ return slugOf(l) === slug; })[0];
+      if(!a) return;
+      if(currentLink && slugOf(currentLink) === slug && window.gcOpenSheet){
+        e.stopPropagation();
+        gcOpenSheet(currentLink.getAttribute('href'), st.tile.getBoundingClientRect());
+        return;
+      }
+      cancelOpen(); clearTimeout(intentTimer);
+      setOpen(a.closest('.group'), true);
+      selectProject(a);
+      a.focus({preventScroll: true});
+      pinned = a;
     });
   });
 
@@ -1250,7 +1158,7 @@
     });
   }
   // where a project opened from its title grows out of: the picture showing for it, if any
-  window.gcPreviewRect = function(){ return activeIndex === -1 ? null : previews[activeIndex].tile.getBoundingClientRect(); };
+  window.gcPreviewRect = function(){ var t = shownTiles()[0]; return t ? t.tile.getBoundingClientRect() : null; };
   window.gcHideIndex = function(){};   // the list stays beside an open project, to pick another
 })();
 </script>

@@ -1,7 +1,8 @@
 # Drawings from CAD
 
 Turns CAD plans and elevations (DWG or DXF) into SVG drawings in the portfolio's drawing language. The output is
-vector, so it stays sharp at any size; line weights scale with the drawing, like ink on a sheet.
+vector, so it stays sharp at any size. Line widths are screen pixels (non-scaling strokes), so even the finest
+line stays at least half a pixel at the small size the site shows the drawings at.
 
 ```
 python tools/drawings/build.py sierra-hotel            # every drawing of a project
@@ -18,23 +19,27 @@ Without AutoCAD, save the DWG as DXF by hand and point the project at the `.dxf`
 
 ## The drawing language
 
-Set in `style.py`, after Gonzalo's reference (pen weights in pt). Widths are in drawing units: one unit is one
-pixel of the sheet at full size (plans 3000 wide, elevations 2000 wide).
+Set in `style.py`, after Gonzalo's reference (pen weights in pt). Widths are screen pixels and do not scale
+with the drawing: shown at about 0.4 of the sheet on the site, lines that scaled came out a fraction of a pixel and
+looked uneven. So the finest line is 0.5 px (one device pixel on a high-density screen), and the weight hierarchy
+is carried by grey value and width.
 
 | weight | what | how it is drawn |
 |---|---|---|
-| 1 3/8 | section cuts: walls, columns | solid black |
-| 7/8 | outer perimeter, secondary structure (low walls, parapets) | `perimeter`, 1.4, black |
-| 5/8 | windows, curtain walls: the middle (glass) lines | `glass`, 0.6, black |
-| 3/8 | windows, curtain walls: the outer (frame) lines | `frame`, 0.35, black |
-| | stairs, steps, pool | `line`, 1.0, black |
-| 1/8 | bathroom fixtures, kitchen counters, islands | `fixture`, 0.8, grey 178 |
-| thinnest | closets | `closet`, 0.6, grey 205 |
+| 1 3/8 | section cuts: structure (or all walls without `poche`) | solid black |
+| | other walls (`poche: structure`) | `wall`, 0.5 px, grey 168, white inside |
+| 7/8 | low walls, parapets | `perimeter`, 0.6 px, grey 51 |
+| | stairs, steps, pool | `line`, 0.5 px, grey 85 |
+| 5/8 | windows, curtain walls: the middle (glass) lines | `glass`, 0.5 px, grey 119 |
+| 3/8 | windows, curtain walls: the outer (frame) lines | `frame`, 0.5 px, grey 170 |
+| 1/8 | bathroom fixtures, kitchen counters, islands | `fixture`, 0.5 px, grey 196 |
+| thinnest | closets | `closet`, 0.5 px, grey 218 |
 | 1/16 | hatches (pool water) | light grey fill (240) |
 
 Elevations: the silhouette (the one line that wraps the building, found from the outline, line and ground layers,
-bridging CAD gaps under 20 cm) and the ground line 2.2; inside it, thinner by importance: volume edges (`outline`)
-1.0, slab edges and openings (`line`) 0.6, window and door frames 0.4, cladding and railings 0.35 in grey 150.
+bridging CAD gaps under 20 cm) and the ground line 1 px black; inside it, lighter by importance: volume edges
+(`outline`) 0.6 px grey 51, slab edges and openings (`line`) 0.5 px grey 102, window and door frames 0.5 px grey
+138, cladding and railings 0.5 px grey 208.
 
 With `'poche': 'structure'` in the plans config, only the structure is solid black: columns (the `column`
 layers), any wall layers listed in `structure_layers`, and any boxes in `structure_boxes` (per floor, e.g. a

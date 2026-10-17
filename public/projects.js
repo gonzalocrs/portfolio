@@ -9,6 +9,9 @@
     hero      path to the main image, e.g. "img/sierra-hotel/hero.jpg"
     lede      one or two sentences under the title
     text      a short second paragraph
+    grid      optional: [{src, size, drawing, fill, caption}, ...] shows every picture in one hand-arranged grid after
+              the text instead of the galleries. size: small (default) / xl / tower / half / wide / full / big / tall;
+              drawing: shown whole instead of cropped; fill: a drawing that may be cropped to fill its tile
     gallery   { drawings: [...], physical: [...] (the physical models), photos: [...] }
               each item: { src: "img/...", caption: "Ground floor plan" }
               photos & renders are laid out freely, without frames and at each picture's own proportions,
@@ -33,6 +36,17 @@ window.PROJECTS = {
     diagram: {src: "img/sierra-hotel/exploded-diagram.jpg", caption: "Exploded axonometric"},
     hero: "img/sierra-hotel/hero.jpg",
     heroPosition: "center",
+    // all the pictures in one grid after the text, as on the Sierra Hotel TEST page (see project.js: grid)
+    grid: [
+      {src: "img/sierra-hotel/photo-4-crop.jpg", size: "full"},
+      {src: "img/sierra-hotel/render-facade.jpg", size: "xl"},
+      {src: "img/sierra-hotel/exploded-diagram.jpg", size: "tower", drawing: true, fill: true, caption: "Exploded axonometric"},
+      {src: "img/sierra-hotel/elevation.svg", size: "half", drawing: true, caption: "Front elevation"},
+      {src: "img/sierra-hotel/photo-5.jpg", size: "half"},
+      {src: "img/sierra-hotel/floor-plans.svg", size: "wide", drawing: true, caption: "Floor plans"},
+      {src: "img/sierra-hotel/photo-1.jpg", size: "half"},
+      {src: "img/sierra-hotel/photo-3.jpg", size: "half"}
+    ],
     gallery: {
       photosLayout: "grid",
       drawings: [

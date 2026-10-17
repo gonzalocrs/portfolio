@@ -177,8 +177,31 @@
      mode: 'free', shapes: [1/1, 3/4, 4/3, 3/4, 4/3, 16/9]}   // free layout: a long section you scroll through normally
   ];
 
+  // a project with grid (see projects.js) shows all its pictures in one hand-arranged grid after the text instead of
+  // the separate galleries: the layout first tried on the Sierra Hotel TEST page (project-oma.html). Photos are
+  // cropped to fill their tile, drawings are shown whole
+  if(p.grid){
+    var gseg = el('section', 'seg seg--grid');
+    var ggrid = el('div', 'g-grid');
+    var glist = [];
+    p.grid.forEach(function(it){
+      var fig = el('figure', 'g-fig' + (it.size ? ' g-fig--' + it.size : '') + (it.drawing ? ' is-drawing' : '') + (it.fill ? ' is-fill' : ''));
+      var img = el('img');
+      img.src = it.src; img.alt = it.caption || p.title; img.loading = 'lazy'; img.decoding = 'async';
+      var item = {src: it.src, alt: img.alt, a: 1.5, caption: it.caption || ''};
+      img.addEventListener('load', function(){ if(img.naturalWidth && img.naturalHeight) item.a = img.naturalWidth / img.naturalHeight; });
+      var k = glist.push(item) - 1;
+      fig.appendChild(img);
+      fig.addEventListener('click', function(){ openLightbox(glist, k); });
+      ggrid.appendChild(fig);
+    });
+    gseg.appendChild(ggrid);
+    app.appendChild(gseg);
+    segs.push({el: gseg, name: 'Pictures', free: true});
+  }
+
   var n = 0;
-  SECTIONS.forEach(function(s){
+  if(!p.grid) SECTIONS.forEach(function(s){
     var items = G[s.key];
     if(!items || !items.length) return;
     var seg = el('section', 'seg seg--gal');

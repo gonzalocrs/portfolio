@@ -48,14 +48,9 @@
   if(p.hero){
     var himg = el('img');
     himg.src = p.hero; himg.alt = p.title;
-    // most projects want a plain centred crop; a few need the crop shifted, or
-    // (when the frame's own aspect leaves little room to shift) a touch of extra
-    // zoom, so the subject isn't cut off by the frame — see projects.js:
-    // heroPosition / heroZoom
-    himg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;' +
-      'object-position:' + (p.heroPosition || 'center') +
-      (p.heroZoom ? ';transform:scale(' + p.heroZoom + ');transform-origin:' + (p.heroZoomOrigin || 'center') : '');
+    // shown whole, never cropped: the full width of the page, at its own height (heroPosition / heroZoom no longer apply)
     hero.appendChild(himg);
+    intro.classList.add('has-hero-img');
   } else {
     var ha = el('div', 'art art--photo');
     ha.style.setProperty('--h', p.hue);

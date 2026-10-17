@@ -221,6 +221,10 @@
   }
   .intro .hero{flex:1 1 0;min-height:0;aspect-ratio:auto;max-height:none}
   .intro .title{margin-top:clamp(.9rem,2.4vh,1.6rem)}
+  /* a real hero image is never cropped: full width, its own height, so the first section grows to fit it */
+  .intro.has-hero-img{height:auto;min-height:0}
+  .intro.has-hero-img .hero{flex:none;aspect-ratio:auto;max-height:none}
+  .intro.has-hero-img .hero img{display:block;width:100%;height:auto}
 
   .info{
     display:grid;

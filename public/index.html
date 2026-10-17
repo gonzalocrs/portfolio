@@ -400,6 +400,9 @@
     background:color-mix(in srgb,var(--paper) 30%,transparent);
     -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
   }
+  /* TEST (horizontal strip): the band along the bottom has a hairline on top, and nothing behind it is blurred */
+  body.sheet-in-wall .sheet-back{background:none;-webkit-backdrop-filter:none;backdrop-filter:none}
+  .sheet.from-picture{border-top:1px solid var(--rule)}
   @media (max-width:600px){ .sheet{width:100%;height:100%;border:0} }
   @media (prefers-reduced-motion:reduce){
     *{transition-duration:.01ms !important}
@@ -1112,7 +1115,9 @@
       selectProject(a);
       a.focus({preventScroll: true});
       pinned = a;
-      growBig(st);
+      // TEST (horizontal strip): the picture opens its project at once, as a sideways strip along the bottom
+      if(window.gcOpenSheet) gcOpenSheet(a.getAttribute('href'), st.tile.getBoundingClientRect());
+      else growBig(st);
     });
   });
 
@@ -1328,7 +1333,12 @@
 // opens the home page with the project already up. Closes with the ×, Esc, a click outside it, or Back.
 (function(){
   var back = null, sheet = null, frame = null, pushed = false;
-  function embedUrl(href){ return href + (href.indexOf('?') === -1 ? '?' : '&') + 'embed=1'; }
+  // TEST: a project opens as the sideways strip (horizontal.html) rather than the vertical project page
+  function embedUrl(href){
+    var m = /[?&]p=([\w-]+)/.exec(href);
+    if(m) return 'horizontal.html?p=' + m[1] + '&embed=1';
+    return href + (href.indexOf('?') === -1 ? '?' : '&') + 'embed=1';
+  }
   // from: the large picture the project was opened from; the sheet grows out of it, keeping its left edge and width
   function open(href, fromHistory, from){
     if(sheet){
@@ -1374,10 +1384,13 @@
   }
   // where the sheet settles: centred, about three quarters of the width, from under the header to the bottom of the
   // window; everything behind it but the header is blurred
+  // TEST: a full-width band along the bottom, from under the index to the bottom of the window; the wall above it
+  // stays in view, and a picture there swaps the project in the band
   function wallRect(){
-    var top = document.querySelector('header.bar').getBoundingClientRect().bottom, w = Math.round(innerWidth * .76);
+    var head = document.querySelector('header.bar').getBoundingClientRect().bottom;
+    var top = Math.round(Math.max(head + 190, innerHeight * .32));
     if(back) back.style.top = top + 'px';
-    return {left: Math.round((innerWidth - w) / 2), width: w, top: top, height: innerHeight - top};
+    return {left: 0, width: innerWidth, top: top, height: innerHeight - top};
   }
   function placeAt(r){
     sheet.from = r;

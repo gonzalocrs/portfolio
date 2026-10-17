@@ -20,6 +20,12 @@
   var bar = document.getElementById('progress');
   var prevBtn = document.getElementById('prev'), nextBtn = document.getElementById('next');
   var phone = window.matchMedia('(max-width:700px)');
+  // inside the home page (index.html opens a project here, in a band along the bottom): no header of its own, and
+  // "back" closes the band instead of leaving
+  var embed = /[?&]embed=1(&|$)/.test(location.search);
+  if(embed) document.documentElement.classList.add('embed');
+  function closeEmbed(){ parent.postMessage({gc: 'close'}, location.origin); }
+  if(embed) document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeEmbed(); });
   var mode = {project: null};
 
   function el(tag, cls, text){
@@ -302,7 +308,7 @@
     // the next project waits at the end, so the strip carries on into it
     var ns = SLUGS[(i + 1) % SLUGS.length], np = P[ns];
     var next = el('a', 'next');
-    next.href = 'horizontal.html?p=' + ns;
+    next.href = 'horizontal.html?p=' + ns + (embed ? '&embed=1' : '');
     var lab = el('div', 'label');
     var lt = el('div');
     lt.appendChild(el('div', 'num mono', 'Next · ' + num(ns)));
@@ -315,9 +321,12 @@
     strip.appendChild(next);
     marks.push({el: next, html: 'Next <b>' + np.title + '</b>'});
 
-    var backA = el('a', 'back', '← All work');
+    var backA = el('a', 'back', embed ? '← ' + p.title : '← All work');
     backA.href = 'horizontal.html';
-    backA.addEventListener('click', function(){ remember(slug); });
+    backA.addEventListener('click', function(e){
+      if(embed){ e.preventDefault(); closeEmbed(); return; }
+      remember(slug);
+    });
     footLeft.appendChild(backA);
   }
 

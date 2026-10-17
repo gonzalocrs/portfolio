@@ -192,6 +192,12 @@
   .steps button:hover{border-color:var(--ink)}
   .steps button:disabled{opacity:.3;cursor:default;border-color:var(--rule)}
 
+  /* ---------- inside the home page's band (see embed in horizontal.js) ---------- */
+  :root.embed{--bar:1rem}              /* only the body's top padding below, no header */
+  .embed .bar{display:none}
+  .embed body{padding-top:1rem}
+  .embed .info h1{font-size:clamp(1.6rem,2.6vw,2.6rem)}
+
   /* ---------- phone: the strip turns into a plain column (a sideways strip of full-height pictures is too narrow a
      window there) ---------- */
   @media (max-width:700px){

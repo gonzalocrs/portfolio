@@ -273,8 +273,25 @@
      about as wide as the area (--side), and the script moves the wall to show the part you are looking at */
   .collage{container-type:size;--side:min(100cqw,calc(1.2 * min(85cqw,100cqh)),calc(100cqh / .88))}
   .wall{position:absolute;left:0;top:0;width:calc(2 * var(--side));height:calc(1.8 * var(--side));pointer-events:none;will-change:transform}
-  /* a touch screen drags the wall, so the area has to take the touches */
+  /* a touch screen swipes the wall, so the area has to take the touches */
   @media not ((hover:hover) and (pointer:fine)){ .collage{pointer-events:auto;touch-action:none} }
+  /* the arrows that step across the wall: small and quiet, only where there is more wall that way */
+  .pan-arrow{
+    position:absolute;z-index:3;
+    display:flex;align-items:center;justify-content:center;
+    width:2.25rem;height:2.25rem;
+    color:var(--mute);background:color-mix(in srgb,var(--paper) 80%,transparent);
+    opacity:0;pointer-events:none;
+    transition:opacity .4s ease,color .2s ease;
+  }
+  .pan-arrow svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.2}
+  .pan-arrow.on{opacity:.75;pointer-events:auto}
+  .pan-arrow.on:hover{opacity:1;color:var(--live)}
+  .pan-arrow[data-dir="left"]{left:0;top:50%;transform:translateY(-50%)}
+  .pan-arrow[data-dir="right"]{right:0;top:50%;transform:translateY(-50%)}
+  .pan-arrow[data-dir="up"]{top:0;left:50%;transform:translateX(-50%)}
+  .pan-arrow[data-dir="down"]{bottom:0;left:50%;transform:translateX(-50%)}
+  .collage.is-previewing .pan-arrow{opacity:0;pointer-events:none}
   .tile{
     position:absolute;
     border:1px solid var(--rule);
@@ -471,6 +488,10 @@
       <div class="tile ambient"></div>
       <div class="tile ambient"></div>
     </div>
+    <button class="pan-arrow" type="button" tabindex="-1" data-dir="up" aria-label="Move up the wall"><svg viewBox="0 0 16 16"><path d="M3 10.5l5-5 5 5"/></svg></button>
+    <button class="pan-arrow" type="button" tabindex="-1" data-dir="down" aria-label="Move down the wall"><svg viewBox="0 0 16 16"><path d="M3 5.5l5 5 5-5"/></svg></button>
+    <button class="pan-arrow" type="button" tabindex="-1" data-dir="left" aria-label="Move left along the wall"><svg viewBox="0 0 16 16"><path d="M10.5 3l-5 5 5 5"/></svg></button>
+    <button class="pan-arrow" type="button" tabindex="-1" data-dir="right" aria-label="Move right along the wall"><svg viewBox="0 0 16 16"><path d="M5.5 3l5 5-5 5"/></svg></button>
   </div>
 </main>
 
@@ -677,54 +698,70 @@
     wall.insertBefore(svg, wall.firstChild);
   })();
 
-  // Moving across the wall. With a mouse, where the pointer is over the wall area says which part of the wall you look
-  // at (right edge: the right end of the wall, and so on), eased so it glides; on a touch screen you drag it.
+  // Moving across the wall: it stands still until you step to the next part of it with the small arrows at the edges of
+  // the area (or the arrow keys, or a swipe on a touch screen); then it glides there in one calm move. The stops are the
+  // two ends of the wall each way, so every stop shows about one bay.
   var wallEl = document.querySelector('.wall');
-  var pan = {x: 0, y: 0}, panTarget = {x: 0, y: 0}, panRaf = null;
+  var stop = {x: 0, y: 0}, pan = {x: 0, y: 0}, panFrom = null, panRaf = null;
+  var arrows = {};
+  Array.prototype.forEach.call(document.querySelectorAll('.pan-arrow'), function(b){ arrows[b.getAttribute('data-dir')] = b; });
   function panRange(){
     var c = collageEl.getBoundingClientRect();
-    return {c: c, mx: Math.max(0, wallEl.offsetWidth - c.width), my: Math.max(0, wallEl.offsetHeight - c.height)};
+    return {mx: Math.max(0, wallEl.offsetWidth - c.width), my: Math.max(0, wallEl.offsetHeight - c.height)};
   }
-  function clampPan(){
+  function syncArrows(){
     var r = panRange();
-    panTarget.x = Math.max(-r.mx, Math.min(0, panTarget.x));
-    panTarget.y = Math.max(-r.my, Math.min(0, panTarget.y));
+    arrows.left.classList.toggle('on', stop.x > 0);
+    arrows.right.classList.toggle('on', stop.x < 1 && r.mx > 0);
+    arrows.up.classList.toggle('on', stop.y > 0);
+    arrows.down.classList.toggle('on', stop.y < 1 && r.my > 0);
   }
-  function panFrame(){
-    pan.x += (panTarget.x - pan.x) * .09;
-    pan.y += (panTarget.y - pan.y) * .09;
-    if(Math.abs(panTarget.x - pan.x) < .3 && Math.abs(panTarget.y - pan.y) < .3){ pan.x = panTarget.x; pan.y = panTarget.y; }
-    wallEl.style.transform = 'translate(' + pan.x.toFixed(1) + 'px,' + pan.y.toFixed(1) + 'px)';
-    panRaf = (pan.x !== panTarget.x || pan.y !== panTarget.y) ? requestAnimationFrame(panFrame) : null;
-  }
-  function panTo(x, y){
-    panTarget.x = x; panTarget.y = y; clampPan();
-    if(!panRaf) panRaf = requestAnimationFrame(panFrame);
-  }
-  var finePointer = window.matchMedia && window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  if(finePointer){
-    window.addEventListener('mousemove', function(e){
-      var r = panRange(), c = r.c;
-      if(e.clientX < c.left || e.clientX > c.right || e.clientY < c.top || e.clientY > c.bottom) return;
-      // a margin at each edge, so the far end of the wall can be reached without hitting the window's edge
-      var fx = Math.max(0, Math.min(1, (e.clientX - c.left - c.width * .1) / (c.width * .8)));
-      var fy = Math.max(0, Math.min(1, (e.clientY - c.top - c.height * .1) / (c.height * .8)));
-      panTo(-fx * r.mx, -fy * r.my);
-    }, {passive: true});
-  } else {
-    var drag = null;
-    collageEl.addEventListener('pointerdown', function(e){ drag = {x: e.clientX, y: e.clientY, px: panTarget.x, py: panTarget.y, moved: false}; });
-    window.addEventListener('pointermove', function(e){
-      if(!drag) return;
-      var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
-      if(Math.abs(dx) + Math.abs(dy) > 6) drag.moved = true;
-      panTo(drag.px + dx, drag.py + dy);
+  function easeInOut(t){ return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
+  function goTo(x, y, instant){
+    stop.x = Math.max(0, Math.min(1, x)); stop.y = Math.max(0, Math.min(1, y));
+    syncArrows();
+    var r = panRange(), to = {x: -stop.x * r.mx, y: -stop.y * r.my};
+    if(instant){ pan = to; wallEl.style.transform = 'translate(' + to.x + 'px,' + to.y + 'px)'; return; }
+    panFrom = {x: pan.x, y: pan.y, t: null};
+    cancelAnimationFrame(panRaf);
+    panRaf = requestAnimationFrame(function step(now){
+      if(panFrom.t === null) panFrom.t = now;
+      var k = easeInOut(Math.min(1, (now - panFrom.t) / 1100));
+      pan.x = panFrom.x + (to.x - panFrom.x) * k; pan.y = panFrom.y + (to.y - panFrom.y) * k;
+      wallEl.style.transform = 'translate(' + pan.x.toFixed(1) + 'px,' + pan.y.toFixed(1) + 'px)';
+      if(k < 1) panRaf = requestAnimationFrame(step);
+      else bringIntoView();
     });
-    window.addEventListener('pointerup', function(){ setTimeout(function(){ drag = null; }, 0); });
-    // a drag that ends on a picture must not also open it
-    collageEl.addEventListener('click', function(e){ if(drag && drag.moved){ e.stopPropagation(); e.preventDefault(); } }, true);
   }
-  window.addEventListener('resize', function(){ panTo(panTarget.x, panTarget.y); });
+  function move(dir){
+    if(dir === 'left') goTo(stop.x - 1, stop.y);
+    if(dir === 'right') goTo(stop.x + 1, stop.y);
+    if(dir === 'up') goTo(stop.x, stop.y - 1);
+    if(dir === 'down') goTo(stop.x, stop.y + 1);
+  }
+  Object.keys(arrows).forEach(function(dir){
+    arrows[dir].addEventListener('click', function(e){ e.stopPropagation(); move(dir); });
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.metaKey || e.ctrlKey || e.altKey || /input|textarea/i.test(e.target.tagName)) return;
+    var dir = {ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down'}[e.key];
+    if(!dir || !arrows[dir].classList.contains('on')) return;
+    e.preventDefault();
+    move(dir);
+  });
+  // a swipe on a touch screen steps the same way (the wall follows the finger: swipe left to go right)
+  var swipe = null;
+  collageEl.addEventListener('pointerdown', function(e){ if(e.pointerType === 'touch') swipe = {x: e.clientX, y: e.clientY}; });
+  window.addEventListener('pointerup', function(e){
+    if(!swipe) return;
+    var dx = e.clientX - swipe.x, dy = e.clientY - swipe.y;
+    swipe = null;
+    if(Math.max(Math.abs(dx), Math.abs(dy)) < 40) return;
+    if(Math.abs(dx) > Math.abs(dy)) move(dx < 0 ? 'right' : 'left');
+    else move(dy < 0 ? 'down' : 'up');
+  });
+  window.addEventListener('resize', function(){ goTo(stop.x, stop.y, true); });
+  goTo(0, 0, true);
 
   // is a slot in view right now (at least mostly)? Pictures go where you are looking
   function inView(sl){
@@ -814,6 +851,15 @@
       var gap = 1610 + Math.random() * 2990;
       s.timer = setTimeout(function(){ ambientCycle(s); }, gap);
     }, ms);
+  }
+  // after a move across the wall, the pictures left behind out of view go, and come back in the openings now in view
+  function bringIntoView(){
+    ambientState.forEach(function(s){
+      if(s.paused || s.hover || s.holding || s.slot === -1 || !s.tile.classList.contains('on')) return;
+      if(inView(AMBIENT_SLOTS[s.slot])) return;
+      clearTimeout(s.timer);
+      hideLater(s, Math.random() * 400);
+    });
   }
   function releaseGroup(s){
     if(!s.group) return;

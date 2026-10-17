@@ -275,23 +275,43 @@
   .wall{position:absolute;left:0;top:0;width:calc(2 * var(--side));height:calc(1.8 * var(--side));pointer-events:none;will-change:transform}
   /* a touch screen swipes the wall, so the area has to take the touches */
   @media not ((hover:hover) and (pointer:fine)){ .collage{pointer-events:auto;touch-action:none} }
-  /* the arrows that step across the wall: small and quiet, only where there is more wall that way */
+  /* stepping across the wall. Each edge where there is more wall is a whole band you can click: a quiet chevron sits
+     in it, and as the pointer comes near, the band fades in from the page colour and the chevron darkens and leans
+     the way it goes. The key plan in the corner shows the four parts of the wall and which one is in view. */
   .pan-arrow{
     position:absolute;z-index:3;
     display:flex;align-items:center;justify-content:center;
-    width:2.25rem;height:2.25rem;
-    color:var(--mute);background:color-mix(in srgb,var(--paper) 80%,transparent);
-    opacity:0;pointer-events:none;
-    transition:opacity .4s ease,color .2s ease;
+    color:var(--mute);
+    opacity:0;pointer-events:none;cursor:pointer;
+    transition:opacity .4s ease,color .25s ease;
   }
-  .pan-arrow svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.2}
-  .pan-arrow.on{opacity:.75;pointer-events:auto}
-  .pan-arrow.on:hover{opacity:1;color:var(--live)}
-  .pan-arrow[data-dir="left"]{left:0;top:50%;transform:translateY(-50%)}
-  .pan-arrow[data-dir="right"]{right:0;top:50%;transform:translateY(-50%)}
-  .pan-arrow[data-dir="up"]{top:0;left:50%;transform:translateX(-50%)}
-  .pan-arrow[data-dir="down"]{bottom:0;left:50%;transform:translateX(-50%)}
-  .collage.is-previewing .pan-arrow{opacity:0;pointer-events:none}
+  .pan-arrow::before{content:"";position:absolute;inset:0;opacity:0;transition:opacity .3s ease}
+  .pan-arrow svg{position:relative;width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.1;transition:transform .3s ease}
+  .pan-arrow.on{opacity:1;pointer-events:auto}
+  .pan-arrow.on:hover{color:var(--ink)}
+  .pan-arrow.on:hover::before{opacity:1}
+  .pan-arrow[data-dir="left"]{left:0;top:3.5rem;bottom:3.5rem;width:4rem}
+  .pan-arrow[data-dir="right"]{right:0;top:3.5rem;bottom:3.5rem;width:4rem}
+  .pan-arrow[data-dir="up"]{top:0;left:4rem;right:4rem;height:3.5rem}
+  .pan-arrow[data-dir="down"]{bottom:0;left:4rem;right:4rem;height:3.5rem}
+  .pan-arrow[data-dir="left"]::before{background:linear-gradient(to right,var(--paper),transparent)}
+  .pan-arrow[data-dir="right"]::before{background:linear-gradient(to left,var(--paper),transparent)}
+  .pan-arrow[data-dir="up"]::before{background:linear-gradient(to bottom,var(--paper),transparent)}
+  .pan-arrow[data-dir="down"]::before{background:linear-gradient(to top,var(--paper),transparent)}
+  .pan-arrow[data-dir="left"]:hover svg{transform:translateX(-3px)}
+  .pan-arrow[data-dir="right"]:hover svg{transform:translateX(3px)}
+  .pan-arrow[data-dir="up"]:hover svg{transform:translateY(-3px)}
+  .pan-arrow[data-dir="down"]:hover svg{transform:translateY(3px)}
+  .keyplan{
+    position:absolute;z-index:3;right:.9rem;bottom:.9rem;
+    display:grid;grid-template-columns:repeat(2,13px);grid-auto-rows:11px;gap:3px;
+    padding:6px;background:color-mix(in srgb,var(--paper) 85%,transparent);
+    pointer-events:auto;transition:opacity .4s ease;
+  }
+  .keyplan button{border:1px solid var(--mute);opacity:.6;transition:background .25s ease,opacity .25s ease}
+  .keyplan button:hover{opacity:1}
+  .keyplan button.here{background:var(--ink);border-color:var(--ink);opacity:.85}
+  .collage.is-previewing .pan-arrow,.collage.is-previewing .keyplan{opacity:0;pointer-events:none}
   .tile{
     position:absolute;
     border:1px solid var(--rule);
@@ -488,10 +508,14 @@
       <div class="tile ambient"></div>
       <div class="tile ambient"></div>
     </div>
-    <button class="pan-arrow" type="button" tabindex="-1" data-dir="up" aria-label="Move up the wall"><svg viewBox="0 0 16 16"><path d="M3 10.5l5-5 5 5"/></svg></button>
-    <button class="pan-arrow" type="button" tabindex="-1" data-dir="down" aria-label="Move down the wall"><svg viewBox="0 0 16 16"><path d="M3 5.5l5 5 5-5"/></svg></button>
-    <button class="pan-arrow" type="button" tabindex="-1" data-dir="left" aria-label="Move left along the wall"><svg viewBox="0 0 16 16"><path d="M10.5 3l-5 5 5 5"/></svg></button>
-    <button class="pan-arrow" type="button" tabindex="-1" data-dir="right" aria-label="Move right along the wall"><svg viewBox="0 0 16 16"><path d="M5.5 3l5 5-5 5"/></svg></button>
+    <button class="pan-arrow" type="button" tabindex="-1" data-dir="up" aria-label="Move up the wall"><svg viewBox="0 0 22 22"><path d="M4 14.5l7-7 7 7"/></svg></button>
+    <button class="pan-arrow" type="button" tabindex="-1" data-dir="down" aria-label="Move down the wall"><svg viewBox="0 0 22 22"><path d="M4 7.5l7 7 7-7"/></svg></button>
+    <button class="pan-arrow" type="button" tabindex="-1" data-dir="left" aria-label="Move left along the wall"><svg viewBox="0 0 22 22"><path d="M14.5 4l-7 7 7 7"/></svg></button>
+    <button class="pan-arrow" type="button" tabindex="-1" data-dir="right" aria-label="Move right along the wall"><svg viewBox="0 0 22 22"><path d="M7.5 4l7 7-7 7"/></svg></button>
+    <div class="keyplan" aria-hidden="true">
+      <button type="button" tabindex="-1" data-x="0" data-y="0"></button><button type="button" tabindex="-1" data-x="1" data-y="0"></button>
+      <button type="button" tabindex="-1" data-x="0" data-y="1"></button><button type="button" tabindex="-1" data-x="1" data-y="1"></button>
+    </div>
   </div>
 </main>
 
@@ -704,6 +728,10 @@
   var wallEl = document.querySelector('.wall');
   var stop = {x: 0, y: 0}, pan = {x: 0, y: 0}, panFrom = null, panRaf = null;
   var arrows = {};
+  var keyCells = Array.prototype.slice.call(document.querySelectorAll('.keyplan button'));
+  keyCells.forEach(function(k){
+    k.addEventListener('click', function(e){ e.stopPropagation(); goTo(+k.getAttribute('data-x'), +k.getAttribute('data-y')); });
+  });
   Array.prototype.forEach.call(document.querySelectorAll('.pan-arrow'), function(b){ arrows[b.getAttribute('data-dir')] = b; });
   function panRange(){
     var c = collageEl.getBoundingClientRect();
@@ -715,6 +743,7 @@
     arrows.right.classList.toggle('on', stop.x < 1 && r.mx > 0);
     arrows.up.classList.toggle('on', stop.y > 0);
     arrows.down.classList.toggle('on', stop.y < 1 && r.my > 0);
+    keyCells.forEach(function(k){ k.classList.toggle('here', +k.getAttribute('data-x') === stop.x && +k.getAttribute('data-y') === stop.y); });
   }
   function easeInOut(t){ return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
   function goTo(x, y, instant){

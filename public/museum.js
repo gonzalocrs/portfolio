@@ -176,8 +176,8 @@
   }
   // where the scroll rests: close up, the label, then one screen of scroll per picture. The room is sticky, one
   // screen tall, so the stage is as tall as the walk is long.
-  // the spotlight's bar line, in the room (see .m-bar): the panorama's wall stands on it
-  function groundLine(){ return Math.round(state.H * .87 + 36 + 8); }
+  // the panorama's floor, in the room: level with the label's foot (see frame), as long as the spotlight's bar
+  function groundLine(){ return Math.round(state.H * .87); }
   function labelStop(){ return Math.round(state.H * .6); }
   function sizeStage(){
     if(!state) return;
@@ -249,12 +249,13 @@
   }
 
   // ---------- 4: the room ----------
-  function setRoom(r){
+  // at: in the spotlight, which picture to land on (from a click on it in the panorama); the first one otherwise
+  function setRoom(r, at){
     room = r;
     try{ sessionStorage.setItem('gc-room', r); }catch(e){}
     buildRoom(); sizeStage();
     syncSwitch();
-    ov.scrollTop = narrow() ? state.gal.offsetTop : labelStop() + state.H;
+    ov.scrollTop = narrow() ? state.gal.offsetTop : labelStop() + state.H * (1 + (r === 'walk' && at ? at : 0));
     frame();   // both rooms rest at the same scroll, so no scroll event comes to place the new one
   }
   // four panes for the panorama, one pane for the spotlight: the icon shows the room it takes you to
@@ -416,7 +417,7 @@
         // the wall itself, standing on its ground line
         var wr = P({x: X0, y: Y0, w: WW, h: WH});
         mk('rect', {x: wr.x, y: wr.y, width: wr.w, height: wr.h, 'class': 'plane'});
-        mk('line', {x1: 0, y1: bh, x2: bay, y2: bh, 'class': 'ground'});
+        mk('line', {x1: 0, y1: bh + 1.5, x2: bay, y2: bh + 1.5, 'class': 'ground'});
         holes.concat(accents).forEach(function(h){
           var o = P(h);
           if(!h.it){
@@ -431,7 +432,7 @@
           var f = el('figure', 'm-hung'), im = new Image(), it = h.it; im.src = it.src; im.alt = it.caption || state.p.title;
           f.style.left = g.x + 'px'; f.style.top = g.y + 'px'; f.style.width = g.w + 'px'; f.style.height = g.h + 'px';
           f.appendChild(im); f.appendChild(el('span', 'cap', it.caption || it.kind));
-          f.addEventListener('click', function(){ zoom(it.src); });
+          f.addEventListener('click', function(){ setRoom('walk', list.indexOf(it)); });
           wall.appendChild(f);
         });
         wall.insertBefore(svg, wall.firstChild);

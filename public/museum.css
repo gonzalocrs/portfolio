@@ -83,12 +83,15 @@ body.museum-on{overflow:hidden}
 .m-step figcaption{position:absolute;left:0;top:100%;margin-top:.7rem;white-space:nowrap;opacity:0;transition:opacity .6s ease .2s}
 .m-step.lit figcaption{opacity:1}
 .m-step .m-end{flex-direction:column;align-items:flex-start;gap:2.5rem}
-.m-bar{position:absolute;top:calc(var(--m-h) * .87 + 44px);height:2px;display:flex;gap:4px;opacity:0}
-.m-bar span{flex:1;background:var(--rule);transition:background .5s ease}
-.m-bar span.here{background:var(--ink)}
+.m-bar{position:absolute;top:calc(var(--m-h) * .87 + 36px);display:flex;gap:4px;opacity:0;pointer-events:none;transition:opacity .6s ease}
+.m-bar.on{opacity:1;pointer-events:auto}
+.m-bar button{flex:1;height:16px;position:relative}
+.m-bar button::before{content:"";position:absolute;left:0;right:0;top:7px;height:2px;background:var(--rule);transition:background .5s ease}
+.m-bar button:hover::before{background:var(--mute)}
+.m-bar button.here::before{background:var(--ink)}
 
 /* salon: everything at once, in openings like the home page's wall; the places left over are empty splayed reveals */
-.m-salon{height:var(--m-h);display:flex;flex-direction:column;padding:clamp(1.5rem,5vh,3rem) clamp(1rem,4vw,2.5rem) 1rem;border-top:1px solid var(--rule)}
+.m-salon{height:var(--m-h);display:flex;flex-direction:column;padding:clamp(1.5rem,5vh,3rem) 0 1rem;will-change:transform}
 .m-wall{position:relative;flex:1;min-height:0}
 .m-wall .facade{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .m-wall .facade .splay{fill:color-mix(in srgb,var(--ink) 4%,var(--paper));stroke:var(--rule)}

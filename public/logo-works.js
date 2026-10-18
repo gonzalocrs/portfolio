@@ -5,7 +5,7 @@
 // --mute, background). still: just the logo, no hovering (while the drawings are being redone).
 (function(){
   var N = 72;                          // points per line
-  var RING = 70, STITCH_W = 3, LINE_W = 1.5, FIT = 47, CORNER = .28;
+  var RING = 70, STITCH_W = 2.2, LINE_W = 1.5, FIT = 47, CORNER = 0;
 
   function lerp(a, b, t){ return a + (b - a) * t; }
   function ease(t){ t = Math.max(0, Math.min(1, t)); return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
@@ -201,7 +201,7 @@
       g.lineCap = 'butt'; g.lineJoin = 'miter';
       g.strokeStyle = ring; g.lineWidth = Math.max(1, .9 * u);
       g.beginPath(); g.arc(cx, cy, RING * u, 0, 2 * Math.PI); g.stroke();
-      // the stitches / the drawing: square-ended bars with slightly softened corners at rest, fine lines once open
+      // the stitches / the drawing: fine, square-ended bars at rest (sharp corners), fine lines once open
       g.strokeStyle = ink; g.lineWidth = lerp(STITCH_W, LINE_W, Math.min(1, o * 1.5)) * u;
       STITCHES.forEach(function(s, i){
         var p = S.work.paths[i], pts = [];

@@ -294,9 +294,9 @@
   html,body{overflow:hidden}
   main.stage{position:relative;flex:1 0 auto;height:calc(100vh - 7.6rem);overflow:hidden}
   .stage > *{position:absolute;left:0;top:0;transition:transform 1.15s cubic-bezier(.65,0,.35,1),opacity 1s ease;will-change:transform,opacity}
-  /* the label stands on the same line as on a visit (its foot at 87% of the room) and grows upwards with "More
-     info", scrolling inside itself if it needs more room */
-  .stage .label{width:min(21rem,30vw);max-height:calc(87% - 1.5rem);overflow-y:auto;top:auto;bottom:13%;padding-bottom:4px}
+  /* the label hangs where it did when Education was under it (its top at 23% of the room); "More info" lengthens it
+     downwards into that space, as far as the line the visit's labels stand on (87%), scrolling inside after that */
+  .stage .label{width:min(21rem,30vw);max-height:64%;overflow-y:auto;top:23%;padding-bottom:4px}
   .stage .label{scrollbar-width:none}
   .stage .label::-webkit-scrollbar{display:none}
   .pic{margin:0;border:1px solid var(--rule);background:color-mix(in srgb,var(--ink) 3%,var(--paper));display:flex;align-items:center;justify-content:center}

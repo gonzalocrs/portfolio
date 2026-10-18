@@ -137,8 +137,10 @@
     sw.addEventListener('click', function(){ setRoom(room === 'walk' ? 'salon' : 'walk'); });
     document.body.appendChild(sw);
 
+    // the picture you came in with: the spotlight starts from it, the gallery hangs it with the rest
+    var first = [].concat.apply([], all.map(function(s){ return s.items; })).filter(function(it){ return it.src === firstSrc; })[0] || {src: firstSrc, caption: '', kind: 'Hero'};
     var rest = all.map(function(s){ return {name: s.name, items: s.items.filter(function(it){ return it.src !== firstSrc; })}; }).filter(function(s){ return s.items.length; });
-    state = {slug: slug, p: p, parts: rest, pic: pic, img: img, label: label, hint: hint, stage: stage, roomEl: roomEl, gal: gal, H: H, a: from ? from.width / from.height : 1.5, opened: false};
+    state = {slug: slug, p: p, parts: rest, first: first, pic: pic, img: img, label: label, hint: hint, stage: stage, roomEl: roomEl, gal: gal, H: H, a: from ? from.width / from.height : 1.5, opened: false};
     var start = function(){
       if(img.naturalWidth) state.a = img.naturalWidth / img.naturalHeight;
       layout();
@@ -255,7 +257,8 @@
   }
 
   // ---------- 4: the room ----------
-  // at: in the spotlight, which picture to land on (from a click on it in the gallery); the first one otherwise
+  // at: in the spotlight, which picture to land on (from a click on it in the gallery; -1 is the one you came in
+  // with, beside the label); the first of the rest otherwise
   function setRoom(r, at){
     room = r;
     buildRoom(); sizeStage();
@@ -291,7 +294,7 @@
     var e = el('div', 'm-end');
     var b1 = el('button'); b1.type = 'button'; b1.appendChild(el('span', 'm-tag', 'Back')); b1.appendChild(document.createTextNode('To the wall'));
     b1.addEventListener('click', function(){ close(); });
-    var b2 = el('button'); b2.type = 'button'; b2.appendChild(el('span', 'm-tag', 'Next room')); b2.appendChild(document.createTextNode(P[ns].title + ' →'));
+    var b2 = el('button'); b2.type = 'button'; b2.appendChild(el('span', 'm-tag', 'Next project')); b2.appendChild(document.createTextNode(P[ns].title + ' →'));
     b2.addEventListener('click', function(){ open(ns, null, null); });
     e.appendChild(b1); e.appendChild(b2);
     return e;
@@ -349,6 +352,7 @@
       // as the pictures need). Each opening takes its picture's proportions inside its place, so nothing is cropped;
       // the places left over stay empty, drawn as splayed reveals.
       // It comes up on the label's right, as the walk's pictures do, and the label stays.
+      list = [state.first].concat(list);   // every picture, the one you came in with first
       var salon = el('div', 'm-pane m-salon'), wall = el('div', 'm-wall');
       salon.appendChild(wall);
       var foot = el('div', 'm-salon-foot'); foot.appendChild(endPiece()); salon.appendChild(foot);
@@ -446,7 +450,8 @@
           var f = el('figure', 'm-hung'), im = new Image(), it = h.it; im.src = it.src; im.alt = it.caption || state.p.title;
           f.style.left = g.x + 'px'; f.style.top = g.y + 'px'; f.style.width = g.w + 'px'; f.style.height = g.h + 'px';
           f.appendChild(im); f.appendChild(el('span', 'cap', it.caption || it.kind));
-          f.addEventListener('click', function(){ setRoom('walk', list.indexOf(it)); });
+          // to that picture in the spotlight (the one you came in with: back to it beside the label)
+          f.addEventListener('click', function(){ setRoom('walk', list.indexOf(it) - 1); });
           wall.appendChild(f);
         });
         wall.insertBefore(svg, wall.firstChild);

@@ -1,9 +1,9 @@
 // The GCV mark in motion, from Gonzalo's "Perspective is everything" study: the rose r = 4 sin(3θ/2) lifted into space
 // by z = 4 sin θ (θ from 0 to 4π). Seen from above it is a six-petal rose; from the side, an hourglass or a lantern;
 // "a point of view does not represent the totality".
-// It rests as the logo. Then each of the six stitches opens into the petal it sits on (they sit at the same six
-// angles), the curve turns through its points of view (above, three-quarter, the two sides) and folds back into
-// the logo. The ring is the curve's equator and turns with it.
+// It rests as the logo, then opens into the curve seen from above (each of the six stitches opens into the petal it
+// sits on: they sit at the same six angles), folds back into the logo, opens into the curve seen from one side, back
+// to the logo, then from the other side. The ring is the curve's equator.
 // logoRose(canvas): draws into the canvas at its css size; colours follow the page (--ink, --ring, the background).
 (function(){
   // the logo, in its 200-unit drawing (about.html), centred on 100,100, y down
@@ -46,31 +46,21 @@
     return {stitch: st, petal: petals[best]};
   });
 
-  // the points of view: spin about the vertical, then tilt towards the viewer (0 = from above, 90 = from the side)
-  var VIEWS = {top: [0, 0], three: [-35, 62], side1: [-90, 90], side2: [0, 90]};
+  // the points of view, as spin about the vertical then tilt towards the viewer (0 = from above, 90 = from the side):
+  // the rose from above, the hourglass from one side, the lantern from the other
+  var VIEWS = {top: [0, 0], side1: [-90, 90], side2: [0, 90]};
   var D = Math.PI / 180;
-  // the cycle, in seconds
-  var TL = [
-    ['rest', 3.2],
-    ['open', 2.4],
-    ['hold', 1.2, 'top'],
-    ['turn', 2.4, 'top', 'three'], ['hold', 1.4, 'three'],
-    ['turn', 2.2, 'three', 'side1'], ['hold', 1.4, 'side1'],
-    ['turn', 2.2, 'side1', 'side2'], ['hold', 1.4, 'side2'],
-    ['turn', 2.4, 'side2', 'top'], ['hold', .8, 'top'],
-    ['close', 2.4]
-  ];
+  // the cycle, in seconds: the logo opens into one view of the curve, closes back into the logo, then the next view
+  var TL = [];
+  ['top', 'side1', 'side2'].forEach(function(v, i){
+    TL.push(['rest', i ? 2.2 : 3.2, v], ['open', 2.4, v], ['hold', 2.2, v], ['close', 2.4, v]);
+  });
   var CYCLE = TL.reduce(function(a, s){ return a + s[1]; }, 0);
   function state(t){
     t = t % CYCLE;
     var i = 0; while(t > TL[i][1]){ t -= TL[i][1]; i++; }
     var s = TL[i], k = ease(t / s[1]);
-    if(s[0] === 'rest') return {open: 0, view: VIEWS.top};
-    if(s[0] === 'open') return {open: k, view: VIEWS.top};
-    if(s[0] === 'close') return {open: 1 - k, view: VIEWS.top};
-    if(s[0] === 'hold') return {open: 1, view: VIEWS[s[2]]};
-    var a = VIEWS[s[2]], b = VIEWS[s[3]];
-    return {open: 1, view: [lerp(a[0], b[0], k), lerp(a[1], b[1], k)]};
+    return {open: s[0] === 'open' ? k : s[0] === 'close' ? 1 - k : s[0] === 'hold' ? 1 : 0, view: VIEWS[s[2]]};
   }
 
   window.logoRose = function(cv){
@@ -97,21 +87,23 @@
       var sa = S.view[0] * D, tb = S.view[1] * D, cA = Math.cos(sa), sA = Math.sin(sa), cB = Math.cos(tb), sB = Math.sin(tb);
       function P(p){
         var x = p[0] * cA - p[1] * sA, y = p[0] * sA + p[1] * cA;
-        return [cx + x * u, cy + (y * cB - p[2] * sB) * u];
+        return [x, y * cB - p[2] * sB];
       }
+      // the logo never turns: each point slides from where it is in the flat logo to where the view puts it
+      var o = ease(S.open);
+      function M(a, b){ var q = P(b); return [cx + lerp(a[0], q[0], o) * u, cy + lerp(a[1], q[1], o) * u]; }
       g.fillStyle = paper; g.fillRect(0, 0, W, H);
       g.lineCap = 'round'; g.lineJoin = 'round';
-      // the ring: the curve's equator, so it turns with it (and is a line seen from the side)
+      // the ring: the curve's equator, so from the side it flattens straight down into a line (a circle needs no spin)
       g.strokeStyle = ring; g.lineWidth = Math.max(1, .9 * u); g.beginPath();
-      for(var i = 0; i <= 96; i++){ var a = i / 96 * 2 * Math.PI, q = P([Math.cos(a) * RING, Math.sin(a) * RING, 0]); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); }
+      for(var i = 0; i <= 96; i++){ var a = i / 96 * 2 * Math.PI, c = [Math.cos(a) * RING, Math.sin(a) * RING], q = [cx + c[0] * u, cy + c[1] * lerp(1, cB, o) * u]; i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); }
       g.closePath(); g.stroke();
       // the stitches / petals: round-ended bars at rest (a little finer than the printed logo), a fine line once open
-      var o = ease(S.open);
       g.strokeStyle = ink; g.lineWidth = lerp(STITCH_W, LINE_W, Math.min(1, o * 1.6)) * u;
       shapes.forEach(function(sh){
         g.beginPath();
         for(var i = 0; i <= N; i++){
-          var a = sh.stitch[i], b = sh.petal[i], q = P([lerp(a[0], b[0], o), lerp(a[1], b[1], o), lerp(a[2], b[2], o)]);
+          var q = M(sh.stitch[i], sh.petal[i]);
           i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]);
         }
         g.stroke();

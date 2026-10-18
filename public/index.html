@@ -1114,7 +1114,7 @@
       selectProject(a);
       a.focus({preventScroll: true});
       pinned = a;
-      if(window.gcMuseum) gcMuseum.open(slug, st.tile.getBoundingClientRect(), st.src);   // TEST: the museum visit (museum.js)
+      if(window.gcMuseum) gcMuseum.open(slug, st.tile.getBoundingClientRect(), st.src);   // the museum visit (museum.js)
       else growBig(st);
     });
   });
@@ -1436,7 +1436,7 @@
     e.preventDefault();
     var from = (window.gcPreviewRect && gcPreviewRect()) || a.getBoundingClientRect();
     var ms = /[?&]p=([\w-]+)/.exec(a.getAttribute('href'));
-    if(window.gcMuseum && ms){ gcMuseum.open(ms[1], from); return; }   // TEST: the museum visit (museum.js)
+    if(window.gcMuseum && ms){ gcMuseum.open(ms[1], from); return; }   // the museum visit (museum.js)
     open(a.getAttribute('href'), false, from);
   });
   window.gcSheetOpen = function(){ return !!sheet; };

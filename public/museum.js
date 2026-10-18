@@ -1,26 +1,26 @@
 /*
-  TEST: a visit to a project, the way you walk up to a painting in a museum (styles in museum.css).
+  A visit to a project, the way you walk up to a painting in a museum (styles in museum.css).
 
     1. the wall: the home page as it is
     2. click a picture (or a title): it comes up close, whole, in the middle of the room
     3. scroll a little: it steps to the right and its wall label appears on the left (name, facts, the text);
        "More info" makes the label taller, to the whole text
     4. scroll on: the rest of the project, hung one of three ways:
-         walk   the label stays; the picture goes up and the second comes up in its place, then each scroll
+         spotlight (walk)  the label stays; the picture goes up and the second comes up in its place, then each scroll
                 moves one picture to the right, each lit as it arrives; a small bar under them says where you are
-         salon  everything at once, hung in openings like the home page's wall
-       /?room=walk|salon picks one (remembered for the visit); a small switch in the corner swaps it.
+         panorama (salon)  everything at once, hung in openings like the home page's wall
+       /?room=spotlight|panorama picks one (remembered for the visit); a small switch in the corner swaps it.
   Every scroll (a wheel gesture, an arrow key) goes one step, gliding slowly.
 
   Content comes from projects.js. Pictures are never cropped.
 */
 (function(){
   var P = window.PROJECTS || {}, SLUGS = Object.keys(P);
-  var ROOMS = [['walk', 'Walk'], ['salon', 'Salon']];
+  var ROOMS = [['walk', 'Spotlight'], ['salon', 'Panorama']];
   var room = 'walk';
   try{
-    var rq = /[?&]room=(walk|salon)\b/.exec(location.search);
-    if(rq) sessionStorage.setItem('gc-room', rq[1]);
+    var rq = /[?&]room=(walk|spotlight|salon|panorama)\b/.exec(location.search);
+    if(rq) sessionStorage.setItem('gc-room', /^(walk|spotlight)$/.test(rq[1]) ? 'walk' : 'salon');
     room = sessionStorage.getItem('gc-room') === 'salon' ? 'salon' : 'walk';
   }catch(e){}
 

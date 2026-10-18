@@ -116,7 +116,7 @@
 
     // the prompt to scroll also takes the step when clicked, for anyone who does not scroll
     var hint = el('button', 'm-hint'); hint.type = 'button';
-    hint.innerHTML = '<span>Scroll</span><svg viewBox="0 0 22 22"><path d="M4 7.5l7 7 7-7"/></svg>';
+    hint.innerHTML = '<span>About this project</span><svg viewBox="0 0 22 22"><path d="M4 7.5l7 7 7-7"/></svg>';
     hint.addEventListener('click', function(){ step(1); });
     roomEl.appendChild(hint);
     stage.appendChild(roomEl);
@@ -235,8 +235,8 @@
       w.bar.classList.toggle('on', dy >= H * .5);
       // and a small arrow at each end of it, for anyone who does not scroll; none before the first or past the end
       var by = Math.round(H * .87 + 36), kk = Math.round(k);
-      w.prev.style.left = (R.areaL - 22) + 'px'; w.next.style.left = (R.areaL + R.bay + 6) + 'px';
-      w.prev.style.top = w.next.style.top = by + 'px';
+      w.prev.style.left = (R.areaL - 34) + 'px'; w.next.style.left = (R.areaL + R.bay + 6) + 'px';
+      w.prev.style.top = w.next.style.top = (by + 8 - 14) + 'px';
       w.prev.classList.toggle('on', dy >= H * .5 && kk > 0);
       w.next.classList.toggle('on', dy >= H * .5 && kk < w.slides.length - 1);
       w.marks.forEach(function(m, i){ m.classList.toggle('here', i === at); });
@@ -250,7 +250,7 @@
     placeSwitch(R, dy >= H * .5);
     var hv = t < .05 || (t > .98 && dy < 4);
     state.hint.style.opacity = hv ? 1 : 0; state.hint.style.pointerEvents = hv ? 'auto' : 'none';
-    state.hint.firstChild.textContent = t > .98 ? 'More from this project' : 'Scroll';
+    state.hint.firstChild.textContent = t > .98 ? 'More from this project' : 'About this project';
     roomFrame();
   }
 

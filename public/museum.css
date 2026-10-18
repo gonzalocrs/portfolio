@@ -91,12 +91,12 @@ body.museum-on{overflow:hidden}
 .m-bar button::before{content:"";position:absolute;left:0;right:0;top:7px;height:2px;background:var(--rule);transition:background .5s ease}
 .m-bar button:hover::before{background:var(--mute)}
 .m-bar button.here::before{background:var(--ink)}
-/* the arrows at the ends of the bar: barely there until you look for them */
-.m-nav{position:absolute;width:16px;height:16px;display:flex;align-items:center;justify-content:center;color:var(--mute);
+/* the arrows at the ends of the bar: quiet, in the grey of the captions, brighter on hover */
+.m-nav{position:absolute;width:28px;height:28px;display:flex;align-items:center;justify-content:center;color:var(--mute);
   opacity:0;pointer-events:none;transition:opacity .5s ease,color .2s}
-.m-nav.on{opacity:.4;pointer-events:auto}
+.m-nav.on{opacity:.75;pointer-events:auto}
 .m-nav.on:hover,.m-nav.on:focus-visible{opacity:1;color:var(--ink)}
-.m-nav svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.1}
+.m-nav svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.3}
 
 /* panorama: one wall, after the south wall at Ronchamp. Every picture is the pane at the back of a splayed opening cut
    through it (the reveal frames it); the places left over are empty openings, and small ones play between them */

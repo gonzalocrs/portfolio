@@ -48,3 +48,6 @@
 
 /contact.js
   Cache-Control: no-cache
+
+/ink-mark.js
+  Cache-Control: no-cache

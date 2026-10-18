@@ -97,7 +97,7 @@ body.museum-on{overflow:hidden}
 .m-wall{position:relative;flex:none}
 .m-wall .facade{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .m-wall .facade .plane{fill:color-mix(in srgb,var(--ink) 2.5%,var(--paper));stroke:var(--rule)}
-.m-wall .facade .ground{stroke:var(--ink);stroke-width:2 !important}
+.m-wall .facade .ground{stroke:var(--ink);stroke-width:1.5 !important}
 .m-wall .facade .splay{fill:color-mix(in srgb,var(--ink) 7%,var(--paper));stroke:var(--rule)}
 .m-wall .facade line{stroke:var(--rule)}
 .m-wall .facade .pane{fill:var(--paper);stroke:var(--rule)}

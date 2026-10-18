@@ -1,7 +1,7 @@
 // The GCV mark in motion, from Gonzalo's "Perspective is everything" study: the rose r = 4 sin(3θ/2) lifted into space
 // by z = 4 sin θ (θ from 0 to 4π). Seen from above it is a six-petal rose; from the side, an hourglass or a lantern;
 // "a point of view does not represent the totality".
-// It rests as the logo, then opens into the curve seen from above (each of the six stitches opens into the petal it
+// It rests as the logo; while you hover over it, it opens into the curve seen from above (each of the six stitches opens into the petal it
 // sits on: they sit at the same six angles), folds back into the logo, opens into the curve seen from one side, back
 // to the logo, then from the other side. The ring is the curve's equator.
 // logoRose(canvas): draws into the canvas at its css size; colours follow the page (--ink, --ring, the background).
@@ -50,17 +50,17 @@
   // the rose from above, the hourglass from one side, the lantern from the other
   var VIEWS = {top: [0, 0], side1: [-90, 90], side2: [0, 90]};
   var D = Math.PI / 180;
-  // the cycle, in seconds: the logo opens into one view of the curve, closes back into the logo, then the next view
-  var TL = [];
-  ['top', 'side1', 'side2'].forEach(function(v, i){
-    TL.push(['rest', i ? 2.2 : 3.2, v], ['open', 2.4, v], ['hold', 2.2, v], ['close', 2.4, v]);
+  // the sequence, in seconds: the logo opens into one view of the curve, closes back into the logo, then the next view.
+  // It only runs while the pointer is over the mark (see hover below); the rests are the pauses between views.
+  var TL = [], at = 0;
+  ['top', 'side1', 'side2'].forEach(function(v){
+    [['rest', 1.2], ['open', 2.4], ['hold', 2.2], ['close', 2.4]].forEach(function(p){ TL.push({kind: p[0], d: p[1], view: v, start: at}); at += p[1]; });
   });
-  var CYCLE = TL.reduce(function(a, s){ return a + s[1]; }, 0);
+  var CYCLE = at;
+  function segAt(t){ t = ((t % CYCLE) + CYCLE) % CYCLE; for(var i = 0; i < TL.length - 1 && t >= TL[i].start + TL[i].d; i++); return TL[i]; }
   function state(t){
-    t = t % CYCLE;
-    var i = 0; while(t > TL[i][1]){ t -= TL[i][1]; i++; }
-    var s = TL[i], k = ease(t / s[1]);
-    return {open: s[0] === 'open' ? k : s[0] === 'close' ? 1 - k : s[0] === 'hold' ? 1 : 0, view: VIEWS[s[2]]};
+    var s = segAt(t), k = ease((((t % CYCLE) + CYCLE) % CYCLE - s.start) / s.d);
+    return {open: s.kind === 'open' ? k : s.kind === 'close' ? 1 - k : s.kind === 'hold' ? 1 : 0, view: VIEWS[s.view]};
   }
 
   window.logoRose = function(cv){
@@ -79,11 +79,17 @@
       W = w; H = h;
     }
 
-    var t0 = null, raf = 0, seen = true;
+    var tl = 0, last = null, raf = 0, hover = false, running = false;
     function draw(now){
       size();
-      if(t0 === null) t0 = now;
-      var S = state(still ? 0 : (now - t0) / 1000), u = Math.min(W, H) / 200, cx = W / 2, cy = H / 2;
+      // advance only while hovered, or while a view is still out (it then closes back into the logo and stops)
+      var dt = last === null ? 0 : Math.min(.1, (now - last) / 1000); last = now;
+      var seg = segAt(tl);
+      if(!hover && seg.kind === 'hold'){ tl = seg.start + seg.d; seg = segAt(tl); }
+      if(!hover && seg.kind === 'open'){ var c = TL[TL.indexOf(seg) + 1]; tl = c.start + (1 - (tl % CYCLE - seg.start) / seg.d) * c.d; seg = c; }
+      if(!hover && seg.kind === 'rest'){ tl = seg.start; running = false; }
+      else tl += dt;
+      var S = state(still ? 0 : tl), u = Math.min(W, H) / 200, cx = W / 2, cy = H / 2;
       var sa = S.view[0] * D, tb = S.view[1] * D, cA = Math.cos(sa), sA = Math.sin(sa), cB = Math.cos(tb), sB = Math.sin(tb);
       function P(p){
         var x = p[0] * cA - p[1] * sA, y = p[0] * sA + p[1] * cA;
@@ -108,16 +114,26 @@
         }
         g.stroke();
       });
-      if(!still && seen) raf = requestAnimationFrame(draw);
+      if(running) raf = requestAnimationFrame(draw); else last = null;
     }
+    function wake(){ if(!running && !still){ running = true; cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); } }
     size(); colours();
     raf = requestAnimationFrame(draw);
-    new MutationObserver(function(){ colours(); }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
-    try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){ setTimeout(colours, 0); }); }catch(e){}
-    if('IntersectionObserver' in window) new IntersectionObserver(function(en){
-      var v = en[0].isIntersecting;
-      if(v && !seen){ seen = true; cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); }
-      seen = v;
-    }).observe(cv);
+    // hovering the mark opens it straight away (skipping the pause), and it keeps going through the views while the
+    // pointer stays; on leaving, the view that is out closes back into the logo. A tap on a touch screen plays one view.
+    var box = cv.parentNode;
+    box.addEventListener('pointerenter', function(e){
+      if(e.pointerType === 'touch') return;
+      hover = true; var s = segAt(tl); if(s.kind === 'rest') tl = s.start + s.d; wake();
+    });
+    box.addEventListener('pointerleave', function(e){ if(e.pointerType !== 'touch') hover = false; });
+    box.addEventListener('pointerdown', function(e){
+      if(e.pointerType !== 'touch' || hover) return;
+      hover = true; var s = segAt(tl); if(s.kind === 'rest') tl = s.start + s.d; wake();
+      setTimeout(function(){ hover = false; }, 4600);
+    });
+    new MutationObserver(function(){ colours(); if(!running) raf = requestAnimationFrame(draw); }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+    try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){ setTimeout(function(){ colours(); if(!running) raf = requestAnimationFrame(draw); }, 0); }); }catch(e){}
+    addEventListener('resize', function(){ if(!running) raf = requestAnimationFrame(draw); });
   };
 })();

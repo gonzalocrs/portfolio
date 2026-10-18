@@ -66,22 +66,20 @@ body.museum-on{overflow:hidden}
 .m-end button:hover{color:var(--live)}
 .m-end .m-tag{display:block;margin-bottom:.4rem}
 
-/* walk: you walk along one long wall; scrolling down moves you sideways past the work, hung on one eye line */
-.m-walk{position:relative}
-.m-walk-view{position:sticky;top:0;height:var(--m-h);overflow:hidden}
-.m-walk-view::after{   /* the floor */
-  content:"";position:absolute;left:0;right:0;bottom:0;height:9%;
-  background:color-mix(in srgb,var(--ink) 4%,var(--paper));border-top:1px solid var(--rule)
-}
-.m-walk-track{position:absolute;left:0;top:0;height:91%;display:flex;align-items:center;gap:7vw;padding:0 12vw 0 clamp(1rem,4vw,2.5rem);will-change:transform}
-.m-walk .m-walltext{flex:0 0 auto;width:min(27rem,80vw)}
-.m-walk .m-group{flex:0 0 auto;display:flex;align-items:center;gap:5vw}
-.m-walk .m-group > .m-tag{writing-mode:vertical-rl;transform:rotate(180deg);align-self:center}
+/* walk: the label stays on the left; the rest of the work hangs in a row after the picture and slides past on the
+   label's right as you scroll, as if you walked along the wall */
+.m-pane{position:absolute;top:0;bottom:0;right:0;overflow:hidden;opacity:0}
+.m-trail{position:absolute;left:0;top:0;height:100%;display:flex;align-items:center;gap:5vw;padding-right:clamp(1rem,4vw,2.5rem);will-change:transform}
+.m-trail .m-group{flex:0 0 auto;display:flex;align-items:center;gap:4vw}
+.m-trail .m-group > .m-tag{writing-mode:vertical-rl;transform:rotate(180deg);align-self:center}
+.m-more{flex:0 0 auto;width:min(24rem,60vw)}
+.m-more p{margin:0;font-size:.92rem;line-height:1.6;color:var(--mute)}
+.m-more p + p{margin-top:.9rem}
 .m-work{display:flex;align-items:flex-end;gap:.9rem;flex:0 0 auto;margin:0}
 .m-work img{display:block;width:auto;border:1px solid var(--rule);background:var(--paper)}
 .m-work figcaption{width:7.5rem;padding-bottom:.2rem;font-family:var(--mono);font-size:.62rem;line-height:1.5;text-transform:uppercase;letter-spacing:.04em;color:var(--mute)}
 .m-work figcaption b{display:block;font-weight:400;color:var(--ink)}
-.m-walk .m-end{flex:0 0 auto;flex-direction:column;align-items:flex-start;width:22rem}
+.m-trail .m-end{flex:0 0 auto;flex-direction:column;align-items:flex-start;width:20rem}
 
 /* salon: the whole project hung at once, edge to edge, as in a salon hang */
 .m-salon{padding:clamp(3rem,10vh,6rem) clamp(1rem,4vw,2.5rem) 4rem;background:color-mix(in srgb,var(--ink) 3%,var(--paper));border-top:1px solid var(--rule)}

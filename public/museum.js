@@ -3,9 +3,10 @@
 
     1. the wall: the home page as it is
     2. click a picture (or a title): it comes up close, whole, in the middle of the room
-    3. scroll a little: it steps aside and its wall label appears beside it (name, facts, the text)
-    4. scroll on: a new room with the rest of the project, hung one of three ways:
-         walk       one long wall you walk along; scrolling down moves you sideways past the work
+    3. scroll a little: it steps to the right and its wall label appears on the left (name, facts, the text)
+    4. scroll on: the rest of the project, hung one of three ways:
+         walk       the label stays where it is and the rest of the work slides past on its right, as if you walked
+                    along the wall; scrolling down moves you sideways
          salon      everything hung at once, edge to edge
          spotlight  a dark room, one work at a time, each lit as you come to it
        /?room=walk|salon|spot picks one (remembered for the visit); a small switch in the corner swaps it.
@@ -78,7 +79,6 @@
     var H = innerHeight - top;
     ov.style.setProperty('--m-h', H + 'px');
     var stage = el('section', 'm-stage'), roomEl = el('div', 'm-room');
-    stage.style.height = narrow() ? 'auto' : Math.round(H * 1.75) + 'px';
     var pic = el('figure', 'm-pic'), img = new Image();
     img.alt = p.title; img.src = firstSrc;
     pic.appendChild(img);
@@ -126,7 +126,7 @@
     document.body.appendChild(sw);
 
     var rest = all.map(function(s){ return {name: s.name, items: s.items.filter(function(it){ return it.src !== firstSrc; })}; }).filter(function(s){ return s.items.length; });
-    state = {slug: slug, p: p, parts: rest, pic: pic, img: img, label: label, hint: hint, stage: stage, gal: gal, H: H, a: from ? from.width / from.height : 1.5, opened: false};
+    state = {slug: slug, p: p, parts: rest, pic: pic, img: img, label: label, hint: hint, stage: stage, roomEl: roomEl, gal: gal, H: H, a: from ? from.width / from.height : 1.5, opened: false};
     var start = function(){
       if(img.naturalWidth) state.a = img.naturalWidth / img.naturalHeight;
       layout();
@@ -144,20 +144,28 @@
     if(img.complete && img.naturalWidth) start(); else { img.onload = start; img.onerror = start; }
     requestAnimationFrame(function(){ ov.classList.add('on'); closeBtn.classList.add('on'); });
     ov.addEventListener('scroll', onScroll, {passive: true});
-    buildRoom();
+    buildRoom(); sizeStage();
     syncSwitch();
   }
 
   function setRect(e, r){ e.style.left = r.x + 'px'; e.style.top = r.y + 'px'; e.style.width = r.w + 'px'; e.style.height = r.h + 'px'; }
-  // r0: close up, in the middle; r1: stepped aside to the left with room for the label on its right
+  // r0: close up, in the middle; r1: stepped to the right, leaving the left for the label (areaL is where the
+  // pictures' side begins). On the walk the picture keeps to the start of its side, so the rest can follow it.
   function rects(){
     var W = innerWidth, H = state.H, a = state.a, gut = Math.max(16, Math.min(40, W * .04));
     var s0 = fit(a, W * .84, H * .84), r0 = {x: (W - s0.w) / 2, y: (H - s0.h) / 2, w: s0.w, h: s0.h};
     var lw = state.label.offsetWidth || 336, gap = Math.max(40, W * .045);
-    var areaW = W - gut * 2 - lw - gap * 2, s1 = fit(a, areaW, H * .74);
-    var x1 = gut + gap * .5 + (areaW - s1.w) / 2;
+    var areaL = gut + lw + gap, areaW = W - areaL - gut, s1 = fit(a, areaW, H * .74);
+    var x1 = state.walk ? areaL : areaL + (areaW - s1.w) / 2;
     var r1 = {x: x1, y: (H - s1.h) / 2, w: s1.w, h: s1.h};
-    return {r0: r0, r1: r1, gap: gap};
+    return {r0: r0, r1: r1, gap: gap, gut: gut, areaL: areaL};
+  }
+  // how far the walk goes sideways, and so how tall the stage is (the room is sticky, one screen tall)
+  function walkLen(R){ var w = state.walk; return w ? Math.max(0, R.r1.x + R.r1.w + R.gap + w.trail.scrollWidth - innerWidth) : 0; }
+  function sizeStage(){
+    if(!state) return;
+    if(narrow()){ state.stage.style.height = 'auto'; return; }
+    state.stage.style.height = Math.round(state.H * 1.75 + (state.walk ? walkLen(rects()) + state.H * .3 : 0)) + 'px';
   }
   function layout(){
     if(!state) return;
@@ -174,17 +182,29 @@
     if(!state || narrow()) { if(state) roomFrame(); return; }
     var y = ov.scrollTop, H = state.H, R = rects();
     var t = ease(clamp(y / (H * .55), 0, 1));
+    // on the walk, once the label is up, scrolling on carries the pictures sideways past it
+    var len = walkLen(R), x = state.walk ? clamp(y - H * .75, 0, len) : 0;
     if(state.opened){
-      setRect(state.pic, {x: R.r0.x + (R.r1.x - R.r0.x) * t, y: R.r0.y + (R.r1.y - R.r0.y) * t, w: R.r0.w + (R.r1.w - R.r0.w) * t, h: R.r0.h + (R.r1.h - R.r0.h) * t});
+      var px = R.r0.x + (R.r1.x - R.r0.x) * t - x;
+      setRect(state.pic, {x: px, y: R.r0.y + (R.r1.y - R.r0.y) * t, w: R.r0.w + (R.r1.w - R.r0.w) * t, h: R.r0.h + (R.r1.h - R.r0.h) * t});
+      // the pictures go out of sight where the label's side begins, never over the label
+      var cut = x > 0 ? clamp(R.areaL - px, 0, R.r1.w + 2) : 0;
+      state.pic.style.clipPath = cut ? 'inset(-2px -2px -2px ' + cut + 'px)' : '';
     }
-    // the label hangs beside the picture, its foot level with the picture's foot
+    // the label hangs on the left, its foot level with the picture's foot, and stays there
     var lo = clamp((t - .35) / .65, 0, 1), L = state.label;
-    L.style.left = (R.r1.x + R.r1.w + R.gap) + 'px';
+    L.style.left = R.gut + 'px';
     L.style.top = Math.max(16, R.r1.y + R.r1.h - L.offsetHeight) + 'px';
     L.style.opacity = lo;
-    L.style.transform = 'translateY(' + Math.round((1 - lo) * 14) + 'px)';
+    L.style.transform = 'translateX(' + Math.round((lo - 1) * 16) + 'px)';
     L.classList.toggle('on', lo > .5);
-    state.hint.style.opacity = t < .05 ? 1 : (t > .98 ? 1 : 0);
+    if(state.walk){
+      var w = state.walk;
+      w.pane.style.left = R.areaL + 'px';
+      w.pane.style.opacity = lo;
+      w.trail.style.transform = 'translateX(' + Math.round(R.r1.x + R.r1.w + R.gap - R.areaL - x) + 'px)';
+    }
+    state.hint.style.opacity = t < .05 ? 1 : (t > .98 && x < 4 ? 1 : 0);
     state.hint.firstChild.textContent = t > .98 ? 'More from this project' : 'Scroll';
     roomFrame();
   }
@@ -193,9 +213,9 @@
   function setRoom(r){
     room = r;
     try{ sessionStorage.setItem('gc-room', r); }catch(e){}
-    buildRoom();
+    buildRoom(); sizeStage();
     syncSwitch();
-    ov.scrollTop = state.gal.offsetTop;
+    ov.scrollTop = room === 'walk' && !narrow() ? state.H * .75 : state.gal.offsetTop;
   }
   function syncSwitch(){ Array.prototype.forEach.call(sw.querySelectorAll('button'), function(b){ b.setAttribute('aria-pressed', b.dataset.room === room ? 'true' : 'false'); }); }
 
@@ -229,17 +249,20 @@
     var gal = state.gal, p = state.p, H = state.H;
     gal.innerHTML = ''; gal.className = 'm-gallery';
     state.walk = null;
+    var old = state.roomEl.querySelector('.m-pane'); if(old) old.remove();
     var n = 0, total = items().length;
     if(room === 'walk' && !narrow()){
-      var walk = el('div', 'm-walk'), view = el('div', 'm-walk-view'), track = el('div', 'm-walk-track');
-      track.appendChild(wallText(p));
+      // the rest of the work, hung in a row after the picture; it slides past on the label's right
+      var pane = el('div', 'm-pane'), trail = el('div', 'm-trail');
+      var more = paras(p.text).slice(1);
+      if(more.length){ var wt = el('div', 'm-more'); more.forEach(function(t){ wt.appendChild(el('p', null, t)); }); trail.appendChild(wt); }
       state.parts.forEach(function(s){
         var grp = el('div', 'm-group');
         var tag = el('div', 'm-tag'); tag.appendChild(el('b', null, s.name)); tag.appendChild(document.createTextNode(s.items.length)); grp.appendChild(tag);
         s.items.forEach(function(it, k){
           n++;
           var f = el('figure', 'm-work'), im = new Image();
-          var hh = Math.round(H * .91 * (it.kind === 'Drawing' || it.kind === 'Concept' ? .7 : (it.kind === 'Hero' ? .66 : (k % 2 ? .5 : .58))));
+          var hh = Math.round(H * (it.kind === 'Drawing' || it.kind === 'Concept' ? .7 : (it.kind === 'Hero' ? .62 : (k % 2 ? .48 : .56))));
           im.style.height = hh + 'px'; im.alt = it.caption || p.title;
           im.onload = sizeWalk; im.src = it.src;
           f.appendChild(im);
@@ -247,12 +270,12 @@
           f.appendChild(cap);
           grp.appendChild(f);
         });
-        track.appendChild(grp);
+        trail.appendChild(grp);
       });
-      track.appendChild(endPiece());
-      view.appendChild(track); walk.appendChild(view); gal.appendChild(walk);
-      state.walk = {el: walk, track: track};
-      sizeWalk();
+      trail.appendChild(endPiece());
+      pane.appendChild(trail);
+      state.roomEl.insertBefore(pane, state.label);
+      state.walk = {pane: pane, trail: trail};
     }
     else if(room === 'salon'){
       var salon = el('div', 'm-salon');
@@ -308,19 +331,9 @@
       state.io = io;
     }
   }
-  // the walk is as tall as the wall is long, so scrolling down carries you along it
-  function sizeWalk(){
-    if(!state || !state.walk) return;
-    var w = state.walk, len = w.track.scrollWidth - innerWidth;
-    w.el.style.height = (state.H + Math.max(0, len)) + 'px';
-    roomFrame();
-  }
-  function roomFrame(){
-    if(!state || !state.walk) return;
-    var w = state.walk;
-    var x = clamp(ov.scrollTop - state.gal.offsetTop, 0, Math.max(0, w.track.scrollWidth - innerWidth));
-    w.track.style.transform = 'translateX(' + (-x) + 'px)';
-  }
+  // the stage is as tall as the walk is long, so scrolling down carries you along it
+  function sizeWalk(){ sizeStage(); onScroll(); }
+  function roomFrame(){}
   function zoom(src){
     var z = el('div', 'm-zoom'), im = new Image(); im.src = src; z.appendChild(im);
     z.addEventListener('click', function(){ z.classList.remove('on'); setTimeout(function(){ z.remove(); }, 300); });
@@ -358,7 +371,7 @@
     if(!state) return;
     state.H = innerHeight - headerBottom();
     ov.style.setProperty('--m-h', state.H + 'px');
-    if(!narrow()) state.stage.style.height = Math.round(state.H * 1.75) + 'px';
+    sizeStage();
     layout();
     if(state.hang) state.hang();
     sizeWalk();

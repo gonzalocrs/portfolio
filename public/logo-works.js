@@ -2,7 +2,8 @@
 // back into the logo, then open into the next. Every drawing is made of exactly six lines, so each stitch always
 // becomes one line of it; the ring stays where it is and the project's name shows under it while it is open.
 // logoWorks(canvas, {still: true}): draws into the canvas at its css size; colours follow the page (--ink, --ring,
-// --mute, background). still: just the logo, no hovering (while the drawings are being redone).
+// --mute; the canvas is transparent, so its box shows through). still: just the logo, no hovering (while the drawings
+// are being redone). It returns {tone(i, v)}: stitch i fades to v, from 1 (ink, the logo) to 0 (the faint ring colour).
 (function(){
   var N = 72;                          // points per line
   var RING = 70, STITCH_W = 3.8, LINE_W = 1.5, FIT = 47, CORNER = .12;
@@ -150,16 +151,15 @@
 
   window.logoWorks = function(cv, opts){
     if(!cv || !cv.getContext) return;
-    var g = cv.getContext('2d'), W = 0, H = 0, ink = '#000', ring = '#ccc', mute = '#888', paper = '#fff', mono = 'monospace', still = false;
+    var g = cv.getContext('2d'), W = 0, H = 0, ink = '#000', ring = '#ccc', mute = '#888', mono = 'monospace', still = false;
     try{ still = matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
     if(opts && opts.still) still = true;
     function colours(){
-      var cs = getComputedStyle(document.documentElement), bg = getComputedStyle(cv.parentNode).backgroundColor;
+      var cs = getComputedStyle(document.documentElement);
       ink = cs.getPropertyValue('--ink').trim() || '#000';
       ring = cs.getPropertyValue('--ring').trim() || '#ccc';
       mute = cs.getPropertyValue('--mute').trim() || '#888';
       mono = cs.getPropertyValue('--mono').trim() || 'monospace';
-      paper = (bg && bg !== 'rgba(0, 0, 0, 0)') ? bg : (cs.getPropertyValue('--paper').trim() || '#fff');
     }
     function size(){
       var dpr = Math.min(2, window.devicePixelRatio || 1), w = Math.round(cv.clientWidth * dpr), h = Math.round(cv.clientHeight * dpr);
@@ -184,9 +184,11 @@
       for(i = n - k - 1; i >= k; i--) g.lineTo(R[i][0], R[i][1]);
       q = mix(R[0], L[0], t); g.quadraticCurveTo(R[0][0], R[0][1], q[0], q[1]);
       q = mix(L[0], R[0], t); g.lineTo(q[0], q[1]); g.quadraticCurveTo(L[0][0], L[0][1], L[k][0], L[k][1]);
-      g.closePath(); g.fillStyle = ink; g.fill();
+      g.closePath(); g.fill();
     }
-    var tl = 0, last = null, raf = 0, hover = false, running = false;
+    var tl = 0, last = null, raf = 0, hover = false, running = false, pending = false, fading = false;
+    var tone = [1, 1, 1, 1, 1, 1], want = tone.slice();
+    function schedule(){ if(!pending){ pending = true; raf = requestAnimationFrame(function(t){ pending = false; draw(t); }); } }
     function draw(now){
       size();
       // advance only while hovered, or while a drawing is still out (it then folds back into the logo and stops)
@@ -197,7 +199,9 @@
       if(!hover && seg.kind === 'rest'){ tl = seg.start; running = false; }
       else tl += dt;
       var S = state(still ? 0 : tl), u = Math.min(W, H) / 200, cx = W / 2, cy = H / 2, o = S.open;
-      g.fillStyle = paper; g.fillRect(0, 0, W, H);
+      g.clearRect(0, 0, W, H);
+      fading = false;
+      tone.forEach(function(v, i){ var d = want[i] - v; if(d){ tone[i] = Math.abs(d) < dt * 3 ? want[i] : v + Math.sign(d) * dt * 3; fading = true; } });
       g.lineCap = 'butt'; g.lineJoin = 'miter';
       g.strokeStyle = ring; g.lineWidth = Math.max(1, .9 * u);
       g.beginPath(); g.arc(cx, cy, RING * u, 0, 2 * Math.PI); g.stroke();
@@ -206,7 +210,10 @@
       STITCHES.forEach(function(s, i){
         var p = S.work.paths[i], pts = [];
         for(var j = 0; j < N; j++) pts.push([cx + lerp(s[j][0], p[j][0], o) * u, cy + lerp(s[j][1], p[j][1], o) * u]);
-        if(o < .12) bar(pts, g.lineWidth, g.lineWidth * CORNER);
+        if(o < .12){
+          if(tone[i] < 1){ g.fillStyle = ring; bar(pts, g.lineWidth, g.lineWidth * CORNER); }
+          g.globalAlpha = tone[i]; g.fillStyle = ink; bar(pts, g.lineWidth, g.lineWidth * CORNER); g.globalAlpha = 1;
+        }
         else{ g.beginPath(); pts.forEach(function(q, j){ j ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); }); g.stroke(); }
       });
       // the project's name, small, under the ring while its drawing is out
@@ -218,12 +225,12 @@
         g.fillText(S.work.name.toUpperCase(), cx, cy + 86 * u);
         g.globalAlpha = 1;
       }
-      if(running) raf = requestAnimationFrame(draw); else last = null;
+      if(running || fading) schedule(); else last = null;
     }
-    function wake(){ if(!running && !still){ running = true; cancelAnimationFrame(raf); raf = requestAnimationFrame(draw); } }
-    function redraw(){ if(!running) raf = requestAnimationFrame(draw); }
+    function wake(){ if(!running && !still){ running = true; schedule(); } }
+    function redraw(){ schedule(); }
     size(); colours();
-    raf = requestAnimationFrame(draw);
+    schedule();
     if(document.fonts) document.fonts.ready.then(redraw);
     // hovering opens the next drawing straight away (skipping the pause) and keeps going through the projects while the
     // pointer stays; on leaving, the drawing that is out folds back into the logo. A tap on a touch screen plays one.
@@ -238,6 +245,7 @@
     new MutationObserver(function(){ colours(); redraw(); }).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
     try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(){ setTimeout(function(){ colours(); redraw(); }, 0); }); }catch(e){}
     addEventListener('resize', redraw);
+    return {tone: function(i, v){ want[i] = Math.max(0, Math.min(1, v)); schedule(); }};
   };
   window.logoWorks.works = WORKS;   // the drawings, for checking them side by side
 })();

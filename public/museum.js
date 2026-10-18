@@ -80,7 +80,8 @@
     var stage = el('section', 'm-stage'), roomEl = el('div', 'm-room');
     var pic = el('figure', 'm-pic'), img = new Image();
     img.alt = p.title; img.src = firstSrc;
-    pic.appendChild(img);
+    pic.appendChild(img); pic.appendChild(maxBtn(firstSrc));
+    img.addEventListener('click', function(){ zoom(firstSrc); });
     roomEl.appendChild(pic);
 
     // the label: one card with the name and the facts, one with the text
@@ -325,7 +326,9 @@
       // the rest of the work in a row of bays on the label's right; it comes up from below, then moves sideways
       var pane = el('div', 'm-pane'), trail = el('div', 'm-trail'), slides = [];
       list.forEach(function(it, i){
-        var sl = el('div', 'm-step'); sl.appendChild(figure(it, i + 1, total));
+        var sl = el('div', 'm-step'), f = figure(it, i + 1, total);
+        f.appendChild(maxBtn(it.src)); f.querySelector('img').addEventListener('click', function(){ zoom(it.src); });
+        sl.appendChild(f);
         trail.appendChild(sl); slides.push(sl);
       });
       var last = el('div', 'm-step m-step-end'); last.appendChild(endPiece()); trail.appendChild(last); slides.push(last);
@@ -503,16 +506,24 @@
     clearTimeout(quiet);
     quiet = setTimeout(function(){ if(anim){ release(); return; } locked = false; acc = 0; }, 200);
   }
-  var acc = 0;
+  // a trackpad swipe counts whichever way it goes: down or right is forward, up or left is back (the pictures do move
+  // sideways, so people swipe sideways). Its momentum keeps sending smaller and smaller events after the fingers
+  // lift; those belong to the same step. A new swipe is told apart by a pause, or by the events growing again
+  // once the glide has finished, so swiping again straight away still moves on
+  var acc = 0, lastAbs = 0, lastT = 0;
   function onWheel(e){
     if(!state || narrow() || e.ctrlKey || document.querySelector('.m-zoom')) return;
-    var dir = e.deltaY > 0 ? 1 : -1;
-    var L = e.target.closest && e.target.closest('.m-label.open');
+    var side = Math.abs(e.deltaX) > Math.abs(e.deltaY), d = side ? e.deltaX : e.deltaY, dir = d > 0 ? 1 : -1;
+    var L = !side && e.target.closest && e.target.closest('.m-label.open');
     if(L && L.scrollHeight > L.clientHeight + 1 && (dir > 0 ? L.scrollTop + L.clientHeight < L.scrollHeight - 1 : L.scrollTop > 0)) return;   // reading the whole text
-    if(Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
     e.preventDefault();
-    if(locked){ release(); return; }
-    acc += e.deltaY * (e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? 600 : 1);
+    var now = performance.now(), a = Math.abs(d), fresh = now - lastT > 200 || (a > lastAbs * 1.6 && a > 6);
+    lastAbs = a; lastT = now;
+    if(locked){
+      if(anim || !fresh){ release(); return; }
+      locked = false; acc = 0;
+    }
+    acc += d * (e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? 600 : 1);
     if(Math.abs(acc) < 30) return;
     acc = 0;
     if(step(dir)){ locked = true; release(); }
@@ -525,6 +536,13 @@
     step(e.shiftKey && e.key === ' ' ? -1 : dir);
   }
   document.addEventListener('keydown', onKey);
+  // a Spotlight picture can be seen as large as the screen allows: click it, or the small corner button
+  function maxBtn(src){
+    var b = el('button', 'm-max'); b.type = 'button'; b.setAttribute('aria-label', 'View larger');
+    b.innerHTML = '<svg viewBox="0 0 16 16"><path d="M10 2.5h3.5V6M6 13.5H2.5V10M13.5 2.5L9 7M2.5 13.5L7 9"/></svg>';
+    b.addEventListener('click', function(e){ e.stopPropagation(); zoom(src); });
+    return b;
+  }
   function zoom(src){
     var z = el('div', 'm-zoom'), im = new Image(); im.src = src; z.appendChild(im);
     z.addEventListener('click', function(){ z.classList.remove('on'); setTimeout(function(){ z.remove(); }, 300); });

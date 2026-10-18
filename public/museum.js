@@ -176,8 +176,8 @@
   }
   // where the scroll rests: close up, the label, then one screen of scroll per picture. The room is sticky, one
   // screen tall, so the stage is as tall as the walk is long.
-  // the panorama's floor, in the room: level with the label's foot (see frame), as long as the spotlight's bar
-  function groundLine(){ return Math.round(state.H * .87); }
+  // the panorama's floor, in the room: the spotlight's bar line (see .m-bar), at the same height and as long
+  function groundLine(){ return Math.round(state.H * .87 + 36 + 8); }
   function labelStop(){ return Math.round(state.H * .6); }
   function sizeStage(){
     if(!state) return;
@@ -417,7 +417,7 @@
         // the wall itself, standing on its ground line
         var wr = P({x: X0, y: Y0, w: WW, h: WH});
         mk('rect', {x: wr.x, y: wr.y, width: wr.w, height: wr.h, 'class': 'plane'});
-        mk('line', {x1: 0, y1: bh + 1.5, x2: bay, y2: bh + 1.5, 'class': 'ground'});
+        mk('line', {x1: 0, y1: bh, x2: bay, y2: bh, 'class': 'ground'});
         holes.concat(accents).forEach(function(h){
           var o = P(h);
           if(!h.it){

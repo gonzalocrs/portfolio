@@ -5,7 +5,7 @@
 // --mute, background). still: just the logo, no hovering (while the drawings are being redone).
 (function(){
   var N = 72;                          // points per line
-  var RING = 70, STITCH_W = 3, LINE_W = 1.5, FIT = 47;
+  var RING = 70, STITCH_W = 3, LINE_W = 1.5, FIT = 47, CORNER = .28;
 
   function lerp(a, b, t){ return a + (b - a) * t; }
   function ease(t){ t = Math.max(0, Math.min(1, t)); return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
@@ -167,6 +167,25 @@
       W = w; H = h;
     }
 
+    // a stitch as a filled bar along its line: square ends with their corners just softened (CORNER of the width)
+    function bar(pts, w, r){
+      var n = pts.length - 1, L = [], R = [], len = 0;
+      for(var i = 0; i <= n; i++){
+        var a = pts[Math.max(0, i - 1)], b = pts[Math.min(n, i + 1)], dx = b[0] - a[0], dy = b[1] - a[1], l = Math.hypot(dx, dy) || 1;
+        L.push([pts[i][0] - dy / l * w / 2, pts[i][1] + dx / l * w / 2]); R.push([pts[i][0] + dy / l * w / 2, pts[i][1] - dx / l * w / 2]);
+        if(i) len += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+      }
+      var k = Math.max(1, Math.min(Math.floor(n / 3), Math.round(r / (len / n || 1)))), t = Math.min(.5, r / w);
+      function mix(a, b, f){ return [lerp(a[0], b[0], f), lerp(a[1], b[1], f)]; }
+      g.beginPath(); g.moveTo(L[k][0], L[k][1]);
+      for(i = k + 1; i <= n - k; i++) g.lineTo(L[i][0], L[i][1]);
+      var q = mix(L[n], R[n], t); g.quadraticCurveTo(L[n][0], L[n][1], q[0], q[1]);
+      q = mix(R[n], L[n], t); g.lineTo(q[0], q[1]); g.quadraticCurveTo(R[n][0], R[n][1], R[n - k][0], R[n - k][1]);
+      for(i = n - k - 1; i >= k; i--) g.lineTo(R[i][0], R[i][1]);
+      q = mix(R[0], L[0], t); g.quadraticCurveTo(R[0][0], R[0][1], q[0], q[1]);
+      q = mix(L[0], R[0], t); g.lineTo(q[0], q[1]); g.quadraticCurveTo(L[0][0], L[0][1], L[k][0], L[k][1]);
+      g.closePath(); g.fillStyle = ink; g.fill();
+    }
     var tl = 0, last = null, raf = 0, hover = false, running = false;
     function draw(now){
       size();
@@ -182,16 +201,13 @@
       g.lineCap = 'butt'; g.lineJoin = 'miter';
       g.strokeStyle = ring; g.lineWidth = Math.max(1, .9 * u);
       g.beginPath(); g.arc(cx, cy, RING * u, 0, 2 * Math.PI); g.stroke();
-      // the stitches / the drawing: sharp, square-ended bars at rest, fine lines once open
+      // the stitches / the drawing: square-ended bars with slightly softened corners at rest, fine lines once open
       g.strokeStyle = ink; g.lineWidth = lerp(STITCH_W, LINE_W, Math.min(1, o * 1.5)) * u;
       STITCHES.forEach(function(s, i){
-        var p = S.work.paths[i];
-        g.beginPath();
-        for(var j = 0; j < N; j++){
-          var x = cx + lerp(s[j][0], p[j][0], o) * u, y = cy + lerp(s[j][1], p[j][1], o) * u;
-          j ? g.lineTo(x, y) : g.moveTo(x, y);
-        }
-        g.stroke();
+        var p = S.work.paths[i], pts = [];
+        for(var j = 0; j < N; j++) pts.push([cx + lerp(s[j][0], p[j][0], o) * u, cy + lerp(s[j][1], p[j][1], o) * u]);
+        if(o < .12) bar(pts, g.lineWidth, g.lineWidth * CORNER);
+        else{ g.beginPath(); pts.forEach(function(q, j){ j ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); }); g.stroke(); }
       });
       // the project's name, small, under the ring while its drawing is out
       if(o > .01){

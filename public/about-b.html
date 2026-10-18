@@ -298,6 +298,9 @@
      downwards into that space, as far as the line the visit's labels stand on (87%), scrolling inside after that */
   .stage .label{width:min(21rem,30vw);max-height:64%;overflow-y:auto;top:23%;padding-bottom:4px}
   .stage .label{scrollbar-width:none}
+  /* the label as a museum wall label: an identity card (where from, the work, its medium) over a text card */
+  .card.tomb .from{margin:0 0 .7rem;font-size:.95rem;font-weight:300}
+  .card.tomb .med{margin:.6rem 0 0;font-size:.9rem;line-height:1.4;font-weight:300}
   .stage .label::-webkit-scrollbar{display:none}
   .pic{margin:0;border:1px solid var(--rule);background:color-mix(in srgb,var(--ink) 3%,var(--paper));display:flex;align-items:center;justify-content:center}
   .pic canvas{display:block;width:100%;height:100%}
@@ -389,13 +392,18 @@
     <canvas id="mark" aria-label="GCV" role="img"></canvas>
   </figure>
   <div class="label" id="label">
+    <div class="card tomb">
+      <span class="tag">About</span>
+      <p class="from">Peruvian. Lives in New York</p>
+      <h1>Structure, Material, Form</h1>
+      <p class="med">Physical models, digital form-making and structural analysis</p>
+      <p class="med">Trained engineer and architectural designer, with a background in real estate development</p>
+    </div>
     <div class="card">
-          <span class="tag">About</span>
-          <p class="work-line">Architecture and development. Based in New York.</p>
-          <p class="text">I came to architecture through engineering and real estate development. These backgrounds continue to shape the way I approach design: as an intersection of structure, material, form, economics, and culture.</p>
-          <p class="text extra">My work has evolved alongside my background. Engineering taught me to approach problems through systems, mathematics, and technical constraints; real estate development introduced questions of efficiency, economics, and performance; and architecture opened a more exploratory space through digital tools and form-making. More recently, physical models have become a way of bringing these ways of thinking together, an intuitive space where structure, material, form, and performance can be tested simultaneously.</p>
-          <p class="text extra">I&rsquo;m particularly interested in the relationship between structural efficiency, aesthetics and in how material and construction can become sources of architectural expression. I&rsquo;m drawn to projects where technical decisions are not separated from the cultural and social questions architecture inevitably carries.</p>
-          <button type="button" class="more-btn">More info</button>
+      <p class="text">I came to architecture through engineering, and it still shapes how I work: I approach a problem as a system of forces, materials and constraints. Architecture then opened a freer space of digital tools and form-making.</p>
+      <p class="text extra">Today physical models are where these ways of thinking meet: an intuitive space where structure, material, form and performance can be tested at once.</p>
+      <p class="text extra">I see design as an intersection of structure, material, form, economics and culture. I&rsquo;m drawn to projects where technical decisions are not separated from the cultural and social questions architecture inevitably carries.</p>
+      <button type="button" class="more-btn">More info</button>
     </div>
   </div>
   <div class="deskpane desk" id="desk">
@@ -584,6 +592,13 @@ document.querySelectorAll('.more-btn').forEach(function(b){
     var px = (pad + lw + W) / 2; S = Math.max(160, Math.min(S, 2 * (px - bayL))); pic.style.width = pic.style.height = S + 'px';
     place(pic, px - S / 2, cy - S / 2 - (at === 2 ? H : 0), at === 2 ? 0 : 1);
     hint.style.left = Math.round(px) + 'px';
+    // the closed label hangs at 23% of the room; on a short window it moves up just enough to show whole, above the
+    // line the visit's labels stand on (87%). "More info" then lengthens it downwards to that line and it scrolls inside
+    if(!label.classList.contains('open')){
+      label.style.top = ''; label.style.maxHeight = 'none';
+      label.style.top = Math.max(8, Math.min(H * .23, H * .87 - label.scrollHeight)) + 'px';
+    }
+    label.style.maxHeight = (H * .87 - parseFloat(label.style.top)) + 'px';
     place(label, pad - (at ? 0 : 30), 0, at ? 1 : 0);
     place(desk, bayL + (bayW - dw) / 2, cy - dh / 2 + (at === 2 ? 0 : H), at === 2 ? 1 : 0);
     hint.querySelector('span').textContent = HINTS[at] || HINTS[1];

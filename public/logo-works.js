@@ -1,10 +1,11 @@
 // The GCV mark in motion: hover it and its six stitches open into a small line drawing of one of the projects, fold
 // back into the logo, then open into the next. Every drawing is made of exactly six lines, so each stitch always
 // becomes one line of it; the ring stays where it is and the project's name shows under it while it is open.
-// logoWorks(canvas): draws into the canvas at its css size; colours follow the page (--ink, --ring, --mute, background).
+// logoWorks(canvas, {still: true}): draws into the canvas at its css size; colours follow the page (--ink, --ring,
+// --mute, background). still: just the logo, no hovering (while the drawings are being redone).
 (function(){
   var N = 72;                          // points per line
-  var RING = 70, STITCH_W = 3.8, LINE_W = 1.5, FIT = 47;
+  var RING = 70, STITCH_W = 3, LINE_W = 1.5, FIT = 47;
 
   function lerp(a, b, t){ return a + (b - a) * t; }
   function ease(t){ t = Math.max(0, Math.min(1, t)); return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
@@ -147,10 +148,11 @@
     return {open: s.kind === 'open' ? k : s.kind === 'close' ? 1 - k : s.kind === 'hold' ? 1 : 0, work: WORKS[s.work]};
   }
 
-  window.logoWorks = function(cv){
+  window.logoWorks = function(cv, opts){
     if(!cv || !cv.getContext) return;
     var g = cv.getContext('2d'), W = 0, H = 0, ink = '#000', ring = '#ccc', mute = '#888', paper = '#fff', mono = 'monospace', still = false;
     try{ still = matchMedia('(prefers-reduced-motion: reduce)').matches; }catch(e){}
+    if(opts && opts.still) still = true;
     function colours(){
       var cs = getComputedStyle(document.documentElement), bg = getComputedStyle(cv.parentNode).backgroundColor;
       ink = cs.getPropertyValue('--ink').trim() || '#000';
@@ -177,10 +179,10 @@
       else tl += dt;
       var S = state(still ? 0 : tl), u = Math.min(W, H) / 200, cx = W / 2, cy = H / 2, o = S.open;
       g.fillStyle = paper; g.fillRect(0, 0, W, H);
-      g.lineCap = 'round'; g.lineJoin = 'round';
+      g.lineCap = 'butt'; g.lineJoin = 'miter';
       g.strokeStyle = ring; g.lineWidth = Math.max(1, .9 * u);
       g.beginPath(); g.arc(cx, cy, RING * u, 0, 2 * Math.PI); g.stroke();
-      // the stitches / the drawing: round-ended bars at rest, fine lines once open
+      // the stitches / the drawing: sharp, square-ended bars at rest, fine lines once open
       g.strokeStyle = ink; g.lineWidth = lerp(STITCH_W, LINE_W, Math.min(1, o * 1.5)) * u;
       STITCHES.forEach(function(s, i){
         var p = S.work.paths[i];

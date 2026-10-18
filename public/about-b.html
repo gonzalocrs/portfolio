@@ -294,10 +294,9 @@
   html,body{overflow:hidden}
   main.stage{position:relative;flex:1 0 auto;height:calc(100vh - 7.6rem);overflow:hidden}
   .stage > *{position:absolute;left:0;top:0;transition:transform 1.15s cubic-bezier(.65,0,.35,1),opacity 1s ease;will-change:transform,opacity}
-  /* the label stands on the same line as on a visit (its foot at 87% of the room) and grows upwards; "More info"
-     puts the rest of the text where Education was, scrolling inside the label if it needs more room */
+  /* the label stands on the same line as on a visit (its foot at 87% of the room) and grows upwards with "More
+     info", scrolling inside itself if it needs more room */
   .stage .label{width:min(21rem,30vw);max-height:calc(87% - 1.5rem);overflow-y:auto;top:auto;bottom:13%;padding-bottom:4px}
-  .stage .label.open .card + .card{display:none}
   .stage .label{scrollbar-width:none}
   .stage .label::-webkit-scrollbar{display:none}
   .pic{margin:0;border:1px solid var(--rule);background:color-mix(in srgb,var(--ink) 3%,var(--paper));display:flex;align-items:center;justify-content:center}
@@ -397,12 +396,6 @@
           <p class="text extra">My work has evolved alongside my background. Engineering taught me to approach problems through systems, mathematics, and technical constraints; real estate development introduced questions of efficiency, economics, and performance; and architecture opened a more exploratory space through digital tools and form-making. More recently, physical models have become a way of bringing these ways of thinking together, an intuitive space where structure, material, form, and performance can be tested simultaneously.</p>
           <p class="text extra">I&rsquo;m particularly interested in the relationship between structural efficiency, aesthetics and in how material and construction can become sources of architectural expression. I&rsquo;m drawn to projects where technical decisions are not separated from the cultural and social questions architecture inevitably carries.</p>
           <button type="button" class="more-btn">More info</button>
-    </div>
-    <div class="card">
-          <span class="tag">Education</span>
-          <p class="line"><span>Master of Architecture + MSRED</span> Columbia University</p>
-          <p class="line"><span>MBA</span> INCAE Business School</p>
-          <p class="line"><span>Civil Engineering</span> Pontificia Universidad Cat&oacute;lica del Per&uacute;</p>
     </div>
   </div>
   <div class="deskpane desk" id="desk">
@@ -627,7 +620,7 @@ document.querySelectorAll('.more-btn').forEach(function(b){
 })();
 </script>
 <script src="logo-works.js"></script>
-<script>logoWorks(document.getElementById("mark"));</script>
+<script>logoWorks(document.getElementById("mark"), {still: true});</script>
 <script src="signature.js"></script>
 </body>
 </html>

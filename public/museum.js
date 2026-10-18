@@ -257,13 +257,13 @@
   // ---------- 4: the room ----------
   // at: in the spotlight, which picture to land on (from a click on it in the gallery); the first one otherwise
   function setRoom(r, at){
-    // from the spotlight to the gallery: remember where the picture in front of you is, to zoom out from it
-    var lit = r === 'salon' && state.walk && !narrow() && state.walk.pane.querySelector('.m-step.lit img');
-    state.zoomFrom = lit ? {src: lit.getAttribute('src'), r: lit.getBoundingClientRect()} : null;
     room = r;
     buildRoom(); sizeStage();
     syncSwitch();
     ov.scrollTop = narrow() ? state.gal.offsetTop : labelStop() + state.H * (1 + (r === 'walk' && at ? at : 0));
+    // the new room fades in (the gallery's wall once it is hung)
+    if(state.walk) [state.walk.pane, state.walk.bar].forEach(fadeIn);
+    else if(state.salon) state.salon.fade = true;
     frame();   // both rooms rest at the same scroll, so no scroll event comes to place the new one
   }
   // four panes for the gallery, one pane for the spotlight: the icon shows the room it takes you to
@@ -450,7 +450,7 @@
           wall.appendChild(f);
         });
         wall.insertBefore(svg, wall.firstChild);
-        zoomOut(wall, foot);
+        if(state.salon && state.salon.fade){ state.salon.fade = false; fadeIn(wall); fadeIn(foot); }
       };
       state.hang = hang;
     }
@@ -469,22 +469,7 @@
     {x: 89, y: 72, w: 4.5, h: 4.5, glass: [.35, .35]}, {x: 84, y: 81, w: 9, h: 4, glass: [.5, .4]}, {x: 71, y: 82, w: 3, h: 3, glass: [.5, .5]}
   ];
   function roomFrame(){}
-  // the gallery comes in as if you stepped back from the picture you were looking at: the whole wall starts scaled up
-  // so that picture sits exactly where it was in the spotlight, then shrinks to its place with the rest around it
-  function zoomOut(wall, foot){
-    var z = state.zoomFrom; state.zoomFrom = null;
-    var f = z && Array.prototype.filter.call(wall.querySelectorAll('.m-hung img'), function(im){ return im.getAttribute('src') === z.src; })[0];
-    if(!f) return;
-    var o = wall.getBoundingClientRect(), h = f.getBoundingClientRect(), k = z.r.width / h.width;
-    if(!(k > 1.01)) return;
-    var tx = z.r.left - o.left - k * (h.left - o.left), ty = z.r.top - o.top - k * (h.top - o.top);
-    wall.style.transition = 'none'; wall.style.transformOrigin = '0 0';
-    wall.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + k + ')';
-    foot.style.transition = 'none'; foot.style.opacity = 0;
-    void wall.offsetWidth;
-    wall.style.transition = 'transform 1.3s cubic-bezier(.45,0,.2,1)'; wall.style.transform = '';
-    foot.style.transition = 'opacity .6s ease .9s'; foot.style.opacity = '';
-  }
+  function fadeIn(e){ e.classList.remove('m-in'); void e.offsetWidth; e.classList.add('m-in'); }
 
   // ---------- one step per scroll: each wheel gesture or key press goes to the next resting place ----------
   var anim = 0, goal = null, locked = false, quiet = 0;

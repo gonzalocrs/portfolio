@@ -116,7 +116,7 @@
 
     // the prompt to scroll also takes the step when clicked, for anyone who does not scroll
     var hint = el('button', 'm-hint'); hint.type = 'button';
-    hint.innerHTML = '<span>Description</span><svg viewBox="0 0 22 22"><path d="M4 7.5l7 7 7-7"/></svg>';
+    hint.innerHTML = '<span>Scroll</span><svg viewBox="0 0 22 22"><path d="M4 7.5l7 7 7-7"/></svg>';
     hint.addEventListener('click', function(){ step(1); });
     roomEl.appendChild(hint);
     stage.appendChild(roomEl);
@@ -250,7 +250,7 @@
     placeSwitch(R, dy >= H * .5);
     var hv = t < .05 || (t > .98 && dy < 4);
     state.hint.style.opacity = hv ? 1 : 0; state.hint.style.pointerEvents = hv ? 'auto' : 'none';
-    state.hint.firstChild.textContent = t > .98 ? 'More from this project' : 'Description';
+    state.hint.firstChild.textContent = t > .98 ? 'More from this project' : 'Scroll';
     roomFrame();
   }
 

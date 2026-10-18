@@ -5,7 +5,7 @@
 // --mute, background). still: just the logo, no hovering (while the drawings are being redone).
 (function(){
   var N = 72;                          // points per line
-  var RING = 70, STITCH_W = 2.2, LINE_W = 1.5, FIT = 47, CORNER = 0;
+  var RING = 70, STITCH_W = 3.8, LINE_W = 1.5, FIT = 47, CORNER = .12;
 
   function lerp(a, b, t){ return a + (b - a) * t; }
   function ease(t){ t = Math.max(0, Math.min(1, t)); return t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }

@@ -164,18 +164,20 @@
 
   function setRect(e, r){ e.style.left = r.x + 'px'; e.style.top = r.y + 'px'; e.style.width = r.w + 'px'; e.style.height = r.h + 'px'; }
   // r0: close up, in the middle; r1: stepped to the right, leaving the left for the label (areaL is where the
-  // pictures' side begins). On the walk each picture has a bay (sw wide) a little narrower than that side, so the
-  // next one shows at the right edge.
+  // pictures' side begins). Each picture has a bay a little narrower than that side; the panorama's wall stands on
+  // the same width.
   function rects(){
     var W = innerWidth, H = state.H, a = state.a, gut = Math.max(16, Math.min(40, W * .04));
     var s0 = fit(a, W * .84, H * .84), r0 = {x: (W - s0.w) / 2, y: (H - s0.h) / 2, w: s0.w, h: s0.h};
     var lw = state.label.offsetWidth || 336, gap = Math.max(40, W * .045);
-    var areaL = gut + lw + gap, areaW = W - areaL - gut, bay = state.walk ? areaW * .8 : areaW;
+    var areaL = gut + lw + gap, areaW = W - areaL - gut, bay = areaW * .8;
     var s1 = fit(a, bay, H * .74), r1 = {x: areaL + (bay - s1.w) / 2, y: (H - s1.h) / 2, w: s1.w, h: s1.h};
     return {r0: r0, r1: r1, gap: gap, gut: gut, areaL: areaL, bay: bay};
   }
   // where the scroll rests: close up, the label, then one screen of scroll per picture. The room is sticky, one
   // screen tall, so the stage is as tall as the walk is long.
+  // the spotlight's bar line, in the room (see .m-bar): the panorama's wall stands on it
+  function groundLine(){ return Math.round(state.H * .87 + 36 + 8); }
   function labelStop(){ return Math.round(state.H * .6); }
   function sizeStage(){
     if(!state) return;
@@ -253,6 +255,7 @@
     buildRoom(); sizeStage();
     syncSwitch();
     ov.scrollTop = narrow() ? state.gal.offsetTop : labelStop() + state.H;
+    frame();   // both rooms rest at the same scroll, so no scroll event comes to place the new one
   }
   // four panes for the panorama, one pane for the spotlight: the icon shows the room it takes you to
   var ICONS = {
@@ -266,7 +269,7 @@
   }
   // under the pictures, in the middle of their side; the same place in both rooms
   function placeSwitch(R, inRoom){
-    var cx = state.walk ? R.areaL + R.bay / 2 : (R.areaL + innerWidth - R.gut) / 2;
+    var cx = R.areaL + R.bay / 2;
     sw.style.left = Math.round(cx) + 'px';
     sw.style.top = Math.round(headerBottom() + Math.min(state.H * .87 + 58, state.H - 34)) + 'px';
     sw.classList.toggle('on', inRoom);
@@ -392,14 +395,16 @@
         var Y0 = Math.min.apply(null, all.map(function(o){ return o.y; })) - M, Y1 = Math.max.apply(null, all.map(function(o){ return o.y + o.h; })) + M;
         X0 -= M; X1 += M;
         // the box the wall fits in, and its scale (wall units to pixels)
-        // the wall stands on the same line as the label's foot
-        wall.style.height = Math.max(120, Math.round(state.H * .87 - wall.offsetTop)) + 'px';
-        var bw = wall.clientWidth, bh = wall.clientHeight, WW = X1 - X0, WH = Y1 - Y0;
+        // the wall stands on a floor line that is the spotlight's bar: the same height, the same length (one bay)
+        var bay = rects().bay, floor = groundLine();
+        wall.style.height = Math.max(120, Math.round(floor - wall.offsetTop)) + 'px';
+        foot.style.left = Math.round(bay + 24) + 'px'; foot.style.bottom = Math.round(state.H - floor) + 'px';
+        var bw = bay, bh = wall.clientHeight, WW = X1 - X0, WH = Y1 - Y0;
         var sc = Math.min(bw / WW, bh / WH), ox = (bw - WW * sc) / 2 - X0 * sc, oy = bh - WH * sc - Y0 * sc;
         function P(o){ return {x: ox + o.x * sc, y: oy + o.y * sc, w: o.w * sc, h: o.h * sc}; }
 
         var NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg');
-        svg.setAttribute('class', 'facade'); svg.setAttribute('viewBox', '0 0 ' + bw + ' ' + bh);
+        svg.setAttribute('class', 'facade'); svg.setAttribute('viewBox', '0 0 ' + wall.clientWidth + ' ' + bh);
         function mk(name, attrs){ var e = document.createElementNS(NS, name); for(var k in attrs) e.setAttribute(k, attrs[k]); svg.appendChild(e); return e; }
         function splay(o, g){
           // an opening cut through the thick wall: its outer edge, the four lines of the reveal, the pane at the back
@@ -411,7 +416,7 @@
         // the wall itself, standing on its ground line
         var wr = P({x: X0, y: Y0, w: WW, h: WH});
         mk('rect', {x: wr.x, y: wr.y, width: wr.w, height: wr.h, 'class': 'plane'});
-        mk('line', {x1: wr.x - M * sc, y1: wr.y + wr.h, x2: wr.x + wr.w + M * sc, y2: wr.y + wr.h, 'class': 'ground'});
+        mk('line', {x1: 0, y1: bh, x2: bay, y2: bh, 'class': 'ground'});
         holes.concat(accents).forEach(function(h){
           var o = P(h);
           if(!h.it){

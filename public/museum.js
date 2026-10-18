@@ -5,11 +5,12 @@
     2. click a picture (or a title): it comes up close, whole, in the middle of the room
     3. scroll a little: it steps to the right and its wall label appears on the left (name, facts, the text);
        "More info" makes the label taller, to the whole text
-    4. scroll on: the rest of the project, hung one of three ways:
+    4. scroll on: the rest of the project, hung one of two ways:
          spotlight (walk)  the label stays; the picture goes up and the second comes up in its place, then each scroll
                 moves one picture to the right, each lit as it arrives; a small bar under them says where you are
-         panorama (salon)  everything at once, hung in openings like the home page's wall
-       /?room=spotlight|panorama picks one (remembered for the visit); a small switch in the corner swaps it.
+         panorama (salon)  everything at once, each picture at the back of a splayed opening in one wall (Ronchamp)
+       A visit starts in spotlight; one small icon under the pictures goes to the other room (four panes: panorama,
+       one pane: back to spotlight). /?room=spotlight|panorama picks one; the choice is remembered for the visit.
   Every scroll (a wheel gesture, an arrow key) goes one step, gliding slowly.
 
   Content comes from projects.js. Pictures are never cropped.
@@ -132,12 +133,9 @@
     closeBtn.addEventListener('click', function(){ close(); });
     document.body.appendChild(closeBtn);
 
-    sw = el('div', 'm-switch'); sw.appendChild(el('span', null, 'Room'));
-    ROOMS.forEach(function(r){
-      var b = el('button', null, r[1]); b.type = 'button'; b.dataset.room = r[0];
-      b.addEventListener('click', function(){ setRoom(r[0]); });
-      sw.appendChild(b);
-    });
+    // the way to the other room: one icon, shown once you are in a room
+    sw = el('button', 'm-switch'); sw.type = 'button';
+    sw.addEventListener('click', function(){ setRoom(room === 'walk' ? 'salon' : 'walk'); });
     document.body.appendChild(sw);
 
     var rest = all.map(function(s){ return {name: s.name, items: s.items.filter(function(it){ return it.src !== firstSrc; })}; }).filter(function(s){ return s.items.length; });
@@ -242,6 +240,7 @@
       sp.style.left = R.areaL + 'px'; sp.style.width = (innerWidth - R.areaL - R.gut) + 'px';
       sp.style.transform = 'translateY(' + Math.round(H - dy) + 'px)';
     }
+    placeSwitch(R, dy >= H * .5);
     state.hint.style.opacity = t < .05 ? 1 : (t > .98 && dy < 4 ? 1 : 0);
     state.hint.firstChild.textContent = t > .98 ? 'More from this project' : 'Scroll';
     roomFrame();
@@ -255,8 +254,22 @@
     syncSwitch();
     ov.scrollTop = narrow() ? state.gal.offsetTop : labelStop() + state.H;
   }
+  // four panes for the panorama, one pane for the spotlight: the icon shows the room it takes you to
+  var ICONS = {
+    salon: '<svg viewBox="0 0 22 22"><rect x="2.5" y="2.5" width="7" height="7"/><rect x="12.5" y="2.5" width="7" height="7"/><rect x="2.5" y="12.5" width="7" height="7"/><rect x="12.5" y="12.5" width="7" height="7"/></svg>',
+    walk: '<svg viewBox="0 0 22 22"><rect x="4.5" y="4.5" width="13" height="13"/></svg>'
+  };
   function syncSwitch(){
-    Array.prototype.forEach.call(sw.querySelectorAll('button[data-room]'), function(b){ b.setAttribute('aria-pressed', b.dataset.room === room ? 'true' : 'false'); });
+    var to = room === 'walk' ? 'salon' : 'walk', name = ROOMS.filter(function(r){ return r[0] === to; })[0][1];
+    sw.innerHTML = ICONS[to] + '<span>' + name + '</span>';
+    sw.setAttribute('aria-label', to === 'salon' ? 'Panorama: see every picture at once' : 'Spotlight: one picture at a time');
+  }
+  // under the pictures, in the middle of their side; the same place in both rooms
+  function placeSwitch(R, inRoom){
+    var cx = state.walk ? R.areaL + R.bay / 2 : (R.areaL + innerWidth - R.gut) / 2;
+    sw.style.left = Math.round(cx) + 'px';
+    sw.style.top = Math.round(headerBottom() + Math.min(state.H * .87 + 58, state.H - 34)) + 'px';
+    sw.classList.toggle('on', inRoom);
   }
 
   function endPiece(){
@@ -333,39 +346,85 @@
       var hang = function(){
         if(!state || state.gal !== gal || left > 0) return;
         wall.innerHTML = '';
-        var nb = Math.max(1, Math.ceil(list.length / BAY.length)), WW = nb * 100, WH = 90;
-        var slots = [];
-        for(var b = 0; b < nb; b++) BAY.forEach(function(o){
-          var w = o.w, h = o.w / o.r, flip = b % 2 === 1;
-          slots.push({x: b * 100 + o.x, y: flip ? WH - o.y - h : o.y, w: w, h: h, r: o.r});
-        });
-        // the box the wall fits in, and its scale (wall units to pixels)
-        var bw = wall.clientWidth, bh = wall.clientHeight, sc = Math.min(bw / WW, bh / WH), ox = (bw - WW * sc) / 2, oy = (bh - WH * sc) / 2;
+        // the places: whole bays of the home page's wall, and in the last one only as many as are still needed, the
+        // ones nearest the rest, so the wall ends where the pictures do
+        var n = list.length, nb = Math.max(1, Math.ceil(n / BAY.length)), slots = [], accents = [];
+        for(var b = 0; b < nb; b++){
+          var flip = b % 2 === 1;
+          var put = function(o, h){ return {x: b * 100 + o.x, y: flip ? 90 - o.y - h : o.y, w: o.w, h: h}; };
+          var bay = BAY.map(function(o){ var r = put(o, o.w / o.r); r.r = o.r; r.glass = o.glass; return r; });
+          if(b === nb - 1){ var need = n - b * BAY.length; bay.sort(function(p, q){ return p.x - q.x; }); bay.forEach(function(r, k){ r.spare = k >= need; }); }
+          slots.push.apply(slots, bay);
+          ACCENT.forEach(function(o){ var r = put(o, o.h); r.glass = o.glass; accents.push(r); });
+        }
         // like goes with like: each picture takes the free place nearest its own proportions
-        var pics = list.slice(), taken = {};
-        var pick = pics.map(function(it){
+        var open = slots.filter(function(sl){ return !sl.spare; }), taken = {};
+        list.forEach(function(it){
           var best = -1;
-          slots.forEach(function(sl, k){ if(!taken[k] && (best < 0 || Math.abs(Math.log(sl.r / it.a)) < Math.abs(Math.log(slots[best].r / it.a)))) best = k; });
-          taken[best] = 1; return best;
+          open.forEach(function(sl, k){ if(!taken[k] && (best < 0 || Math.abs(Math.log(sl.r / it.a)) < Math.abs(Math.log(open[best].r / it.a)))) best = k; });
+          taken[best] = 1; open[best].it = it;
         });
+        // each opening takes its picture's proportions (same size of hole, same centre), so the picture fills it and
+        // nothing is cropped; then all of them shrink together, just enough to keep a pier of wall between any two
+        var holes = slots.map(function(sl){
+          if(!sl.it) return {x: sl.x, y: sl.y, w: sl.w, h: sl.h, glass: sl.glass, spare: sl.spare};
+          var A = sl.w * sl.h, w = Math.sqrt(A * sl.it.a), h = Math.sqrt(A / sl.it.a);
+          return {x: sl.x + (sl.w - w) / 2, y: sl.y + (sl.h - h) / 2, w: w, h: h, it: sl.it};
+        });
+        var PIER = 3;
+        function scaled(o, k){ return {x: o.x + o.w * (1 - k) / 2, y: o.y + o.h * (1 - k) / 2, w: o.w * k, h: o.h * k}; }
+        function apart(p, q, d){ return p.x + p.w + d <= q.x || q.x + q.w + d <= p.x || p.y + p.h + d <= q.y || q.y + q.h + d <= p.y; }
+        function fits(k){
+          var hs = holes.map(function(o){ return scaled(o, k); });
+          for(var i = 0; i < hs.length; i++) for(var j = i + 1; j < hs.length; j++) if((holes[i].it || holes[j].it) && !apart(hs[i], hs[j], PIER)) return false;
+          return true;
+        }
+        var lo = .3, hi = 1;
+        if(fits(1)) lo = 1; else for(var it8 = 0; it8 < 18; it8++){ var mid = (lo + hi) / 2; if(fits(mid)) lo = mid; else hi = mid; }
+        holes = holes.map(function(o){ var r = scaled(o, lo); r.it = o.it; r.glass = o.glass; r.spare = o.spare; return r; });
+        // the wall ends a pier past the last picture; spare places inside it stay as empty openings, the rest go
+        var used = holes.filter(function(o){ return o.it; });
+        var X0 = Math.min.apply(null, used.map(function(o){ return o.x; })), X1 = Math.max.apply(null, used.map(function(o){ return o.x + o.w; }));
+        holes = holes.filter(function(o){ return o.it || (o.x >= X0 - .01 && o.x + o.w <= X1 + .01); });
+        // the small openings, only where they do not run into a bigger one
+        accents = accents.filter(function(a){ return a.x >= X0 && a.x + a.w <= X1 && holes.every(function(o){ return apart(a, o, 1.2); }); });
+        var all = holes.concat(accents), M = 4;
+        var Y0 = Math.min.apply(null, all.map(function(o){ return o.y; })) - M, Y1 = Math.max.apply(null, all.map(function(o){ return o.y + o.h; })) + M;
+        X0 -= M; X1 += M;
+        // the box the wall fits in, and its scale (wall units to pixels)
+        // the wall stands on the same line as the label's foot
+        wall.style.height = Math.max(120, Math.round(state.H * .87 - wall.offsetTop)) + 'px';
+        var bw = wall.clientWidth, bh = wall.clientHeight, WW = X1 - X0, WH = Y1 - Y0;
+        var sc = Math.min(bw / WW, bh / WH), ox = (bw - WW * sc) / 2 - X0 * sc, oy = bh - WH * sc - Y0 * sc;
+        function P(o){ return {x: ox + o.x * sc, y: oy + o.y * sc, w: o.w * sc, h: o.h * sc}; }
+
         var NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg');
         svg.setAttribute('class', 'facade'); svg.setAttribute('viewBox', '0 0 ' + bw + ' ' + bh);
-        function line(x1, y1, x2, y2){ var l = document.createElementNS(NS, 'line'); l.setAttribute('x1', x1); l.setAttribute('y1', y1); l.setAttribute('x2', x2); l.setAttribute('y2', y2); svg.appendChild(l); }
-        function rect(x, y, w, h, c){ var r = document.createElementNS(NS, 'rect'); r.setAttribute('x', x); r.setAttribute('y', y); r.setAttribute('width', w); r.setAttribute('height', h); r.setAttribute('class', c); svg.appendChild(r); }
-        slots.forEach(function(sl, k){
-          var X = ox + sl.x * sc, Y = oy + sl.y * sc, Wd = sl.w * sc, Ht = sl.h * sc, j = pick.indexOf(k);
-          if(j < 0){
-            // an empty opening: the splayed reveal
-            var gw = Wd * .28, gh = Ht * .24, gx = X + (Wd - gw) / 2, gy = Y + (Ht - gh) / 2;
-            rect(X, Y, Wd, Ht, 'splay');
-            line(X, Y, gx, gy); line(X + Wd, Y, gx + gw, gy); line(X + Wd, Y + Ht, gx + gw, gy + gh); line(X, Y + Ht, gx, gy + gh);
-            rect(gx, gy, gw, gh, 'pane');
+        function mk(name, attrs){ var e = document.createElementNS(NS, name); for(var k in attrs) e.setAttribute(k, attrs[k]); svg.appendChild(e); return e; }
+        function splay(o, g){
+          // an opening cut through the thick wall: its outer edge, the four lines of the reveal, the pane at the back
+          mk('rect', {x: o.x, y: o.y, width: o.w, height: o.h, 'class': 'splay'});
+          [[o.x, o.y, g.x, g.y], [o.x + o.w, o.y, g.x + g.w, g.y], [o.x + o.w, o.y + o.h, g.x + g.w, g.y + g.h], [o.x, o.y + o.h, g.x, g.y + g.h]]
+            .forEach(function(l){ mk('line', {x1: l[0], y1: l[1], x2: l[2], y2: l[3]}); });
+          mk('rect', {x: g.x, y: g.y, width: g.w, height: g.h, 'class': 'pane'});
+        }
+        // the wall itself, standing on its ground line
+        var wr = P({x: X0, y: Y0, w: WW, h: WH});
+        mk('rect', {x: wr.x, y: wr.y, width: wr.w, height: wr.h, 'class': 'plane'});
+        mk('line', {x1: wr.x - M * sc, y1: wr.y + wr.h, x2: wr.x + wr.w + M * sc, y2: wr.y + wr.h, 'class': 'ground'});
+        holes.concat(accents).forEach(function(h){
+          var o = P(h);
+          if(!h.it){
+            var gw = (h.glass ? h.glass[0] : .3) * o.w, gh = (h.glass ? h.glass[1] : .3) * o.h;
+            splay(o, {x: o.x + (o.w - gw) / 2, y: o.y + (o.h - gh) / 2, w: gw, h: gh});
             return;
           }
-          var it = pics[j], s1 = fit(it.a, Wd, Ht);
-          var f = el('figure', 'm-hung'), im = new Image(); im.src = it.src; im.alt = it.caption || state.p.title;
-          f.style.left = (X + (Wd - s1.w) / 2) + 'px'; f.style.top = (Y + (Ht - s1.h) / 2) + 'px';
-          f.style.width = s1.w + 'px'; f.style.height = s1.h + 'px';
+          // a picture is the pane at the back of its opening: the reveal frames it, a little deeper on the larger side
+          var d = Math.max(5, Math.min(o.w, o.h) * .085), s1 = fit(h.it.a, o.w - 2 * d, o.h - 2 * d);
+          var g = {x: o.x + (o.w - s1.w) / 2, y: o.y + (o.h - s1.h) / 2, w: s1.w, h: s1.h};
+          splay(o, g);
+          var f = el('figure', 'm-hung'), im = new Image(), it = h.it; im.src = it.src; im.alt = it.caption || state.p.title;
+          f.style.left = g.x + 'px'; f.style.top = g.y + 'px'; f.style.width = g.w + 'px'; f.style.height = g.h + 'px';
           f.appendChild(im); f.appendChild(el('span', 'cap', it.caption || it.kind));
           f.addEventListener('click', function(){ zoom(it.src); });
           wall.appendChild(f);
@@ -376,10 +435,17 @@
     }
   }
   // one bay of the home page's wall: places of different sizes and proportions (wall units, a bay is 100 x 90)
+  // (glass: the pane at the back of an empty one, as fractions of it)
   var BAY = [
-    {x: 1, y: 1, w: 33, r: 10 / 11}, {x: 39, y: 6, w: 28, r: 4 / 3}, {x: 72, y: 0, w: 24, r: 3 / 4},
-    {x: 5, y: 44, w: 30, r: 3 / 2}, {x: 41, y: 31, w: 27, r: 1}, {x: 74, y: 37, w: 25, r: 4 / 5},
-    {x: 1, y: 67, w: 27, r: 4 / 3}, {x: 33, y: 66, w: 31, r: 3 / 2}
+    {x: 1, y: 1, w: 33, r: 10 / 11, glass: [.26, .2]}, {x: 39, y: 6, w: 28, r: 4 / 3, glass: [.3, .3]}, {x: 72, y: 0, w: 24, r: 3 / 4, glass: [.28, .16]},
+    {x: 5, y: 44, w: 30, r: 3 / 2, glass: [.6, .18]}, {x: 41, y: 31, w: 27, r: 1, glass: [.26, .28]}, {x: 74, y: 37, w: 25, r: 4 / 5, glass: [.2, .55]},
+    {x: 1, y: 67, w: 27, r: 4 / 3, glass: [.22, .5]}, {x: 33, y: 66, w: 31, r: 3 / 2, glass: [.45, .24]}
+  ];
+  // and its little openings, which never hold a picture: they are there for the play of sizes, as at Ronchamp
+  var ACCENT = [
+    {x: 37.5, y: 40, w: 1.6, h: 14, glass: [.7, .6]}, {x: 68.8, y: 6, w: 1.4, h: 16, glass: [.7, .4]}, {x: 14, y: 39.6, w: 9, h: 2.2, glass: [.6, .45]},
+    {x: 70, y: 73, w: 6, h: 6, glass: [.4, .4]}, {x: 78.5, y: 71, w: 2.2, h: 11, glass: [.6, .5]}, {x: 83, y: 74, w: 4, h: 3, glass: [.5, .5]},
+    {x: 89, y: 72, w: 4.5, h: 4.5, glass: [.35, .35]}, {x: 84, y: 81, w: 9, h: 4, glass: [.5, .4]}, {x: 71, y: 82, w: 3, h: 3, glass: [.5, .5]}
   ];
   function roomFrame(){}
 

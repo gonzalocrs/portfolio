@@ -586,9 +586,9 @@ document.querySelectorAll('.more-btn').forEach(function(b){
     var S = Math.min(H * .66, W * .42); pic.style.width = pic.style.height = S + 'px';
     var dw = Math.min(bayW, 900), dh = Math.min(H * .74, 560); desk.style.width = dw + 'px'; desk.style.height = dh + 'px';
     desk.style.padding = 'clamp(1.4rem,3.5vh,2.4rem) clamp(1.4rem,3vw,2.6rem)';
-    // the mark stands in the middle of the screen, over the prompt; on a narrow window it gets smaller rather than
-    // moving, so it never runs into the label
-    var px = W / 2; S = Math.max(160, Math.min(S, 2 * (px - bayL))); pic.style.width = pic.style.height = S + 'px';
+    // the mark stands, over the prompt, in the middle of what the label leaves: from the label's edge to the edge of
+    // the screen. On a narrow window it gets smaller rather than running into the label
+    var px = (pad + lw + W) / 2; S = Math.max(160, Math.min(S, 2 * (px - bayL))); pic.style.width = pic.style.height = S + 'px';
     place(pic, px - S / 2, cy - S / 2 - (at === 2 ? H : 0), at === 2 ? 0 : 1);
     hint.style.left = Math.round(px) + 'px';
     place(label, pad - (at ? 0 : 30), 0, at ? 1 : 0);

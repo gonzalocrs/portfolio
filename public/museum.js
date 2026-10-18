@@ -6,27 +6,22 @@
     3. scroll a little: it steps to the right and its wall label appears on the left (name, facts, the text);
        "More info" widens the label to the whole text
     4. scroll on: the rest of the project, hung one of three ways:
-         walk       the label stays; the picture goes up and the second comes up in its place, then each scroll
-                    moves one picture to the right
-         salon      the rest hung loosely on one wall you scroll over freely: loose, pairs or column (/?hang=)
-         spotlight  a dark room you cross to the right, one work at a time, each lit as you come to it
-       /?room=walk|salon|spot picks one (remembered for the visit); a small switch in the corner swaps it.
-  Every scroll (a wheel gesture, an arrow key) goes one step, gliding slowly; the salon's wall scrolls freely.
+         walk   the label stays; the picture goes up and the second comes up in its place, then each scroll
+                moves one picture to the right, each lit as it arrives; a small bar under them says where you are
+         salon  everything at once, hung in openings like the home page's wall
+       /?room=walk|salon picks one (remembered for the visit); a small switch in the corner swaps it.
+  Every scroll (a wheel gesture, an arrow key) goes one step, gliding slowly.
 
   Content comes from projects.js. Pictures are never cropped.
 */
 (function(){
   var P = window.PROJECTS || {}, SLUGS = Object.keys(P);
-  var ROOMS = [['walk', 'Walk'], ['salon', 'Salon'], ['spot', 'Spotlight']];
-  var HANGS = [['loose', 'Loose'], ['pairs', 'Pairs'], ['column', 'Column']];
-  var room = 'walk', hangStyle = 'loose';
+  var ROOMS = [['walk', 'Walk'], ['salon', 'Salon']];
+  var room = 'walk';
   try{
-    var hq = /[?&]hang=(loose|pairs|column)\b/.exec(location.search);
-    if(hq) sessionStorage.setItem('gc-hang', hq[1]);
-    hangStyle = sessionStorage.getItem('gc-hang') || 'loose';
-    var rq = /[?&]room=(walk|salon|spot)\b/.exec(location.search);
+    var rq = /[?&]room=(walk|salon)\b/.exec(location.search);
     if(rq) sessionStorage.setItem('gc-room', rq[1]);
-    room = sessionStorage.getItem('gc-room') || 'walk';
+    room = sessionStorage.getItem('gc-room') === 'salon' ? 'salon' : 'walk';
   }catch(e){}
 
   // lighter copies of camera originals
@@ -143,13 +138,6 @@
       b.addEventListener('click', function(){ setRoom(r[0]); });
       sw.appendChild(b);
     });
-    var hs = el('div', 'm-hangs'); hs.appendChild(el('span', null, 'Hang'));
-    HANGS.forEach(function(h){
-      var b = el('button', null, h[1]); b.type = 'button'; b.dataset.hang = h[0];
-      b.addEventListener('click', function(){ setHang(h[0]); });
-      hs.appendChild(b);
-    });
-    sw.appendChild(hs);
     document.body.appendChild(sw);
 
     var rest = all.map(function(s){ return {name: s.name, items: s.items.filter(function(it){ return it.src !== firstSrc; })}; }).filter(function(s){ return s.items.length; });
@@ -200,8 +188,7 @@
   function stops(){
     var L = labelStop(), H = state.H, o = [0, L];
     if(state.walk) state.walk.slides.forEach(function(s, k){ o.push(L + (k + 1) * H); });
-    else if(state.spot) state.spot.slides.forEach(function(s, k){ o.push(state.gal.offsetTop + k * H); });
-    else o.push(state.gal.offsetTop);
+    else if(!narrow()) o.push(state.gal.offsetTop);
     return o;
   }
   function layout(){
@@ -234,9 +221,19 @@
     L.classList.toggle('on', lo > .5);
     if(state.walk){
       var w = state.walk;
-      w.pane.style.left = R.areaL + 'px';
+      // the pane is one bay wide, so the next picture stays out of sight until it comes
+      w.pane.style.left = R.areaL + 'px'; w.pane.style.width = R.bay + 'px';
       w.slides.forEach(function(s){ s.style.width = R.bay + 'px'; s.style.marginRight = R.gap + 'px'; });
       w.trail.style.transform = 'translate(' + Math.round(-k * (R.bay + R.gap)) + 'px,' + Math.round(H - dy) + 'px)';
+      // a picture is lit while it is in front of you, as in a dark room
+      var here = dy < H * .5 ? -1 : Math.round(k);
+      w.slides.forEach(function(s, i){ s.classList.toggle('lit', i === here); });
+      // the bar: one mark per picture (the first one included), the one in front of you dark
+      var at = dy < H * .5 ? 0 : Math.min(Math.round(k) + 1, w.marks.length - 1);
+      w.bar.style.left = R.areaL + 'px'; w.bar.style.width = R.bay + 'px';
+      w.bar.style.opacity = lo;
+      w.marks.forEach(function(m, i){ m.classList.toggle('here', i === at); });
+      w.bar.classList.toggle('done', Math.round(k) >= w.slides.length - 1 && dy >= H * .5);
     }
     state.hint.style.opacity = t < .05 ? 1 : (t > .98 && dy < 4 ? 1 : 0);
     state.hint.firstChild.textContent = t > .98 ? 'More from this project' : 'Scroll';
@@ -251,16 +248,8 @@
     syncSwitch();
     ov.scrollTop = room === 'walk' && !narrow() ? labelStop() + state.H : state.gal.offsetTop;
   }
-  function setHang(h){
-    hangStyle = h;
-    try{ sessionStorage.setItem('gc-hang', h); }catch(e){}
-    if(state.hang) state.hang();
-    syncSwitch();
-  }
   function syncSwitch(){
     Array.prototype.forEach.call(sw.querySelectorAll('button[data-room]'), function(b){ b.setAttribute('aria-pressed', b.dataset.room === room ? 'true' : 'false'); });
-    Array.prototype.forEach.call(sw.querySelectorAll('button[data-hang]'), function(b){ b.setAttribute('aria-pressed', b.dataset.hang === hangStyle ? 'true' : 'false'); });
-    sw.classList.toggle('salon', room === 'salon');
   }
 
   function endPiece(){
@@ -280,34 +269,45 @@
     var f = el('figure', cls), im = new Image();
     im.alt = it.caption || state.p.title; im.src = it.src;
     f.appendChild(im);
-    var cap = el('figcaption', 'm-tag'); cap.appendChild(el('b', null, pad(n) + ' / ' + pad(total))); cap.appendChild(document.createTextNode(it.caption || it.kind));
-    f.appendChild(cap);
+    f.appendChild(el('figcaption', 'm-tag', it.caption || it.kind));
     return f;
   }
 
   function buildRoom(){
     var gal = state.gal, H = state.H;
     gal.innerHTML = ''; gal.className = 'm-gallery';
-    if(state.io) state.io.disconnect();
-    state.walk = null; state.spot = null; state.hang = null; state.io = null;
-    var old = state.roomEl.querySelector('.m-pane'); if(old) old.remove();
+    state.walk = null; state.hang = null;
+    Array.prototype.forEach.call(state.roomEl.querySelectorAll('.m-pane,.m-bar'), function(e){ e.remove(); });
     var list = items(), total = list.length;
-    if(room === 'walk' && !narrow()){
+    if(narrow()){
+      // on a phone: the rest, one under the other
+      var col = el('div', 'm-list');
+      list.forEach(function(it, i){ col.appendChild(figure(it, i + 1, total)); });
+      col.appendChild(endPiece());
+      gal.appendChild(col);
+    }
+    else if(room === 'walk'){
       // the rest of the work in a row of bays on the label's right; it comes up from below, then moves sideways
       var pane = el('div', 'm-pane'), trail = el('div', 'm-trail'), slides = [];
       list.forEach(function(it, i){
         var sl = el('div', 'm-step'); sl.appendChild(figure(it, i + 1, total));
         trail.appendChild(sl); slides.push(sl);
       });
-      var last = el('div', 'm-step'); last.appendChild(endPiece()); trail.appendChild(last); slides.push(last);
+      var last = el('div', 'm-step m-step-end'); last.appendChild(endPiece()); trail.appendChild(last); slides.push(last);
       pane.appendChild(trail);
+      var bar = el('div', 'm-bar'), marks = [];
+      for(var m = 0; m <= total; m++){ var mk = el('span'); bar.appendChild(mk); marks.push(mk); }
       state.roomEl.insertBefore(pane, state.label);
-      state.walk = {pane: pane, trail: trail, slides: slides};
+      state.roomEl.appendChild(bar);
+      state.walk = {pane: pane, trail: trail, slides: slides, bar: bar, marks: marks};
     }
-    else if(room === 'salon'){
-      // the rest hung loosely on one wall that you look over freely, in one of three hangs
+    else{
+      // the salon: everything at once, in openings like the home page's wall (the same bay of openings, as many bays
+      // as the pictures need). Each opening takes its picture's proportions inside its place, so nothing is cropped;
+      // the places left over stay empty, drawn as splayed reveals.
       var salon = el('div', 'm-salon'), wall = el('div', 'm-wall');
-      salon.appendChild(wall); salon.appendChild(endPiece());
+      salon.appendChild(wall);
+      var foot = el('div', 'm-salon-foot'); foot.appendChild(endPiece()); salon.appendChild(foot);
       gal.appendChild(salon);
       var left = list.length;
       list.forEach(function(it){
@@ -318,75 +318,55 @@
       var hang = function(){
         if(!state || state.gal !== gal || left > 0) return;
         wall.innerHTML = '';
-        var W = wall.clientWidth, placed = [], bottom = 0, gapY = Math.max(48, H * .1);
-        function below(){ return placed.length ? bottom + gapY : 0; }
-        function put(it, i, x, w, y){
-          var h = w / it.a;
-          // unless told where, as high as it can go without touching anything above it
-          if(y == null){ y = 0; placed.forEach(function(r){ if(x < r.x + r.w + 24 && x + w + 24 > r.x) y = Math.max(y, r.y + r.h + gapY); }); }
-          var f = figure(it, i + 1, total, 'm-hung');
-          f.style.left = x + 'px'; f.style.top = y + 'px'; f.style.width = w + 'px';
-          f.querySelector('img').style.height = h + 'px';
+        var nb = Math.max(1, Math.ceil(list.length / BAY.length)), WW = nb * 100, WH = 90;
+        var slots = [];
+        for(var b = 0; b < nb; b++) BAY.forEach(function(o){
+          var w = o.w, h = o.w / o.r, flip = b % 2 === 1;
+          slots.push({x: b * 100 + o.x, y: flip ? WH - o.y - h : o.y, w: w, h: h, r: o.r});
+        });
+        // the box the wall fits in, and its scale (wall units to pixels)
+        var bw = wall.clientWidth, bh = wall.clientHeight, sc = Math.min(bw / WW, bh / WH), ox = (bw - WW * sc) / 2, oy = (bh - WH * sc) / 2;
+        // like goes with like: each picture takes the free place nearest its own proportions
+        var pics = list.slice(), taken = {};
+        var pick = pics.map(function(it){
+          var best = -1;
+          slots.forEach(function(sl, k){ if(!taken[k] && (best < 0 || Math.abs(Math.log(sl.r / it.a)) < Math.abs(Math.log(slots[best].r / it.a)))) best = k; });
+          taken[best] = 1; return best;
+        });
+        var NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg');
+        svg.setAttribute('class', 'facade'); svg.setAttribute('viewBox', '0 0 ' + bw + ' ' + bh);
+        function line(x1, y1, x2, y2){ var l = document.createElementNS(NS, 'line'); l.setAttribute('x1', x1); l.setAttribute('y1', y1); l.setAttribute('x2', x2); l.setAttribute('y2', y2); svg.appendChild(l); }
+        function rect(x, y, w, h, c){ var r = document.createElementNS(NS, 'rect'); r.setAttribute('x', x); r.setAttribute('y', y); r.setAttribute('width', w); r.setAttribute('height', h); r.setAttribute('class', c); svg.appendChild(r); }
+        slots.forEach(function(sl, k){
+          var X = ox + sl.x * sc, Y = oy + sl.y * sc, Wd = sl.w * sc, Ht = sl.h * sc, j = pick.indexOf(k);
+          if(j < 0){
+            // an empty opening: the splayed reveal
+            var gw = Wd * .28, gh = Ht * .24, gx = X + (Wd - gw) / 2, gy = Y + (Ht - gh) / 2;
+            rect(X, Y, Wd, Ht, 'splay');
+            line(X, Y, gx, gy); line(X + Wd, Y, gx + gw, gy); line(X + Wd, Y + Ht, gx + gw, gy + gh); line(X, Y + Ht, gx, gy + gh);
+            rect(gx, gy, gw, gh, 'pane');
+            return;
+          }
+          var it = pics[j], s1 = fit(it.a, Wd, Ht);
+          var f = el('figure', 'm-hung'), im = new Image(); im.src = it.src; im.alt = it.caption || state.p.title;
+          f.style.left = (X + (Wd - s1.w) / 2) + 'px'; f.style.top = (Y + (Ht - s1.h) / 2) + 'px';
+          f.style.width = s1.w + 'px'; f.style.height = s1.h + 'px';
+          f.appendChild(im); f.appendChild(el('span', 'cap', it.caption || it.kind));
           f.addEventListener('click', function(){ zoom(it.src); });
           wall.appendChild(f);
-          placed.push({x: x, y: y, w: w, h: h}); bottom = Math.max(bottom, y + h);
-        }
-        function size(it, wf, hmax){ var w = W * wf; return Math.min(w, hmax * it.a); }
-        if(hangStyle === 'loose'){
-          // scattered, as on the home wall: varied sizes and positions, nothing touching
-          var WF = [.4, .28, .34, .24, .44, .3, .36], XF = [.02, .56, .2, .66, .06, .46, .28];
-          list.forEach(function(it, i){
-            var w = size(it, WF[i % WF.length] * (it.kind === 'Drawing' || it.kind === 'Concept' ? 1.15 : 1), H * .62);
-            put(it, i, clamp(W * XF[i % XF.length], 0, W - w), w);
-          });
-        }
-        else if(hangStyle === 'pairs'){
-          // two at a time, large, the pair stepping left and right down the wall
-          for(var i = 0; i < list.length; i += 2){
-            var a = list[i], b = list[i + 1], g = Math.max(32, W * .05), row = W * .86;
-            var h = b ? Math.min(H * .58, (row - g) / (a.a + b.a)) : Math.min(H * .62, row * .6 / a.a);
-            var x0 = (i / 2) % 2 ? W - (b ? h * (a.a + b.a) + g : h * a.a) : 0, y0 = below();
-            put(a, i, x0, h * a.a, y0);
-            if(b) put(b, i + 1, x0 + h * a.a + g, h * b.a, y0);
-          }
-        }
-        else{
-          // one at a time down a long wall, each stepping left, centre, right
-          var XS = [.06, .5, .94];
-          list.forEach(function(it, i){
-            var w = size(it, .56, H * .7), c = W * XS[i % 3];
-            put(it, i, clamp(c - w / 2, 0, W - w), w, below());
-          });
-        }
-        wall.style.height = (bottom + 40) + 'px';
+        });
+        wall.insertBefore(svg, wall.firstChild);
       };
       state.hang = hang;
     }
-    else{
-      // a dark room you walk across to the right, one work at a time, each lit as you come to it
-      var spot = el('div', 'm-spot'), view = el('div', 'm-spot-view'), track = el('div', 'm-spot-track'), sls = [];
-      list.forEach(function(it, i){
-        var s = el('div', 'm-slide'), im = new Image(); im.src = it.src; im.alt = it.caption || state.p.title;
-        s.appendChild(im);
-        var tg = el('div', 'm-tag'); tg.appendChild(el('b', null, it.kind)); tg.appendChild(document.createTextNode(it.caption || '')); s.appendChild(tg);
-        s.appendChild(el('div', 'm-tag count', pad(i + 1) + ' / ' + pad(total)));
-        track.appendChild(s); sls.push(s);
-      });
-      var endS = el('div', 'm-slide m-slide-end'); endS.appendChild(endPiece()); track.appendChild(endS); sls.push(endS);
-      view.appendChild(track); spot.appendChild(view); gal.appendChild(spot);
-      spot.style.height = sls.length * H + 'px';
-      state.spot = {el: spot, track: track, slides: sls};
-    }
   }
-  // the spotlight room: scrolling down carries you sideways, one screen of scroll per work
-  function roomFrame(){
-    if(!state || !state.spot) return;
-    var s = state.spot, k = clamp((ov.scrollTop - state.gal.offsetTop) / state.H, 0, s.slides.length - 1), cw = ov.clientWidth;
-    s.slides.forEach(function(sl){ sl.style.width = cw + 'px'; });
-    s.track.style.transform = 'translateX(' + (-k * cw) + 'px)';
-    var here = Math.round(k);
-    s.slides.forEach(function(sl, i){ sl.classList.toggle('lit', i === here && ov.scrollTop >= state.gal.offsetTop - state.H * .5); });
-  }
+  // one bay of the home page's wall: places of different sizes and proportions (wall units, a bay is 100 x 90)
+  var BAY = [
+    {x: 1, y: 1, w: 33, r: 10 / 11}, {x: 39, y: 6, w: 28, r: 4 / 3}, {x: 72, y: 0, w: 24, r: 3 / 4},
+    {x: 5, y: 44, w: 30, r: 3 / 2}, {x: 41, y: 31, w: 27, r: 1}, {x: 74, y: 37, w: 25, r: 4 / 5},
+    {x: 1, y: 67, w: 27, r: 4 / 3}, {x: 33, y: 66, w: 31, r: 3 / 2}
+  ];
+  function roomFrame(){}
   // keep the layout in step for a moment (while the label widens or narrows)
   function follow(ms){ var end = performance.now() + ms; (function go(){ frame(); if(performance.now() < end) requestAnimationFrame(go); })(); }
 
@@ -413,11 +393,6 @@
     return true;
   }
   // the salon is hung on one wall you look over freely; stepping only takes you to it and back
-  function free(dir){
-    if(room !== 'salon') return false;
-    var g = state.gal.offsetTop, y = ov.scrollTop;
-    return y > g + 2 || (y >= g - 2 && dir > 0);
-  }
   function release(){
     clearTimeout(quiet);
     quiet = setTimeout(function(){ if(anim){ release(); return; } locked = false; acc = 0; }, 200);
@@ -428,7 +403,7 @@
     var dir = e.deltaY > 0 ? 1 : -1;
     var L = e.target.closest && e.target.closest('.m-label.open');
     if(L && L.scrollHeight > L.clientHeight + 1 && (dir > 0 ? L.scrollTop + L.clientHeight < L.scrollHeight - 1 : L.scrollTop > 0)) return;   // reading the whole text
-    if(Math.abs(e.deltaX) > Math.abs(e.deltaY) || free(dir)) return;
+    if(Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
     e.preventDefault();
     if(locked){ release(); return; }
     acc += e.deltaY * (e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? 600 : 1);
@@ -439,7 +414,7 @@
   function onKey(e){
     if(!state || narrow() || e.metaKey || e.ctrlKey || e.altKey || document.querySelector('.m-zoom')) return;
     var dir = {ArrowDown: 1, PageDown: 1, ' ': 1, ArrowUp: -1, PageUp: -1}[e.key];
-    if(!dir || free(dir) || (e.target.closest && e.target.closest('button'))) return;
+    if(!dir || (e.target.closest && e.target.closest('button'))) return;
     e.preventDefault();
     step(e.shiftKey && e.key === ' ' ? -1 : dir);
   }
@@ -454,7 +429,6 @@
   function teardown(now){
     if(!ov) return;
     var o = ov, c = closeBtn, s = sw;
-    if(state && state.io) state.io.disconnect();
     ov = closeBtn = sw = state = null;
     document.body.classList.remove('museum-on');
     if(now){ o.remove(); c.remove(); s.remove(); return; }

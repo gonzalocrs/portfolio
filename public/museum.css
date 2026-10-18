@@ -71,38 +71,49 @@ body.museum-on{overflow:hidden}
 .m-end .m-tag{display:block;margin-bottom:.4rem}
 
 /* walk: the label stays on the left; on its right the first picture goes up, the second comes up in its place, then
-   each step moves one bay to the right (the next picture shows at the right edge) */
-.m-pane{position:absolute;top:0;bottom:0;right:0;overflow:hidden}
+   each step moves one bay to the right. The pane is one bay wide, so the next picture is out of sight until it comes,
+   and each is lit as it arrives (the spotlight room, folded in). The bar under them says where you are. */
+.m-pane{position:absolute;top:0;bottom:0;overflow:hidden}
 .m-trail{position:absolute;left:0;top:0;display:flex;will-change:transform}
 .m-step{flex:0 0 auto;height:var(--m-h);display:flex;align-items:center;justify-content:center}
 .m-step figure{position:relative;margin:0;max-width:100%}
-.m-step img{display:block;max-width:100%;max-height:calc(var(--m-h) * .74);width:auto;height:auto;border:1px solid var(--rule);background:var(--paper)}
-.m-step figcaption{position:absolute;left:0;top:100%;margin-top:.7rem;white-space:nowrap}
-.m-step .m-end,.m-slide-end .m-end{flex-direction:column;align-items:flex-start;gap:2.5rem}
+.m-step img{display:block;max-width:100%;max-height:calc(var(--m-h) * .74);width:auto;height:auto;border:1px solid var(--rule);background:var(--paper);
+  opacity:.15;transition:opacity .9s ease}
+.m-step.lit img{opacity:1}
+.m-step figcaption{position:absolute;left:0;top:100%;margin-top:.7rem;white-space:nowrap;opacity:0;transition:opacity .6s ease .2s}
+.m-step.lit figcaption{opacity:1}
+.m-step .m-end{flex-direction:column;align-items:flex-start;gap:2.5rem}
+.m-bar{position:absolute;top:calc(var(--m-h) * .87 + 44px);height:2px;display:flex;gap:4px;opacity:0}
+.m-bar span{flex:1;background:var(--rule);transition:background .5s ease}
+.m-bar span.here{background:var(--ink)}
 
-/* salon: the rest hung loosely on one wall you scroll over freely (loose, pairs or column; see museum.js) */
-.m-salon{padding:clamp(4rem,12vh,7rem) clamp(1rem,4vw,2.5rem) 4rem;background:color-mix(in srgb,var(--ink) 3%,var(--paper));border-top:1px solid var(--rule)}
-.m-wall{position:relative}
-.m-hung{position:absolute;margin:0;cursor:zoom-in}
-.m-hung img{display:block;width:100%;border:1px solid var(--rule);background:var(--paper)}
-.m-hung figcaption{margin-top:.6rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.m-salon .m-end{margin-top:5rem}
+/* salon: everything at once, in openings like the home page's wall; the places left over are empty splayed reveals */
+.m-salon{height:var(--m-h);display:flex;flex-direction:column;padding:clamp(1.5rem,5vh,3rem) clamp(1rem,4vw,2.5rem) 1rem;border-top:1px solid var(--rule)}
+.m-wall{position:relative;flex:1;min-height:0}
+.m-wall .facade{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.m-wall .facade .splay{fill:color-mix(in srgb,var(--ink) 4%,var(--paper));stroke:var(--rule)}
+.m-wall .facade line{stroke:var(--rule)}
+.m-wall .facade .pane{fill:var(--paper);stroke:var(--rule)}
+.m-wall .facade *{stroke-width:1}
+.m-hung{position:absolute;margin:0;border:1px solid var(--rule);background:var(--paper);cursor:zoom-in}
+.m-hung img{display:block;width:100%;height:100%}
+.m-hung .cap{position:absolute;left:.5rem;bottom:.5rem;font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;
+  padding:.25em .55em;background:var(--paper);color:var(--mute);opacity:0;transition:opacity .25s ease;white-space:nowrap;max-width:calc(100% - 1rem);overflow:hidden;text-overflow:ellipsis}
+.m-hung:hover .cap{opacity:1}
+.m-salon-foot{padding-top:1rem}
+.m-salon-foot .m-end{justify-content:flex-end;gap:3rem}
+.m-salon-foot .m-end button{font-size:1rem}
 .m-zoom{position:fixed;inset:0;z-index:70;display:flex;align-items:center;justify-content:center;padding:4vh 4vw;
   background:color-mix(in srgb,var(--paper) 94%,transparent);cursor:zoom-out;opacity:0;transition:opacity .3s ease}
 .m-zoom.on{opacity:1}
 .m-zoom img{max-width:100%;max-height:100%;border:1px solid var(--rule)}
 
-/* spotlight: a dark room, one work at a time, each lit as you come to it */
-.m-spot{background:#0b0b0c;color:#ecebe8;--mute:#8b8d90;--rule:#2b2d30;--ink:#ecebe8;--paper:#0b0b0c}
-.m-spot-view{position:sticky;top:0;height:var(--m-h);overflow:hidden}
-.m-spot-track{display:flex;height:100%;will-change:transform}
-.m-slide{position:relative;flex:0 0 auto;height:var(--m-h);display:flex;align-items:center;justify-content:center}
-.m-slide img{max-width:84vw;max-height:78%;opacity:.12;transform:scale(.985);transition:opacity .9s ease,transform 1.2s cubic-bezier(.2,.7,.2,1);
-  box-shadow:0 30px 80px -30px rgba(0,0,0,.9)}
-.m-slide.lit img{opacity:1;transform:none}
-.m-slide .m-tag{position:absolute;left:clamp(1rem,4vw,2.5rem);bottom:4rem;opacity:0;transition:opacity .6s ease .2s}
-.m-slide .count{left:auto;right:clamp(1rem,4vw,2.5rem)}
-.m-slide.lit .m-tag{opacity:1}
+/* on a phone: the rest, one under the other */
+.m-list{padding:2rem 1rem 3rem;border-top:1px solid var(--rule)}
+.m-list figure{margin:0 0 2.2rem}
+.m-list img{display:block;width:100%;height:auto;border:1px solid var(--rule)}
+.m-list figcaption{margin-top:.5rem}
+.m-list .m-end{flex-direction:column;gap:1.5rem}
 
 /* the test switch between the three rooms */
 .m-switch{position:fixed;z-index:62;left:clamp(1rem,4vw,2.5rem);bottom:1rem;display:flex;gap:.2rem;padding:.3rem;
@@ -112,8 +123,6 @@ body.museum-on{overflow:hidden}
 .m-switch button{padding:.25rem .5rem;color:var(--mute)}
 .m-switch button:hover{color:var(--ink)}
 .m-switch button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
-.m-hangs{display:none;gap:.2rem;margin-left:.3rem;padding-left:.5rem;border-left:1px solid var(--rule)}
-.m-switch.salon .m-hangs{display:flex}
 
 @media (max-width:700px){
   .m-label{position:static;width:auto;opacity:1;padding:0 1rem 2rem}
@@ -122,7 +131,6 @@ body.museum-on{overflow:hidden}
   .m-pic{position:relative;left:auto !important;top:auto !important;width:auto !important;height:auto !important;margin:1rem}
   .m-pic img{height:auto}
   .m-hint{display:none}
-  .m-switch{bottom:.6rem}
-  .m-slide .m-tag{bottom:3.6rem}
+  .m-switch{display:none}
 }
 @media (prefers-reduced-motion:reduce){ .museum *{transition-duration:.01ms !important;animation:none !important} }

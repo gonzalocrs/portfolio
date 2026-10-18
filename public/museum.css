@@ -98,7 +98,7 @@ body.museum-on{overflow:hidden}
 .m-nav.on:hover,.m-nav.on:focus-visible{opacity:1;color:var(--ink)}
 .m-nav svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.3}
 
-/* panorama: one wall, after the south wall at Ronchamp. Every picture is the pane at the back of a splayed opening cut
+/* gallery: one wall, after the south wall at Ronchamp. Every picture is the pane at the back of a splayed opening cut
    through it (the reveal frames it); the places left over are empty openings, and small ones play between them */
 .m-salon{height:var(--m-h);display:flex;flex-direction:column;padding:clamp(1.5rem,5vh,3rem) 0 1rem;will-change:transform}
 .m-wall{position:relative;flex:none}

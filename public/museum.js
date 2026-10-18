@@ -8,18 +8,18 @@
     4. scroll on: the rest of the project, hung one of two ways:
          spotlight (walk)  the label stays; the picture goes up and the second comes up in its place, then each scroll
                 moves one picture to the right, each lit as it arrives; a small bar under them says where you are
-         panorama (salon)  everything at once, each picture at the back of a splayed opening in one wall (Ronchamp)
-       A visit starts in spotlight; one small icon under the pictures goes to the other room (four panes: panorama,
-       one pane: back to spotlight). Every visit starts in spotlight (/?room=panorama opens a linked one there).
+         gallery (salon)   everything at once, each picture at the back of a splayed opening in one wall (Ronchamp)
+       A visit starts in spotlight; one small icon under the pictures goes to the other room (four panes: gallery,
+       one pane: back to spotlight). Every visit starts in spotlight (/?room=gallery opens a linked one there).
   Every scroll (a wheel gesture, an arrow key) goes one step, gliding slowly.
 
   Content comes from projects.js. Pictures are never cropped.
 */
 (function(){
   var P = window.PROJECTS || {}, SLUGS = Object.keys(P);
-  var ROOMS = [['walk', 'Spotlight'], ['salon', 'Panorama']];
-  // every visit starts in the spotlight; /?room=panorama only opens the first one (a link) in the panorama
-  var room = 'walk', rq = /[?&]room=(salon|panorama)\b/.test(location.search) ? 'salon' : null;
+  var ROOMS = [['walk', 'Spotlight'], ['salon', 'Gallery']];
+  // every visit starts in the spotlight; /?room=gallery only opens the first one (a link) in the gallery
+  var room = 'walk', rq = /[?&]room=(salon|panorama|gallery)\b/.test(location.search) ? 'salon' : null;
 
   // lighter copies of camera originals
   function web(src){
@@ -116,7 +116,7 @@
 
     // the prompt to scroll also takes the step when clicked, for anyone who does not scroll
     var hint = el('button', 'm-hint'); hint.type = 'button';
-    hint.innerHTML = '<span>About this project</span><svg viewBox="0 0 22 22"><path d="M4 7.5l7 7 7-7"/></svg>';
+    hint.innerHTML = '<span>Description</span><svg viewBox="0 0 22 22"><path d="M4 7.5l7 7 7-7"/></svg>';
     hint.addEventListener('click', function(){ step(1); });
     roomEl.appendChild(hint);
     stage.appendChild(roomEl);
@@ -163,7 +163,7 @@
 
   function setRect(e, r){ e.style.left = r.x + 'px'; e.style.top = r.y + 'px'; e.style.width = r.w + 'px'; e.style.height = r.h + 'px'; }
   // r0: close up, in the middle; r1: stepped to the right, leaving the left for the label (areaL is where the
-  // pictures' side begins). Each picture has a bay a little narrower than that side; the panorama's wall stands on
+  // pictures' side begins). Each picture has a bay a little narrower than that side; the gallery's wall stands on
   // the same width.
   function rects(){
     var W = innerWidth, H = state.H, a = state.a, gut = Math.max(16, Math.min(40, W * .04));
@@ -175,7 +175,7 @@
   }
   // where the scroll rests: close up, the label, then one screen of scroll per picture. The room is sticky, one
   // screen tall, so the stage is as tall as the walk is long.
-  // the panorama's floor, in the room: the spotlight's bar line (see .m-bar), at the same height and as long
+  // the gallery's floor, in the room: the spotlight's bar line (see .m-bar), at the same height and as long
   function groundLine(){ return Math.round(state.H * .87 + 36 + 8); }
   function labelStop(){ return Math.round(state.H * .6); }
   function sizeStage(){
@@ -250,20 +250,23 @@
     placeSwitch(R, dy >= H * .5);
     var hv = t < .05 || (t > .98 && dy < 4);
     state.hint.style.opacity = hv ? 1 : 0; state.hint.style.pointerEvents = hv ? 'auto' : 'none';
-    state.hint.firstChild.textContent = t > .98 ? 'More from this project' : 'About this project';
+    state.hint.firstChild.textContent = t > .98 ? 'More from this project' : 'Description';
     roomFrame();
   }
 
   // ---------- 4: the room ----------
-  // at: in the spotlight, which picture to land on (from a click on it in the panorama); the first one otherwise
+  // at: in the spotlight, which picture to land on (from a click on it in the gallery); the first one otherwise
   function setRoom(r, at){
+    // from the spotlight to the gallery: remember where the picture in front of you is, to zoom out from it
+    var lit = r === 'salon' && state.walk && !narrow() && state.walk.pane.querySelector('.m-step.lit img');
+    state.zoomFrom = lit ? {src: lit.getAttribute('src'), r: lit.getBoundingClientRect()} : null;
     room = r;
     buildRoom(); sizeStage();
     syncSwitch();
     ov.scrollTop = narrow() ? state.gal.offsetTop : labelStop() + state.H * (1 + (r === 'walk' && at ? at : 0));
     frame();   // both rooms rest at the same scroll, so no scroll event comes to place the new one
   }
-  // four panes for the panorama, one pane for the spotlight: the icon shows the room it takes you to
+  // four panes for the gallery, one pane for the spotlight: the icon shows the room it takes you to
   var ICONS = {
     salon: '<svg viewBox="0 0 22 22"><rect x="2.5" y="2.5" width="7" height="7"/><rect x="12.5" y="2.5" width="7" height="7"/><rect x="2.5" y="12.5" width="7" height="7"/><rect x="12.5" y="12.5" width="7" height="7"/></svg>',
     walk: '<svg viewBox="0 0 22 22"><rect x="4.5" y="4.5" width="13" height="13"/></svg>'
@@ -271,7 +274,7 @@
   function syncSwitch(){
     var to = room === 'walk' ? 'salon' : 'walk', name = ROOMS.filter(function(r){ return r[0] === to; })[0][1];
     sw.innerHTML = ICONS[to] + '<span>' + name + '</span>';
-    sw.setAttribute('aria-label', to === 'salon' ? 'Panorama: see every picture at once' : 'Spotlight: one picture at a time');
+    sw.setAttribute('aria-label', to === 'salon' ? 'Gallery: see every picture at once' : 'Spotlight: one picture at a time');
   }
   // under the pictures, in the middle of their side; the same place in both rooms
   function placeSwitch(R, inRoom){
@@ -447,6 +450,7 @@
           wall.appendChild(f);
         });
         wall.insertBefore(svg, wall.firstChild);
+        zoomOut(wall, foot);
       };
       state.hang = hang;
     }
@@ -465,6 +469,22 @@
     {x: 89, y: 72, w: 4.5, h: 4.5, glass: [.35, .35]}, {x: 84, y: 81, w: 9, h: 4, glass: [.5, .4]}, {x: 71, y: 82, w: 3, h: 3, glass: [.5, .5]}
   ];
   function roomFrame(){}
+  // the gallery comes in as if you stepped back from the picture you were looking at: the whole wall starts scaled up
+  // so that picture sits exactly where it was in the spotlight, then shrinks to its place with the rest around it
+  function zoomOut(wall, foot){
+    var z = state.zoomFrom; state.zoomFrom = null;
+    var f = z && Array.prototype.filter.call(wall.querySelectorAll('.m-hung img'), function(im){ return im.getAttribute('src') === z.src; })[0];
+    if(!f) return;
+    var o = wall.getBoundingClientRect(), h = f.getBoundingClientRect(), k = z.r.width / h.width;
+    if(!(k > 1.01)) return;
+    var tx = z.r.left - o.left - k * (h.left - o.left), ty = z.r.top - o.top - k * (h.top - o.top);
+    wall.style.transition = 'none'; wall.style.transformOrigin = '0 0';
+    wall.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + k + ')';
+    foot.style.transition = 'none'; foot.style.opacity = 0;
+    void wall.offsetWidth;
+    wall.style.transition = 'transform 1.3s cubic-bezier(.45,0,.2,1)'; wall.style.transform = '';
+    foot.style.transition = 'opacity .6s ease .9s'; foot.style.opacity = '';
+  }
 
   // ---------- one step per scroll: each wheel gesture or key press goes to the next resting place ----------
   var anim = 0, goal = null, locked = false, quiet = 0;

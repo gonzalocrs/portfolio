@@ -3,10 +3,10 @@
 
     1. the wall: the home page as it is
     2. click a picture (or a title): it comes up close, whole, in the middle of the room
-    3. scroll a little: it steps to the right and its wall label appears on the left (name, facts, the text)
+    3. scroll a little: it steps to the right and its wall label appears on the left (name, facts, the text);
+       "More info" widens the label to the whole text
     4. scroll on: the rest of the project, hung one of three ways:
-         walk       the label stays where it is and the rest of the work slides past on its right, as if you walked
-                    along the wall; scrolling down moves you sideways
+         walk       the label stays; the picture goes up and the next comes up whole in its place, one per scroll
          salon      everything hung at once, edge to edge
          spotlight  a dark room, one work at a time, each lit as you come to it
        /?room=walk|salon|spot picks one (remembered for the visit); a small switch in the corner swaps it.
@@ -97,8 +97,22 @@
     });
     label.appendChild(c1);
     var text = paras(p.text), lead = p.lede ? [p.lede] : [];
-    var first = lead.concat(text.slice(0, 1));
-    if(first.length){ var c2 = el('div', 'm-card'); first.forEach(function(t){ c2.appendChild(el('p', 'text', t)); }); label.appendChild(c2); }
+    var allText = lead.concat(text), shown = lead.length + Math.min(1, text.length);
+    if(allText.length){
+      var c2 = el('div', 'm-card');
+      allText.forEach(function(t, i){ c2.appendChild(el('p', 'text' + (i >= shown ? ' extra' : ''), t)); });
+      if(allText.length > shown){
+        var more = el('button', 'm-more-btn', 'More info'); more.type = 'button';
+        more.addEventListener('click', function(){
+          var on = label.classList.toggle('open');
+          more.textContent = on ? 'Less' : 'More info';
+          if(!on) label.scrollTop = 0;
+          follow(500);   // the picture makes room as the label widens
+        });
+        c2.appendChild(more);
+      }
+      label.appendChild(c2);
+    }
     roomEl.appendChild(label);
 
     var hint = el('div', 'm-hint');
@@ -144,28 +158,42 @@
     if(img.complete && img.naturalWidth) start(); else { img.onload = start; img.onerror = start; }
     requestAnimationFrame(function(){ ov.classList.add('on'); closeBtn.classList.add('on'); });
     ov.addEventListener('scroll', onScroll, {passive: true});
+    ov.addEventListener('wheel', onWheel, {passive: false});
     buildRoom(); sizeStage();
     syncSwitch();
   }
 
   function setRect(e, r){ e.style.left = r.x + 'px'; e.style.top = r.y + 'px'; e.style.width = r.w + 'px'; e.style.height = r.h + 'px'; }
   // r0: close up, in the middle; r1: stepped to the right, leaving the left for the label (areaL is where the
-  // pictures' side begins). On the walk the picture keeps to the start of its side, so the rest can follow it.
+  // pictures' side begins)
   function rects(){
     var W = innerWidth, H = state.H, a = state.a, gut = Math.max(16, Math.min(40, W * .04));
     var s0 = fit(a, W * .84, H * .84), r0 = {x: (W - s0.w) / 2, y: (H - s0.h) / 2, w: s0.w, h: s0.h};
     var lw = state.label.offsetWidth || 336, gap = Math.max(40, W * .045);
     var areaL = gut + lw + gap, areaW = W - areaL - gut, s1 = fit(a, areaW, H * .74);
-    var x1 = state.walk ? areaL : areaL + (areaW - s1.w) / 2;
+    var x1 = areaL + (areaW - s1.w) / 2;
     var r1 = {x: x1, y: (H - s1.h) / 2, w: s1.w, h: s1.h};
     return {r0: r0, r1: r1, gap: gap, gut: gut, areaL: areaL};
   }
-  // how far the walk goes sideways, and so how tall the stage is (the room is sticky, one screen tall)
-  function walkLen(R){ var w = state.walk; return w ? Math.max(0, R.r1.x + R.r1.w + R.gap + w.trail.scrollWidth - innerWidth) : 0; }
+  // where the scroll rests: close up, the label, then (walk) one screen per picture. The room is sticky, one screen
+  // tall, so the stage is as tall as the walk is long.
+  function labelStop(){ return Math.round(state.H * .6); }
   function sizeStage(){
     if(!state) return;
     if(narrow()){ state.stage.style.height = 'auto'; return; }
-    state.stage.style.height = Math.round(state.H * 1.75 + (state.walk ? walkLen(rects()) + state.H * .3 : 0)) + 'px';
+    var n = state.walk ? state.walk.slides.length : 0;
+    state.stage.style.height = (n ? state.H + labelStop() + n * state.H : Math.round(state.H * 1.75)) + 'px';
+  }
+  function stops(){
+    var L = labelStop(), H = state.H, o = [0, L];
+    if(state.walk) state.walk.slides.forEach(function(s, k){ o.push(L + (k + 1) * H); });
+    else if(room === 'salon') o.push(state.gal.offsetTop);
+    else if(state.spot){
+      var max = ov.scrollHeight - ov.clientHeight;
+      Array.prototype.forEach.call(state.spot.querySelectorAll('.m-slide'), function(sl){ o.push(Math.min(max, state.gal.offsetTop + sl.offsetTop)); });
+      o.push(max);
+    }
+    return o;
   }
   function layout(){
     if(!state) return;
@@ -182,14 +210,10 @@
     if(!state || narrow()) { if(state) roomFrame(); return; }
     var y = ov.scrollTop, H = state.H, R = rects();
     var t = ease(clamp(y / (H * .55), 0, 1));
-    // on the walk, once the label is up, scrolling on carries the pictures sideways past it
-    var len = walkLen(R), x = state.walk ? clamp(y - H * .75, 0, len) : 0;
+    // on the walk, past the label, the pictures go up one screen per step and the label stays
+    var dy = state.walk ? Math.max(0, y - labelStop()) : 0;
     if(state.opened){
-      var px = R.r0.x + (R.r1.x - R.r0.x) * t - x;
-      setRect(state.pic, {x: px, y: R.r0.y + (R.r1.y - R.r0.y) * t, w: R.r0.w + (R.r1.w - R.r0.w) * t, h: R.r0.h + (R.r1.h - R.r0.h) * t});
-      // the pictures go out of sight where the label's side begins, never over the label
-      var cut = x > 0 ? clamp(R.areaL - px, 0, R.r1.w + 2) : 0;
-      state.pic.style.clipPath = cut ? 'inset(-2px -2px -2px ' + cut + 'px)' : '';
+      setRect(state.pic, {x: R.r0.x + (R.r1.x - R.r0.x) * t, y: R.r0.y + (R.r1.y - R.r0.y) * t - dy, w: R.r0.w + (R.r1.w - R.r0.w) * t, h: R.r0.h + (R.r1.h - R.r0.h) * t});
     }
     // the label hangs on the left, its foot level with the picture's foot, and stays there
     var lo = clamp((t - .35) / .65, 0, 1), L = state.label;
@@ -201,10 +225,10 @@
     if(state.walk){
       var w = state.walk;
       w.pane.style.left = R.areaL + 'px';
-      w.pane.style.opacity = lo;
-      w.trail.style.transform = 'translateX(' + Math.round(R.r1.x + R.r1.w + R.gap - R.areaL - x) + 'px)';
+      w.pane.style.width = (innerWidth - R.areaL - R.gut) + 'px';
+      w.trail.style.transform = 'translateY(' + Math.round(H - dy) + 'px)';
     }
-    state.hint.style.opacity = t < .05 ? 1 : (t > .98 && x < 4 ? 1 : 0);
+    state.hint.style.opacity = t < .05 ? 1 : (t > .98 && dy < 4 ? 1 : 0);
     state.hint.firstChild.textContent = t > .98 ? 'More from this project' : 'Scroll';
     roomFrame();
   }
@@ -215,7 +239,7 @@
     try{ sessionStorage.setItem('gc-room', r); }catch(e){}
     buildRoom(); sizeStage();
     syncSwitch();
-    ov.scrollTop = room === 'walk' && !narrow() ? state.H * .75 : state.gal.offsetTop;
+    ov.scrollTop = room === 'walk' && !narrow() ? labelStop() + state.H : state.gal.offsetTop;
   }
   function syncSwitch(){ Array.prototype.forEach.call(sw.querySelectorAll('button'), function(b){ b.setAttribute('aria-pressed', b.dataset.room === room ? 'true' : 'false'); }); }
 
@@ -248,34 +272,25 @@
   function buildRoom(){
     var gal = state.gal, p = state.p, H = state.H;
     gal.innerHTML = ''; gal.className = 'm-gallery';
-    state.walk = null;
+    state.walk = null; state.spot = null; state.hang = null;
     var old = state.roomEl.querySelector('.m-pane'); if(old) old.remove();
     var n = 0, total = items().length;
     if(room === 'walk' && !narrow()){
-      // the rest of the work, hung in a row after the picture; it slides past on the label's right
-      var pane = el('div', 'm-pane'), trail = el('div', 'm-trail');
-      var more = paras(p.text).slice(1);
-      if(more.length){ var wt = el('div', 'm-more'); more.forEach(function(t){ wt.appendChild(el('p', null, t)); }); trail.appendChild(wt); }
-      state.parts.forEach(function(s){
-        var grp = el('div', 'm-group');
-        var tag = el('div', 'm-tag'); tag.appendChild(el('b', null, s.name)); tag.appendChild(document.createTextNode(s.items.length)); grp.appendChild(tag);
-        s.items.forEach(function(it, k){
-          n++;
-          var f = el('figure', 'm-work'), im = new Image();
-          var hh = Math.round(H * (it.kind === 'Drawing' || it.kind === 'Concept' ? .7 : (it.kind === 'Hero' ? .62 : (k % 2 ? .48 : .56))));
-          im.style.height = hh + 'px'; im.alt = it.caption || p.title;
-          im.onload = sizeWalk; im.src = it.src;
-          f.appendChild(im);
-          var cap = el('figcaption'); cap.appendChild(el('b', null, pad(n))); cap.appendChild(document.createTextNode(it.caption || it.kind));
-          f.appendChild(cap);
-          grp.appendChild(f);
-        });
-        trail.appendChild(grp);
+      // the rest of the work, one screen each, coming up from below on the label's right
+      var pane = el('div', 'm-pane'), trail = el('div', 'm-trail'), slides = [];
+      items().forEach(function(it){
+        n++;
+        var sl = el('div', 'm-step'), f = el('figure'), im = new Image();
+        im.alt = it.caption || p.title; im.src = it.src;
+        f.appendChild(im);
+        var cap = el('figcaption', 'm-tag'); cap.appendChild(el('b', null, pad(n) + ' / ' + pad(total))); cap.appendChild(document.createTextNode(it.caption || it.kind));
+        f.appendChild(cap);
+        sl.appendChild(f); trail.appendChild(sl); slides.push(sl);
       });
-      trail.appendChild(endPiece());
+      var last = el('div', 'm-step'); last.appendChild(endPiece()); trail.appendChild(last); slides.push(last);
       pane.appendChild(trail);
       state.roomEl.insertBefore(pane, state.label);
-      state.walk = {pane: pane, trail: trail};
+      state.walk = {pane: pane, trail: trail, slides: slides};
     }
     else if(room === 'salon'){
       var salon = el('div', 'm-salon');
@@ -293,11 +308,12 @@
       var hang = function(){
         if(!state || state.gal !== gal) return;
         rows.innerHTML = '';
-        var W = rows.clientWidth, gap = 14, target = Math.max(180, H * .46), row = [], sum = 0;
+        var W = rows.clientWidth, gap = Math.round(clamp(W * .035, 28, 56)), target = Math.max(180, H * .44), row = [], sum = 0;
+        rows.style.gap = gap + 'px';
         function flush(last){
           if(!row.length) return;
           var h = last ? Math.min(target, (W - gap * (row.length - 1)) / sum) : (W - gap * (row.length - 1)) / sum;
-          var r = el('div', 'm-row');
+          var r = el('div', 'm-row'); r.style.gap = gap + 'px';
           row.forEach(function(it){
             var f = el('figure'), im = new Image(); im.src = it.src; im.alt = it.caption || p.title;
             f.style.width = Math.floor(it.a * h) + 'px'; f.style.height = Math.floor(h) + 'px';
@@ -314,7 +330,7 @@
     }
     else{
       var spot = el('div', 'm-spot');
-      var intro = el('div', 'm-slide'); intro.appendChild(wallText(p)); spot.appendChild(intro);
+      state.spot = spot;
       items().forEach(function(it){
         n++;
         var s = el('div', 'm-slide'), im = new Image(); im.src = it.src; im.alt = it.caption || p.title;
@@ -331,9 +347,64 @@
       state.io = io;
     }
   }
-  // the stage is as tall as the walk is long, so scrolling down carries you along it
-  function sizeWalk(){ sizeStage(); onScroll(); }
   function roomFrame(){}
+  // keep the layout in step for a moment (while the label widens or narrows)
+  function follow(ms){ var end = performance.now() + ms; (function go(){ frame(); if(performance.now() < end) requestAnimationFrame(go); })(); }
+
+  // ---------- one step per scroll: each wheel gesture or key press goes to the next resting place ----------
+  var anim = 0, goal = null, locked = false, quiet = 0;
+  function glide(to){
+    var from = ov.scrollTop, t0 = performance.now(), d = 650;
+    goal = to; cancelAnimationFrame(anim);
+    (function go(now){
+      if(!ov) return;
+      var k = clamp((now - t0) / d, 0, 1), e = k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      ov.scrollTop = from + (to - from) * e;
+      if(k < 1) anim = requestAnimationFrame(go); else { anim = 0; goal = null; }
+    })(t0);
+  }
+  function step(dir){
+    var list = stops(), y = goal != null ? goal : ov.scrollTop, cur = 0;
+    list.forEach(function(v, i){ if(Math.abs(v - y) < Math.abs(list[cur] - y)) cur = i; });
+    if(dir > 0 && list[cur] < y - 2) cur--;          // between two stops: the next one is the one ahead
+    if(dir < 0 && list[cur] > y + 2) cur++;
+    var next = clamp(cur + dir, 0, list.length - 1);
+    if(Math.abs(list[next] - y) < 2) return false;
+    glide(list[next]);
+    return true;
+  }
+  // the salon is hung on one wall you look over freely; stepping only takes you to it and back
+  function free(dir){
+    if(room !== 'salon' || state.walk) return false;
+    var g = state.gal.offsetTop, y = ov.scrollTop;
+    return y > g + 2 || (y >= g - 2 && dir > 0);
+  }
+  function release(){
+    clearTimeout(quiet);
+    quiet = setTimeout(function(){ if(anim){ release(); return; } locked = false; acc = 0; }, 200);
+  }
+  var acc = 0;
+  function onWheel(e){
+    if(!state || narrow() || e.ctrlKey || document.querySelector('.m-zoom')) return;
+    var dir = e.deltaY > 0 ? 1 : -1;
+    var L = e.target.closest && e.target.closest('.m-label.open');
+    if(L && L.scrollHeight > L.clientHeight + 1 && (dir > 0 ? L.scrollTop + L.clientHeight < L.scrollHeight - 1 : L.scrollTop > 0)) return;   // reading the whole text
+    if(Math.abs(e.deltaX) > Math.abs(e.deltaY) || free(dir)) return;
+    e.preventDefault();
+    if(locked){ release(); return; }
+    acc += e.deltaY * (e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? 600 : 1);
+    if(Math.abs(acc) < 30) return;
+    acc = 0;
+    if(step(dir)){ locked = true; release(); }
+  }
+  function onKey(e){
+    if(!state || narrow() || e.metaKey || e.ctrlKey || e.altKey || document.querySelector('.m-zoom')) return;
+    var dir = {ArrowDown: 1, PageDown: 1, ' ': 1, ArrowUp: -1, PageUp: -1}[e.key];
+    if(!dir || free(dir) || (e.target.closest && e.target.closest('button'))) return;
+    e.preventDefault();
+    step(e.shiftKey && e.key === ' ' ? -1 : dir);
+  }
+  document.addEventListener('keydown', onKey);
   function zoom(src){
     var z = el('div', 'm-zoom'), im = new Image(); im.src = src; z.appendChild(im);
     z.addEventListener('click', function(){ z.classList.remove('on'); setTimeout(function(){ z.remove(); }, 300); });
@@ -374,7 +445,6 @@
     sizeStage();
     layout();
     if(state.hang) state.hang();
-    sizeWalk();
   });
 
   window.gcMuseum = {open: function(slug, from, src){ open(slug, from, src); }, isOpen: function(){ return !!ov; }};

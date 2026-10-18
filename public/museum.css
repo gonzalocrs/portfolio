@@ -30,6 +30,13 @@ body.museum-on{overflow:hidden}
 /* the wall label, as in a museum: a card with the name and the facts, a second card with the text */
 .m-label{position:absolute;width:min(21rem,30vw);opacity:0;pointer-events:none}
 .m-label.on{pointer-events:auto}
+.m-label{transition:width .45s cubic-bezier(.2,.7,.2,1);scrollbar-width:thin;scrollbar-color:var(--rule) transparent}
+.m-label.open{width:min(40rem,46vw);max-height:calc(var(--m-h) - 32px);overflow-y:auto;padding:0 6px 14px 0}
+.m-card p.extra{display:none}
+.m-label.open .m-card p.extra{display:block}
+.m-more-btn{display:block;margin-top:1rem;font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);
+  text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--rule)}
+.m-more-btn:hover{color:var(--live)}
 .m-card{
   background:color-mix(in srgb,var(--ink) 3%,var(--paper));
   box-shadow:0 1px 0 color-mix(in srgb,var(--ink) 10%,transparent),0 6px 18px -10px rgba(0,0,0,.25);
@@ -66,20 +73,14 @@ body.museum-on{overflow:hidden}
 .m-end button:hover{color:var(--live)}
 .m-end .m-tag{display:block;margin-bottom:.4rem}
 
-/* walk: the label stays on the left; the rest of the work hangs in a row after the picture and slides past on the
-   label's right as you scroll, as if you walked along the wall */
-.m-pane{position:absolute;top:0;bottom:0;right:0;overflow:hidden;opacity:0}
-.m-trail{position:absolute;left:0;top:0;height:100%;display:flex;align-items:center;gap:5vw;padding-right:clamp(1rem,4vw,2.5rem);will-change:transform}
-.m-trail .m-group{flex:0 0 auto;display:flex;align-items:center;gap:4vw}
-.m-trail .m-group > .m-tag{writing-mode:vertical-rl;transform:rotate(180deg);align-self:center}
-.m-more{flex:0 0 auto;width:min(24rem,60vw)}
-.m-more p{margin:0;font-size:.92rem;line-height:1.6;color:var(--mute)}
-.m-more p + p{margin-top:.9rem}
-.m-work{display:flex;align-items:flex-end;gap:.9rem;flex:0 0 auto;margin:0}
-.m-work img{display:block;width:auto;border:1px solid var(--rule);background:var(--paper)}
-.m-work figcaption{width:7.5rem;padding-bottom:.2rem;font-family:var(--mono);font-size:.62rem;line-height:1.5;text-transform:uppercase;letter-spacing:.04em;color:var(--mute)}
-.m-work figcaption b{display:block;font-weight:400;color:var(--ink)}
-.m-trail .m-end{flex:0 0 auto;flex-direction:column;align-items:flex-start;width:20rem}
+/* walk: the label stays on the left; on its right each picture goes up and the next comes up whole, one per scroll */
+.m-pane{position:absolute;top:0;bottom:0;overflow:hidden}
+.m-trail{position:absolute;left:0;top:0;width:100%;will-change:transform}
+.m-step{height:var(--m-h);display:flex;align-items:center;justify-content:center}
+.m-step figure{position:relative;margin:0;max-width:100%}
+.m-step img{display:block;max-width:100%;max-height:calc(var(--m-h) * .74);width:auto;height:auto;border:1px solid var(--rule);background:var(--paper)}
+.m-step figcaption{position:absolute;left:0;top:100%;margin-top:.7rem;white-space:nowrap}
+.m-step .m-end{flex-direction:column;align-items:flex-start;gap:2.5rem}
 
 /* salon: the whole project hung at once, edge to edge, as in a salon hang */
 .m-salon{padding:clamp(3rem,10vh,6rem) clamp(1rem,4vw,2.5rem) 4rem;background:color-mix(in srgb,var(--ink) 3%,var(--paper));border-top:1px solid var(--rule)}
@@ -100,12 +101,11 @@ body.museum-on{overflow:hidden}
 
 /* spotlight: a dark room, one work at a time, each lit as you come to it */
 .m-spot{background:#0b0b0c;color:#ecebe8;--mute:#8b8d90;--rule:#2b2d30;--ink:#ecebe8;--paper:#0b0b0c}
-.museum:has(.m-spot){scroll-snap-type:y proximity}
-.m-slide{position:relative;height:var(--m-h);scroll-snap-align:start;display:flex;align-items:center;justify-content:center}
+.m-slide{position:relative;height:var(--m-h);display:flex;align-items:center;justify-content:center}
 .m-slide img{max-width:84vw;max-height:78%;opacity:.12;transform:scale(.985);transition:opacity .9s ease,transform 1.2s cubic-bezier(.2,.7,.2,1);
   box-shadow:0 30px 80px -30px rgba(0,0,0,.9)}
 .m-slide.lit img{opacity:1;transform:none}
-.m-slide .m-tag{position:absolute;left:clamp(1rem,4vw,2.5rem);bottom:1.4rem;opacity:0;transition:opacity .6s ease .2s}
+.m-slide .m-tag{position:absolute;left:clamp(1rem,4vw,2.5rem);bottom:4rem;opacity:0;transition:opacity .6s ease .2s}
 .m-slide .count{left:auto;right:clamp(1rem,4vw,2.5rem)}
 .m-slide.lit .m-tag{opacity:1}
 .m-spot .m-walltext{width:min(34rem,86vw)}
@@ -122,6 +122,7 @@ body.museum-on{overflow:hidden}
 
 @media (max-width:700px){
   .m-label{position:static;width:auto;opacity:1;padding:0 1rem 2rem}
+  .m-label.open{width:auto;max-height:none;overflow:visible}
   .m-room{position:relative;height:auto;overflow:visible}
   .m-pic{position:relative;left:auto !important;top:auto !important;width:auto !important;height:auto !important;margin:1rem}
   .m-pic img{height:auto}

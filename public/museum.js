@@ -566,7 +566,7 @@
     if(state.hang) state.hang();
   });
 
-  window.gcMuseum = {open: function(slug, from, src){ open(slug, from, src); }, isOpen: function(){ return !!ov; }};
+  window.gcMuseum = {open: function(slug, from, src){ open(slug, from, src); }, isOpen: function(){ return !!ov; }, close: close};
   var vq = /[?&]visit=([\w-]+)/.exec(location.search);
   if(vq && P[vq[1]]){
     var go = function(){ history.replaceState(null, '', '/'); open(vq[1], null, null); };

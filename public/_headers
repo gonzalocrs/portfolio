@@ -39,3 +39,12 @@
 
 /museum.js
   Cache-Control: no-cache
+
+/about-b.html
+  Cache-Control: no-cache
+
+/about-c.html
+  Cache-Control: no-cache
+
+/contact.js
+  Cache-Control: no-cache

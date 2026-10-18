@@ -438,7 +438,6 @@
   </a>
   <nav>
     <a href="about.html">About</a>
-    <a href="contact.html">Contact</a>
     <button class="switch theme-switch" id="theme" role="switch" aria-checked="false" aria-label="Dark mode">
       <span class="switch-label">Dark mode</span>
       <span class="switch-track"><span class="switch-knob"></span></span>
@@ -603,12 +602,14 @@
   DESK.addEventListener('change', fitCollage);
   if(document.fonts && document.fonts.ready) document.fonts.ready.then(fitCollage);
 
-  // the name in the header doubles as a home link: collapses everything
-  // back to the plain index, ready to also mean "back" once individual
-  // project pages exist
+  // the name in the header is the home link: from anywhere (a visit, a sheet, a filtered or panned wall)
+  // it closes everything and brings the wall back to where it starts
   document.getElementById('home').addEventListener('click', function(e){
     e.preventDefault();
-    setOpen(null, false);
+    if(window.gcMuseum && gcMuseum.isOpen()) gcMuseum.close();
+    if(window.gcSheetClose) gcSheetClose();
+    closeAll();
+    goTo(0, 0);
     window.scrollTo({top: 0, behavior: 'smooth'});
   });
 
@@ -1440,6 +1441,7 @@
     open(a.getAttribute('href'), false, from);
   });
   window.gcSheetOpen = function(){ return !!sheet; };
+  window.gcSheetClose = close;
   window.gcOpenSheet = function(href, from){ open(href, false, from); };
 
   var m = /[?&]show=([^&]+)/.exec(location.search);

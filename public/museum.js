@@ -4,7 +4,7 @@
     1. the wall: the home page as it is
     2. click a picture (or a title): it comes up close, whole, in the middle of the room
     3. scroll a little: it steps to the right and its wall label appears on the left (name, facts, the text);
-       "More info" widens the label to the whole text
+       "More info" makes the label taller, to the whole text
     4. scroll on: the rest of the project, hung one of three ways:
          walk   the label stays; the picture goes up and the second comes up in its place, then each scroll
                 moves one picture to the right, each lit as it arrives; a small bar under them says where you are
@@ -108,8 +108,7 @@
           var on = label.classList.toggle('open');
           more.textContent = on ? 'Less' : 'More info';
           if(!on) label.scrollTop = 0;
-          follow(500);   // the picture makes room as the label widens
-          if(state.hang) setTimeout(function(){ if(state && state.hang) state.hang(); }, 480);
+          frame();   // it grows taller, upward from its foot
         });
         c2.appendChild(more);
       }
@@ -213,10 +212,11 @@
     if(state.opened){
       setRect(state.pic, {x: R.r0.x + (R.r1.x - R.r0.x) * t, y: R.r0.y + (R.r1.y - R.r0.y) * t - dy, w: R.r0.w + (R.r1.w - R.r0.w) * t, h: R.r0.h + (R.r1.h - R.r0.h) * t});
     }
-    // the label hangs on the left, its foot level with the picture's foot, and stays there
+    // the label hangs on the left with its foot on one line, the same in every room, and stays there; when it
+    // opens it grows upward
     var lo = clamp((t - .35) / .65, 0, 1), L = state.label;
     L.style.left = R.gut + 'px';
-    L.style.top = Math.max(16, R.r1.y + R.r1.h - L.offsetHeight) + 'px';
+    L.style.top = Math.max(16, Math.round(H * .87) - L.offsetHeight) + 'px';
     L.style.opacity = lo;
     L.style.transform = 'translateX(' + Math.round((lo - 1) * 16) + 'px)';
     L.classList.toggle('on', lo > .5);
@@ -382,8 +382,6 @@
     {x: 1, y: 67, w: 27, r: 4 / 3}, {x: 33, y: 66, w: 31, r: 3 / 2}
   ];
   function roomFrame(){}
-  // keep the layout in step for a moment (while the label widens or narrows)
-  function follow(ms){ var end = performance.now() + ms; (function go(){ frame(); if(performance.now() < end) requestAnimationFrame(go); })(); }
 
   // ---------- one step per scroll: each wheel gesture or key press goes to the next resting place ----------
   var anim = 0, goal = null, locked = false, quiet = 0;

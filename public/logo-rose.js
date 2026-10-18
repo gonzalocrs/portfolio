@@ -17,7 +17,7 @@
     arc(58.5, Math.PI - Math.asin(8.55 / 58.5), Math.PI + Math.asin(8.55 / 58.5)),
     seg(67.71, 48.54, 79.91, 60.74)
   ];
-  var RING = 70, STITCH_W = 5, LINE_W = 1.25, SCALE = 16;   // petal tips at 64, just inside the ring
+  var RING = 70, STITCH_W = 3.8, LINE_W = 1.25, SCALE = 16;   // petal tips at 64, just inside the ring
   var N = 140;                                               // points per petal
 
   function lerp(a, b, t){ return a + (b - a) * t; }
@@ -105,10 +105,9 @@
       g.strokeStyle = ring; g.lineWidth = Math.max(1, .9 * u); g.beginPath();
       for(var i = 0; i <= 96; i++){ var a = i / 96 * 2 * Math.PI, q = P([Math.cos(a) * RING, Math.sin(a) * RING, 0]); i ? g.lineTo(q[0], q[1]) : g.moveTo(q[0], q[1]); }
       g.closePath(); g.stroke();
-      // the stitches / petals: square-ended bars at rest, a fine continuous line once open
+      // the stitches / petals: round-ended bars at rest (a little finer than the printed logo), a fine line once open
       var o = ease(S.open);
       g.strokeStyle = ink; g.lineWidth = lerp(STITCH_W, LINE_W, Math.min(1, o * 1.6)) * u;
-      g.lineCap = S.open === 0 ? 'butt' : 'round';
       shapes.forEach(function(sh){
         g.beginPath();
         for(var i = 0; i <= N; i++){

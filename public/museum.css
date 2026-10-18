@@ -57,8 +57,9 @@ body.museum-on{overflow:hidden}
   position:absolute;left:50%;bottom:1.1rem;transform:translateX(-50%);
   display:flex;flex-direction:column;align-items:center;gap:.2rem;
   font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);
-  transition:opacity .3s ease;pointer-events:none;white-space:nowrap
+  transition:opacity .3s ease,color .2s;pointer-events:none;white-space:nowrap;cursor:pointer
 }
+.m-hint:hover,.m-hint:focus-visible{color:var(--ink)}
 .m-hint svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.1;animation:m-nudge 2.2s ease-in-out infinite}
 @keyframes m-nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
 
@@ -90,6 +91,12 @@ body.museum-on{overflow:hidden}
 .m-bar button::before{content:"";position:absolute;left:0;right:0;top:7px;height:2px;background:var(--rule);transition:background .5s ease}
 .m-bar button:hover::before{background:var(--mute)}
 .m-bar button.here::before{background:var(--ink)}
+/* the arrows at the ends of the bar: barely there until you look for them */
+.m-nav{position:absolute;width:16px;height:16px;display:flex;align-items:center;justify-content:center;color:var(--mute);
+  opacity:0;pointer-events:none;transition:opacity .5s ease,color .2s}
+.m-nav.on{opacity:.4;pointer-events:auto}
+.m-nav.on:hover,.m-nav.on:focus-visible{opacity:1;color:var(--ink)}
+.m-nav svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.1}
 
 /* panorama: one wall, after the south wall at Ronchamp. Every picture is the pane at the back of a splayed opening cut
    through it (the reveal frames it); the places left over are empty openings, and small ones play between them */

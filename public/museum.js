@@ -10,7 +10,7 @@
                 moves one picture to the right, each lit as it arrives; a small bar under them says where you are
          panorama (salon)  everything at once, each picture at the back of a splayed opening in one wall (Ronchamp)
        A visit starts in spotlight; one small icon under the pictures goes to the other room (four panes: panorama,
-       one pane: back to spotlight). /?room=spotlight|panorama picks one; the choice is remembered for the visit.
+       one pane: back to spotlight). Every visit starts in spotlight (/?room=panorama opens a linked one there).
   Every scroll (a wheel gesture, an arrow key) goes one step, gliding slowly.
 
   Content comes from projects.js. Pictures are never cropped.
@@ -18,12 +18,8 @@
 (function(){
   var P = window.PROJECTS || {}, SLUGS = Object.keys(P);
   var ROOMS = [['walk', 'Spotlight'], ['salon', 'Panorama']];
-  var room = 'walk';
-  try{
-    var rq = /[?&]room=(walk|spotlight|salon|panorama)\b/.exec(location.search);
-    if(rq) sessionStorage.setItem('gc-room', /^(walk|spotlight)$/.test(rq[1]) ? 'walk' : 'salon');
-    room = sessionStorage.getItem('gc-room') === 'salon' ? 'salon' : 'walk';
-  }catch(e){}
+  // every visit starts in the spotlight; /?room=panorama only opens the first one (a link) in the panorama
+  var room = 'walk', rq = /[?&]room=(salon|panorama)\b/.test(location.search) ? 'salon' : null;
 
   // lighter copies of camera originals
   function web(src){
@@ -72,6 +68,7 @@
     var top = headerBottom();
     document.documentElement.style.setProperty('--m-top', top + 'px');
     if(ov) teardown(true);
+    room = rq || 'walk'; rq = null;
     var all = parts(p), firstSrc = src ? web(src) : (all[0] && all[0].items[0].src);
     if(!firstSrc) return;
     if(!fromHistory) history.pushState({visit: slug, src: firstSrc}, '', '/?visit=' + slug);
@@ -117,8 +114,10 @@
     }
     roomEl.appendChild(label);
 
-    var hint = el('div', 'm-hint');
+    // the prompt to scroll also takes the step when clicked, for anyone who does not scroll
+    var hint = el('button', 'm-hint'); hint.type = 'button';
     hint.innerHTML = '<span>Scroll</span><svg viewBox="0 0 22 22"><path d="M4 7.5l7 7 7-7"/></svg>';
+    hint.addEventListener('click', function(){ step(1); });
     roomEl.appendChild(hint);
     stage.appendChild(roomEl);
     ov.appendChild(stage);
@@ -234,6 +233,12 @@
       var at = Math.min(Math.round(k), w.marks.length - 1);
       w.bar.style.left = R.areaL + 'px'; w.bar.style.width = R.bay + 'px';
       w.bar.classList.toggle('on', dy >= H * .5);
+      // and a small arrow at each end of it, for anyone who does not scroll; none before the first or past the end
+      var by = Math.round(H * .87 + 36), kk = Math.round(k);
+      w.prev.style.left = (R.areaL - 22) + 'px'; w.next.style.left = (R.areaL + R.bay + 6) + 'px';
+      w.prev.style.top = w.next.style.top = by + 'px';
+      w.prev.classList.toggle('on', dy >= H * .5 && kk > 0);
+      w.next.classList.toggle('on', dy >= H * .5 && kk < w.slides.length - 1);
       w.marks.forEach(function(m, i){ m.classList.toggle('here', i === at); });
     }
     if(state.salon){
@@ -243,7 +248,8 @@
       sp.style.transform = 'translateY(' + Math.round(H - dy) + 'px)';
     }
     placeSwitch(R, dy >= H * .5);
-    state.hint.style.opacity = t < .05 ? 1 : (t > .98 && dy < 4 ? 1 : 0);
+    var hv = t < .05 || (t > .98 && dy < 4);
+    state.hint.style.opacity = hv ? 1 : 0; state.hint.style.pointerEvents = hv ? 'auto' : 'none';
     state.hint.firstChild.textContent = t > .98 ? 'More from this project' : 'Scroll';
     roomFrame();
   }
@@ -252,7 +258,6 @@
   // at: in the spotlight, which picture to land on (from a click on it in the panorama); the first one otherwise
   function setRoom(r, at){
     room = r;
-    try{ sessionStorage.setItem('gc-room', r); }catch(e){}
     buildRoom(); sizeStage();
     syncSwitch();
     ov.scrollTop = narrow() ? state.gal.offsetTop : labelStop() + state.H * (1 + (r === 'walk' && at ? at : 0));
@@ -301,7 +306,7 @@
     var gal = state.gal, H = state.H;
     gal.innerHTML = ''; gal.className = 'm-gallery';
     state.walk = null; state.hang = null; state.salon = null;
-    Array.prototype.forEach.call(state.roomEl.querySelectorAll('.m-pane,.m-bar'), function(e){ e.remove(); });
+    Array.prototype.forEach.call(state.roomEl.querySelectorAll('.m-pane,.m-bar,.m-nav'), function(e){ e.remove(); });
     var list = items(), total = list.length;
     if(narrow()){
       // on a phone: the rest, one under the other
@@ -328,7 +333,13 @@
       });
       state.roomEl.insertBefore(pane, state.label);
       state.roomEl.appendChild(bar);
-      state.walk = {pane: pane, trail: trail, slides: slides, bar: bar, marks: marks};
+      var nav = [-1, 1].map(function(d){
+        var a = el('button', 'm-nav'); a.type = 'button'; a.setAttribute('aria-label', d < 0 ? 'Previous picture' : 'Next picture');
+        a.innerHTML = '<svg viewBox="0 0 16 16"><path d="' + (d < 0 ? 'M10 3.5L5.5 8l4.5 4.5' : 'M6 3.5L10.5 8 6 12.5') + '"/></svg>';
+        a.addEventListener('click', function(){ step(d); });
+        state.roomEl.appendChild(a); return a;
+      });
+      state.walk = {pane: pane, trail: trail, slides: slides, bar: bar, marks: marks, prev: nav[0], next: nav[1]};
     }
     else{
       // the salon: everything at once, in openings like the home page's wall (the same bay of openings, as many bays

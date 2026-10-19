@@ -168,8 +168,8 @@ body.museum-on{overflow:hidden}
   /* "More info": the whole label floats up as a card over everything, scrolling inside if it is long */
   .m-label.float{position:fixed;z-index:61;left:.75rem !important;right:.75rem;bottom:.75rem;padding:0;max-height:calc(var(--m-h) * .7);overflow-y:auto;
     overscroll-behavior:contain;animation:m-float .35s ease;box-shadow:0 12px 34px -12px rgba(0,0,0,.5);
-    background:color-mix(in srgb,color-mix(in srgb,var(--ink) 3%,var(--paper)) 86%,transparent);
-    -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+    background:color-mix(in srgb,color-mix(in srgb,var(--ink) 3%,var(--paper)) 94%,transparent);
+    -webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
   /* a little see-through, so the picture behind still shows its shape: you are on the same page */
   .m-label.float .m-card{box-shadow:none;background:transparent}
   .m-label.float .m-card:last-child{padding-bottom:3rem}

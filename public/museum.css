@@ -133,6 +133,9 @@ body.museum-on{overflow:hidden}
 .m-step:not(.lit) .m-max{visibility:hidden}
 @media (hover:none){.m-max{opacity:.85}}
 
+/* on a phone: the spotlight sideways, every picture in one row swiped one at a time, the bar under it */
+.m-strip{display:none}
+.m-sbar{display:none}
 /* on a phone: the rest, one under the other */
 .m-list{padding:2rem 1rem 3rem;border-top:1px solid var(--rule)}
 .m-list figure{margin:0 0 2.2rem}
@@ -154,7 +157,21 @@ body.museum-on{overflow:hidden}
   .m-label{position:static;width:auto;opacity:1;padding:0 1rem 2rem}
   .m-label.open{width:auto;max-height:none;overflow:visible}
   .m-room{position:relative;height:auto;overflow:visible}
-  .m-pic{position:relative;left:auto !important;top:auto !important;width:auto !important;height:auto !important;margin:1rem}
+  .m-pic{display:none}
+  .m-strip{display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;margin-top:3.2rem}
+  .m-strip::-webkit-scrollbar{display:none}
+  .m-strip-step{flex:0 0 100%;scroll-snap-align:start;scroll-snap-stop:always;box-sizing:border-box;padding:0 1rem;
+    height:calc(58vh + 2.4rem);display:flex;align-items:center;justify-content:center}
+  .m-strip-step figure{position:relative;margin:0;max-width:100%}
+  .m-strip-step img{display:block;max-width:100%;max-height:58vh;width:auto;height:auto;border:1px solid var(--rule);background:var(--paper)}
+  .m-strip-step figcaption{position:absolute;left:0;top:100%;margin-top:.5rem;white-space:nowrap}
+  .m-strip-end .m-end{flex-direction:column;align-items:flex-start;gap:1.6rem}
+  .m-sbar{display:flex;gap:4px;margin:1.4rem 1rem 1.6rem}
+  .m-sbar button{flex:1;height:16px;position:relative}
+  .m-sbar button::before{content:"";position:absolute;left:0;right:0;top:7px;height:2px;background:var(--rule);transition:background .4s ease}
+  .m-sbar button.here::before{background:var(--ink)}
+  .m-max{opacity:.85}
   .m-pic img{height:auto}
   .m-hint{display:none}
   .m-switch{display:none}

@@ -314,14 +314,30 @@
     var gal = state.gal, H = state.H;
     gal.innerHTML = ''; gal.className = 'm-gallery';
     state.walk = null; state.hang = null; state.salon = null;
-    Array.prototype.forEach.call(state.roomEl.querySelectorAll('.m-pane,.m-bar,.m-nav'), function(e){ e.remove(); });
+    Array.prototype.forEach.call(state.roomEl.querySelectorAll('.m-pane,.m-bar,.m-nav,.m-strip,.m-sbar'), function(e){ e.remove(); });
     var list = items(), total = list.length;
+    state.built = narrow();
     if(narrow()){
-      // on a phone: the rest, one under the other
-      var col = el('div', 'm-list');
-      list.forEach(function(it, i){ col.appendChild(figure(it, i + 1, total)); });
-      col.appendChild(endPiece());
-      gal.appendChild(col);
+      // on a phone, the spotlight sideways: every picture (the one you came in with first) in one row you swipe
+      // through, one at a time, with the bar under it; the label under that
+      var every = [state.first].concat(list), strip = el('div', 'm-strip'), sbar = el('div', 'm-sbar'), smarks = [];
+      every.forEach(function(it, i){
+        var sl = el('div', 'm-strip-step'), f = figure(it, i + 1, every.length);
+        f.appendChild(maxBtn(it.src)); f.querySelector('img').addEventListener('click', function(){ zoom(it.src); });
+        sl.appendChild(f); strip.appendChild(sl);
+        var mk = el('button'); mk.type = 'button'; mk.setAttribute('aria-label', it.caption || it.kind);
+        mk.addEventListener('click', function(){ strip.scrollTo({left: i * strip.clientWidth, behavior: 'smooth'}); });
+        sbar.appendChild(mk); smarks.push(mk);
+      });
+      var endS = el('div', 'm-strip-step m-strip-end'); endS.appendChild(endPiece()); strip.appendChild(endS);
+      var mark = function(){
+        var k = Math.round(strip.scrollLeft / (strip.clientWidth || 1));
+        smarks.forEach(function(m, i){ m.classList.toggle('here', i === Math.min(k, smarks.length - 1)); });
+      };
+      strip.addEventListener('scroll', function(){ requestAnimationFrame(mark); }, {passive: true});
+      state.roomEl.insertBefore(strip, state.label);
+      if(every.length > 1) state.roomEl.insertBefore(sbar, state.label);
+      mark();
     }
     else if(room === 'walk'){
       // the rest of the work in a row of bays on the label's right; it comes up from below, then moves sideways
@@ -595,6 +611,7 @@
   }, true);
   window.addEventListener('resize', function(){
     if(!state) return;
+    if(state.built !== narrow()){ buildRoom(); sizeStage(); }   // a phone turned on its side, or back
     state.H = innerHeight - headerBottom();
     ov.style.setProperty('--m-h', state.H + 'px');
     sizeStage();

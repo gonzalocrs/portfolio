@@ -1,8 +1,12 @@
 name = "portfolio"
 compatibility_date = "2026-09-17"
+# the passcode entrance (src/worker.js) runs before any file is served
+main = "src/worker.js"
 
 [assets]
 directory = "./public"
+binding = "ASSETS"
+run_worker_first = true
 
 [observability]
 enabled = true

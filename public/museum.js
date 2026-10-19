@@ -147,11 +147,11 @@
       layout();
       // the picture comes up from where it hung on the wall
       if(from && !narrow()){
-        var r0 = rects().r0;
+        var r1 = rects().r1;
         setRect(pic, {x: from.left, y: from.top - top, w: from.width, h: from.height});
         void pic.offsetWidth;
         pic.classList.add('fly');
-        setRect(pic, r0);
+        setRect(pic, r1);
         setTimeout(function(){ if(state && state.pic === pic){ pic.classList.remove('fly'); state.opened = true; onScroll(); } }, 720);
       }
       else{ state.opened = true; onScroll(); }
@@ -161,6 +161,7 @@
     ov.addEventListener('scroll', onScroll, {passive: true});
     ov.addEventListener('wheel', onWheel, {passive: false});
     buildRoom(); sizeStage();
+    ov.scrollTop = narrow() ? 0 : labelStop();   // the visit opens on the picture with its label beside it
     syncSwitch();
   }
 
@@ -188,7 +189,7 @@
     state.stage.style.height = (n ? state.H + labelStop() + n * state.H : Math.round(state.H * 1.75)) + 'px';
   }
   function stops(){
-    var L = labelStop(), H = state.H, o = [0, L];
+    var L = labelStop(), H = state.H, o = [L];
     if(state.walk) state.walk.slides.forEach(function(s, k){ o.push(L + (k + 1) * H); });
     else if(state.salon) o.push(L + H);
     return o;
@@ -207,7 +208,7 @@
   function frame(){
     if(!state || narrow()) { if(state) roomFrame(); return; }
     var y = ov.scrollTop, H = state.H, R = rects(), L0 = labelStop();
-    var t = ease(clamp(y / (H * .55), 0, 1));
+    var t = 1;   // no close-up first: the picture comes from the wall straight to its place beside the label
     // on the walk, past the label: the first picture goes up and the second comes up in its place, then each
     // step goes one bay to the right; the label stays
     var dy = state.walk || state.salon ? clamp(y - L0, 0, H) : 0, k = state.walk ? Math.max(0, (y - L0 - H) / H) : 0;
@@ -439,11 +440,12 @@
         var wr = P({x: X0, y: Y0, w: WW, h: WH});
         mk('rect', {x: wr.x, y: wr.y, width: wr.w, height: wr.h, 'class': 'plane'});
         mk('line', {x1: 0, y1: bh, x2: bay, y2: bh, 'class': 'ground'});
+        var views = [];
         holes.concat(accents).forEach(function(h){
           var o = P(h);
           if(!h.it){
-            var gw = (h.glass ? h.glass[0] : .3) * o.w, gh = (h.glass ? h.glass[1] : .3) * o.h;
-            splay(o, {x: o.x + (o.w - gw) / 2, y: o.y + (o.h - gh) / 2, w: gw, h: gh});
+            var gw = (h.glass ? h.glass[0] : .3) * o.w, gh = (h.glass ? h.glass[1] : .3) * o.h, g0 = {x: o.x + (o.w - gw) / 2, y: o.y + (o.h - gh) / 2, w: gw, h: gh};
+            splay(o, g0); views.push(g0);
             return;
           }
           // a picture is the pane at the back of its opening: the reveal frames it, a little deeper on the larger side
@@ -457,11 +459,27 @@
           f.addEventListener('click', function(){ setRoom('walk', list.indexOf(it) - 1); });
           wall.appendChild(f);
         });
+        // behind the wall, one view: a photograph of the project seen through the panes of the empty openings, each
+        // showing its own part of it, as if looking out through the wall
+        var vsrc = viewOf(list);
+        if(vsrc && views.length){
+          var cid = 'm-view-' + Date.now(), defs = mk('defs', {}), cp = document.createElementNS(NS, 'clipPath');
+          cp.setAttribute('id', cid); defs.appendChild(cp);
+          views.forEach(function(g){ var r = document.createElementNS(NS, 'rect'); ['x', 'y'].forEach(function(k){ r.setAttribute(k, g[k]); }); r.setAttribute('width', g.w); r.setAttribute('height', g.h); cp.appendChild(r); });
+          var vi = mk('image', {x: wr.x, y: wr.y, width: wr.w, height: wr.h, preserveAspectRatio: 'xMidYMid slice', 'clip-path': 'url(#' + cid + ')', 'class': 'view'});
+          vi.setAttribute('href', vsrc); vi.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', vsrc);
+          views.forEach(function(g){ mk('rect', {x: g.x, y: g.y, width: g.w, height: g.h, 'class': 'pane-edge'}); });
+        }
         wall.insertBefore(svg, wall.firstChild);
         if(state.salon && state.salon.fade){ state.salon.fade = false; fadeIn(wall); fadeIn(foot); }
       };
       state.hang = hang;
     }
+  }
+  // the view behind the gallery's wall: the project's widest photograph (not a drawing), the hero if there is none
+  function viewOf(list){
+    var ph = list.filter(function(it){ return !isDrawing(it) && it.a; }).sort(function(p, q){ return q.a - p.a; });
+    return ph.length ? ph[0].src : (state.p.hero ? web(state.p.hero) : null);
   }
   // one bay of the home page's wall: places of different sizes and proportions (wall units, a bay is 100 x 90)
   // (glass: the pane at the back of an empty one, as fractions of it)

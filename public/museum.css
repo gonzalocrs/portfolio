@@ -29,6 +29,7 @@ body.museum-on{overflow:hidden}
 
 /* the wall label, as in a museum: a card with the name and the facts, a second card with the text */
 .m-label{position:absolute;width:min(21rem,30vw);opacity:0;pointer-events:none}
+.m-label{transition:opacity .6s ease .3s,transform .6s ease .3s}   /* it comes in as the picture lands beside it */
 .m-label.on{pointer-events:auto}
 .m-label{scrollbar-width:thin;scrollbar-color:var(--rule) transparent}
 .m-label.open{max-height:calc(var(--m-h) * .87 - 16px);overflow-y:auto;padding-bottom:14px}
@@ -109,6 +110,8 @@ body.museum-on{overflow:hidden}
 .m-wall .facade line{stroke:var(--rule)}
 .m-wall .facade .pane{fill:var(--paper);stroke:var(--rule)}
 .m-wall .facade *{stroke-width:1}
+.m-wall .facade .view{opacity:.92}
+.m-wall .facade .pane-edge{fill:none;stroke:var(--rule)}
 .m-hung{position:absolute;margin:0;border:1px solid var(--rule);background:var(--paper);cursor:pointer}
 .m-hung img{display:block;width:100%;height:100%}
 .m-hung .cap{position:absolute;left:.5rem;bottom:.5rem;font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;

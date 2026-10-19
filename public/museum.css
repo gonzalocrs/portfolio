@@ -153,21 +153,35 @@ body.museum-on{overflow:hidden}
   font-family:var(--mono);font-size:.64rem;text-transform:uppercase;letter-spacing:.05em;opacity:0;transition:opacity .25s ease}
 .m-switch:hover span,.m-switch:focus-visible span{opacity:1}
 
+.m-pmore{display:none}
+/* on a phone the visit is one screen tall: the pictures to swipe, their bar, and the label's name under them */
 @media (max-width:700px){
-  .m-label{position:static;width:auto;opacity:1;padding:0 1rem 2rem}
-  .m-label.open{width:auto;max-height:none;overflow:visible}
-  .m-room{position:relative;height:auto;overflow:visible}
+  .museum{overflow:hidden}
+  .m-gallery{display:none}
+  .m-room{position:relative;height:var(--m-h);overflow:hidden;display:flex;flex-direction:column}
+  .m-label{position:relative;width:auto;opacity:1 !important;padding:0 1rem 1rem;flex:none;transform:none !important;pointer-events:auto;left:auto !important;top:auto !important}
+  .m-label .m-card{padding:.85rem 1rem .9rem}
+  .m-label .m-card h2{font-size:1.35rem}
+  .m-label .work-line,.m-label .line,.m-label .m-card + .m-card,.m-label .m-more-btn{display:none}
+  .m-pmore{display:block;margin-top:.6rem;font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);
+    text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--rule)}
+  /* "More info": the whole label floats up as a card over everything, scrolling inside if it is long */
+  .m-label.float{position:fixed;z-index:61;left:.75rem !important;right:.75rem;bottom:.75rem;padding:0;max-height:calc(var(--m-h) * .7);overflow-y:auto;
+    overscroll-behavior:contain;animation:m-float .35s ease;background:color-mix(in srgb,var(--ink) 3%,var(--paper));box-shadow:0 12px 34px -12px rgba(0,0,0,.5)}
+  .m-label.float .m-card{box-shadow:none}
+  .m-label.float .m-card + .m-card{margin-top:0;padding-top:0}
+  .m-label.float .work-line,.m-label.float .line,.m-label.float .m-card + .m-card,.m-label.float .m-card p.extra{display:block}
   .m-pic{display:none}
-  .m-strip{display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;
+  .m-strip{display:flex;flex:1 1 auto;min-height:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;scrollbar-width:none;
     -webkit-overflow-scrolling:touch;margin-top:3.2rem}
   .m-strip::-webkit-scrollbar{display:none}
-  .m-strip-step{flex:0 0 100%;scroll-snap-align:start;scroll-snap-stop:always;box-sizing:border-box;padding:0 1rem;
-    height:calc(58vh + 2.4rem);display:flex;align-items:center;justify-content:center}
+  .m-strip-step{flex:0 0 100%;scroll-snap-align:start;scroll-snap-stop:always;box-sizing:border-box;padding:0 1rem 1.8rem;
+    height:100%;display:flex;align-items:center;justify-content:center}
   .m-strip-step figure{position:relative;margin:0;max-width:100%}
-  .m-strip-step img{display:block;max-width:100%;max-height:58vh;width:auto;height:auto;border:1px solid var(--rule);background:var(--paper)}
+  .m-strip-step img{display:block;max-width:100%;max-height:calc(var(--m-h) - 15rem);width:auto;height:auto;border:1px solid var(--rule);background:var(--paper)}
   .m-strip-step figcaption{position:absolute;left:0;top:100%;margin-top:.5rem;white-space:nowrap}
   .m-strip-end .m-end{flex-direction:column;align-items:flex-start;gap:1.6rem}
-  .m-sbar{display:flex;gap:4px;margin:1.4rem 1rem 1.6rem}
+  .m-sbar{display:flex;flex:none;gap:4px;margin:.4rem 1rem 1rem}
   .m-sbar button{flex:1;height:16px;position:relative}
   .m-sbar button::before{content:"";position:absolute;left:0;right:0;top:7px;height:2px;background:var(--rule);transition:background .4s ease}
   .m-sbar button.here::before{background:var(--ink)}
@@ -179,5 +193,6 @@ body.museum-on{overflow:hidden}
 /* changing rooms: the new one fades in */
 .m-in{animation:m-in .8s ease}
 @keyframes m-in{from{opacity:0}to{opacity:1}}
+@keyframes m-float{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
 
 @media (prefers-reduced-motion:reduce){ .museum *{transition-duration:.01ms !important;animation:none !important} }

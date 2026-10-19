@@ -113,6 +113,12 @@
       }
       label.appendChild(c2);
     }
+    // on a phone the visit fits the screen: the label shows only the name, and "More info" floats the whole label
+    // up as a card over the pictures; "Hide" (or a tap outside it) puts it away and the swiping goes on
+    var pm = el('button', 'm-pmore', 'More info'); pm.type = 'button';
+    function float(on){ label.classList.toggle('float', on); pm.textContent = on ? 'Hide' : 'More info'; if(on) label.scrollTop = 0; }
+    pm.addEventListener('click', function(){ float(!label.classList.contains('float')); });
+    c1.appendChild(pm);
     roomEl.appendChild(label);
 
     // the prompt to scroll also takes the step when clicked, for anyone who does not scroll
@@ -127,6 +133,10 @@
     ov.appendChild(gal);
     document.body.appendChild(ov);
     document.body.classList.add('museum-on');
+
+    ov.addEventListener('click', function(e){
+      if(label.classList.contains('float') && !label.contains(e.target)){ e.stopPropagation(); e.preventDefault(); float(false); }
+    }, true);
 
     closeBtn = el('button', 'm-close'); closeBtn.type = 'button'; closeBtn.setAttribute('aria-label', 'Back to the wall');
     closeBtn.innerHTML = '<svg viewBox="0 0 16 16"><path d="M3 3l10 10M13 3L3 13"/></svg>';

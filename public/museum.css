@@ -167,8 +167,17 @@ body.museum-on{overflow:hidden}
     text-decoration:underline;text-underline-offset:3px;text-decoration-color:var(--rule)}
   /* "More info": the whole label floats up as a card over everything, scrolling inside if it is long */
   .m-label.float{position:fixed;z-index:61;left:.75rem !important;right:.75rem;bottom:.75rem;padding:0;max-height:calc(var(--m-h) * .7);overflow-y:auto;
-    overscroll-behavior:contain;animation:m-float .35s ease;background:color-mix(in srgb,var(--ink) 3%,var(--paper));box-shadow:0 12px 34px -12px rgba(0,0,0,.5)}
-  .m-label.float .m-card{box-shadow:none}
+    overscroll-behavior:contain;animation:m-float .35s ease;box-shadow:0 12px 34px -12px rgba(0,0,0,.5);
+    background:color-mix(in srgb,color-mix(in srgb,var(--ink) 3%,var(--paper)) 86%,transparent);
+    -webkit-backdrop-filter:blur(3px);backdrop-filter:blur(3px)}
+  /* a little see-through, so the picture behind still shows its shape: you are on the same page */
+  .m-label.float .m-card{box-shadow:none;background:transparent}
+  .m-label.float .m-card:last-child{padding-bottom:3rem}
+  .m-label.float .m-pmore{display:none}
+  .m-phide{display:none}
+  .m-label.float ~ .m-phide{display:flex;position:fixed;z-index:62;right:1.1rem;bottom:1.1rem;width:2.4rem;height:2.4rem;align-items:center;justify-content:center;
+    color:var(--ink);border-radius:50%;background:color-mix(in srgb,color-mix(in srgb,var(--ink) 3%,var(--paper)) 92%,transparent);animation:m-float .35s ease}
+  .m-phide svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:square}
   .m-label.float .m-card + .m-card{margin-top:0;padding-top:0}
   .m-label.float .work-line,.m-label.float .line,.m-label.float .m-card + .m-card,.m-label.float .m-card p.extra{display:block}
   .m-pic{display:none}

@@ -114,12 +114,17 @@
       label.appendChild(c2);
     }
     // on a phone the visit fits the screen: the label shows only the name, and "More info" floats the whole label
-    // up as a card over the pictures; "Hide" (or a tap outside it) puts it away and the swiping goes on
+    // up as a card over the pictures; the symbol in its bottom right corner (or a tap outside it) puts it away and
+    // the swiping goes on
     var pm = el('button', 'm-pmore', 'More info'); pm.type = 'button';
-    function float(on){ label.classList.toggle('float', on); pm.textContent = on ? 'Hide' : 'More info'; if(on) label.scrollTop = 0; }
-    pm.addEventListener('click', function(){ float(!label.classList.contains('float')); });
+    var ph = el('button', 'm-phide'); ph.type = 'button'; ph.setAttribute('aria-label', 'Hide');
+    ph.innerHTML = '<svg viewBox="0 0 22 22"><path d="M4 7.5l7 7 7-7"/></svg>';
+    function float(on){ label.classList.toggle('float', on); if(on) label.scrollTop = 0; }
+    pm.addEventListener('click', function(){ float(true); });
+    ph.addEventListener('click', function(){ float(false); });
     c1.appendChild(pm);
     roomEl.appendChild(label);
+    roomEl.appendChild(ph);
 
     // the prompt to scroll also takes the step when clicked, for anyone who does not scroll
     var hint = el('button', 'm-hint'); hint.type = 'button';

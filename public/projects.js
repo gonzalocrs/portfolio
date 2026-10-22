@@ -7,6 +7,7 @@
     ready     true once the page has its real content. Until then the page shows
               the full layout as a roadmap, with marked placeholders.
     hero      path to the main image, e.g. "img/sierra-hotel/hero.jpg"
+    heroPositionPhone  optional: where a phone-shaped crop of the hero looks on the home page, e.g. "78% center"
     lede      one or two sentences under the title
     text      a short second paragraph
     grid      optional: [{src, size, drawing, fill, caption}, ...] shows every picture in one hand-arranged grid after

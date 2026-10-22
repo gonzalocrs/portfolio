@@ -43,7 +43,6 @@ window.PROJECTS = {
       {src: "img/sierra-hotel/render-facade.jpg", size: "xl"},
       {src: "img/sierra-hotel/exploded-diagram.jpg", size: "tower", drawing: true, fill: true, caption: "Exploded axonometric"},
       {src: "img/sierra-hotel/elevation.svg", size: "half", drawing: true, caption: "Front elevation"},
-      {src: "img/sierra-hotel/photo-5.jpg", size: "half"},
       {src: "img/sierra-hotel/floor-plans.svg", size: "wide", drawing: true, caption: "Floor plans"},
       {src: "img/sierra-hotel/photo-1.jpg", size: "half"},
       {src: "img/sierra-hotel/photo-3.jpg", size: "half"}
@@ -60,7 +59,6 @@ window.PROJECTS = {
         {src: "img/sierra-hotel/photo-2.jpg", caption: ""},
         {src: "img/sierra-hotel/photo-3.jpg", caption: ""},
         {src: "img/sierra-hotel/photo-4.jpg", caption: ""},
-        {src: "img/sierra-hotel/photo-5.jpg", caption: ""},
         {src: "img/sierra-hotel/photo-6.jpg", caption: ""},
         {src: "img/sierra-hotel/photo-7.jpg", caption: ""},
         {src: "img/sierra-hotel/render-facade.jpg", caption: ""}

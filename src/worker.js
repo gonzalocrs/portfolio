@@ -29,8 +29,7 @@ function entrance(next, wrong){
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;800&family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
 <style>
-  :root{--paper:#fff;--ink:#0f1216;--rule:#d8d6d1;--mute:#7b7d80;--live:#1a2ce0;--mono:"IBM Plex Mono",Consolas,monospace}
-  @media (prefers-color-scheme:dark){:root{--paper:#0d0e10;--ink:#f2f1ee;--rule:#2b2d30;--mute:#8b8d90;--live:#7d8bff}}
+  :root{--paper:#fff;--ink:#0f1216;--rule:#d8d6d1;--mute:#7b7d80;--live:#0f1216;--mono:"IBM Plex Mono",Consolas,monospace}
   *{box-sizing:border-box}
   html,body{margin:0;height:100%;background:var(--paper);color:var(--ink);font-family:Archivo,system-ui,sans-serif;font-weight:300}
   body{display:flex;flex-direction:column;padding:1.6rem 2.5rem}
@@ -46,7 +45,7 @@ function entrance(next, wrong){
   input{flex:1;min-width:0;font:inherit;font-size:1rem;color:var(--ink);background:transparent;border:0;border-bottom:1px solid var(--rule);padding:.35rem 0;border-radius:0;outline:none}
   input:focus{border-bottom-color:var(--ink)}
   button{background:none;border:0;padding:.4rem 0;cursor:pointer;color:var(--ink);display:flex;align-items:center;gap:.35rem}
-  button:hover{color:var(--live)}
+  button:hover{text-decoration:underline;text-underline-offset:3px}
   button svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.5}
   .err{margin-top:.8rem;color:var(--ink)}
   @media (max-width:700px){body{padding:1.2rem 1rem}}

@@ -14,28 +14,14 @@
     --ink:#0f1216;
     --rule:#d8d6d1;
     --mute:#7b7d80;
-    --live:#1a2ce0;
+    --live:var(--ink);   /* no colour accent: hover and current states go to full ink */
     --font:"Archivo","Helvetica Neue",Arial,sans-serif;
     --mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
   }
-  @media (prefers-color-scheme: dark){
-    :root:not([data-theme="light"]){
-      --paper:#0d0e10;
-      --ink:#f2f1ee;
-      --rule:#2b2d30;
-      --mute:#8b8d90;
-      --live:#7d8bff;
-    }
-  }
-  :root[data-theme="dark"]{
-    --paper:#0d0e10;
-    --ink:#f2f1ee;
-    --rule:#2b2d30;
-    --mute:#8b8d90;
-    --live:#7d8bff;
-  }
 
   *{box-sizing:border-box}
+  html{-webkit-tap-highlight-color:transparent}
+  ::selection{background:rgba(15,18,22,.12)}
   html,body{margin:0;padding:0}
   body{
     background:var(--paper);
@@ -65,8 +51,7 @@
     letter-spacing:.04em;
   }
   .bar nav{position:relative;display:flex;align-items:center;gap:1.25rem}
-  /* the mobile-only settings icon and its popover (dark mode + language); hidden on desktop, where the
-     plain labelled switch above is already clear enough on its own */
+  /* the mobile-only settings icon and its popover (language); hidden on desktop */
   .settings-btn{display:none;color:var(--ink)}
   .settings-btn svg circle{fill:var(--paper)}
   .settings-panel{
@@ -118,9 +103,6 @@
     .gv-mark{width:170px;font-size:10.5px}
     .bar{gap:1.75rem}
     .bar nav{gap:.85rem}
-    /* the labelled switch is a header-bar item on desktop; on mobile it moves into the settings icon's
-       popover instead, where there's room for its label and for language alongside it */
-    .bar > nav > .switch{display:none}
     .settings-btn{display:flex;align-items:center;justify-content:center;padding:.3rem}
   }
 
@@ -136,34 +118,6 @@
   .introname{position:fixed;left:0;top:0;z-index:101;pointer-events:none;transform-origin:0 0;margin:0}
 
 
-  /* ---------- theme switch ---------- */
-  .switch{
-    display:inline-flex;
-    align-items:center;
-    gap:.55rem;
-    font-family:var(--mono);
-    font-size:.78rem;
-    text-transform:uppercase;
-    letter-spacing:.04em;
-  }
-  .switch:hover .switch-label{color:var(--live)}
-  .switch-track{
-    position:relative;flex:0 0 auto;
-    width:32px;height:18px;
-    border-radius:6px;
-    background:var(--rule);
-    transition:background .25s ease;
-  }
-  .switch[aria-checked="true"] .switch-track{background:var(--live)}
-  .switch-knob{
-    position:absolute;top:2px;left:2px;
-    width:14px;height:14px;
-    border-radius:3px;
-    background:#fff;
-    box-shadow:0 1px 3px rgba(0,0,0,.35),0 1px 1px rgba(0,0,0,.18);
-    transition:transform .25s cubic-bezier(.2,.7,.2,1);
-  }
-  .switch[aria-checked="true"] .switch-knob{transform:translateX(14px)}
 
   /* ---------- layout ---------- */
   main{
@@ -438,12 +392,6 @@
   </a>
   <nav>
     <a href="about.html">About</a>
-    <button class="switch theme-switch" id="theme" role="switch" aria-checked="false" aria-label="Dark mode">
-      <span class="switch-label">Dark mode</span>
-      <span class="switch-track"><span class="switch-knob"></span></span>
-    </button>
-    <!-- mobile only: the desktop switch above is hidden below 640px and replaced by this icon, which opens
-         dark mode + language in one place instead of a bare, unlabelled toggle -->
     <button class="settings-btn" id="settingsBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="Settings">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
         <line x1="3" y1="6" x2="21" y2="6"></line><circle cx="15" cy="6" r="2.1"></circle>
@@ -452,12 +400,6 @@
       </svg>
     </button>
     <div class="settings-panel" id="settingsPanel" hidden>
-      <div class="settings-row">
-        <span class="mono">Dark mode</span>
-        <button class="switch theme-switch" type="button" role="switch" aria-checked="false" aria-label="Dark mode">
-          <span class="switch-track"><span class="switch-knob"></span></span>
-        </button>
-      </div>
       <div class="settings-row">
         <span class="mono">Language</span>
         <div class="lang-toggle" role="group" aria-label="Language">
@@ -1164,45 +1106,7 @@
     });
   })();
 
-  // theme switch — the desktop header's own switch and the mobile popover's copy of it move together
-  var switches = Array.prototype.slice.call(document.querySelectorAll('.theme-switch'));
-
-  function isDark(){
-    var attr = document.documentElement.getAttribute('data-theme');
-    if(attr === 'dark') return true;
-    if(attr === 'light') return false;
-    return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  }
-  function syncSwitch(){
-    switches.forEach(function(b){ b.setAttribute('aria-checked', isDark() ? 'true' : 'false'); });
-  }
-
-  try {
-    var saved = sessionStorage.getItem('gc-theme');
-    if(saved) document.documentElement.setAttribute('data-theme', saved);
-  } catch(e){}
-  syncSwitch();
-
-  switches.forEach(function(b){
-    b.addEventListener('click', function(){
-      var next = isDark() ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', next);
-      try { sessionStorage.setItem('gc-theme', next); } catch(e){}
-      syncSwitch();
-    });
-  });
-
-  // the site follows the system theme; the switch only overrides it for this visit
-  try{
-    var mq = window.matchMedia('(prefers-color-scheme: dark)');
-    mq.addEventListener('change', function(){
-      document.documentElement.removeAttribute('data-theme');
-      try{ sessionStorage.removeItem('gc-theme'); }catch(e){}
-      syncSwitch();
-    });
-  }catch(e){}
-
-  // mobile-only settings popover: dark mode (above) and language, behind one icon instead of a bare toggle
+  // mobile-only settings popover: language, behind one icon
   var settingsBtn = document.getElementById('settingsBtn'), settingsPanel = document.getElementById('settingsPanel');
   if(settingsBtn && settingsPanel){
     var closeSettings = function(){
@@ -1420,15 +1324,6 @@
   document.addEventListener('keydown', function(e){
     if(sheet && e.key === 'Escape'){ e.stopImmediatePropagation(); close(); }
   }, true);
-  // the theme switch on the home page also turns the project in the sheet
-  function syncTheme(){
-    try{
-      var t = document.documentElement.getAttribute('data-theme'), d = frame && frame.contentDocument.documentElement;
-      if(!d) return;
-      if(t) d.setAttribute('data-theme', t); else d.removeAttribute('data-theme');
-    }catch(e){}
-  }
-  new MutationObserver(syncTheme).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
 
   document.addEventListener('click', function(e){
     if(e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || e.button > 0) return;   // new-tab clicks stay as they are

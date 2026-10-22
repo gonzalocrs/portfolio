@@ -28,7 +28,7 @@
 window.PROJECTS = {
   "sierra-hotel": {
     title: "Sierra Hotel", group: "Built", hue: 18,
-    kicker: "Cusco · 2023",
+    kicker: "Cusco, 2023",
     ready: true,
     text: [
       "This project transformed an existing structural shell into a hotel, requiring a complete redesign of the interior layout and façade. As my first non-residential project, it gave me the opportunity to explore how architecture could shape a guest’s experience while working within the constraints of an existing structure.",
@@ -65,45 +65,45 @@ window.PROJECTS = {
   },
   "edificio-murano": {
     title: "Edificio Murano", group: "Built", hue: 210,
-    kicker: "Cusco · 2021",
+    kicker: "Cusco, 2021",
     credits: [["Type", "Residential"], ["Location", "Cusco, Peru"], ["Year", "2021"], ["Studio", "Urba"], ["Design", "Gonzalo Cáceres Valcárcel"]],
     diagram: {}
   },
   "urba-branding": {
     title: "Urba Inmobiliaria", group: "Built", hue: 96,
-    kicker: "Lima · 2020",
+    kicker: "Lima, 2020",
     credits: [["Type", "Graphic / Branding"], ["Location", "Lima, Peru"], ["Year", "2020"], ["Studio", "Cirkel"], ["Design", "Gonzalo Cáceres Valcárcel"]],
     diagram: {}
   },
 
   "the-outermost-dock": {
     title: "Outer Dock", group: "Unbuilt", hue: 200,
-    kicker: "Columbia GSAPP · 2026",
+    kicker: "New York, 2026",
     credits: [["School", "Columbia GSAPP"], ["Year", "2026"], ["Design", "Gonzalo Cáceres Valcárcel"]],
     diagram: {}
   },
   "social-sanctuary": {
     title: "East 5th", group: "Unbuilt", hue: 42,
-    kicker: "Columbia GSAPP · 2025",
+    kicker: "New York, 2025",
     credits: [["School", "Columbia GSAPP"], ["Year", "2025"], ["Design", "Gonzalo Cáceres Valcárcel"]],
     diagram: {src: "img/social-sanctuary/hand-drawing.jpg"}
   },
   "permanent-impermanence": {
     title: "Joint", group: "Unbuilt", hue: 330,
-    kicker: "Columbia GSAPP · 2025",
+    kicker: "New York, 2025",
     credits: [["School", "Columbia GSAPP"], ["Year", "2025"], ["Design", "Gonzalo Cáceres Valcárcel"]],
     diagram: {}
   },
   "intra-urban-forestation": {
     title: "Aftergrowth", group: "Unbuilt", hue: 150,
-    kicker: "Columbia GSAPP · 2024",
+    kicker: "New York, 2024",
     credits: [["School", "Columbia GSAPP"], ["Year", "2024"], ["Design", "Gonzalo Cáceres Valcárcel"]],
     diagram: {}
   },
 
   "anticlastic-roof-structure": {
     title: "Anticlastic Surfaces", group: "Research", hue: 8,
-    kicker: "Robert Marino · 2026",
+    kicker: "New York, 2026",
     lede: "How can a double-curved surface emerge from a system of flat, developable elements?",
     text: [
       "This study explores the translation of double-curved geometry into a constructible system of flat plywood panels. Rather than beginning with a continuous shell and subdividing it, the surface is developed through the geometry of individual planar elements, testing how their orientation, edges, and connections can collectively generate an anticlastic form.",
@@ -152,7 +152,7 @@ window.PROJECTS = {
   },
   "vaulted-shell-structure": {
     title: "Lean Shells", group: "Research", hue: 260,
-    kicker: "Robert Marino · 2026",
+    kicker: "New York, 2026",
     lede: "A physical study of vaulted plywood shell structures, investigating efficient, structurally sound and expressive roof systems that can accommodate insulation.",
     credits: [["Type", "Structural Form-Finding"], ["Practice", "Robert Marino Architects"], ["Year", "2026"], ["Design", "Gonzalo Cáceres Valcárcel"]],
     // reserves the full-bleed diagram slot (see anticlastic-roof-structure)
@@ -161,7 +161,7 @@ window.PROJECTS = {
   },
   "modular-living-architecture": {
     title: "Open Assembly", group: "Research", hue: 120,
-    kicker: "2025",
+    kicker: "New York, 2025",
     lede: "A modular system for sphere-like structures, built from the fewest possible parts that assemble with one another, like an organic system.",
     credits: [["Type", "Modular Systems"], ["Year", "2025"], ["Design", "Gonzalo Cáceres Valcárcel"]],
     diagram: {}

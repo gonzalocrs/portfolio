@@ -271,10 +271,10 @@
   .st-box img{display:block;max-width:100%;max-height:100%;object-fit:contain}
   .st-plate{width:min(100%,calc((100% - 4.2rem) * 1.5));aspect-ratio:3/2;max-height:100%;background:#f1f0ed;display:flex;align-items:center;justify-content:center;
     font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
-  .st-cap{position:absolute;left:0;right:0;bottom:0;height:4.2rem;display:flex;align-items:flex-start;gap:1rem;padding-top:.9rem;cursor:pointer}
-  .st-cap b{font-weight:500;font-size:1rem;letter-spacing:-.005em}
-  .st-cap span{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);padding-top:.25rem}
-  .st-cap .st-n{margin-left:auto}
+  /* the name in the project label's face (Archivo extra bold), its place and year on the same baseline */
+  .st-cap{position:absolute;left:0;right:0;bottom:0;height:4.2rem;display:flex;align-items:baseline;gap:1rem;padding-top:1rem;cursor:pointer}
+  .st-cap b{font-weight:800;font-size:clamp(1.15rem,1.5vw,1.35rem);letter-spacing:-.02em;line-height:1}
+  .st-cap span{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute)}
   /* showroom: the list makes way; the categories sit under the picture instead */
   body.home-showroom #index{display:none}
   body.home-showroom .collage{inset:0 clamp(1rem,4vw,2.5rem) 0 clamp(1rem,4vw,2.5rem);pointer-events:auto}
@@ -544,9 +544,9 @@
       <div class="panel" id="p-built">
         <div>
           <ul class="works">
-            <li class="work"><a href="project.html?p=sierra-hotel" data-hue="18"><span class="name">Sierra Hotel<span class="tag">Urba</span></span><span class="meta">Cusco · 2023</span></a></li>
-            <li class="work"><a href="project.html?p=edificio-murano" data-hue="210"><span class="name">Edificio Murano<span class="tag">Urba</span></span><span class="meta">Cusco · 2021</span></a></li>
-            <li class="work"><a href="project.html?p=urba-branding" data-hue="96"><span class="name">Urba Inmobiliaria<span class="tag">Cirkel</span></span><span class="meta">Lima · 2020</span></a></li>
+            <li class="work"><a href="project.html?p=sierra-hotel" data-hue="18"><span class="name">Sierra Hotel</span><span class="meta">Cusco, 2023</span></a></li>
+            <li class="work"><a href="project.html?p=edificio-murano" data-hue="210"><span class="name">Edificio Murano</span><span class="meta">Cusco, 2021</span></a></li>
+            <li class="work"><a href="project.html?p=urba-branding" data-hue="96"><span class="name">Urba Inmobiliaria</span><span class="meta">Lima, 2020</span></a></li>
           </ul>
         </div>
       </div>
@@ -557,10 +557,10 @@
       <div class="panel" id="p-unbuilt">
         <div>
           <ul class="works">
-            <li class="work"><a href="project.html?p=the-outermost-dock" data-hue="200"><span class="name">Outer Dock</span><span class="meta">Columbia GSAPP · 2026</span></a></li>
-            <li class="work"><a href="project.html?p=social-sanctuary" data-hue="42"><span class="name">East 5th</span><span class="meta">Columbia GSAPP · 2025</span></a></li>
-            <li class="work"><a href="project.html?p=permanent-impermanence" data-hue="330"><span class="name">Joint</span><span class="meta">Columbia GSAPP · 2025</span></a></li>
-            <li class="work"><a href="project.html?p=intra-urban-forestation" data-hue="150"><span class="name">Aftergrowth</span><span class="meta">Columbia GSAPP · 2024</span></a></li>
+            <li class="work"><a href="project.html?p=the-outermost-dock" data-hue="200"><span class="name">Outer Dock</span><span class="meta">New York, 2026</span></a></li>
+            <li class="work"><a href="project.html?p=social-sanctuary" data-hue="42"><span class="name">East 5th</span><span class="meta">New York, 2025</span></a></li>
+            <li class="work"><a href="project.html?p=permanent-impermanence" data-hue="330"><span class="name">Joint</span><span class="meta">New York, 2025</span></a></li>
+            <li class="work"><a href="project.html?p=intra-urban-forestation" data-hue="150"><span class="name">Aftergrowth</span><span class="meta">New York, 2024</span></a></li>
           </ul>
         </div>
       </div>
@@ -571,9 +571,9 @@
       <div class="panel" id="p-research">
         <div>
           <ul class="works">
-            <li class="work"><a href="project.html?p=anticlastic-roof-structure" data-hue="8"><span class="name">Anticlastic Surfaces<span class="tag">Robert Marino</span></span><span class="meta">2026</span></a></li>
-            <li class="work"><a href="project.html?p=vaulted-shell-structure" data-hue="260"><span class="name">Lean Shells<span class="tag">Robert Marino</span></span><span class="meta">2026</span></a></li>
-            <li class="work"><a href="project.html?p=modular-living-architecture" data-hue="120"><span class="name">Open Assembly</span><span class="meta">2025</span></a></li>
+            <li class="work"><a href="project.html?p=anticlastic-roof-structure" data-hue="8"><span class="name">Anticlastic Surfaces</span><span class="meta">New York, 2026</span></a></li>
+            <li class="work"><a href="project.html?p=vaulted-shell-structure" data-hue="260"><span class="name">Lean Shells</span><span class="meta">New York, 2026</span></a></li>
+            <li class="work"><a href="project.html?p=modular-living-architecture" data-hue="120"><span class="name">Open Assembly</span><span class="meta">New York, 2025</span></a></li>
           </ul>
         </div>
       </div>
@@ -1176,7 +1176,7 @@
       L.box = el('div', 'st-box', L);
       L.img = el('img', '', L.box); L.img.alt = '';
       L.plate = el('div', 'st-plate', L.box, 'In preparation');
-      var c = el('div', 'st-cap', L); L.t = el('b', '', c); L.k = el('span', '', c); L.n = el('span', 'st-n', c);
+      var c = el('div', 'st-cap', L); L.t = el('b', '', c); L.k = el('span', '', c);
       L.addEventListener('click', function(e){
         var me = e.currentTarget;
         if(!me.slug) return;
@@ -1197,7 +1197,6 @@
     var all = coverSlugs(), i = all.indexOf(slug);
     L.slug = slug; L.src = c.src;
     L.t.textContent = c.pr.title; L.k.textContent = c.pr.kicker || '';
-    L.n.textContent = i === -1 ? '' : pad2(i + 1) + ' / ' + pad2(all.length);
     L.classList.toggle('drawing', c.drawing);
     L.img.style.objectPosition = (window.matchMedia('(max-width:900px)').matches && c.pr.heroPositionPhone) || c.pos;   // only matters where the picture is cropped (mix1)
     function swap(){ if(stage.cur !== slug) return; stage.layers.forEach(function(x){ x.classList.toggle('on', x === L); }); }

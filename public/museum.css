@@ -118,6 +118,10 @@ body.museum-on{overflow:hidden}
   padding:.25em .55em;background:var(--paper);color:var(--mute);opacity:0;transition:opacity .25s ease;white-space:nowrap;max-width:calc(100% - 1rem);overflow:hidden;text-overflow:ellipsis}
 .m-hung:hover .cap{opacity:1}
 /* back to the wall / next room: beside the wall, standing on the same floor line, past its end */
+/* gallery options being tried (?gal=...): the pictures alone, no wall */
+.m-plate{position:absolute;background:color-mix(in srgb,var(--ink) 3.5%,var(--paper))}
+.m-hung.on-plate{border-color:transparent}
+.m-hung.small{border-color:color-mix(in srgb,var(--ink) 8%,transparent)}
 .m-salon-foot{position:absolute;right:0}
 .m-salon-foot .m-end{flex-direction:column;align-items:flex-start;gap:1.2rem}
 .m-salon-foot .m-end button{font-size:1rem}

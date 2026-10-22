@@ -403,6 +403,7 @@
       var hang = function(){
         if(!state || state.gal !== gal || left > 0) return;
         wall.innerHTML = '';
+        if(GSTYLE){ hangPlain(list, wall, foot); return; }
         // the places: whole bays of the home page's wall, and in the last one only as many as are still needed, the
         // ones nearest the rest, so the wall ends where the pictures do
         var n = list.length, nb = Math.max(1, Math.ceil(n / BAY.length)), slots = [], accents = [];
@@ -506,6 +507,89 @@
       };
       state.hang = hang;
     }
+  }
+  // gallery options being tried (?gal=rows|plates|lead): no wall, the pictures alone on a strict layout, standing
+  // on the same floor line as the spotlight's bar
+  var GSTYLE = (location.search.match(/[?&]gal=(rows|plates|lead)\b/) || [])[1] || null;
+  function hangPlain(list, wall, foot){
+    var bay = rects().bay, floor = groundLine();
+    wall.style.height = Math.max(120, Math.round(floor - wall.offsetTop)) + 'px';
+    foot.style.left = Math.round(bay + 24) + 'px'; foot.style.bottom = Math.round(state.H - floor) + 'px';
+    var bw = bay, bh = wall.clientHeight, g = Math.round(Math.max(12, Math.min(20, bw * .016)));
+    var NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('class', 'facade plain'); svg.setAttribute('viewBox', '0 0 ' + wall.clientWidth + ' ' + bh);
+    var ln = document.createElementNS(NS, 'line');
+    [['x1', 0], ['y1', bh], ['x2', bay], ['y2', bh], ['class', 'ground']].forEach(function(p){ ln.setAttribute(p[0], p[1]); });
+    svg.appendChild(ln); wall.appendChild(svg);
+    function put(it, r, cls){
+      var f = el('figure', 'm-hung ' + (cls || '')), im = new Image(); im.src = it.src; im.alt = it.caption || state.p.title;
+      setRect(f, {x: Math.round(r.x), y: Math.round(r.y), w: Math.round(r.w), h: Math.round(r.h)});
+      f.appendChild(im); f.appendChild(el('span', 'cap', it.caption || it.kind));
+      f.addEventListener('click', function(){ setRoom('walk', list.indexOf(it) - 1); });
+      wall.appendChild(f); return f;
+    }
+    // fit pictures (contained, never cropped) into a box of cells: c columns, as many rows as needed
+    function cells(n, W, H, gap, aspects){
+      var best = null;
+      for(var c = 1; c <= n; c++){
+        var rws = Math.ceil(n / c), cw = (W - (c - 1) * gap) / c, ch = (H - (rws - 1) * gap) / rws;
+        if(cw <= 0 || ch <= 0) continue;
+        var area = aspects.reduce(function(s, a){ var f = fit(a, cw, ch); return s + f.w * f.h; }, 0);
+        if(!best || area > best.area) best = {c: c, rows: rws, cw: cw, ch: ch, area: area};
+      }
+      return best;
+    }
+    if(GSTYLE === 'rows'){
+      // a contact sheet: rows of one height, each filling the width, the order kept
+      var S = list.reduce(function(s, it){ return s + it.a; }, 0), pick = null;
+      for(var r = 1; r <= list.length; r++){
+        var rowsL = [], cur = [], acc = 0, tgt = S / r;
+        list.forEach(function(it, i){
+          cur.push(it); acc += it.a;
+          var left = list.length - i - 1, need = r - rowsL.length - 1;
+          if((acc >= tgt * (rowsL.length + 1) - it.a / 2 && need > 0 && left >= need) || left === 0){ rowsL.push(cur); cur = []; }
+        });
+        if(cur.length) rowsL.push(cur);
+        var hs = rowsL.map(function(row){ return (bw - (row.length - 1) * g) / row.reduce(function(s, it){ return s + it.a; }, 0); });
+        var tot = hs.reduce(function(s, h){ return s + h; }, 0) + (rowsL.length - 1) * g, sc = Math.min(1, (bh - g) / tot);
+        var cover = sc * sc * hs.reduce(function(s, h, k){ return s + h * h * rowsL[k].reduce(function(t, it){ return t + it.a; }, 0); }, 0);
+        if(!pick || cover > pick.cover) pick = {rows: rowsL, hs: hs, sc: sc, tot: tot, cover: cover};
+      }
+      var y = bh - g - pick.tot * pick.sc, x0 = (bw - bw * pick.sc) / 2;
+      pick.rows.forEach(function(row, k){
+        var h = pick.hs[k] * pick.sc, x = x0;
+        row.forEach(function(it){ var w = it.a * h; put(it, {x: x, y: y, w: w, h: h}); x += w + g * pick.sc; });
+        y += h + g * pick.sc;
+      });
+    }
+    else if(GSTYLE === 'plates'){
+      // plates: one cell for every picture, all the same size, each a quiet panel like the label's card, the picture
+      // centred on it with a margin
+      var gp = g * 1.2, bx = cells(list.length, bw, bh - gp, gp, list.map(function(it){ return it.a; }));
+      var m = Math.max(8, Math.min(bx.cw, bx.ch) * .06);
+      list.forEach(function(it, i){
+        var cx = (i % bx.c) * (bx.cw + gp), cy = Math.floor(i / bx.c) * (bx.ch + gp);
+        var plate = el('div', 'm-plate'); setRect(plate, {x: Math.round(cx), y: Math.round(cy), w: Math.round(bx.cw), h: Math.round(bx.ch)}); wall.appendChild(plate);
+        var f = fit(it.a, bx.cw - 2 * m, bx.ch - 2 * m);
+        put(it, {x: cx + (bx.cw - f.w) / 2, y: cy + (bx.ch - f.h) / 2, w: f.w, h: f.h}, 'on-plate');
+      });
+    }
+    else{
+      // lead: the picture you came in with, large, and the rest as a tidy index under it, in one strict grid
+      var rest = list.slice(1), ih = rest.length ? (bh - g) * .3 : 0, lf = fit(list[0].a, bw, bh - g - ih - (rest.length ? g * 2 : 0));
+      var top = bh - g - ih - (rest.length ? g * 2 : 0) - lf.h;
+      put(list[0], {x: 0, y: top, w: lf.w, h: lf.h}, 'lead');
+      if(rest.length){
+        var ib = cells(rest.length, bw, ih, g * .75, rest.map(function(it){ return it.a; }));
+        var iy = bh - g - ih, rows2 = Math.ceil(rest.length / ib.c);
+        // equal cells; each picture sits on the cell's foot, so every row has one line along its bottom
+        rest.forEach(function(it, i){
+          var cx = (i % ib.c) * (ib.cw + g * .75), cy = iy + Math.floor(i / ib.c) * (ib.ch + g * .75), f = fit(it.a, ib.cw, ib.ch);
+          put(it, {x: cx + (ib.cw - f.w) / 2, y: cy + (ib.ch - f.h), w: f.w, h: f.h}, 'small');
+        });
+      }
+    }
+    if(state.salon && state.salon.fade){ state.salon.fade = false; fadeIn(wall); fadeIn(foot); }
   }
   // the view behind the gallery's wall: the project's widest photograph (not a drawing), the hero if there is none
   function viewOf(list){

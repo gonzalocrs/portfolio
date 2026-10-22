@@ -260,6 +260,21 @@
   .collage.flow .wall{position:relative;overflow:hidden;will-change:auto}
   .collage.flow.settled .tile.ambient{transition:opacity .5s ease,left .6s cubic-bezier(.3,.7,.2,1),top .6s cubic-bezier(.3,.7,.2,1),width .6s cubic-bezier(.3,.7,.2,1),height .6s cubic-bezier(.3,.7,.2,1)}
   .collage.home-rows{touch-action:pan-y}
+  /* curated: no frames; a drawing sits on a pale plate (its white paper multiplied into it) so every picture reads as one
+     solid, even rectangle */
+  .collage.flow .tile{border:0;background:#f1f0ed}
+  .collage.flow .tile.drawing .fill{mix-blend-mode:multiply}
+  .collage.flow .tile.ambient.on.off{opacity:.12}
+  .collage.flow .tile .cap{display:none}
+  .flow-cap{position:absolute;display:flex;flex-direction:column;gap:.2rem;opacity:0;transition:opacity .5s ease,left .6s cubic-bezier(.3,.7,.2,1),top .6s cubic-bezier(.3,.7,.2,1);pointer-events:none;white-space:nowrap}
+  .flow-cap.on{opacity:1;pointer-events:auto;cursor:pointer}
+  .flow-cap.on.off{opacity:.12}
+  .flow-cap b{font-weight:500;font-size:.95rem;letter-spacing:-.005em;color:var(--ink)}
+  .flow-cap span{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute)}
+  .flow-cap:hover b{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+  .flow-rail{position:absolute;height:1px;background:var(--rule);opacity:0;transition:opacity .4s ease;pointer-events:none}
+  .flow-rail.on{opacity:1}
+  .flow-rail i{position:absolute;top:-.5px;height:2px;background:var(--ink)}
   .collage.home-line{touch-action:pan-x}
   .tile{
     position:absolute;
@@ -833,7 +848,7 @@
   // one picture tile per opening on the wall, so every window holds a picture for good
   (function(){
     var wallEl = document.querySelector('.wall'), have = wallEl.querySelectorAll('.tile.ambient').length, n = AMBIENT_SLOTS.length;
-    if(FLOW){ var u = {}; Object.keys(GROUPS).forEach(function(k){ GROUPS[k].all.forEach(function(src){ u[src] = 1; }); }); n = Object.keys(u).length; }
+    if(FLOW) n = curated().length;
     for(var k = have; k < n; k++){ var d = document.createElement('div'); d.className = 'tile ambient'; wallEl.appendChild(d); }
   })();
   var ambientTiles = Array.prototype.slice.call(document.querySelectorAll('.tile.ambient'));
@@ -869,7 +884,7 @@
   function hang(){
     var seen = {}, picks = [];
     Object.keys(GROUPS).forEach(function(k){ GROUPS[k].all.forEach(function(src){ if(!seen[src]){ seen[src] = 1; picks.push({src: src, group: k}); } }); });
-    if(FLOW){ hangFlow(shuffle(picks)); return; }
+    if(FLOW){ hangFlow(); return; }
     picks = shuffle(picks).slice(0, AMBIENT_SLOTS.length);
     if(!picks.length) return;
     var left = picks.length;
@@ -899,23 +914,53 @@
   }
   function bringIntoView(){}
 
-  // rows / line: every picture whole (never cropped), at one height, in a loose shuffled order
-  var flowCat = null, flowReady = false;
-  function hangFlow(picks){
-    var left = picks.length;
+  // rows / line: a curated sequence, project by project in the order of the index, each picture whole (never cropped)
+  // at one height; a project's pictures sit close together, with its name and place under (line) or above (rows)
+  function curated(){
+    var FLOW_MAX = 6, out = [];      // pictures per project on the landing page; the rest are in the project itself
+    links.map(slugOf).forEach(function(slug){
+      var pr = window.PROJECTS && window.PROJECTS[slug];
+      if(!pr) return;
+      var g = pr.gallery || {}, seen = {}, list = [];
+      function add(src, sec){ if(src && !seen[src] && list.length < FLOW_MAX){ seen[src] = 1; list.push({src: src, group: slug + '/' + sec}); } }
+      add(pr.hero, 'hero');
+      if(pr.grid) pr.grid.forEach(function(it){ (Array.isArray(it) ? it : [it]).forEach(function(x){ add(x.src, x.drawing ? 'drawings' : 'photos'); }); });
+      (g.physical || []).forEach(function(it){ add(it.src, 'physical'); });
+      (g.photos || []).forEach(function(it){ add(it.src, 'photos'); });
+      if(pr.diagram) add(pr.diagram.src, 'diagram');
+      (g.drawings || []).forEach(function(it){ add(it.src, 'drawings'); });
+      out = out.concat(list);
+    });
+    return out;
+  }
+  var flowCat = null, flowReady = false, flowCaps = {};
+  function hangFlow(){
+    var picks = curated(), left = picks.length;
     if(!left) return;
     picks.forEach(function(p){ loadAspect(thumb(p.src), function(a){ p.a = a || 1; if(--left === 0) done(); }); });
     function done(){
       picks.forEach(function(p, i){
-        var s = ambientState[i], pr = window.PROJECTS && window.PROJECTS[p.group.split('/')[0]];
+        var s = ambientState[i], sec = p.group.split('/')[1];
         s.slot = i; s.src = p.src; s.group = p.group; s.a = p.a;
         s.tile.style.aspectRatio = 'auto';
-        setFill(s.fill, p.src, hues[Math.floor(Math.random() * hues.length)]);
-        s.cap.textContent = pr ? pr.title : '';
+        s.tile.classList.toggle('drawing', sec === 'drawings' || sec === 'diagram' || /\.(svg|png|webp)$/i.test(p.src));
+        setFill(s.fill, p.src, 0);
+        s.cap.textContent = '';
+        var slug = p.group.split('/')[0];
+        if(!flowCaps[slug]){
+          var pr = window.PROJECTS[slug], c = document.createElement('a');
+          c.className = 'flow-cap'; c.href = 'project.html?p=' + slug;
+          c.innerHTML = '<b></b><span></span>';
+          c.firstChild.textContent = pr.title; c.lastChild.textContent = pr.kicker || '';
+          c.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); s.tile.click(); });
+          wallEl.appendChild(c);
+          flowCaps[slug] = c;
+        }
       });
       layoutFlow();
       picks.forEach(function(p, i){ ambientState[i].tile.classList.add('on'); });
       requestAnimationFrame(function(){ flowReady = true; collageEl.classList.add('settled'); });
+      if(MODE === 'line') collageEl.addEventListener('scroll', syncRail, {passive: true});
     }
   }
   // lays the pictures out again: only those in the open category (if any), the rest step out
@@ -924,25 +969,52 @@
     var phone = window.matchMedia('(max-width:900px)').matches, H = collageEl.clientHeight;
     var W = collageEl.clientWidth - (phone ? 0 : 40);     // the same margin on the right as the header's
     function put(s, x, y, w, h){ var t = s.tile.style; t.left = Math.round(x) + 'px'; t.top = Math.round(y) + 'px'; t.width = Math.round(w) + 'px'; t.height = Math.round(h) + 'px'; }
+    function cap(slug, x, y){ var c = flowCaps[slug]; if(!c) return; c.style.left = Math.round(x) + 'px'; c.style.top = Math.round(y) + 'px'; c.classList.add('on'); }
+    Object.keys(flowCaps).forEach(function(k){ flowCaps[k].classList.toggle('on', !flowCat || flowCat.indexOf(k) !== -1); });
+    // the pictures of each project, in order
+    var byProject = [];
+    list.forEach(function(s){ var k = slugOfTile(s), last = byProject[byProject.length - 1]; if(last && last.slug === k) last.tiles.push(s); else byProject.push({slug: k, tiles: [s]}); });
+    var g = phone ? 6 : 10;                                   // between pictures of one project
     if(MODE === 'rows'){
-      var g = phone ? 8 : 14, T = phone ? W * .42 : Math.max(150, Math.min(300, H * .32)), y = 0, row = [], sum = 0;
-      function flush(last){
-        if(!row.length) return;
-        var h = last ? T : (W - g * (row.length - 1)) / sum, x = 0;
-        row.forEach(function(s){ put(s, x, y, h * s.a, h); x += h * s.a + g; });
-        y += h + g; row = []; sum = 0;
-      }
-      list.forEach(function(s){
-        row.push(s); sum += s.a;
-        if(sum * T + g * (row.length - 1) >= W) flush(false);
+      var T = phone ? W * .4 : Math.max(150, Math.min(280, H * .3)), y = 0, CAPH = phone ? 46 : 52, SEP = phone ? 44 : 72;
+      byProject.forEach(function(pj, n){
+        if(n) y += SEP;
+        cap(pj.slug, 0, y); y += CAPH;
+        var row = [], sum = 0;
+        function flush(last){
+          if(!row.length) return;
+          var h = last ? Math.min(T, (W - g * (row.length - 1)) / sum) : (W - g * (row.length - 1)) / sum, x = 0;
+          row.forEach(function(s){ put(s, x, y, h * s.a, h); x += h * s.a + g; });
+          y += h + g; row = []; sum = 0;
+        }
+        pj.tiles.forEach(function(s){ row.push(s); sum += s.a; if(sum * T + g * (row.length - 1) >= W) flush(false); });
+        flush(true);
+        y -= g;
       });
-      flush(true);
-      wallEl.style.width = W + 'px'; wallEl.style.height = Math.max(0, y - g + (phone ? 0 : 40)) + 'px';
+      wallEl.style.width = W + 'px'; wallEl.style.height = Math.max(0, y + (phone ? 0 : 40)) + 'px';
     } else {
-      var h = phone ? H * .6 : H * .42, gap = phone ? 14 : Math.round(Math.max(28, W * .03)), x = 0, top = (H - h) / 2;
-      list.forEach(function(s){ put(s, x, top, h * s.a, h); x += h * s.a + gap; });
-      wallEl.style.width = Math.max(W, x - gap + (phone ? 0 : W * .08)) + 'px'; wallEl.style.height = H + 'px';
+      var h = phone ? H * .58 : H * .5, SEPX = phone ? 44 : Math.round(Math.max(64, W * .07)), x = 0, top = Math.round((H - h) / 2) - 18;
+      byProject.forEach(function(pj, n){
+        if(n) x += SEPX - g;
+        cap(pj.slug, x, top + h + 14);
+        pj.tiles.forEach(function(s){ put(s, x, top, h * s.a, h); x += h * s.a + g; });
+      });
+      wallEl.style.width = Math.max(W, x - g + (phone ? 0 : W * .3)) + 'px'; wallEl.style.height = H + 'px';
+      syncRail();
     }
+  }
+  // line: a thin rail along the bottom shows how far along the sequence you are
+  var rail = null;
+  function syncRail(){
+    if(MODE !== 'line') return;
+    if(!rail){ rail = document.createElement('div'); rail.className = 'flow-rail'; rail.innerHTML = '<i></i>'; collageEl.parentNode.appendChild(rail); }
+    var c = collageEl, max = c.scrollWidth - c.clientWidth, w = c.clientWidth / Math.max(1, c.scrollWidth);
+    var cr = c.getBoundingClientRect(), pr = c.parentNode.getBoundingClientRect();
+    rail.style.left = (cr.left - pr.left) + 'px'; rail.style.width = (c.clientWidth - (window.matchMedia('(max-width:900px)').matches ? 0 : 40)) + 'px';
+    rail.style.top = (cr.bottom - pr.top - 28) + 'px';
+    rail.firstChild.style.width = (w * 100) + '%';
+    rail.firstChild.style.left = (max > 0 ? c.scrollLeft / max * (1 - w) * 100 : 0) + '%';
+    rail.classList.toggle('on', max > 4);
   }
   // the pictures fully inside the area now
   function inArea(s){
@@ -1026,9 +1098,10 @@
       var cat = g ? Array.prototype.map.call(g.querySelectorAll('.work a'), slugOf) : null;
       if(String(cat) !== String(flowCat)){ flowCat = cat; if(flowReady){ layoutFlow(); collageEl.scrollTo({left: 0, top: 0, behavior: 'smooth'}); } }
       ambientState.forEach(function(s){ s.tile.classList.toggle('off', !!keep && keep.indexOf(slugOfTile(s)) === -1); });
+      Object.keys(flowCaps).forEach(function(k){ flowCaps[k].classList.toggle('off', !!keep && keep.indexOf(k) === -1); });
       if(currentLink){
         var m = mine(slugOf(currentLink)).filter(function(s){ return !flowCat || flowCat.indexOf(slugOfTile(s)) !== -1; });
-        if(m.length && !m.some(inArea)) collageEl.scrollTo(MODE === 'rows' ? {top: m[0].tile.offsetTop, behavior: 'smooth'} : {left: Math.max(0, m[0].tile.offsetLeft - 20), behavior: 'smooth'});
+        if(m.length && !m.some(inArea)) collageEl.scrollTo(MODE === 'rows' ? {top: Math.max(0, m[0].tile.offsetTop - 52), behavior: 'smooth'} : {left: Math.max(0, m[0].tile.offsetLeft - 20), behavior: 'smooth'});
       }
       return;
     }

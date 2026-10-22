@@ -328,6 +328,22 @@
   body.home-showroom3:not(.on-light) .show-cats button.on,body.home-showroom3:not(.on-light) .show-cats button:hover,
   body.home-showroom3:not(.on-light) .sh-arrow{color:#fff}
   body.home-showroom3.on-light .show-foot{border-top-color:var(--rule)}
+  /* mix1: stage, with the picture filling everything right of the list up to the screen's edge, cropped like showroom's,
+     and the same slow settle as each one comes in */
+  body.home-mix1 .stage{right:0}
+  body.home-mix1 .st-box{background:#f1f0ed;overflow:hidden}
+  body.home-mix1 .st-box img{width:100%;height:100%;max-width:none;max-height:none;object-fit:cover;transform:scale(1.04);transition:transform 1.6s cubic-bezier(.2,.7,.2,1)}
+  body.home-mix1 .st-layer.on .st-box img{transform:scale(1)}
+  body.home-mix1 .st-layer.drawing .st-box img{object-fit:contain;padding:2.5rem;box-sizing:border-box;mix-blend-mode:multiply}
+  body.home-mix1 .st-cap{padding-right:clamp(1rem,4vw,2.5rem)}
+  /* mix2: showroom without the big name; the line under the picture is the list of names (the one shown in ink) and its place */
+  body.home-mix2 .sl-cap,body.home-mix2 .show-cats,body.home-mix2 .show-nav{display:none}
+  body.home-mix2 .sl-box{bottom:3.6rem}
+  body.home-mix2 .show-foot{height:2.6rem;bottom:.2rem;gap:2rem}
+  .show-names{display:flex;flex-wrap:wrap;gap:.2rem 1.6rem}
+  .show-names button{font-weight:500;font-size:1rem;letter-spacing:-.005em;color:var(--mute);padding:.5rem 0;transition:color .25s ease}
+  .show-names button:hover,.show-names button.on{color:var(--ink)}
+  .sh-place{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);white-space:nowrap}
   /* curated: no frames; a drawing sits on a pale plate (its white paper multiplied into it) so every picture reads as one
      solid, even rectangle */
   .collage.flow .tile{border:0;background:#f1f0ed}
@@ -419,6 +435,11 @@
     .sl-cap{bottom:2.8rem;height:3.4rem}
     .sl-name{flex-direction:column;align-items:flex-start;gap:.45rem}
     .show-cats{gap:.9rem}
+    body.home-mix2 .sl-box{bottom:4.6rem}
+    body.home-mix2 .collage{height:calc((100vw - 2rem) * .75 + 4.8rem)}
+    body.home-mix2 .show-foot{height:auto;bottom:0;align-items:flex-start;flex-direction:column;gap:0}
+    .show-names{gap:0 1.1rem}
+    .sh-place{display:none}
   }
 
   /* ---------- a project opened on top of the home page ---------- */
@@ -729,11 +750,14 @@
   // showroom: one project per screen, a single large picture with its name, stepped through sideways
   // showroom2 / showroom3: two refinements of showroom (the picture edge to edge with a quieter name; the picture
   // filling the whole screen with the name and menu over it in white)
-  if(['loose', 'rows', 'line', 'stage', 'showroom', 'showroom2', 'showroom3'].indexOf(MODE) === -1) MODE = '';
-  var SHOW = /^showroom/.test(MODE);
-  var FLOW = MODE === 'rows' || MODE === 'line', SINGLE = MODE === 'stage' || SHOW;
+  // mix1 / mix2: stage and showroom crossed (mix1: stage's list and cross-fade with the picture filling the rest of the
+  // screen, as large as showroom's; mix2: showroom's one picture per screen with stage's names, in a line under it, to point at)
+  if(['loose', 'rows', 'line', 'stage', 'showroom', 'showroom2', 'showroom3', 'mix1', 'mix2'].indexOf(MODE) === -1) MODE = '';
+  var SHOW = /^showroom/.test(MODE) || MODE === 'mix2', STAGE = MODE === 'stage' || MODE === 'mix1';
+  var FLOW = MODE === 'rows' || MODE === 'line', SINGLE = STAGE || SHOW;
   if(MODE){ collageEl.classList.add('home-' + MODE); document.body.classList.add('home-' + MODE); }
   if(SHOW && MODE !== 'showroom'){ collageEl.classList.add('home-showroom'); document.body.classList.add('home-showroom'); }
+  if(MODE === 'mix1'){ collageEl.classList.add('home-stage'); document.body.classList.add('home-stage'); }
   if(SINGLE) collageEl.classList.add('single');
   if(FLOW) collageEl.classList.add('flow');
   // one bay: big openings of different sizes and proportions, so an image is actually readable in each (none overlap,
@@ -984,7 +1008,7 @@
     var seen = {}, picks = [];
     Object.keys(GROUPS).forEach(function(k){ GROUPS[k].all.forEach(function(src){ if(!seen[src]){ seen[src] = 1; picks.push({src: src, group: k}); } }); });
     if(FLOW){ hangFlow(); return; }
-    if(MODE === 'stage'){ buildStage(); return; }
+    if(STAGE){ buildStage(); return; }
     if(SHOW){ buildShow(); return; }
     picks = shuffle(picks).slice(0, AMBIENT_SLOTS.length);
     if(!picks.length) return;
@@ -1175,6 +1199,7 @@
     L.t.textContent = c.pr.title; L.k.textContent = c.pr.kicker || '';
     L.n.textContent = i === -1 ? '' : pad2(i + 1) + ' / ' + pad2(all.length);
     L.classList.toggle('drawing', c.drawing);
+    L.img.style.objectPosition = (window.matchMedia('(max-width:900px)').matches && c.pr.heroPositionPhone) || c.pos;   // only matters where the picture is cropped (mix1)
     function swap(){ if(stage.cur !== slug) return; stage.layers.forEach(function(x){ x.classList.toggle('on', x === L); }); }
     if(c.src){
       L.img.style.display = ''; L.plate.style.display = 'none';
@@ -1219,6 +1244,18 @@
       show.slides.push(sl);
     });
     var foot = el('div', 'show-foot', wrap);
+    if(MODE === 'mix2'){
+      // the names stand in for the categories, arrows and counter: pointing at one brings its picture, a click opens it
+      var names = el('div', 'show-names', foot), hold = null;
+      show.place = el('span', 'sh-place', foot);
+      show.names = show.list.map(function(slug, i){
+        var b = el('button', '', names, coverOf(slug).pr.title); b.type = 'button';
+        b.addEventListener('mouseenter', function(){ clearTimeout(hold); hold = setTimeout(function(){ showTo(i); }, 120); });
+        b.addEventListener('mouseleave', function(){ clearTimeout(hold); });
+        b.addEventListener('click', function(e){ e.stopPropagation(); var im = show.slides[i].querySelector('img'); openVisit(slug, im.getBoundingClientRect(), im.getAttribute('src')); });
+        return b;
+      });
+    }
     var cats = el('div', 'show-cats', foot);
     ['All'].concat(groups.map(function(g){ return g.querySelector('.head').textContent.replace(/[+−–-]\s*$/, '').trim(); })).forEach(function(name, i){
       var b = el('button', i ? '' : 'on', cats, name); b.type = 'button';
@@ -1258,6 +1295,7 @@
     show.at = Math.max(0, Math.min(vis.length - 1, i));
     vis.forEach(function(sl, k){ sl.classList.toggle('here', k === show.at); });
     show.count.textContent = pad2(show.at + 1) + ' / ' + pad2(vis.length);
+    if(show.names){ var cur = show.slides.indexOf(vis[show.at]); show.names.forEach(function(b, k){ b.classList.toggle('on', k === cur); }); show.place.textContent = cur > -1 ? (coverOf(show.list[cur]).pr.kicker || '') : ''; }
     document.body.classList.toggle('on-light', !!vis[show.at] && vis[show.at].classList.contains('plate'));   // showroom3: dark type over a pale picture
     show.prev.classList.toggle('on', show.at > 0);
     show.next.classList.toggle('on', show.at < vis.length - 1);
@@ -1340,7 +1378,7 @@
     var keep = null, g = document.querySelector('.group[data-open="true"]');
     if(currentLink) keep = [slugOf(currentLink)];
     else if(g) keep = Array.prototype.map.call(g.querySelectorAll('.work a'), slugOf);
-    if(MODE === 'stage'){ stageFilter(); return; }
+    if(STAGE){ stageFilter(); return; }
     if(SHOW) return;
     if(FLOW){
       // a category closes the gaps (the pictures move up together); pointing at a project only fades the others
@@ -1378,7 +1416,7 @@
   // the pictures of the project pointed at that are in view right now
   function shownTiles(){
     if(!currentLink) return [];
-    if(MODE === 'stage') return stage.el ? [{tile: stage.el.querySelector('.st-layer.on') || stage.el}] : [];
+    if(STAGE) return stage.el ? [{tile: stage.el.querySelector('.st-layer.on') || stage.el}] : [];
     return mine(slugOf(currentLink)).filter(function(s){ return FLOW ? inArea(s) : inView(AMBIENT_SLOTS[s.slot]); });
   }
 

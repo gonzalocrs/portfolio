@@ -260,6 +260,46 @@
   .collage.flow .wall{position:relative;overflow:hidden;will-change:auto}
   .collage.flow.settled .tile.ambient{transition:opacity .5s ease,left .6s cubic-bezier(.3,.7,.2,1),top .6s cubic-bezier(.3,.7,.2,1),width .6s cubic-bezier(.3,.7,.2,1),height .6s cubic-bezier(.3,.7,.2,1)}
   .collage.home-rows{touch-action:pan-y}
+  /* ---- one picture per project ---- */
+  .collage.single .pan-arrow,.collage.single .keyplan,.collage.single .wall{display:none}
+  /* stage */
+  .collage.home-stage{pointer-events:auto}
+  .stage{position:absolute;inset:0 40px 0 0}
+  .st-layer{position:absolute;inset:0;opacity:0;transition:opacity .9s ease;pointer-events:none}
+  .st-layer.on{opacity:1;pointer-events:auto}
+  .st-box{position:absolute;left:0;right:0;top:0;bottom:4.2rem;display:flex;align-items:flex-end;justify-content:flex-start;cursor:pointer}
+  .st-box img{display:block;max-width:100%;max-height:100%;object-fit:contain}
+  .st-plate{width:min(100%,calc((100% - 4.2rem) * 1.5));aspect-ratio:3/2;max-height:100%;background:#f1f0ed;display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+  .st-cap{position:absolute;left:0;right:0;bottom:0;height:4.2rem;display:flex;align-items:flex-start;gap:1rem;padding-top:.9rem;cursor:pointer}
+  .st-cap b{font-weight:500;font-size:1rem;letter-spacing:-.005em}
+  .st-cap span{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);padding-top:.25rem}
+  .st-cap .st-n{margin-left:auto}
+  /* showroom: the list makes way; the categories sit under the picture instead */
+  body.home-showroom #index{display:none}
+  body.home-showroom .collage{inset:0 clamp(1rem,4vw,2.5rem) 0 clamp(1rem,4vw,2.5rem);pointer-events:auto}
+  .show{position:absolute;inset:0;overflow:hidden}
+  .show-track{position:absolute;left:0;top:0;bottom:0;display:flex;transition:transform 1.05s cubic-bezier(.65,0,.25,1)}
+  .slide{position:relative;flex:none;height:100%}
+  .slide.gone{display:none}
+  .sl-box{position:absolute;left:0;right:0;top:0;bottom:7.5rem;overflow:hidden;cursor:pointer;background:#f1f0ed}
+  .sl-box img{display:block;width:100%;height:100%;object-fit:cover;transform:scale(1.04);transition:transform 1.6s cubic-bezier(.2,.7,.2,1)}
+  .slide.here .sl-box img{transform:scale(1)}
+  .slide.plate .sl-box img{object-fit:contain;padding:2.5rem;box-sizing:border-box;mix-blend-mode:multiply}
+  .sl-cap{position:absolute;left:0;right:0;bottom:3.4rem;height:4.1rem;display:flex;align-items:flex-end}
+  .sl-name{display:flex;align-items:baseline;gap:1.1rem;cursor:pointer;opacity:0;transform:translateY(8px);transition:opacity .7s ease .35s,transform .7s cubic-bezier(.2,.7,.2,1) .35s}
+  .slide.here .sl-name{opacity:1;transform:none}
+  .sl-name b{font-weight:800;font-size:clamp(1.9rem,3.6vw,3.2rem);letter-spacing:-.025em;line-height:1}
+  .sl-name span{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute)}
+  .show-foot{position:absolute;left:0;right:0;bottom:.4rem;height:2rem;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--rule)}
+  .show-cats{display:flex;gap:1.4rem}
+  .show-cats button,.sh-count{font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute)}
+  .show-cats button{padding:.5rem 0}
+  .show-cats button:hover,.show-cats button.on{color:var(--ink)}
+  .show-nav{display:flex;align-items:center;gap:.6rem}
+  .sh-arrow{display:flex;color:var(--ink);opacity:.25;pointer-events:none;transition:opacity .3s ease}
+  .sh-arrow.on{opacity:1;pointer-events:auto}
+  .sh-arrow svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.2}
   /* curated: no frames; a drawing sits on a pale plate (its white paper multiplied into it) so every picture reads as one
      solid, even rectangle */
   .collage.flow .tile{border:0;background:#f1f0ed}
@@ -340,6 +380,13 @@
     }
     /* rows on a phone: all the rows below the titles, the page itself scrolls */
     .collage.home-rows{aspect-ratio:auto;overflow:visible;container-type:normal}
+    .collage.home-stage{aspect-ratio:.95}
+    .stage{right:0}
+    body.home-showroom .collage{inset:auto;aspect-ratio:auto;height:calc((100vw - 2rem) * .75 + 6.4rem);margin-top:1rem}
+    .sl-box{bottom:6.4rem}
+    .sl-cap{bottom:2.8rem;height:3.4rem}
+    .sl-name{flex-direction:column;align-items:flex-start;gap:.45rem}
+    .show-cats{gap:.9rem}
   }
 
   /* ---------- a project opened on top of the home page ---------- */
@@ -646,9 +693,12 @@
   // loose: the same wall with only the pictures (no drawn openings); rows: justified rows of one height, scrolled
   // down; line: one row at one height on a shared centre line, scrolled sideways. No value: the wall as it is.
   var MODE = (new URLSearchParams(location.search).get('home') || '').toLowerCase();
-  if(['loose', 'rows', 'line'].indexOf(MODE) === -1) MODE = '';
-  var FLOW = MODE === 'rows' || MODE === 'line';
-  if(MODE) collageEl.classList.add('home-' + MODE);
+  // stage: the list beside one large picture per project, which changes with the title pointed at;
+  // showroom: one project per screen, a single large picture with its name, stepped through sideways
+  if(['loose', 'rows', 'line', 'stage', 'showroom'].indexOf(MODE) === -1) MODE = '';
+  var FLOW = MODE === 'rows' || MODE === 'line', SINGLE = MODE === 'stage' || MODE === 'showroom';
+  if(MODE){ collageEl.classList.add('home-' + MODE); document.body.classList.add('home-' + MODE); }
+  if(SINGLE) collageEl.classList.add('single');
   if(FLOW) collageEl.classList.add('flow');
   // one bay: big openings of different sizes and proportions, so an image is actually readable in each (none overlap,
   // and their edges deliberately don't line up into columns); glass is the size of the small pane at the back of the
@@ -754,6 +804,7 @@
   function easeInOut(t){ return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
   function goTo(x, y, instant){
     if(FLOW){ collageEl.scrollTo({left: 0, top: 0, behavior: instant ? 'auto' : 'smooth'}); return; }
+    if(SINGLE){ if(MODE === 'showroom') showTo(0, instant); return; }
     stop.x = Math.max(0, Math.min(1, x)); stop.y = Math.max(0, Math.min(1, y));
     syncArrows();
     var r = panRange(), to = {x: -stop.x * r.mx, y: -stop.y * r.my};
@@ -770,6 +821,8 @@
     });
   }
   function move(dir){
+    if(MODE === 'showroom'){ showTo(show.at + (dir === 'right' || dir === 'down' ? 1 : -1)); return; }
+    if(SINGLE) return;
     if(dir === 'left') goTo(stop.x - 1, stop.y);
     if(dir === 'right') goTo(stop.x + 1, stop.y);
     if(dir === 'up') goTo(stop.x, stop.y - 1);
@@ -795,6 +848,15 @@
     if(e.clientX < c.left || e.clientX > c.right || e.clientY < c.top || e.clientY > c.bottom) return;
     if(e.target.closest && e.target.closest('.index')) return;
     e.preventDefault();
+    if(SINGLE){    // showroom: one gesture, one project
+      if(MODE !== 'showroom' || wheelLock) { if(wheelLock) release(); return; }
+      var d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      acc.x += d;
+      if(Math.abs(acc.x) < 40) return;
+      showTo(show.at + (acc.x > 0 ? 1 : -1)); acc.x = 0;
+      wheelLock = true; stepAt = performance.now(); release();
+      return;
+    }
     if(FLOW){      // the pictures slide with the fingers or the wheel, freely
       var q = e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? 600 : 1;
       if(MODE === 'rows') collageEl.scrollTop += e.deltaY * q;
@@ -819,6 +881,7 @@
     if(window.gcSheetOpen && gcSheetOpen()) return;
     if(window.gcMuseum && gcMuseum.isOpen()) return;
     var dir = {ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down'}[e.key];
+    if(dir && MODE === 'showroom'){ e.preventDefault(); move(dir); return; }
     if(!dir || !arrows[dir].classList.contains('on')) return;
     e.preventDefault();
     move(dir);
@@ -834,7 +897,7 @@
     if(Math.abs(dx) > Math.abs(dy)) move(dx < 0 ? 'right' : 'left');
     else move(dy < 0 ? 'down' : 'up');
   });
-  window.addEventListener('resize', function(){ if(FLOW) layoutFlow(); else goTo(stop.x, stop.y, true); });
+  window.addEventListener('resize', function(){ if(FLOW) layoutFlow(); else if(MODE === 'showroom') showTo(show.at, true); else if(!SINGLE) goTo(stop.x, stop.y, true); });
   goTo(0, 0, true);
 
   // is a slot in view right now (at least mostly)? Pictures go where you are looking
@@ -885,6 +948,8 @@
     var seen = {}, picks = [];
     Object.keys(GROUPS).forEach(function(k){ GROUPS[k].all.forEach(function(src){ if(!seen[src]){ seen[src] = 1; picks.push({src: src, group: k}); } }); });
     if(FLOW){ hangFlow(); return; }
+    if(MODE === 'stage'){ buildStage(); return; }
+    if(MODE === 'showroom'){ buildShow(); return; }
     picks = shuffle(picks).slice(0, AMBIENT_SLOTS.length);
     if(!picks.length) return;
     var left = picks.length;
@@ -1016,6 +1081,142 @@
     rail.firstChild.style.left = (max > 0 ? c.scrollLeft / max * (1 - w) * 100 : 0) + '%';
     rail.classList.toggle('on', max > 4);
   }
+  // ---- one picture per project (stage, showroom) ----
+  // each project's cover: its own `cover` if it has one, else its hero, else its first picture
+  function coverOf(slug){
+    var pr = window.PROJECTS && window.PROJECTS[slug];
+    if(!pr) return null;
+    var g = pr.gallery || {}, first = null;
+    ['physical', 'photos'].forEach(function(k){ if(!first && g[k] && g[k][0]) first = g[k][0].src; });
+    if(!first && pr.diagram && pr.diagram.src) first = pr.diagram.src;
+    if(!first && g.drawings && g.drawings[0]) first = g.drawings[0].src;
+    var src = pr.cover || pr.hero || first;
+    return {slug: slug, pr: pr, src: src || null, full: !!(pr.cover || pr.hero), pos: pr.heroPosition || 'center',
+            drawing: !!src && !(pr.cover || pr.hero) && (src === (pr.diagram && pr.diagram.src) || /\.(svg|png|webp)$/i.test(src))};
+  }
+  function coverSlugs(){
+    var cat = document.querySelector('.group[data-open="true"]'), list = cat ? Array.prototype.map.call(cat.querySelectorAll('.work a'), slugOf) : links.map(slugOf);
+    return list.filter(function(k){ var c = coverOf(k); return c && c.src; });
+  }
+  function el(tag, cls, parent, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text) e.textContent = text; if(parent) parent.appendChild(e); return e; }
+  function pad2(n){ return (n < 10 ? '0' : '') + n; }
+  function openVisit(slug, rect, src){
+    var a = links.filter(function(l){ return slugOf(l) === slug; })[0];
+    if(window.gcMuseum) gcMuseum.open(slug, rect, src);
+    else if(a) location.href = a.getAttribute('href');
+  }
+
+  // stage: one large picture, uncropped, standing on a common line, its name under it; it changes with the title
+  // pointed at (a soft cross-fade), and by itself every few seconds while nothing is pointed at
+  var stage = {el: null, cur: null, timer: null, layers: []};
+  function buildStage(){
+    stage.el = el('div', 'stage', collageEl);
+    for(var i = 0; i < 2; i++){
+      var L = el('div', 'st-layer', stage.el);
+      L.box = el('div', 'st-box', L);
+      L.img = el('img', '', L.box); L.img.alt = '';
+      L.plate = el('div', 'st-plate', L.box, 'In preparation');
+      var c = el('div', 'st-cap', L); L.t = el('b', '', c); L.k = el('span', '', c); L.n = el('span', 'st-n', c);
+      L.addEventListener('click', function(e){
+        var me = e.currentTarget;
+        if(!me.slug) return;
+        e.stopPropagation();
+        openVisit(me.slug, (me.img.style.display !== 'none' ? me.img : me.plate).getBoundingClientRect(), me.src);
+      });
+      stage.layers.push(L);
+    }
+    var first = coverSlugs()[0];
+    if(first) stageShow(first, true);
+    stageAuto();
+  }
+  function stageShow(slug, instant){
+    if(stage.cur === slug) return;
+    stage.cur = slug;
+    var c = coverOf(slug), on = stage.layers[0].classList.contains('on') ? stage.layers[0] : stage.layers[1];
+    var L = instant ? on : (on === stage.layers[0] ? stage.layers[1] : stage.layers[0]);
+    var all = coverSlugs(), i = all.indexOf(slug);
+    L.slug = slug; L.src = c.src;
+    L.t.textContent = c.pr.title; L.k.textContent = c.pr.kicker || '';
+    L.n.textContent = i === -1 ? '' : pad2(i + 1) + ' / ' + pad2(all.length);
+    L.classList.toggle('drawing', c.drawing);
+    function swap(){ if(stage.cur !== slug) return; stage.layers.forEach(function(x){ x.classList.toggle('on', x === L); }); }
+    if(c.src){
+      L.img.style.display = ''; L.plate.style.display = 'none';
+      if(L.img.getAttribute('src') === c.src) swap();
+      else { L.img.onload = swap; L.img.onerror = swap; L.img.src = c.src; }
+    } else { L.img.style.display = 'none'; L.img.removeAttribute('src'); L.plate.style.display = ''; swap(); }
+  }
+  function stageAuto(){
+    clearInterval(stage.timer);
+    stage.timer = setInterval(function(){
+      if(currentLink || (window.gcMuseum && gcMuseum.isOpen()) || document.hidden) return;
+      var all = coverSlugs();
+      if(all.length < 2) return;
+      stageShow(all[(all.indexOf(stage.cur) + 1) % all.length]);
+    }, 5000);
+  }
+  function stageFilter(){
+    if(!stage.el) return;
+    if(currentLink){ stageShow(slugOf(currentLink)); return; }
+    var all = coverSlugs();
+    if(all.length && all.indexOf(stage.cur) === -1) stageShow(all[0]);
+    stageAuto();
+  }
+
+  // showroom: one project per screen, its picture as large as the screen allows and its name set large under it;
+  // a scroll, swipe, arrow key or the arrows by the counter step to the next project
+  var show = {at: 0, slides: [], track: null, list: []};
+  function buildShow(){
+    var wrap = el('div', 'show', collageEl);
+    show.track = el('div', 'show-track', wrap);
+    show.list = coverSlugs();
+    show.list.forEach(function(slug, i){
+      var c = coverOf(slug), sl = el('div', 'slide' + (c.full ? ' full' : ' plate'), show.track);
+      var box = el('div', 'sl-box', sl), im = el('img', '', box);
+      im.alt = c.pr.title; im.src = c.src; im.style.objectPosition = c.pos;
+      if(c.drawing) sl.classList.add('drawing');
+      var cap = el('div', 'sl-cap', sl), left = el('div', 'sl-name', cap);
+      el('b', '', left, c.pr.title); el('span', '', left, c.pr.kicker || '');
+      box.addEventListener('click', function(e){ e.stopPropagation(); openVisit(slug, im.getBoundingClientRect(), c.src); });
+      left.addEventListener('click', function(e){ e.stopPropagation(); openVisit(slug, im.getBoundingClientRect(), c.src); });
+      show.slides.push(sl);
+    });
+    var foot = el('div', 'show-foot', wrap);
+    var cats = el('div', 'show-cats', foot);
+    ['All'].concat(groups.map(function(g){ return g.querySelector('.head').textContent.replace(/[+−–-]\s*$/, '').trim(); })).forEach(function(name, i){
+      var b = el('button', i ? '' : 'on', cats, name); b.type = 'button';
+      b.addEventListener('click', function(e){
+        e.stopPropagation();
+        Array.prototype.forEach.call(cats.children, function(x){ x.classList.toggle('on', x === b); });
+        var keep = i ? Array.prototype.map.call(groups[i - 1].querySelectorAll('.work a'), slugOf) : null;
+        show.slides.forEach(function(sl, k){ sl.classList.toggle('gone', !!keep && keep.indexOf(show.list[k]) === -1); });
+        showTo(0, true);
+      });
+    });
+    var nav = el('div', 'show-nav', foot);
+    show.prev = el('button', 'sh-arrow', nav); show.prev.type = 'button'; show.prev.setAttribute('aria-label', 'Previous project');
+    show.prev.innerHTML = '<svg viewBox="0 0 22 22"><path d="M14.5 4l-7 7 7 7"/></svg>';
+    show.count = el('span', 'sh-count', nav);
+    show.next = el('button', 'sh-arrow', nav); show.next.type = 'button'; show.next.setAttribute('aria-label', 'Next project');
+    show.next.innerHTML = '<svg viewBox="0 0 22 22"><path d="M7.5 4l7 7-7 7"/></svg>';
+    show.prev.addEventListener('click', function(e){ e.stopPropagation(); showTo(show.at - 1); });
+    show.next.addEventListener('click', function(e){ e.stopPropagation(); showTo(show.at + 1); });
+    showTo(0, true);
+  }
+  function showTo(i, instant){
+    if(!show || !show.track) return;     // (goTo runs once before the showroom is built)
+    var vis = show.slides.filter(function(sl){ return !sl.classList.contains('gone'); });
+    show.at = Math.max(0, Math.min(vis.length - 1, i));
+    var W = collageEl.clientWidth;
+    show.slides.forEach(function(sl){ sl.style.width = W + 'px'; });
+    show.track.style.transition = instant ? 'none' : '';
+    show.track.style.transform = 'translateX(' + (-show.at * W) + 'px)';
+    vis.forEach(function(sl, k){ sl.classList.toggle('here', k === show.at); });
+    show.count.textContent = pad2(show.at + 1) + ' / ' + pad2(vis.length);
+    show.prev.classList.toggle('on', show.at > 0);
+    show.next.classList.toggle('on', show.at < vis.length - 1);
+  }
+
   // the pictures fully inside the area now
   function inArea(s){
     var c = collageEl.getBoundingClientRect(), r = s.tile.getBoundingClientRect();
@@ -1093,6 +1294,8 @@
     var keep = null, g = document.querySelector('.group[data-open="true"]');
     if(currentLink) keep = [slugOf(currentLink)];
     else if(g) keep = Array.prototype.map.call(g.querySelectorAll('.work a'), slugOf);
+    if(MODE === 'stage'){ stageFilter(); return; }
+    if(MODE === 'showroom') return;
     if(FLOW){
       // a category closes the gaps (the pictures move up together); pointing at a project only fades the others
       var cat = g ? Array.prototype.map.call(g.querySelectorAll('.work a'), slugOf) : null;
@@ -1129,6 +1332,7 @@
   // the pictures of the project pointed at that are in view right now
   function shownTiles(){
     if(!currentLink) return [];
+    if(MODE === 'stage') return stage.el ? [{tile: stage.el.querySelector('.st-layer.on') || stage.el}] : [];
     return mine(slugOf(currentLink)).filter(function(s){ return FLOW ? inArea(s) : inView(AMBIENT_SLOTS[s.slot]); });
   }
 

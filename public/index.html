@@ -275,18 +275,6 @@
   .st-cap b{font-weight:500;font-size:1rem;letter-spacing:-.005em}
   .st-cap span{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);padding-top:.25rem}
   .st-cap .st-n{margin-left:auto}
-  /* centre: the picture smaller, centred in white space on a common line, its name centred under it */
-  .collage.home-centre .st-layer,.collage.home-edge .st-layer{transition:opacity 1.2s ease}
-  .collage.home-centre .st-box{left:8%;right:8%;top:8%;bottom:5.6rem;justify-content:center}
-  .collage.home-centre .st-cap{height:5.6rem;flex-direction:column;align-items:center;gap:.35rem;padding-top:1.1rem}
-  .collage.home-centre .st-cap b{font-weight:400;font-size:.95rem}
-  .collage.home-centre .st-cap span{padding-top:0}
-  .collage.home-centre .st-n,.collage.home-edge .st-n{display:none}
-  /* edge: one large picture set against the right edge of the screen, standing on its name, which sits small beneath */
-  .collage.home-edge .stage{inset:0}
-  .collage.home-edge .st-box{bottom:3.2rem;justify-content:flex-end;align-items:flex-end}
-  .collage.home-edge .st-cap{height:3.2rem;justify-content:flex-end;padding-right:clamp(1rem,4vw,2.5rem);padding-top:.85rem}
-  .collage.home-edge .st-cap b{font-weight:400;font-size:.95rem}
   /* showroom: the list makes way; the categories sit under the picture instead */
   body.home-showroom #index{display:none}
   body.home-showroom .collage{inset:0 clamp(1rem,4vw,2.5rem) 0 clamp(1rem,4vw,2.5rem);pointer-events:auto}
@@ -397,8 +385,6 @@
     .collage.home-rows{aspect-ratio:auto;overflow:visible;container-type:normal}
     .collage.home-stage{aspect-ratio:.95}
     .stage{right:0}
-    .collage.home-centre .st-box{left:0;right:0;top:0}
-    .collage.home-edge .st-cap{padding-right:0}
     body.home-showroom .collage{inset:auto;aspect-ratio:auto;height:calc((100vw - 2rem) * .75 + 6.4rem);margin-top:1rem}
     .sl-box{bottom:6.4rem}
     .sl-cap{bottom:2.8rem;height:3.4rem}
@@ -712,12 +698,9 @@
   var MODE = (new URLSearchParams(location.search).get('home') || '').toLowerCase();
   // stage: the list beside one large picture per project, which changes with the title pointed at;
   // showroom: one project per screen, a single large picture with its name, stepped through sideways
-  // centre / edge: two quieter takes on stage (the picture centred in white space; one large picture against the right edge)
-  if(['loose', 'rows', 'line', 'stage', 'centre', 'edge', 'showroom'].indexOf(MODE) === -1) MODE = '';
-  var STAGE = MODE === 'stage' || MODE === 'centre' || MODE === 'edge';
-  var FLOW = MODE === 'rows' || MODE === 'line', SINGLE = STAGE || MODE === 'showroom';
+  if(['loose', 'rows', 'line', 'stage', 'showroom'].indexOf(MODE) === -1) MODE = '';
+  var FLOW = MODE === 'rows' || MODE === 'line', SINGLE = MODE === 'stage' || MODE === 'showroom';
   if(MODE){ collageEl.classList.add('home-' + MODE); document.body.classList.add('home-' + MODE); }
-  if(STAGE) collageEl.classList.add('home-stage');
   if(SINGLE) collageEl.classList.add('single');
   if(FLOW) collageEl.classList.add('flow');
   // one bay: big openings of different sizes and proportions, so an image is actually readable in each (none overlap,
@@ -968,7 +951,7 @@
     var seen = {}, picks = [];
     Object.keys(GROUPS).forEach(function(k){ GROUPS[k].all.forEach(function(src){ if(!seen[src]){ seen[src] = 1; picks.push({src: src, group: k}); } }); });
     if(FLOW){ hangFlow(); return; }
-    if(STAGE){ buildStage(); return; }
+    if(MODE === 'stage'){ buildStage(); return; }
     if(MODE === 'showroom'){ buildShow(); return; }
     picks = shuffle(picks).slice(0, AMBIENT_SLOTS.length);
     if(!picks.length) return;
@@ -1322,7 +1305,7 @@
     var keep = null, g = document.querySelector('.group[data-open="true"]');
     if(currentLink) keep = [slugOf(currentLink)];
     else if(g) keep = Array.prototype.map.call(g.querySelectorAll('.work a'), slugOf);
-    if(STAGE){ stageFilter(); return; }
+    if(MODE === 'stage'){ stageFilter(); return; }
     if(MODE === 'showroom') return;
     if(FLOW){
       // a category closes the gaps (the pictures move up together); pointing at a project only fades the others
@@ -1360,7 +1343,7 @@
   // the pictures of the project pointed at that are in view right now
   function shownTiles(){
     if(!currentLink) return [];
-    if(STAGE) return stage.el ? [{tile: stage.el.querySelector('.st-layer.on') || stage.el}] : [];
+    if(MODE === 'stage') return stage.el ? [{tile: stage.el.querySelector('.st-layer.on') || stage.el}] : [];
     return mine(slugOf(currentLink)).filter(function(s){ return FLOW ? inArea(s) : inView(AMBIENT_SLOTS[s.slot]); });
   }
 

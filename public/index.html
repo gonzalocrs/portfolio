@@ -253,6 +253,14 @@
   .keyplan button:hover{opacity:1}
   .keyplan button.here{background:var(--ink);border-color:var(--ink);opacity:.85}
   .collage.is-previewing .pan-arrow,.collage.is-previewing .keyplan{opacity:0;pointer-events:none}
+  /* trial layouts (?home=rows / line): the area itself scrolls, freely; no arrows or key plan */
+  .collage.flow .pan-arrow,.collage.flow .keyplan{display:none}
+  .collage.flow{overflow:auto;scrollbar-width:none;overscroll-behavior:contain}
+  .collage.flow::-webkit-scrollbar{display:none}
+  .collage.flow .wall{position:relative;overflow:hidden;will-change:auto}
+  .collage.flow.settled .tile.ambient{transition:opacity .5s ease,left .6s cubic-bezier(.3,.7,.2,1),top .6s cubic-bezier(.3,.7,.2,1),width .6s cubic-bezier(.3,.7,.2,1),height .6s cubic-bezier(.3,.7,.2,1)}
+  .collage.home-rows{touch-action:pan-y}
+  .collage.home-line{touch-action:pan-x}
   .tile{
     position:absolute;
     border:1px solid var(--rule);
@@ -315,6 +323,8 @@
       display:block;width:100%;aspect-ratio:1;
       margin-top:clamp(2.5rem,10vw,4rem);
     }
+    /* rows on a phone: all the rows below the titles, the page itself scrolls */
+    .collage.home-rows{aspect-ratio:auto;overflow:visible;container-type:normal}
   }
 
   /* ---------- a project opened on top of the home page ---------- */
@@ -617,6 +627,14 @@
   // across it (see the panning below). It is made of four bays, each the same block of openings flipped a different
   // way, so it never repeats visibly. Coordinates are in wall units: a bay is 100 across, the wall 200 x 180.
   var WALL_W = 200, WALL_H = 180;
+  // Trial layouts for the home page (?home=loose|rows|line), to compare before one replaces the wall:
+  // loose: the same wall with only the pictures (no drawn openings); rows: justified rows of one height, scrolled
+  // down; line: one row at one height on a shared centre line, scrolled sideways. No value: the wall as it is.
+  var MODE = (new URLSearchParams(location.search).get('home') || '').toLowerCase();
+  if(['loose', 'rows', 'line'].indexOf(MODE) === -1) MODE = '';
+  var FLOW = MODE === 'rows' || MODE === 'line';
+  if(MODE) collageEl.classList.add('home-' + MODE);
+  if(FLOW) collageEl.classList.add('flow');
   // one bay: big openings of different sizes and proportions, so an image is actually readable in each (none overlap,
   // and their edges deliberately don't line up into columns); glass is the size of the small pane at the back of the
   // splayed reveal, as [w, h] fractions of the opening
@@ -670,6 +688,7 @@
   // small pane at the back), so the wall reads as a whole even while most openings are empty. A picture fills its whole
   // opening when it comes in, so it is never small.
   (function drawFacade(){
+    if(MODE) return;
     var NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg');
     svg.setAttribute('class', 'facade');
     svg.setAttribute('viewBox', '0 0 ' + WALL_W + ' ' + WALL_H);
@@ -719,6 +738,7 @@
   }
   function easeInOut(t){ return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
   function goTo(x, y, instant){
+    if(FLOW){ collageEl.scrollTo({left: 0, top: 0, behavior: instant ? 'auto' : 'smooth'}); return; }
     stop.x = Math.max(0, Math.min(1, x)); stop.y = Math.max(0, Math.min(1, y));
     syncArrows();
     var r = panRange(), to = {x: -stop.x * r.mx, y: -stop.y * r.my};
@@ -760,6 +780,12 @@
     if(e.clientX < c.left || e.clientX > c.right || e.clientY < c.top || e.clientY > c.bottom) return;
     if(e.target.closest && e.target.closest('.index')) return;
     e.preventDefault();
+    if(FLOW){      // the pictures slide with the fingers or the wheel, freely
+      var q = e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? 600 : 1;
+      if(MODE === 'rows') collageEl.scrollTop += e.deltaY * q;
+      else collageEl.scrollLeft += (Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY) * q;
+      return;
+    }
     if(wheelLock){ release(); return; }
     var k = e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? 600 : 1;
     var dx = e.deltaX * k, dy = e.deltaY * k;
@@ -784,7 +810,7 @@
   });
   // a swipe on a touch screen steps the same way (the wall follows the finger: swipe left to go right)
   var swipe = null;
-  collageEl.addEventListener('pointerdown', function(e){ if(e.pointerType === 'touch') swipe = {x: e.clientX, y: e.clientY}; });
+  collageEl.addEventListener('pointerdown', function(e){ if(e.pointerType === 'touch' && !FLOW) swipe = {x: e.clientX, y: e.clientY}; });
   window.addEventListener('pointerup', function(e){
     if(!swipe) return;
     var dx = e.clientX - swipe.x, dy = e.clientY - swipe.y;
@@ -793,7 +819,7 @@
     if(Math.abs(dx) > Math.abs(dy)) move(dx < 0 ? 'right' : 'left');
     else move(dy < 0 ? 'down' : 'up');
   });
-  window.addEventListener('resize', function(){ goTo(stop.x, stop.y, true); });
+  window.addEventListener('resize', function(){ if(FLOW) layoutFlow(); else goTo(stop.x, stop.y, true); });
   goTo(0, 0, true);
 
   // is a slot in view right now (at least mostly)? Pictures go where you are looking
@@ -806,8 +832,9 @@
 
   // one picture tile per opening on the wall, so every window holds a picture for good
   (function(){
-    var wallEl = document.querySelector('.wall'), have = wallEl.querySelectorAll('.tile.ambient').length;
-    for(var k = have; k < AMBIENT_SLOTS.length; k++){ var d = document.createElement('div'); d.className = 'tile ambient'; wallEl.appendChild(d); }
+    var wallEl = document.querySelector('.wall'), have = wallEl.querySelectorAll('.tile.ambient').length, n = AMBIENT_SLOTS.length;
+    if(FLOW){ var u = {}; Object.keys(GROUPS).forEach(function(k){ GROUPS[k].all.forEach(function(src){ u[src] = 1; }); }); n = Object.keys(u).length; }
+    for(var k = have; k < n; k++){ var d = document.createElement('div'); d.className = 'tile ambient'; wallEl.appendChild(d); }
   })();
   var ambientTiles = Array.prototype.slice.call(document.querySelectorAll('.tile.ambient'));
   var ambientState = ambientTiles.map(function(tile){
@@ -842,6 +869,7 @@
   function hang(){
     var seen = {}, picks = [];
     Object.keys(GROUPS).forEach(function(k){ GROUPS[k].all.forEach(function(src){ if(!seen[src]){ seen[src] = 1; picks.push({src: src, group: k}); } }); });
+    if(FLOW){ hangFlow(shuffle(picks)); return; }
     picks = shuffle(picks).slice(0, AMBIENT_SLOTS.length);
     if(!picks.length) return;
     var left = picks.length;
@@ -870,6 +898,57 @@
     s.tile.classList.add('on');
   }
   function bringIntoView(){}
+
+  // rows / line: every picture whole (never cropped), at one height, in a loose shuffled order
+  var flowCat = null, flowReady = false;
+  function hangFlow(picks){
+    var left = picks.length;
+    if(!left) return;
+    picks.forEach(function(p){ loadAspect(thumb(p.src), function(a){ p.a = a || 1; if(--left === 0) done(); }); });
+    function done(){
+      picks.forEach(function(p, i){
+        var s = ambientState[i], pr = window.PROJECTS && window.PROJECTS[p.group.split('/')[0]];
+        s.slot = i; s.src = p.src; s.group = p.group; s.a = p.a;
+        s.tile.style.aspectRatio = 'auto';
+        setFill(s.fill, p.src, hues[Math.floor(Math.random() * hues.length)]);
+        s.cap.textContent = pr ? pr.title : '';
+      });
+      layoutFlow();
+      picks.forEach(function(p, i){ ambientState[i].tile.classList.add('on'); });
+      requestAnimationFrame(function(){ flowReady = true; collageEl.classList.add('settled'); });
+    }
+  }
+  // lays the pictures out again: only those in the open category (if any), the rest step out
+  function layoutFlow(){
+    var list = ambientState.filter(function(s){ return s.slot !== -1 && (!flowCat || flowCat.indexOf(slugOfTile(s)) !== -1); });
+    var phone = window.matchMedia('(max-width:900px)').matches, H = collageEl.clientHeight;
+    var W = collageEl.clientWidth - (phone ? 0 : 40);     // the same margin on the right as the header's
+    function put(s, x, y, w, h){ var t = s.tile.style; t.left = Math.round(x) + 'px'; t.top = Math.round(y) + 'px'; t.width = Math.round(w) + 'px'; t.height = Math.round(h) + 'px'; }
+    if(MODE === 'rows'){
+      var g = phone ? 8 : 14, T = phone ? W * .42 : Math.max(150, Math.min(300, H * .32)), y = 0, row = [], sum = 0;
+      function flush(last){
+        if(!row.length) return;
+        var h = last ? T : (W - g * (row.length - 1)) / sum, x = 0;
+        row.forEach(function(s){ put(s, x, y, h * s.a, h); x += h * s.a + g; });
+        y += h + g; row = []; sum = 0;
+      }
+      list.forEach(function(s){
+        row.push(s); sum += s.a;
+        if(sum * T + g * (row.length - 1) >= W) flush(false);
+      });
+      flush(true);
+      wallEl.style.width = W + 'px'; wallEl.style.height = Math.max(0, y - g + (phone ? 0 : 40)) + 'px';
+    } else {
+      var h = phone ? H * .6 : H * .42, gap = phone ? 14 : Math.round(Math.max(28, W * .03)), x = 0, top = (H - h) / 2;
+      list.forEach(function(s){ put(s, x, top, h * s.a, h); x += h * s.a + gap; });
+      wallEl.style.width = Math.max(W, x - gap + (phone ? 0 : W * .08)) + 'px'; wallEl.style.height = H + 'px';
+    }
+  }
+  // the pictures fully inside the area now
+  function inArea(s){
+    var c = collageEl.getBoundingClientRect(), r = s.tile.getBoundingClientRect();
+    return r.right > c.left + 10 && r.left < c.right - 10 && r.bottom > c.top + 10 && r.top < c.bottom - 10;
+  }
   hang();
 
   var leaveTimer = null;
@@ -942,6 +1021,17 @@
     var keep = null, g = document.querySelector('.group[data-open="true"]');
     if(currentLink) keep = [slugOf(currentLink)];
     else if(g) keep = Array.prototype.map.call(g.querySelectorAll('.work a'), slugOf);
+    if(FLOW){
+      // a category closes the gaps (the pictures move up together); pointing at a project only fades the others
+      var cat = g ? Array.prototype.map.call(g.querySelectorAll('.work a'), slugOf) : null;
+      if(String(cat) !== String(flowCat)){ flowCat = cat; if(flowReady){ layoutFlow(); collageEl.scrollTo({left: 0, top: 0, behavior: 'smooth'}); } }
+      ambientState.forEach(function(s){ s.tile.classList.toggle('off', !!keep && keep.indexOf(slugOfTile(s)) === -1); });
+      if(currentLink){
+        var m = mine(slugOf(currentLink)).filter(function(s){ return !flowCat || flowCat.indexOf(slugOfTile(s)) !== -1; });
+        if(m.length && !m.some(inArea)) collageEl.scrollTo(MODE === 'rows' ? {top: m[0].tile.offsetTop, behavior: 'smooth'} : {left: Math.max(0, m[0].tile.offsetLeft - 20), behavior: 'smooth'});
+      }
+      return;
+    }
     ambientState.forEach(function(s){ s.tile.classList.toggle('off', !!keep && keep.indexOf(slugOfTile(s)) === -1); });
     if(currentLink) seek(slugOf(currentLink));
   }
@@ -966,7 +1056,7 @@
   // the pictures of the project pointed at that are in view right now
   function shownTiles(){
     if(!currentLink) return [];
-    return mine(slugOf(currentLink)).filter(function(s){ return inView(AMBIENT_SLOTS[s.slot]); });
+    return mine(slugOf(currentLink)).filter(function(s){ return FLOW ? inArea(s) : inView(AMBIENT_SLOTS[s.slot]); });
   }
 
   // After a picture on the wall is clicked, its project stays selected while the pointer travels over to the list:

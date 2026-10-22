@@ -279,8 +279,11 @@
   body.home-showroom #index{display:none}
   body.home-showroom .collage{inset:0 clamp(1rem,4vw,2.5rem) 0 clamp(1rem,4vw,2.5rem);pointer-events:auto}
   .show{position:absolute;inset:0;overflow:hidden}
-  .show-track{position:absolute;left:0;top:0;bottom:0;display:flex;transition:transform 1.05s cubic-bezier(.65,0,.25,1)}
-  .slide{position:relative;flex:none;height:100%}
+  .show-track{position:absolute;inset:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;
+    overscroll-behavior-x:contain;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+  .show-track::-webkit-scrollbar{display:none}
+  .slide{position:relative;flex:none;width:100%;height:100%;scroll-snap-align:start;scroll-snap-stop:always}
+  body.home-showroom .collage{touch-action:pan-x pan-y}
   .slide.gone{display:none}
   .sl-box{position:absolute;left:0;right:0;top:0;bottom:7.5rem;overflow:hidden;cursor:pointer;background:#f1f0ed}
   .sl-box img{display:block;width:100%;height:100%;object-fit:cover;transform:scale(1.04);transition:transform 1.6s cubic-bezier(.2,.7,.2,1)}
@@ -848,7 +851,7 @@
     if(e.clientX < c.left || e.clientX > c.right || e.clientY < c.top || e.clientY > c.bottom) return;
     if(e.target.closest && e.target.closest('.index')) return;
     e.preventDefault();
-    if(SINGLE){    // showroom: one gesture, one project
+    if(SINGLE){    // showroom: one gesture (sideways, down or up), one project; fingers on a touch screen scroll it natively
       if(MODE !== 'showroom' || wheelLock) { if(wheelLock) release(); return; }
       var d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
       acc.x += d;
@@ -888,7 +891,7 @@
   });
   // a swipe on a touch screen steps the same way (the wall follows the finger: swipe left to go right)
   var swipe = null;
-  collageEl.addEventListener('pointerdown', function(e){ if(e.pointerType === 'touch' && !FLOW) swipe = {x: e.clientX, y: e.clientY}; });
+  collageEl.addEventListener('pointerdown', function(e){ if(e.pointerType === 'touch' && !FLOW && !SINGLE) swipe = {x: e.clientX, y: e.clientY}; });
   window.addEventListener('pointerup', function(e){
     if(!swipe) return;
     var dx = e.clientX - swipe.x, dy = e.clientY - swipe.y;
@@ -1201,16 +1204,24 @@
     show.next.innerHTML = '<svg viewBox="0 0 22 22"><path d="M7.5 4l7 7-7 7"/></svg>';
     show.prev.addEventListener('click', function(e){ e.stopPropagation(); showTo(show.at - 1); });
     show.next.addEventListener('click', function(e){ e.stopPropagation(); showTo(show.at + 1); });
+    // the track is a plain sideways scroller that snaps to each project, so a finger or a trackpad swipes it natively
+    var settle = null;
+    show.track.addEventListener('scroll', function(){
+      clearTimeout(settle);
+      settle = setTimeout(function(){ var W = show.track.clientWidth; if(W) mark(Math.round(show.track.scrollLeft / W)); }, 90);
+    }, {passive: true});
     showTo(0, true);
   }
   function showTo(i, instant){
     if(!show || !show.track) return;     // (goTo runs once before the showroom is built)
     var vis = show.slides.filter(function(sl){ return !sl.classList.contains('gone'); });
+    i = Math.max(0, Math.min(vis.length - 1, i));
+    show.track.scrollTo({left: i * show.track.clientWidth, behavior: instant ? 'auto' : 'smooth'});
+    mark(i);
+  }
+  function mark(i){
+    var vis = show.slides.filter(function(sl){ return !sl.classList.contains('gone'); });
     show.at = Math.max(0, Math.min(vis.length - 1, i));
-    var W = collageEl.clientWidth;
-    show.slides.forEach(function(sl){ sl.style.width = W + 'px'; });
-    show.track.style.transition = instant ? 'none' : '';
-    show.track.style.transform = 'translateX(' + (-show.at * W) + 'px)';
     vis.forEach(function(sl, k){ sl.classList.toggle('here', k === show.at); });
     show.count.textContent = pad2(show.at + 1) + ' / ' + pad2(vis.length);
     show.prev.classList.toggle('on', show.at > 0);

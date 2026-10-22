@@ -724,7 +724,7 @@
   // Trial layouts for the home page (?home=loose|rows|line), to compare before one replaces the wall:
   // loose: the same wall with only the pictures (no drawn openings); rows: justified rows of one height, scrolled
   // down; line: one row at one height on a shared centre line, scrolled sideways. No value: the wall as it is.
-  var MODE = (new URLSearchParams(location.search).get('home') || '').toLowerCase();
+  var MODE = (new URLSearchParams(location.search).get('home') || 'showroom').toLowerCase();
   // stage: the list beside one large picture per project, which changes with the title pointed at;
   // showroom: one project per screen, a single large picture with its name, stepped through sideways
   // showroom2 / showroom3: two refinements of showroom (the picture edge to edge with a quieter name; the picture

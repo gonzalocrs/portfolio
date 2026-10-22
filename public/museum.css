@@ -54,16 +54,6 @@ body.museum-on{overflow:hidden}
 .m-card p.text{margin:0;font-size:.9rem;line-height:1.5;font-weight:300}
 .m-card p.text + p.text{margin-top:.7rem}
 
-.m-hint{
-  position:absolute;left:50%;bottom:1.1rem;transform:translateX(-50%);
-  display:flex;flex-direction:column;align-items:center;gap:.2rem;
-  font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);
-  transition:opacity .3s ease,color .2s;pointer-events:none;white-space:nowrap;cursor:pointer
-}
-.m-hint:hover,.m-hint:focus-visible{color:var(--ink)}
-.m-hint svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.1;animation:m-nudge 2.2s ease-in-out infinite}
-@keyframes m-nudge{0%,100%{transform:translateY(0)}50%{transform:translateY(4px)}}
-
 /* ---------- 4: the room with the rest of the project ---------- */
 .m-gallery{position:relative}
 .m-tag{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute)}
@@ -104,24 +94,14 @@ body.museum-on{overflow:hidden}
 .m-salon{height:var(--m-h);display:flex;flex-direction:column;padding:clamp(1.5rem,5vh,3rem) 0 1rem;will-change:transform}
 .m-wall{position:relative;flex:none}
 .m-wall .facade{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.m-wall .facade .plane{fill:color-mix(in srgb,var(--ink) 2.5%,var(--paper));stroke:var(--rule)}
 .m-wall .facade .ground{stroke:var(--ink);stroke-width:1.5 !important}
-.m-wall .facade .splay{fill:color-mix(in srgb,var(--ink) 7%,var(--paper));stroke:var(--rule)}
-.m-wall .facade line{stroke:var(--rule)}
-.m-wall .facade .pane{fill:var(--paper);stroke:var(--rule)}
 .m-wall .facade *{stroke-width:1}
-.m-wall .facade .view{opacity:.92}
-.m-wall .facade .pane-edge{fill:none;stroke:var(--rule)}
 .m-hung{position:absolute;margin:0;border:1px solid var(--rule);background:var(--paper);cursor:pointer}
 .m-hung img{display:block;width:100%;height:100%}
 .m-hung .cap{position:absolute;left:.5rem;bottom:.5rem;font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.05em;
   padding:.25em .55em;background:var(--paper);color:var(--mute);opacity:0;transition:opacity .25s ease;white-space:nowrap;max-width:calc(100% - 1rem);overflow:hidden;text-overflow:ellipsis}
 .m-hung:hover .cap{opacity:1}
 /* back to the wall / next room: beside the wall, standing on the same floor line, past its end */
-/* gallery options being tried (?gal=...): the pictures alone, no wall */
-.m-plate{position:absolute;background:color-mix(in srgb,var(--ink) 3.5%,var(--paper))}
-.m-hung.on-plate{border-color:transparent}
-.m-hung.small{border-color:color-mix(in srgb,var(--ink) 8%,transparent)}
 .m-salon-foot{position:absolute;right:0}
 .m-salon-foot .m-end{flex-direction:column;align-items:flex-start;gap:1.2rem}
 .m-salon-foot .m-end button{font-size:1rem}
@@ -200,8 +180,7 @@ body.museum-on{overflow:hidden}
   .m-sbar button.here::before{background:var(--ink)}
   .m-max{opacity:.85}
   .m-pic img{height:auto}
-  .m-hint{display:none}
-  .m-switch{display:none}
+    .m-switch{display:none}
 }
 /* changing rooms: the new one fades in */
 .m-in{animation:m-in .8s ease}

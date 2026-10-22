@@ -126,11 +126,6 @@
     roomEl.appendChild(label);
     roomEl.appendChild(ph);
 
-    // the prompt to scroll also takes the step when clicked, for anyone who does not scroll
-    var hint = el('button', 'm-hint'); hint.type = 'button';
-    hint.innerHTML = '<span>Scroll</span><svg viewBox="0 0 22 22"><path d="M4 7.5l7 7 7-7"/></svg>';
-    hint.addEventListener('click', function(){ step(1); });
-    roomEl.appendChild(hint);
     stage.appendChild(roomEl);
     ov.appendChild(stage);
 
@@ -156,7 +151,7 @@
     // the picture you came in with: the spotlight starts from it, the gallery hangs it with the rest
     var first = [].concat.apply([], all.map(function(s){ return s.items; })).filter(function(it){ return it.src === firstSrc; })[0] || {src: firstSrc, caption: '', kind: 'Hero'};
     var rest = all.map(function(s){ return {name: s.name, items: s.items.filter(function(it){ return it.src !== firstSrc; })}; }).filter(function(s){ return s.items.length; });
-    state = {slug: slug, p: p, parts: rest, first: first, pic: pic, img: img, label: label, hint: hint, stage: stage, roomEl: roomEl, gal: gal, H: H, a: from ? from.width / from.height : 1.5, opened: false};
+    state = {slug: slug, p: p, parts: rest, first: first, pic: pic, img: img, label: label, stage: stage, roomEl: roomEl, gal: gal, H: H, a: from ? from.width / from.height : 1.5, opened: false};
     var start = function(){
       if(img.naturalWidth) state.a = img.naturalWidth / img.naturalHeight;
       layout();
@@ -247,17 +242,17 @@
       // a picture is lit while it is in front of you, as in a dark room
       var here = dy < H * .5 ? -1 : Math.round(k);
       w.slides.forEach(function(s, i){ s.classList.toggle('lit', i === here); });
-      // the bar: one mark per picture (the first one included), the one in front of you dark
-      // it shows once you are among the rest, moving sideways (not on the first picture)
-      var at = Math.min(Math.round(k), w.marks.length - 1);
+      // the bar: one mark per picture (the one you came in with first), the one in front of you dark; it is there
+      // from the start, so the line itself says there is more
+      var at = dy < H * .5 ? 0 : Math.min(Math.round(k) + 1, w.marks.length - 1);
       w.bar.style.left = R.areaL + 'px'; w.bar.style.width = R.bay + 'px';
-      w.bar.classList.toggle('on', dy >= H * .5);
+      w.bar.classList.add('on');
       // and a small arrow at each end of it, for anyone who does not scroll; none before the first or past the end
       var by = Math.round(H * .87 + 36), kk = Math.round(k);
       w.prev.style.left = (R.areaL - 34) + 'px'; w.next.style.left = (R.areaL + R.bay + 6) + 'px';
       w.prev.style.top = w.next.style.top = (by + 8 - 14) + 'px';
       w.prev.classList.toggle('on', dy >= H * .5 && kk > 0);
-      w.next.classList.toggle('on', dy >= H * .5 && kk < w.slides.length - 1);
+      w.next.classList.toggle('on', dy < H * .5 || kk < w.slides.length - 1);
       w.marks.forEach(function(m, i){ m.classList.toggle('here', i === at); });
     }
     if(state.salon){
@@ -266,10 +261,7 @@
       sp.style.left = R.areaL + 'px'; sp.style.width = (innerWidth - R.areaL - R.gut) + 'px';
       sp.style.transform = 'translateY(' + Math.round(H - dy) + 'px)';
     }
-    placeSwitch(R, dy >= H * .5);
-    var hv = t < .05 || (t > .98 && dy < 4);
-    state.hint.style.opacity = hv ? 1 : 0; state.hint.style.pointerEvents = hv ? 'auto' : 'none';
-    state.hint.firstChild.textContent = t > .98 ? 'More from this project' : 'Scroll';
+    placeSwitch(R, true);
     roomFrame();
   }
 
@@ -366,7 +358,10 @@
       var last = el('div', 'm-step m-step-end'); last.appendChild(endPiece()); trail.appendChild(last); slides.push(last);
       pane.appendChild(trail);
       var bar = el('div', 'm-bar'), marks = [];
-      // the bar: one mark per picture after the first; each takes you to its picture
+      // the bar: one mark per picture, the one you came in with first; each takes you to its picture
+      var m0 = el('button'); m0.type = 'button'; m0.setAttribute('aria-label', state.first.caption || state.first.kind || state.p.title);
+      m0.addEventListener('click', function(){ glide(labelStop()); });
+      bar.appendChild(m0); marks.push(m0);
       list.forEach(function(it, i){
         var mk = el('button'); mk.type = 'button'; mk.setAttribute('aria-label', it.caption || it.kind);
         mk.addEventListener('click', function(){ glide(labelStop() + (i + 1) * state.H); });
@@ -383,10 +378,8 @@
       state.walk = {pane: pane, trail: trail, slides: slides, bar: bar, marks: marks, prev: nav[0], next: nav[1]};
     }
     else{
-      // the salon: everything at once, in openings like the home page's wall (the same bay of openings, as many bays
-      // as the pictures need). Each opening takes its picture's proportions inside its place, so nothing is cropped;
-      // the places left over stay empty, drawn as splayed reveals.
-      // It comes up on the label's right, as the walk's pictures do, and the label stays.
+      // the salon: everything at once, as a contact sheet (see hangRows). It comes up on the label's right, as the
+      // walk's pictures do, and the label stays.
       list = [state.first].concat(list);   // every picture, the one you came in with first
       var salon = el('div', 'm-pane m-salon'), wall = el('div', 'm-wall');
       salon.appendChild(wall);
@@ -403,115 +396,14 @@
       var hang = function(){
         if(!state || state.gal !== gal || left > 0) return;
         wall.innerHTML = '';
-        if(GSTYLE){ hangPlain(list, wall, foot); return; }
-        // the places: whole bays of the home page's wall, and in the last one only as many as are still needed, the
-        // ones nearest the rest, so the wall ends where the pictures do
-        var n = list.length, nb = Math.max(1, Math.ceil(n / BAY.length)), slots = [], accents = [];
-        for(var b = 0; b < nb; b++){
-          var flip = b % 2 === 1;
-          var put = function(o, h){ return {x: b * 100 + o.x, y: flip ? 90 - o.y - h : o.y, w: o.w, h: h}; };
-          var bay = BAY.map(function(o){ var r = put(o, o.w / o.r); r.r = o.r; r.glass = o.glass; return r; });
-          if(b === nb - 1){ var need = n - b * BAY.length; bay.sort(function(p, q){ return p.x - q.x; }); bay.forEach(function(r, k){ r.spare = k >= need; }); }
-          slots.push.apply(slots, bay);
-          ACCENT.forEach(function(o){ var r = put(o, o.h); r.glass = o.glass; accents.push(r); });
-        }
-        // like goes with like: each picture takes the free place nearest its own proportions
-        var open = slots.filter(function(sl){ return !sl.spare; }), taken = {};
-        list.forEach(function(it){
-          var best = -1;
-          open.forEach(function(sl, k){ if(!taken[k] && (best < 0 || Math.abs(Math.log(sl.r / it.a)) < Math.abs(Math.log(open[best].r / it.a)))) best = k; });
-          taken[best] = 1; open[best].it = it;
-        });
-        // each opening takes its picture's proportions (same size of hole, same centre), so the picture fills it and
-        // nothing is cropped; then all of them shrink together, just enough to keep a pier of wall between any two
-        var holes = slots.map(function(sl){
-          if(!sl.it) return {x: sl.x, y: sl.y, w: sl.w, h: sl.h, glass: sl.glass, spare: sl.spare};
-          var A = sl.w * sl.h, w = Math.sqrt(A * sl.it.a), h = Math.sqrt(A / sl.it.a);
-          return {x: sl.x + (sl.w - w) / 2, y: sl.y + (sl.h - h) / 2, w: w, h: h, it: sl.it};
-        });
-        var PIER = 3;
-        function scaled(o, k){ return {x: o.x + o.w * (1 - k) / 2, y: o.y + o.h * (1 - k) / 2, w: o.w * k, h: o.h * k}; }
-        function apart(p, q, d){ return p.x + p.w + d <= q.x || q.x + q.w + d <= p.x || p.y + p.h + d <= q.y || q.y + q.h + d <= p.y; }
-        function fits(k){
-          var hs = holes.map(function(o){ return scaled(o, k); });
-          for(var i = 0; i < hs.length; i++) for(var j = i + 1; j < hs.length; j++) if((holes[i].it || holes[j].it) && !apart(hs[i], hs[j], PIER)) return false;
-          return true;
-        }
-        var lo = .3, hi = 1;
-        if(fits(1)) lo = 1; else for(var it8 = 0; it8 < 18; it8++){ var mid = (lo + hi) / 2; if(fits(mid)) lo = mid; else hi = mid; }
-        holes = holes.map(function(o){ var r = scaled(o, lo); r.it = o.it; r.glass = o.glass; r.spare = o.spare; return r; });
-        // the wall ends a pier past the last picture; spare places inside it stay as empty openings, the rest go
-        var used = holes.filter(function(o){ return o.it; });
-        var X0 = Math.min.apply(null, used.map(function(o){ return o.x; })), X1 = Math.max.apply(null, used.map(function(o){ return o.x + o.w; }));
-        holes = holes.filter(function(o){ return o.it || (o.x >= X0 - .01 && o.x + o.w <= X1 + .01); });
-        // the small openings, only where they do not run into a bigger one
-        accents = accents.filter(function(a){ return a.x >= X0 && a.x + a.w <= X1 && holes.every(function(o){ return apart(a, o, 1.2); }); });
-        var all = holes.concat(accents), M = 4;
-        var Y0 = Math.min.apply(null, all.map(function(o){ return o.y; })) - M, Y1 = Math.max.apply(null, all.map(function(o){ return o.y + o.h; })) + M;
-        X0 -= M; X1 += M;
-        // the box the wall fits in, and its scale (wall units to pixels)
-        // the wall stands on a floor line that is the spotlight's bar: the same height, the same length (one bay)
-        var bay = rects().bay, floor = groundLine();
-        wall.style.height = Math.max(120, Math.round(floor - wall.offsetTop)) + 'px';
-        foot.style.left = Math.round(bay + 24) + 'px'; foot.style.bottom = Math.round(state.H - floor) + 'px';
-        var bw = bay, bh = wall.clientHeight, WW = X1 - X0, WH = Y1 - Y0;
-        var sc = Math.min(bw / WW, bh / WH), ox = (bw - WW * sc) / 2 - X0 * sc, oy = bh - WH * sc - Y0 * sc;
-        function P(o){ return {x: ox + o.x * sc, y: oy + o.y * sc, w: o.w * sc, h: o.h * sc}; }
-
-        var NS = 'http://www.w3.org/2000/svg', svg = document.createElementNS(NS, 'svg');
-        svg.setAttribute('class', 'facade'); svg.setAttribute('viewBox', '0 0 ' + wall.clientWidth + ' ' + bh);
-        function mk(name, attrs){ var e = document.createElementNS(NS, name); for(var k in attrs) e.setAttribute(k, attrs[k]); svg.appendChild(e); return e; }
-        function splay(o, g){
-          // an opening cut through the thick wall: its outer edge, the four lines of the reveal, the pane at the back
-          mk('rect', {x: o.x, y: o.y, width: o.w, height: o.h, 'class': 'splay'});
-          [[o.x, o.y, g.x, g.y], [o.x + o.w, o.y, g.x + g.w, g.y], [o.x + o.w, o.y + o.h, g.x + g.w, g.y + g.h], [o.x, o.y + o.h, g.x, g.y + g.h]]
-            .forEach(function(l){ mk('line', {x1: l[0], y1: l[1], x2: l[2], y2: l[3]}); });
-          mk('rect', {x: g.x, y: g.y, width: g.w, height: g.h, 'class': 'pane'});
-        }
-        // the wall itself, standing on its ground line
-        var wr = P({x: X0, y: Y0, w: WW, h: WH});
-        mk('rect', {x: wr.x, y: wr.y, width: wr.w, height: wr.h, 'class': 'plane'});
-        mk('line', {x1: 0, y1: bh, x2: bay, y2: bh, 'class': 'ground'});
-        var views = [];
-        holes.concat(accents).forEach(function(h){
-          var o = P(h);
-          if(!h.it){
-            var gw = (h.glass ? h.glass[0] : .3) * o.w, gh = (h.glass ? h.glass[1] : .3) * o.h, g0 = {x: o.x + (o.w - gw) / 2, y: o.y + (o.h - gh) / 2, w: gw, h: gh};
-            splay(o, g0); views.push(g0);
-            return;
-          }
-          // a picture is the pane at the back of its opening: the reveal frames it, a little deeper on the larger side
-          var d = Math.max(5, Math.min(o.w, o.h) * .085), s1 = fit(h.it.a, o.w - 2 * d, o.h - 2 * d);
-          var g = {x: o.x + (o.w - s1.w) / 2, y: o.y + (o.h - s1.h) / 2, w: s1.w, h: s1.h};
-          splay(o, g);
-          var f = el('figure', 'm-hung'), im = new Image(), it = h.it; im.src = it.src; im.alt = it.caption || state.p.title;
-          f.style.left = g.x + 'px'; f.style.top = g.y + 'px'; f.style.width = g.w + 'px'; f.style.height = g.h + 'px';
-          f.appendChild(im); f.appendChild(el('span', 'cap', it.caption || it.kind));
-          // to that picture in the spotlight (the one you came in with: back to it beside the label)
-          f.addEventListener('click', function(){ setRoom('walk', list.indexOf(it) - 1); });
-          wall.appendChild(f);
-        });
-        // behind the wall, one view: a photograph of the project seen through the panes of the empty openings, each
-        // showing its own part of it, as if looking out through the wall
-        var vsrc = viewOf(list);
-        if(vsrc && views.length){
-          var cid = 'm-view-' + Date.now(), defs = mk('defs', {}), cp = document.createElementNS(NS, 'clipPath');
-          cp.setAttribute('id', cid); defs.appendChild(cp);
-          views.forEach(function(g){ var r = document.createElementNS(NS, 'rect'); ['x', 'y'].forEach(function(k){ r.setAttribute(k, g[k]); }); r.setAttribute('width', g.w); r.setAttribute('height', g.h); cp.appendChild(r); });
-          var vi = mk('image', {x: wr.x, y: wr.y, width: wr.w, height: wr.h, preserveAspectRatio: 'xMidYMid slice', 'clip-path': 'url(#' + cid + ')', 'class': 'view'});
-          vi.setAttribute('href', vsrc); vi.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', vsrc);
-          views.forEach(function(g){ mk('rect', {x: g.x, y: g.y, width: g.w, height: g.h, 'class': 'pane-edge'}); });
-        }
-        wall.insertBefore(svg, wall.firstChild);
-        if(state.salon && state.salon.fade){ state.salon.fade = false; fadeIn(wall); fadeIn(foot); }
+        hangRows(list, wall, foot);
       };
       state.hang = hang;
     }
   }
-  // gallery options being tried (?gal=rows|plates|lead): no wall, the pictures alone on a strict layout, standing
-  // on the same floor line as the spotlight's bar
-  var GSTYLE = (location.search.match(/[?&]gal=(rows|plates|lead)\b/) || [])[1] || null;
-  function hangPlain(list, wall, foot){
+  // the gallery as a contact sheet: rows of one height, each filling the width, one gap throughout, the order kept;
+  // nothing is cropped. It stands on the same floor line as the spotlight's bar.
+  function hangRows(list, wall, foot){
     var bay = rects().bay, floor = groundLine();
     wall.style.height = Math.max(120, Math.round(floor - wall.offsetTop)) + 'px';
     foot.style.left = Math.round(bay + 24) + 'px'; foot.style.bottom = Math.round(state.H - floor) + 'px';
@@ -528,87 +420,29 @@
       f.addEventListener('click', function(){ setRoom('walk', list.indexOf(it) - 1); });
       wall.appendChild(f); return f;
     }
-    // fit pictures (contained, never cropped) into a box of cells: c columns, as many rows as needed
-    function cells(n, W, H, gap, aspects){
-      var best = null;
-      for(var c = 1; c <= n; c++){
-        var rws = Math.ceil(n / c), cw = (W - (c - 1) * gap) / c, ch = (H - (rws - 1) * gap) / rws;
-        if(cw <= 0 || ch <= 0) continue;
-        var area = aspects.reduce(function(s, a){ var f = fit(a, cw, ch); return s + f.w * f.h; }, 0);
-        if(!best || area > best.area) best = {c: c, rows: rws, cw: cw, ch: ch, area: area};
-      }
-      return best;
-    }
-    if(GSTYLE === 'rows'){
-      // a contact sheet: rows of one height, each filling the width, the order kept
-      var S = list.reduce(function(s, it){ return s + it.a; }, 0), pick = null;
-      for(var r = 1; r <= list.length; r++){
-        var rowsL = [], cur = [], acc = 0, tgt = S / r;
-        list.forEach(function(it, i){
-          cur.push(it); acc += it.a;
-          var left = list.length - i - 1, need = r - rowsL.length - 1;
-          if((acc >= tgt * (rowsL.length + 1) - it.a / 2 && need > 0 && left >= need) || left === 0){ rowsL.push(cur); cur = []; }
-        });
-        if(cur.length) rowsL.push(cur);
-        var hs = rowsL.map(function(row){ return (bw - (row.length - 1) * g) / row.reduce(function(s, it){ return s + it.a; }, 0); });
-        var tot = hs.reduce(function(s, h){ return s + h; }, 0) + (rowsL.length - 1) * g, sc = Math.min(1, (bh - g) / tot);
-        var cover = sc * sc * hs.reduce(function(s, h, k){ return s + h * h * rowsL[k].reduce(function(t, it){ return t + it.a; }, 0); }, 0);
-        if(!pick || cover > pick.cover) pick = {rows: rowsL, hs: hs, sc: sc, tot: tot, cover: cover};
-      }
-      var y = bh - g - pick.tot * pick.sc, x0 = (bw - bw * pick.sc) / 2;
-      pick.rows.forEach(function(row, k){
-        var h = pick.hs[k] * pick.sc, x = x0;
-        row.forEach(function(it){ var w = it.a * h; put(it, {x: x, y: y, w: w, h: h}); x += w + g * pick.sc; });
-        y += h + g * pick.sc;
-      });
-    }
-    else if(GSTYLE === 'plates'){
-      // plates: one cell for every picture, all the same size, each a quiet panel like the label's card, the picture
-      // centred on it with a margin
-      var gp = g * 1.2, bx = cells(list.length, bw, bh - gp, gp, list.map(function(it){ return it.a; }));
-      var m = Math.max(8, Math.min(bx.cw, bx.ch) * .06);
+    // try every number of rows and keep the one where the pictures come out largest
+    var S = list.reduce(function(s, it){ return s + it.a; }, 0), pick = null;
+    for(var r = 1; r <= list.length; r++){
+      var rowsL = [], cur = [], acc = 0, tgt = S / r;
       list.forEach(function(it, i){
-        var cx = (i % bx.c) * (bx.cw + gp), cy = Math.floor(i / bx.c) * (bx.ch + gp);
-        var plate = el('div', 'm-plate'); setRect(plate, {x: Math.round(cx), y: Math.round(cy), w: Math.round(bx.cw), h: Math.round(bx.ch)}); wall.appendChild(plate);
-        var f = fit(it.a, bx.cw - 2 * m, bx.ch - 2 * m);
-        put(it, {x: cx + (bx.cw - f.w) / 2, y: cy + (bx.ch - f.h) / 2, w: f.w, h: f.h}, 'on-plate');
+        cur.push(it); acc += it.a;
+        var left = list.length - i - 1, need = r - rowsL.length - 1;
+        if((acc >= tgt * (rowsL.length + 1) - it.a / 2 && need > 0 && left >= need) || left === 0){ rowsL.push(cur); cur = []; }
       });
+      if(cur.length) rowsL.push(cur);
+      var hs = rowsL.map(function(row){ return (bw - (row.length - 1) * g) / row.reduce(function(s, it){ return s + it.a; }, 0); });
+      var tot = hs.reduce(function(s, h){ return s + h; }, 0) + (rowsL.length - 1) * g, sc = Math.min(1, (bh - g) / tot);
+      var cover = sc * sc * hs.reduce(function(s, h, k){ return s + h * h * rowsL[k].reduce(function(t, it){ return t + it.a; }, 0); }, 0);
+      if(!pick || cover > pick.cover) pick = {rows: rowsL, hs: hs, sc: sc, tot: tot, cover: cover};
     }
-    else{
-      // lead: the picture you came in with, large, and the rest as a tidy index under it, in one strict grid
-      var rest = list.slice(1), ih = rest.length ? (bh - g) * .3 : 0, lf = fit(list[0].a, bw, bh - g - ih - (rest.length ? g * 2 : 0));
-      var top = bh - g - ih - (rest.length ? g * 2 : 0) - lf.h;
-      put(list[0], {x: 0, y: top, w: lf.w, h: lf.h}, 'lead');
-      if(rest.length){
-        var ib = cells(rest.length, bw, ih, g * .75, rest.map(function(it){ return it.a; }));
-        var iy = bh - g - ih, rows2 = Math.ceil(rest.length / ib.c);
-        // equal cells; each picture sits on the cell's foot, so every row has one line along its bottom
-        rest.forEach(function(it, i){
-          var cx = (i % ib.c) * (ib.cw + g * .75), cy = iy + Math.floor(i / ib.c) * (ib.ch + g * .75), f = fit(it.a, ib.cw, ib.ch);
-          put(it, {x: cx + (ib.cw - f.w) / 2, y: cy + (ib.ch - f.h), w: f.w, h: f.h}, 'small');
-        });
-      }
-    }
+    var y = bh - g - pick.tot * pick.sc, x0 = (bw - bw * pick.sc) / 2;
+    pick.rows.forEach(function(row, k){
+      var h = pick.hs[k] * pick.sc, x = x0;
+      row.forEach(function(it){ var w = it.a * h; put(it, {x: x, y: y, w: w, h: h}); x += w + g * pick.sc; });
+      y += h + g * pick.sc;
+    });
     if(state.salon && state.salon.fade){ state.salon.fade = false; fadeIn(wall); fadeIn(foot); }
   }
-  // the view behind the gallery's wall: the project's widest photograph (not a drawing), the hero if there is none
-  function viewOf(list){
-    var ph = list.filter(function(it){ return !isDrawing(it) && it.a; }).sort(function(p, q){ return q.a - p.a; });
-    return ph.length ? ph[0].src : (state.p.hero ? web(state.p.hero) : null);
-  }
-  // one bay of the home page's wall: places of different sizes and proportions (wall units, a bay is 100 x 90)
-  // (glass: the pane at the back of an empty one, as fractions of it)
-  var BAY = [
-    {x: 1, y: 1, w: 33, r: 10 / 11, glass: [.26, .2]}, {x: 39, y: 6, w: 28, r: 4 / 3, glass: [.3, .3]}, {x: 72, y: 0, w: 24, r: 3 / 4, glass: [.28, .16]},
-    {x: 5, y: 44, w: 30, r: 3 / 2, glass: [.6, .18]}, {x: 41, y: 31, w: 27, r: 1, glass: [.26, .28]}, {x: 74, y: 37, w: 25, r: 4 / 5, glass: [.2, .55]},
-    {x: 1, y: 67, w: 27, r: 4 / 3, glass: [.22, .5]}, {x: 33, y: 66, w: 31, r: 3 / 2, glass: [.45, .24]}
-  ];
-  // and its little openings, which never hold a picture: they are there for the play of sizes, as at Ronchamp
-  var ACCENT = [
-    {x: 37.5, y: 40, w: 1.6, h: 14, glass: [.7, .6]}, {x: 68.8, y: 6, w: 1.4, h: 16, glass: [.7, .4]}, {x: 14, y: 39.6, w: 9, h: 2.2, glass: [.6, .45]},
-    {x: 70, y: 73, w: 6, h: 6, glass: [.4, .4]}, {x: 78.5, y: 71, w: 2.2, h: 11, glass: [.6, .5]}, {x: 83, y: 74, w: 4, h: 3, glass: [.5, .5]},
-    {x: 89, y: 72, w: 4.5, h: 4.5, glass: [.35, .35]}, {x: 84, y: 81, w: 9, h: 4, glass: [.5, .4]}, {x: 71, y: 82, w: 3, h: 3, glass: [.5, .5]}
-  ];
   function roomFrame(){}
   function fadeIn(e){ e.classList.remove('m-in'); void e.offsetWidth; e.classList.add('m-in'); }
 

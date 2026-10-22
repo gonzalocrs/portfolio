@@ -219,11 +219,17 @@
     if(!state || narrow()) { if(state) roomFrame(); return; }
     var y = ov.scrollTop, H = state.H, R = rects(), L0 = labelStop();
     var t = 1;   // no close-up first: the picture comes from the wall straight to its place beside the label
-    // on the walk, past the label: the first picture goes up and the second comes up in its place, then each
-    // step goes one bay to the right; the label stays
-    var dy = state.walk || state.salon ? clamp(y - L0, 0, H) : 0, k = state.walk ? Math.max(0, (y - L0 - H) / H) : 0;
+    // on the walk every step goes one bay sideways, the first one too: the picture you came in with moves off to
+    // the left and the next comes in from the right; the label stays. The gallery comes up from below instead.
+    var dy = state.salon ? clamp(y - L0, 0, H) : 0, k = state.walk ? Math.max(0, (y - L0) / H) : 0;
+    var off = k * (R.bay + R.gap);
     if(state.opened){
-      setRect(state.pic, {x: R.r0.x + (R.r1.x - R.r0.x) * t, y: R.r0.y + (R.r1.y - R.r0.y) * t - dy, w: R.r0.w + (R.r1.w - R.r0.w) * t, h: R.r0.h + (R.r1.h - R.r0.h) * t});
+      var pr = {x: R.r0.x + (R.r1.x - R.r0.x) * t - off, y: R.r0.y + (R.r1.y - R.r0.y) * t - dy, w: R.r0.w + (R.r1.w - R.r0.w) * t, h: R.r0.h + (R.r1.h - R.r0.h) * t};
+      setRect(state.pic, pr);
+      // seen through the same opening as the rest, so it never slides over the label
+      var cut = state.walk ? Math.max(0, Math.round(R.areaL - pr.x)) : 0;
+      state.pic.style.clipPath = cut > 0 ? 'inset(0 0 0 ' + cut + 'px)' : '';
+      state.pic.style.visibility = cut >= pr.w ? 'hidden' : '';
     }
     // the label hangs on the left with its foot on one line, the same in every room, and stays there; when it
     // opens it grows upward
@@ -238,21 +244,21 @@
       // the pane is one bay wide, so the next picture stays out of sight until it comes
       w.pane.style.left = R.areaL + 'px'; w.pane.style.width = R.bay + 'px';
       w.slides.forEach(function(s){ s.style.width = R.bay + 'px'; s.style.marginRight = R.gap + 'px'; });
-      w.trail.style.transform = 'translate(' + Math.round(-k * (R.bay + R.gap)) + 'px,' + Math.round(H - dy) + 'px)';
+      w.trail.style.transform = 'translateX(' + Math.round(R.bay + R.gap - off) + 'px)';
       // a picture is lit while it is in front of you, as in a dark room
-      var here = dy < H * .5 ? -1 : Math.round(k);
+      var here = Math.round(k) - 1;
       w.slides.forEach(function(s, i){ s.classList.toggle('lit', i === here); });
       // the bar: one mark per picture (the one you came in with first), the one in front of you dark; it is there
       // from the start, so the line itself says there is more
-      var at = dy < H * .5 ? 0 : Math.min(Math.round(k) + 1, w.marks.length - 1);
+      var at = Math.min(Math.round(k), w.marks.length - 1);
       w.bar.style.left = R.areaL + 'px'; w.bar.style.width = R.bay + 'px';
       w.bar.classList.add('on');
       // and a small arrow at each end of it, for anyone who does not scroll; none before the first or past the end
       var by = Math.round(H * .87 + 36), kk = Math.round(k);
       w.prev.style.left = (R.areaL - 34) + 'px'; w.next.style.left = (R.areaL + R.bay + 6) + 'px';
       w.prev.style.top = w.next.style.top = (by + 8 - 14) + 'px';
-      w.prev.classList.toggle('on', dy >= H * .5 && kk > 0);
-      w.next.classList.toggle('on', dy < H * .5 || kk < w.slides.length - 1);
+      w.prev.classList.toggle('on', kk > 0);
+      w.next.classList.toggle('on', kk < w.slides.length);
       w.marks.forEach(function(m, i){ m.classList.toggle('here', i === at); });
     }
     if(state.salon){

@@ -51,8 +51,7 @@ window.PROJECTS = {
       photosLayout: "grid",
       drawings: [
         {src: "img/sierra-hotel/facade.webp", caption: "Facade"},
-        {src: "img/sierra-hotel/floor-plans-3.webp", caption: "Floor plans"},
-        {src: "img/sierra-hotel/facade-details.webp", caption: "Facade details"}
+        {src: "img/sierra-hotel/floor-plans-3.webp", caption: "Floor plans"}
       ],
       photos: [
         {src: "img/sierra-hotel/photo-1.jpg", caption: ""},

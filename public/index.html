@@ -275,45 +275,6 @@
   .st-cap b{font-weight:500;font-size:1rem;letter-spacing:-.005em}
   .st-cap span{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);padding-top:.25rem}
   .st-cap .st-n{margin-left:auto}
-  /* stage2 / stage3: numbered list, project number under the picture, a timing line */
-  .work .num{font-family:var(--mono);font-weight:400;font-size:.62rem;letter-spacing:.04em;color:var(--mute);margin-right:.7rem;vertical-align:.12em;font-variant-numeric:tabular-nums}
-  .work a.current .num{color:var(--ink)}
-  .collage.sv2 .st-cap,.collage.sv3 .st-cap{gap:1.1rem}
-  .collage.sv2 .st-n,.collage.sv3 .st-n{order:-1;margin-left:0;font-variant-numeric:tabular-nums;color:var(--ink)}
-  .collage.sv2 .st-cap b,.collage.sv3 .st-cap b{margin-right:auto}
-  .st-time{position:absolute;left:0;right:0;bottom:1.3rem;height:1px;background:var(--rule);z-index:3;pointer-events:none}
-  .st-time i{position:absolute;left:0;top:-.5px;height:2px;width:0;background:var(--ink)}
-  .st-time.held i{background:var(--ink)}
-  /* stage2: the shutter */
-  .collage.sv2 .st-layer{opacity:1;clip-path:inset(0 100% 0 0);transition:clip-path 1.15s cubic-bezier(.77,0,.18,1)}
-  .collage.sv2 .st-layer.on{clip-path:inset(0 0 0 0);z-index:2}
-  .collage.sv2 .st-layer.was{clip-path:inset(0 0 0 0);z-index:1}
-  .collage.sv2 .st-box img{transform:scale(1.045);transform-origin:left bottom;transition:transform 1.8s cubic-bezier(.2,.7,.2,1)}
-  .collage.sv2 .st-layer.on .st-box img{transform:none}
-  /* stage3: one fixed frame (a pale plate with crop marks); pictures change inside it by sliding across */
-  .collage.sv3 .stage{inset:12px 52px 0 12px}     /* room for the crop marks */
-  body.home-stage2 .index,body.home-stage3 .index{width:min(21.5rem,100%)}
-  .st-frame{position:absolute;left:0;right:0;top:0;bottom:4.2rem;background:#f1f0ed;pointer-events:none}
-  .st-frame .tick{position:absolute;width:14px;height:14px;border:0 solid var(--ink)}
-  .st-frame .tl{left:-8px;top:-8px;border-left-width:1px;border-top-width:1px}
-  .st-frame .tr{right:-8px;top:-8px;border-right-width:1px;border-top-width:1px}
-  .st-frame .bl{left:-8px;bottom:-8px;border-left-width:1px;border-bottom-width:1px}
-  .st-frame .br{right:-8px;bottom:-8px;border-right-width:1px;border-bottom-width:1px}
-  .collage.sv3 .st-layer{opacity:1;transition:none}
-  .collage.sv3 .st-box{justify-content:center;align-items:center;padding:clamp(1.5rem,4.5%,3.5rem);overflow:hidden}
-  .collage.sv3 .st-box img{box-shadow:0 18px 40px -28px rgba(15,18,22,.35);opacity:0;transform:translateX(9%);
-    transition:opacity .7s ease,transform .95s cubic-bezier(.65,0,.35,1)}
-  .collage.sv3 .st-layer.on .st-box img{opacity:1;transform:none}
-  .collage.sv3 .st-layer:not(.on) .st-box img.gone{transform:translateX(-9%)}
-  .collage.sv3 .st-layer.drawing .st-box img{mix-blend-mode:multiply;box-shadow:none}
-  .collage.sv3 .st-plate{background:transparent}
-  .collage.sv3 .st-cap{opacity:0;transition:opacity .5s ease}
-  .collage.sv3 .st-layer.on .st-cap{opacity:1;transition-delay:.25s}
-  .collage.sv3 .st-layer:not(.on){pointer-events:none}
-  .st-lead{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:5;opacity:0;transition:opacity .25s ease}
-  .st-lead.on{opacity:1}
-  .st-lead line{stroke:var(--ink);stroke-width:.75;transition:stroke-dashoffset .55s cubic-bezier(.4,0,.2,1)}
-  .st-lead circle{fill:var(--ink)}
   /* showroom: the list makes way; the categories sit under the picture instead */
   body.home-showroom #index{display:none}
   body.home-showroom .collage{inset:0 clamp(1rem,4vw,2.5rem) 0 clamp(1rem,4vw,2.5rem);pointer-events:auto}
@@ -424,7 +385,6 @@
     .collage.home-rows{aspect-ratio:auto;overflow:visible;container-type:normal}
     .collage.home-stage{aspect-ratio:.95}
     .stage{right:0}
-    .collage.sv3 .stage{inset:12px 12px 0 12px}
     body.home-showroom .collage{inset:auto;aspect-ratio:auto;height:calc((100vw - 2rem) * .75 + 6.4rem);margin-top:1rem}
     .sl-box{bottom:6.4rem}
     .sl-cap{bottom:2.8rem;height:3.4rem}
@@ -738,12 +698,9 @@
   var MODE = (new URLSearchParams(location.search).get('home') || '').toLowerCase();
   // stage: the list beside one large picture per project, which changes with the title pointed at;
   // showroom: one project per screen, a single large picture with its name, stepped through sideways
-  // stage2 / stage3: two refinements of stage (shutter change and a timing line; a fixed frame with crop marks)
-  if(['loose', 'rows', 'line', 'stage', 'stage2', 'stage3', 'showroom'].indexOf(MODE) === -1) MODE = '';
-  var STAGE = /^stage/.test(MODE), SV = MODE === 'stage2' ? 2 : MODE === 'stage3' ? 3 : 1;
-  var FLOW = MODE === 'rows' || MODE === 'line', SINGLE = STAGE || MODE === 'showroom';
+  if(['loose', 'rows', 'line', 'stage', 'showroom'].indexOf(MODE) === -1) MODE = '';
+  var FLOW = MODE === 'rows' || MODE === 'line', SINGLE = MODE === 'stage' || MODE === 'showroom';
   if(MODE){ collageEl.classList.add('home-' + MODE); document.body.classList.add('home-' + MODE); }
-  if(STAGE){ collageEl.classList.add('home-stage'); collageEl.classList.add('sv' + SV); }
   if(SINGLE) collageEl.classList.add('single');
   if(FLOW) collageEl.classList.add('flow');
   // one bay: big openings of different sizes and proportions, so an image is actually readable in each (none overlap,
@@ -994,7 +951,7 @@
     var seen = {}, picks = [];
     Object.keys(GROUPS).forEach(function(k){ GROUPS[k].all.forEach(function(src){ if(!seen[src]){ seen[src] = 1; picks.push({src: src, group: k}); } }); });
     if(FLOW){ hangFlow(); return; }
-    if(STAGE){ buildStage(); return; }
+    if(MODE === 'stage'){ buildStage(); return; }
     if(MODE === 'showroom'){ buildShow(); return; }
     picks = shuffle(picks).slice(0, AMBIENT_SLOTS.length);
     if(!picks.length) return;
@@ -1155,22 +1112,8 @@
   // stage: one large picture, uncropped, standing on a common line, its name under it; it changes with the title
   // pointed at (a soft cross-fade), and by itself every few seconds while nothing is pointed at
   var stage = {el: null, cur: null, timer: null, layers: []};
-  var PERIOD = 5000;
   function buildStage(){
     stage.el = el('div', 'stage', collageEl);
-    if(SV > 1){
-      // every project numbered in the list, the same number under its picture
-      links.forEach(function(a, i){ var n = el('span', 'num', null, pad2(i + 1)); a.querySelector('.name').insertBefore(n, a.querySelector('.name').firstChild); a.numText = pad2(i + 1); });
-      stage.time = el('div', 'st-time', stage.el); el('i', '', stage.time);
-    }
-    if(SV === 3){
-      stage.frame = el('div', 'st-frame', stage.el);
-      ['tl', 'tr', 'bl', 'br'].forEach(function(k){ el('i', 'tick ' + k, stage.frame); });
-      stage.lead = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      stage.lead.setAttribute('class', 'st-lead');
-      stage.lead.innerHTML = '<line/><circle r="2.2"/>';
-      document.body.appendChild(stage.lead);
-    }
     for(var i = 0; i < 2; i++){
       var L = el('div', 'st-layer', stage.el);
       L.box = el('div', 'st-box', L);
@@ -1197,52 +1140,14 @@
     var all = coverSlugs(), i = all.indexOf(slug);
     L.slug = slug; L.src = c.src;
     L.t.textContent = c.pr.title; L.k.textContent = c.pr.kicker || '';
-    if(SV > 1){ var a = links.filter(function(x){ return slugOf(x) === slug; })[0]; L.n.textContent = a ? 'No. ' + a.numText : ''; }
-    else L.n.textContent = i === -1 ? '' : pad2(i + 1) + ' / ' + pad2(all.length);
+    L.n.textContent = i === -1 ? '' : pad2(i + 1) + ' / ' + pad2(all.length);
     L.classList.toggle('drawing', c.drawing);
-    function swap(){
-      if(stage.cur !== slug) return;
-      var old = stage.layers.filter(function(x){ return x !== L && x.classList.contains('on'); })[0];
-      if(old && SV === 2){       // the new picture wipes in over the old one, which stays put underneath until it is covered
-        old.classList.add('was'); clearTimeout(old.wasT);
-        old.wasT = setTimeout(function(){ old.style.transition = 'none'; old.classList.remove('was'); void old.offsetWidth; old.style.transition = ''; }, 1250);
-      }
-      if(SV === 2){ L.classList.remove('was'); clearTimeout(L.wasT); }
-      if(old && SV === 3){       // the old picture slides on out to the left, the new one comes in from the right
-        var oi = old.img; oi.classList.add('gone'); clearTimeout(oi.goneT);
-        oi.goneT = setTimeout(function(){ oi.style.transition = 'none'; oi.classList.remove('gone'); void oi.offsetWidth; oi.style.transition = ''; }, 1000);
-      }
-      if(SV === 3){ clearTimeout(L.img.goneT); L.img.classList.remove('gone'); }
-      stage.layers.forEach(function(x){ x.classList.toggle('on', x === L); });
-      stageTime();
-    }
+    function swap(){ if(stage.cur !== slug) return; stage.layers.forEach(function(x){ x.classList.toggle('on', x === L); }); }
     if(c.src){
       L.img.style.display = ''; L.plate.style.display = 'none';
       if(L.img.getAttribute('src') === c.src) swap();
       else { L.img.onload = swap; L.img.onerror = swap; L.img.src = c.src; }
     } else { L.img.style.display = 'none'; L.img.removeAttribute('src'); L.plate.style.display = ''; swap(); }
-  }
-  // the timing line: a hairline that fills while a picture is up, to show when the next one comes
-  function stageTime(){
-    if(!stage.time) return;
-    var bar = stage.time.firstChild, run = !currentLink && coverSlugs().length > 1;
-    bar.style.transition = 'none'; bar.style.width = run ? '0' : '100%'; void bar.offsetWidth;
-    if(run){ bar.style.transition = 'width ' + PERIOD + 'ms linear'; bar.style.width = '100%'; }
-    stage.time.classList.toggle('held', !run);
-  }
-  // stage3: a fine leader line from the title pointed at to the frame, as on a drawing
-  function stageLead(){
-    if(!stage.lead) return;
-    var a = currentLink, show = a && window.matchMedia('(hover:hover) and (pointer:fine)').matches;
-    stage.lead.classList.toggle('on', !!show);
-    if(!show) return;
-    var r = a.getBoundingClientRect(), f = stage.frame.getBoundingClientRect();
-    var x1 = r.right + 14, y = Math.round(r.top + r.height / 2) + .5, x2 = f.left - 10;
-    var ln = stage.lead.firstChild, dot = stage.lead.lastChild, len = Math.max(0, x2 - x1);
-    ln.setAttribute('x1', x1); ln.setAttribute('x2', x2); ln.setAttribute('y1', y); ln.setAttribute('y2', y);
-    dot.setAttribute('cx', x2); dot.setAttribute('cy', y);
-    ln.style.transition = 'none'; ln.style.strokeDasharray = len; ln.style.strokeDashoffset = len; void ln.getBoundingClientRect();
-    ln.style.transition = ''; ln.style.strokeDashoffset = 0;
   }
   function stageAuto(){
     clearInterval(stage.timer);
@@ -1251,17 +1156,15 @@
       var all = coverSlugs();
       if(all.length < 2) return;
       stageShow(all[(all.indexOf(stage.cur) + 1) % all.length]);
-    }, PERIOD);
+    }, 5000);
   }
   function stageFilter(){
     if(!stage.el) return;
-    stageLead();
-    if(currentLink){ stageShow(slugOf(currentLink)); stageTime(); return; }
+    if(currentLink){ stageShow(slugOf(currentLink)); return; }
     var all = coverSlugs();
     if(all.length && all.indexOf(stage.cur) === -1) stageShow(all[0]);
-    stageAuto(); stageTime();
+    stageAuto();
   }
-  if(STAGE) window.addEventListener('scroll', function(){ if(stage.lead) stage.lead.classList.remove('on'); }, {passive: true});
 
   // showroom: one project per screen, its picture as large as the screen allows and its name set large under it;
   // a scroll, swipe, arrow key or the arrows by the counter step to the next project
@@ -1402,7 +1305,7 @@
     var keep = null, g = document.querySelector('.group[data-open="true"]');
     if(currentLink) keep = [slugOf(currentLink)];
     else if(g) keep = Array.prototype.map.call(g.querySelectorAll('.work a'), slugOf);
-    if(STAGE){ stageFilter(); return; }
+    if(MODE === 'stage'){ stageFilter(); return; }
     if(MODE === 'showroom') return;
     if(FLOW){
       // a category closes the gaps (the pictures move up together); pointing at a project only fades the others
@@ -1440,7 +1343,7 @@
   // the pictures of the project pointed at that are in view right now
   function shownTiles(){
     if(!currentLink) return [];
-    if(STAGE) return stage.el ? [{tile: stage.el.querySelector('.st-layer.on') || stage.el}] : [];
+    if(MODE === 'stage') return stage.el ? [{tile: stage.el.querySelector('.st-layer.on') || stage.el}] : [];
     return mine(slugOf(currentLink)).filter(function(s){ return FLOW ? inArea(s) : inView(AMBIENT_SLOTS[s.slot]); });
   }
 

@@ -303,6 +303,31 @@
   .sh-arrow{display:flex;color:var(--ink);opacity:.25;pointer-events:none;transition:opacity .3s ease}
   .sh-arrow.on{opacity:1;pointer-events:auto}
   .sh-arrow svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.2}
+  /* showroom2: the picture edge to edge; the name set quieter, the line under it gone */
+  body.home-showroom2 .collage{left:0;right:0}
+  body.home-showroom2 .sl-box{bottom:6.6rem}
+  body.home-showroom2 .sl-cap,body.home-showroom2 .show-foot{padding:0 clamp(1rem,4vw,2.5rem)}
+  body.home-showroom2 .sl-cap{bottom:2.6rem;height:3.4rem}
+  body.home-showroom2 .sl-name b,body.home-showroom3 .sl-name b{font-weight:400;font-size:clamp(1.25rem,1.9vw,1.7rem);letter-spacing:-.01em}
+  body.home-showroom2 .show-foot{border-top:0;bottom:.5rem}
+  /* showroom3: the picture fills the screen, under the header; name, categories and counter sit on it in white */
+  body.home-showroom3 .collage{position:fixed;inset:0;z-index:0}
+  body.home-showroom3 > footer{display:none}
+  body.home-showroom3 .bar{position:relative;z-index:2;transition:color .6s ease}
+  body.home-showroom3:not(.on-light) .bar{--ink:#fff;--mute:rgba(255,255,255,.75);color:#fff}
+  body.home-showroom3 .sl-box{bottom:0}
+  body.home-showroom3 .slide.full .sl-box::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(to top,rgba(10,12,14,.42),rgba(10,12,14,0) 38%),linear-gradient(to bottom,rgba(10,12,14,.22),rgba(10,12,14,0) 18%)}
+  body.home-showroom3 .slide.plate .sl-box img{padding:5.5rem 2.5rem 7rem}
+  body.home-showroom3 .sl-cap{left:clamp(1rem,4vw,2.5rem);right:clamp(1rem,4vw,2.5rem);bottom:3.6rem;height:3.4rem}
+  body.home-showroom3 .slide.full .sl-name b{color:#fff}
+  body.home-showroom3 .slide.full .sl-name span{color:rgba(255,255,255,.78)}
+  body.home-showroom3 .show-foot{left:clamp(1rem,4vw,2.5rem);right:clamp(1rem,4vw,2.5rem);bottom:1rem;border-top-color:rgba(255,255,255,.35);transition:color .6s ease,border-color .6s ease}
+  body.home-showroom3:not(.on-light) .show-foot{color:#fff}
+  body.home-showroom3:not(.on-light) .show-cats button,body.home-showroom3:not(.on-light) .sh-count{color:rgba(255,255,255,.72)}
+  body.home-showroom3:not(.on-light) .show-cats button.on,body.home-showroom3:not(.on-light) .show-cats button:hover,
+  body.home-showroom3:not(.on-light) .sh-arrow{color:#fff}
+  body.home-showroom3.on-light .show-foot{border-top-color:var(--rule)}
   /* curated: no frames; a drawing sits on a pale plate (its white paper multiplied into it) so every picture reads as one
      solid, even rectangle */
   .collage.flow .tile{border:0;background:#f1f0ed}
@@ -386,6 +411,10 @@
     .collage.home-stage{aspect-ratio:.95}
     .stage{right:0}
     body.home-showroom .collage{inset:auto;aspect-ratio:auto;height:calc((100vw - 2rem) * .75 + 6.4rem);margin-top:1rem}
+    body.home-showroom2 .collage{width:auto;margin-left:calc(-1 * clamp(1rem,4vw,2.5rem));margin-right:calc(-1 * clamp(1rem,4vw,2.5rem));height:calc(100vw * .8 + 6rem)}
+    body.home-showroom3 .collage{position:fixed;inset:0;height:auto;margin:0}
+    body.home-showroom3 .sl-box{bottom:0}
+    body.home-showroom3 .sl-cap{bottom:3.6rem}
     .sl-box{bottom:6.4rem}
     .sl-cap{bottom:2.8rem;height:3.4rem}
     .sl-name{flex-direction:column;align-items:flex-start;gap:.45rem}
@@ -698,9 +727,13 @@
   var MODE = (new URLSearchParams(location.search).get('home') || '').toLowerCase();
   // stage: the list beside one large picture per project, which changes with the title pointed at;
   // showroom: one project per screen, a single large picture with its name, stepped through sideways
-  if(['loose', 'rows', 'line', 'stage', 'showroom'].indexOf(MODE) === -1) MODE = '';
-  var FLOW = MODE === 'rows' || MODE === 'line', SINGLE = MODE === 'stage' || MODE === 'showroom';
+  // showroom2 / showroom3: two refinements of showroom (the picture edge to edge with a quieter name; the picture
+  // filling the whole screen with the name and menu over it in white)
+  if(['loose', 'rows', 'line', 'stage', 'showroom', 'showroom2', 'showroom3'].indexOf(MODE) === -1) MODE = '';
+  var SHOW = /^showroom/.test(MODE);
+  var FLOW = MODE === 'rows' || MODE === 'line', SINGLE = MODE === 'stage' || SHOW;
   if(MODE){ collageEl.classList.add('home-' + MODE); document.body.classList.add('home-' + MODE); }
+  if(SHOW && MODE !== 'showroom'){ collageEl.classList.add('home-showroom'); document.body.classList.add('home-showroom'); }
   if(SINGLE) collageEl.classList.add('single');
   if(FLOW) collageEl.classList.add('flow');
   // one bay: big openings of different sizes and proportions, so an image is actually readable in each (none overlap,
@@ -807,7 +840,7 @@
   function easeInOut(t){ return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
   function goTo(x, y, instant){
     if(FLOW){ collageEl.scrollTo({left: 0, top: 0, behavior: instant ? 'auto' : 'smooth'}); return; }
-    if(SINGLE){ if(MODE === 'showroom') showTo(0, instant); return; }
+    if(SINGLE){ if(SHOW) showTo(0, instant); return; }
     stop.x = Math.max(0, Math.min(1, x)); stop.y = Math.max(0, Math.min(1, y));
     syncArrows();
     var r = panRange(), to = {x: -stop.x * r.mx, y: -stop.y * r.my};
@@ -824,7 +857,7 @@
     });
   }
   function move(dir){
-    if(MODE === 'showroom'){ showTo(show.at + (dir === 'right' || dir === 'down' ? 1 : -1)); return; }
+    if(SHOW){ showTo(show.at + (dir === 'right' || dir === 'down' ? 1 : -1)); return; }
     if(SINGLE) return;
     if(dir === 'left') goTo(stop.x - 1, stop.y);
     if(dir === 'right') goTo(stop.x + 1, stop.y);
@@ -852,7 +885,7 @@
     if(e.target.closest && e.target.closest('.index')) return;
     e.preventDefault();
     if(SINGLE){    // showroom: one gesture (sideways, down or up), one project; fingers on a touch screen scroll it natively
-      if(MODE !== 'showroom' || wheelLock) { if(wheelLock) release(); return; }
+      if(!SHOW || wheelLock) { if(wheelLock) release(); return; }
       var d = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
       acc.x += d;
       if(Math.abs(acc.x) < 40) return;
@@ -884,7 +917,7 @@
     if(window.gcSheetOpen && gcSheetOpen()) return;
     if(window.gcMuseum && gcMuseum.isOpen()) return;
     var dir = {ArrowLeft: 'left', ArrowRight: 'right', ArrowUp: 'up', ArrowDown: 'down'}[e.key];
-    if(dir && MODE === 'showroom'){ e.preventDefault(); move(dir); return; }
+    if(dir && SHOW){ e.preventDefault(); move(dir); return; }
     if(!dir || !arrows[dir].classList.contains('on')) return;
     e.preventDefault();
     move(dir);
@@ -900,7 +933,7 @@
     if(Math.abs(dx) > Math.abs(dy)) move(dx < 0 ? 'right' : 'left');
     else move(dy < 0 ? 'down' : 'up');
   });
-  window.addEventListener('resize', function(){ if(FLOW) layoutFlow(); else if(MODE === 'showroom') showTo(show.at, true); else if(!SINGLE) goTo(stop.x, stop.y, true); });
+  window.addEventListener('resize', function(){ if(FLOW) layoutFlow(); else if(SHOW) showTo(show.at, true); else if(!SINGLE) goTo(stop.x, stop.y, true); });
   goTo(0, 0, true);
 
   // is a slot in view right now (at least mostly)? Pictures go where you are looking
@@ -952,7 +985,7 @@
     Object.keys(GROUPS).forEach(function(k){ GROUPS[k].all.forEach(function(src){ if(!seen[src]){ seen[src] = 1; picks.push({src: src, group: k}); } }); });
     if(FLOW){ hangFlow(); return; }
     if(MODE === 'stage'){ buildStage(); return; }
-    if(MODE === 'showroom'){ buildShow(); return; }
+    if(SHOW){ buildShow(); return; }
     picks = shuffle(picks).slice(0, AMBIENT_SLOTS.length);
     if(!picks.length) return;
     var left = picks.length;
@@ -1176,7 +1209,8 @@
     show.list.forEach(function(slug, i){
       var c = coverOf(slug), sl = el('div', 'slide' + (c.full ? ' full' : ' plate'), show.track);
       var box = el('div', 'sl-box', sl), im = el('img', '', box);
-      im.alt = c.pr.title; im.src = c.src; im.style.objectPosition = c.pos;
+      im.alt = c.pr.title; im.src = c.src;
+      im.style.objectPosition = (window.matchMedia('(max-width:900px)').matches && c.pr.heroPositionPhone) || c.pos;   // a tall phone screen crops a wide picture hard
       if(c.drawing) sl.classList.add('drawing');
       var cap = el('div', 'sl-cap', sl), left = el('div', 'sl-name', cap);
       el('b', '', left, c.pr.title); el('span', '', left, c.pr.kicker || '');
@@ -1224,6 +1258,7 @@
     show.at = Math.max(0, Math.min(vis.length - 1, i));
     vis.forEach(function(sl, k){ sl.classList.toggle('here', k === show.at); });
     show.count.textContent = pad2(show.at + 1) + ' / ' + pad2(vis.length);
+    document.body.classList.toggle('on-light', !!vis[show.at] && vis[show.at].classList.contains('plate'));   // showroom3: dark type over a pale picture
     show.prev.classList.toggle('on', show.at > 0);
     show.next.classList.toggle('on', show.at < vis.length - 1);
   }
@@ -1306,7 +1341,7 @@
     if(currentLink) keep = [slugOf(currentLink)];
     else if(g) keep = Array.prototype.map.call(g.querySelectorAll('.work a'), slugOf);
     if(MODE === 'stage'){ stageFilter(); return; }
-    if(MODE === 'showroom') return;
+    if(SHOW) return;
     if(FLOW){
       // a category closes the gaps (the pictures move up together); pointing at a project only fades the others
       var cat = g ? Array.prototype.map.call(g.querySelectorAll('.work a'), slugOf) : null;

@@ -37,6 +37,7 @@ window.PROJECTS = {
     diagram: {src: "img/sierra-hotel/exploded-diagram.jpg", caption: "Exploded axonometric"},
     hero: "img/sierra-hotel/hero.jpg",
     heroPosition: "center",
+    heroPositionPhone: "78% center",   // where a phone-shaped crop of the hero looks (the building is on the right)
     // all the pictures in one grid after the text, (see project.js: grid)
     grid: [
       {src: "img/sierra-hotel/photo-4-crop.jpg", size: "full"},

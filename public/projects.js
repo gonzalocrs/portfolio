@@ -56,7 +56,6 @@ window.PROJECTS = {
       ],
       photos: [
         {src: "img/sierra-hotel/photo-1.jpg", caption: ""},
-        {src: "img/sierra-hotel/photo-2.jpg", caption: ""},
         {src: "img/sierra-hotel/photo-3.jpg", caption: ""},
         {src: "img/sierra-hotel/photo-4.jpg", caption: ""},
         {src: "img/sierra-hotel/photo-6.jpg", caption: ""},

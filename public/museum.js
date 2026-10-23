@@ -20,6 +20,9 @@
   var ROOMS = [['walk', 'Spotlight'], ['salon', 'Gallery']];
   // every visit starts in the spotlight; /?room=gallery only opens the first one (a link) in the gallery
   var room = 'walk', rq = /[?&]room=(salon|panorama|gallery)\b/.test(location.search) ? 'salon' : null;
+  // gallery options being tried (?gal=strip|editorial|index), each scrolled freely inside the room; the contact sheet
+  // (hangRows) otherwise
+  var GAL = (location.search.match(/[?&]gal=(strip|editorial|index)\b/) || [])[1] || null;
 
   // lighter copies of camera originals
   function web(src){
@@ -402,7 +405,7 @@
       var hang = function(){
         if(!state || state.gal !== gal || left > 0) return;
         wall.innerHTML = '';
-        hangRows(list, wall, foot);
+        if(GAL) hangFree(list, salon, wall, foot); else hangRows(list, wall, foot);
       };
       state.hang = hang;
     }
@@ -449,6 +452,37 @@
     });
     if(state.salon && state.salon.fade){ state.salon.fade = false; fadeIn(wall); fadeIn(foot); }
   }
+  // the gallery options: every picture whole, scrolled through freely inside the room, the label staying on the left.
+  //   strip      one row at one height, standing on the spotlight's floor line, running off the screen's right edge
+  //   editorial  one column on a twelve-column grid, pictures at varied widths and alternating sides, as a magazine
+  //   index      small, all at one height, numbered, in rows that wrap
+  // a click on a picture opens it in the spotlight
+  var EDIT = [['1 / -1', 'start'], ['4 / -1', 'end'], ['1 / 8', 'start'], ['8 / -1', 'end'], ['2 / 11', 'start']];
+  function hangFree(list, salon, wall, foot){
+    wall.style.display = 'none'; foot.style.display = 'none';
+    var old = salon.querySelector('.m-free'), keep = old ? (GAL === 'strip' ? old.scrollLeft : old.scrollTop) : 0;
+    if(old) old.remove();
+    var R = rects(), floor = groundLine(), top = Math.round(Math.max(24, Math.min(48, state.H * .05)));
+    var box = el('div', 'm-free m-free-' + GAL);
+    box.style.top = top + 'px'; box.style.height = (floor - top) + 'px';
+    if(GAL === 'strip'){ salon.style.width = (innerWidth - R.areaL) + 'px'; box.style.right = '0'; }   // to the screen's edge, so the row reads as going on
+    list.forEach(function(it, i){
+      var f = el('figure', 'm-fig' + (isDrawing(it) ? ' drawing' : '')), im = new Image();
+      im.src = it.src; im.alt = it.caption || state.p.title;
+      f.appendChild(im);
+      var cap = el('figcaption', 'm-tag');
+      if(GAL === 'index') cap.appendChild(el('b', '', pad(i + 1)));
+      cap.appendChild(document.createTextNode(it.caption || it.kind));
+      f.appendChild(cap);
+      if(GAL === 'editorial'){ var e = EDIT[i % EDIT.length]; f.style.gridColumn = e[0]; f.style.justifySelf = e[1]; }
+      f.addEventListener('click', function(){ setRoom('walk', i - 1); });
+      box.appendChild(f);
+    });
+    var end = el('div', 'm-free-end'); end.appendChild(endPiece()); box.appendChild(end);
+    salon.appendChild(box);
+    if(GAL === 'strip') box.scrollLeft = keep; else box.scrollTop = keep;
+    if(state.salon && state.salon.fade){ state.salon.fade = false; fadeIn(box); }
+  }
   function roomFrame(){}
   function fadeIn(e){ e.classList.remove('m-in'); void e.offsetWidth; e.classList.add('m-in'); }
 
@@ -483,12 +517,24 @@
   // sideways, so people swipe sideways). Its momentum keeps sending smaller and smaller events after the fingers
   // lift; those belong to the same step. A new swipe is told apart by a pause, or by the events growing again
   // once the glide has finished, so swiping again straight away still moves on
-  var acc = 0, lastAbs = 0, lastT = 0;
+  var acc = 0, lastAbs = 0, lastT = 0, freeT = 0;
   function onWheel(e){
     if(!state || narrow() || e.ctrlKey || document.querySelector('.m-zoom')) return;
     var side = Math.abs(e.deltaX) > Math.abs(e.deltaY), d = side ? e.deltaX : e.deltaY, dir = d > 0 ? 1 : -1;
     var L = !side && e.target.closest && e.target.closest('.m-label.open');
     if(L && L.scrollHeight > L.clientHeight + 1 && (dir > 0 ? L.scrollTop + L.clientHeight < L.scrollHeight - 1 : L.scrollTop > 0)) return;   // reading the whole text
+    var F = e.target.closest && e.target.closest('.m-free'), now0 = performance.now();
+    if(F){
+      var X = F.classList.contains('m-free-strip'), v = X ? (side ? e.deltaX : e.deltaY) : (side ? 0 : e.deltaY);
+      var can = v > 0 ? (X ? F.scrollLeft + F.clientWidth < F.scrollWidth - 1 : F.scrollTop + F.clientHeight < F.scrollHeight - 1)
+                      : v < 0 && (X ? F.scrollLeft > 0 : F.scrollTop > 0);
+      if(can || now0 - freeT < 350){    // still going through it (or the same swipe's momentum running out at its end)
+        if(can) freeT = now0;
+        if(X && !side){ e.preventDefault(); F.scrollLeft += v; }
+        else if(!can) e.preventDefault();
+        return;
+      }
+    }
     e.preventDefault();
     var now = performance.now(), a = Math.abs(d), fresh = now - lastT > 200 || (a > lastAbs * 1.6 && a > 6);
     lastAbs = a; lastT = now;

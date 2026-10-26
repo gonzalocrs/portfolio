@@ -292,16 +292,24 @@
     }
     function step(d){ var now = Date.now(); if(now - lastStep < 900) return; lastStep = now; show(at + d, d); }
     var withPics = SLUGS.filter(coverOf);
+    // each visit opens on a different project (his call, 2026-10-26: "i always see sierra"): picked at random, never the
+    // one the last visit opened on; scrolling then goes on through the others in the usual order and comes round again
+    var last = null; try { last = localStorage.getItem('gc-first'); } catch(e){}
+    var firsts = withPics.filter(function(s){ return s !== last; }); if(!firsts.length) firsts = withPics;
+    var first = firsts[Math.floor(Math.random() * firsts.length)];
+    try { localStorage.setItem('gc-first', first); } catch(e){}
     Promise.all(withPics.map(function(s){ return loadAll(pictures(s)); })).then(function(all){
+      var start = 0;
       all.forEach(function(got, j){
         got = homePicks(got, withPics[j]);
         got.forEach(function(o, k){
-          var sd = j === 0 && k === 0 ? 'm' : side();
-          seq.push({it: o.it, r: o.r, slug: withPics[j], k: k, k0: o.k0, n: got.length, side: sd, w: j === 0 && k === 0 ? (o.r >= 1.15 ? 72 : 44) : size(o.r),
+          var lead = withPics[j] === first && k === 0, sd = lead ? 'm' : side();
+          if(lead) start = seq.length;
+          seq.push({it: o.it, r: o.r, slug: withPics[j], k: k, k0: o.k0, n: got.length, side: sd, w: lead ? (o.r >= 1.15 ? 72 : 44) : size(o.r),
             pw: pick([78, 86, 94]), off: pick([0, .06, .12]), y: sd === 'm' ? .45 : pick([.15, .35, .55, .8])});
         });
       });
-      show(0, 1);
+      show(start, 1);
     });
     marks.forEach(function(m){
       m.addEventListener('click', function(e){

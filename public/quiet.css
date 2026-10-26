@@ -165,3 +165,75 @@
   @media (max-width:900px){
     .gv-mark{width:170px;font-size:10.5px}
   }
+
+/* the picture in the middle of the space right of the marks (home and projects; 2026-10-26, for wide screens) */
+.qt-stage .p-layer{justify-content:center}
+/* inside a project: a little smaller than the space, with a caption under it */
+.qp .qt-stage .p-layer{padding:3vh 4%}
+.qf{margin:0;height:100%;max-width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.qf img{display:block;max-width:100%;max-height:calc(100% - 2.6rem);width:auto;height:auto;cursor:inherit;pointer-events:auto}
+.qf figcaption{margin-top:.8rem;max-width:100%;text-align:center;line-height:1.3}
+.qf .plate{height:calc(100% - 2.6rem);aspect-ratio:3/2;max-width:100%}
+@media (max-width:700px){ .qp .qt-stage .p-layer{padding:0} .qf figcaption{margin-top:.5rem} }
+
+/* home trial ?home=roll (see buildRoll in quiet.js): the page scrolls, the pictures come down it one by one, left,
+   right or near the middle, each opening as it arrives; the marks stay put */
+body.l-quiet.qh-roll{height:auto;overflow:visible}
+.qh-roll .bar{position:fixed;top:0;left:0;z-index:5}
+.qh-roll .qt{align-items:start;padding-top:0}
+.qh-roll .qt-ticks{position:sticky;top:0;height:100vh}
+.qr-flow{padding:22vh 0 40vh;min-width:0;display:flex;flex-direction:column}
+.qr-row{display:flex;align-items:flex-start}
+.qr-row.l{justify-content:flex-start}
+.qr-row.r{justify-content:flex-end}
+.qr-row.m{justify-content:center}
+.qr-row.two{justify-content:space-between;padding:0 6% 0 2%}
+.qr-fig{margin:0;cursor:pointer;flex:none}
+.qr-fig img{display:block;width:100%;height:auto}
+.qr-par{will-change:transform}
+.qr-fig{transform:translateY(8vh);transition:transform 1.6s cubic-bezier(.16,.8,.2,1)}
+.qr-fig.in{transform:none}
+.in-unveil .qr-fig img,.in-drift .qr-fig img{clip-path:inset(100% 0 0 0);transition:clip-path 1.4s cubic-bezier(.7,0,.2,1)}
+.in-unveil .qr-fig.in img,.in-drift .qr-fig.in img{clip-path:inset(0 0 0 0)}
+.in-rise .qr-fig{opacity:0;transition:opacity 1.3s ease,transform 1.6s cubic-bezier(.16,.8,.2,1)}
+.in-rise .qr-fig.in{opacity:1}
+.qr-end{height:1px}
+@media (max-width:700px){
+  .qh-roll .bar{position:static}
+  .qh-roll .qt{display:flex;flex-direction:column;gap:0;padding-bottom:0}
+  .qh-roll .qt-ticks{order:2;position:sticky;top:auto;bottom:0;height:auto;align-self:stretch;margin:0 calc(-1 * var(--gut));background:var(--paper);padding:1rem var(--gut) 2.4rem;z-index:4}
+  .qr-flow{padding:4vh 0 20vh}
+  .qr-row.two{padding:0}
+  .qr-fig{width:min(86%, 100%) !important;margin:0 !important}
+  .qr-row.two .qr-fig{width:47% !important}
+  .qr-row.two .qr-fig + .qr-fig{margin-top:10vh !important}
+}
+
+/* ?home=roll, one at a time (buildRollOne): only one picture on the screen; a scroll fades it out as it rises away and
+   the next opens out of its bottom edge somewhere else */
+.qo-stage{position:relative;min-height:0;overflow:hidden}
+.qo-fig{position:absolute;margin:0;cursor:pointer;transform:translateY(7vh);transition:transform 1.5s cubic-bezier(.16,.8,.2,1)}
+.qo-fig.from-up{transform:translateY(-7vh)}
+.qo-fig img{display:block;width:100%;height:auto}
+.in-unveil .qo-fig img{clip-path:inset(100% 0 0 0);transition:clip-path 1.3s cubic-bezier(.7,0,.2,1)}
+.in-unveil .qo-fig.from-up img{clip-path:inset(0 0 100% 0)}
+.in-rise .qo-fig{opacity:0;transition:opacity 1.2s ease,transform 1.5s cubic-bezier(.16,.8,.2,1)}
+.qo-fig.in{transform:none;opacity:1}
+.in-unveil .qo-fig.in img{clip-path:inset(0 0 0 0)}
+.qo-fig.out{opacity:0;transition:opacity .7s ease,transform 1s cubic-bezier(.5,0,.2,1);pointer-events:none}
+.qo-fig.out.up{transform:translateY(-6vh)}
+.qo-fig.out.down{transform:translateY(6vh)}
+@media (max-width:700px){
+  body.l-quiet.qh-one{height:100svh;overflow:hidden}
+  .qh-one .qt-stage,.qh-one .qo-stage{order:-1;height:auto;flex:1}
+  .qh-one .qt{display:flex;flex-direction:column;padding-bottom:0}
+  .qh-one .qo-stage{touch-action:none}
+}
+.in-unveil .qo-fig.out img{clip-path:inset(0 0 0 0)}
+.qp .qt-stage.none,.qp .qt-stage.none img{cursor:default}
+/* beside: the words stand centred top to bottom in the space, wherever the name is (his note, 2026-10-26); when they
+   are longer than the space they start at the top and scroll */
+.qd-beside .qp-card{top:0;display:flex;flex-direction:column}
+.qd-beside .qp-card > :first-child{margin-top:auto}
+.qd-beside .qp-card > :last-child{margin-bottom:auto}
+@media (max-width:700px){ .qp.qd-beside .qp-card{top:auto;display:block} .qd-beside .qp-card > :first-child{margin-top:0} }

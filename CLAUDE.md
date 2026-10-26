@@ -8,7 +8,9 @@ https://portfolio.gonzalo-crs.workers.dev. GitHub: `gonzalocrs/portfolio`, branc
 
 - `public/index.html` + `public/project.html` (`?p=<slug>`, optional `&i=<n>`): since 2026-10-26 both run `public/quiet.js` +
   `public/quiet.css` (the "quiet" design: a column of short marks as the index, one picture at a time, the words behind a
-  "+", a line intro on the home page; `?intro` replays it). `project.js`, `museum.js/css` and `embed.js` belong to the
+  "+"). Since the evening of 2026-10-26 the home shows one or two pictures per project, one at a time: a scroll fades
+  one out and the next opens elsewhere (`buildRollOne`). Earlier homes stay reachable: `?home=stage` (with the line intro,
+  `?intro` replays it) and `?home=flow` (a scrolling page). Project pages stop at their first and last picture. `project.js`, `museum.js/css` and `embed.js` belong to the
   previous design (branch `backup/live-2026-10-26`) and are no longer loaded by these two pages.
 - `public/projects.js`: **all project content** (one entry per project). This is the file you edit most.
 - `public/about.html`, `contact.html`, `contact.js`, `signature.js`: other pages.

@@ -237,22 +237,3 @@ body.l-quiet.qh-roll{height:auto;overflow:visible}
 .qd-beside .qp-card > :first-child{margin-top:auto}
 .qd-beside .qp-card > :last-child{margin-bottom:auto}
 @media (max-width:700px){ .qp.qd-beside .qp-card{top:auto;display:block} .qd-beside .qp-card > :first-child{margin-top:0} }
-
-/* dark theme trial (?theme=dark, see quiet.js): the same site on near-black. Pictures keep their own colours; never
-   invert the drawings (his call, 2026-10-26). Drawings with a see-through ground get a white one, as on paper */
-html.dark{
-  --paper:#0f0f0f;
-  --ink:#ecebe7;
-  --rule:#3a3a3a;
-  --mute:#8d8d8b;
-  --faint:#4a4a49;
-  --plate:#1a1a1a;
-  color-scheme:dark;
-}
-html.dark body{background:var(--paper)}
-html.dark ::selection{background:rgba(236,235,231,.18)}
-html.dark img[src$=".svg"],html.dark img[src$=".png"]{background:#fff}
-html.dark .qp .qt-stage{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M4 14h19M17 8l6 6-6 6' fill='none' stroke='%23ecebe7' stroke-width='1.2'/%3E%3C/svg%3E") 14 14,e-resize}
-html.dark .qp .qt-stage.back{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M24 14H5M11 8l-6 6 6 6' fill='none' stroke='%23ecebe7' stroke-width='1.2'/%3E%3C/svg%3E") 14 14,w-resize}
-html.dark .qp .qt-stage.none{cursor:default}
-@media (max-width:700px){ html.dark .qp .qp-card{box-shadow:0 10px 40px rgba(0,0,0,.6);border:1px solid var(--rule)} }

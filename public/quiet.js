@@ -60,6 +60,42 @@
     return marks;
   }
   function quietHref(s, i){ return 'project.html?p=' + s + (i ? '&i=' + i : ''); }
+  // going into a project from a picture on the home (test, 2026-10-26): the page doesn't reload. The picture lifts off
+  // the home and glides to its place in the project while the home fades away and the project fades in around it; the
+  // address changes to the project's, and Back returns to the home. (The older homes, ?home=stage|flow, still just go.)
+  var PAGE = document.body.getAttribute('data-page');
+  function enter(img, href){ location.href = href; }
+  function into(img, slug, k){
+    if(PAGE !== 'home') return;
+    PAGE = 'project';
+    var r0 = img.getBoundingClientRect(), home = main.firstElementChild, hr = home.getBoundingClientRect();
+    // the home stays where it is, on a layer of its own, to fade out; the project is laid out underneath, unseen, so the
+    // picture knows where it lands before it sets off; then one motion: the picture flies (same pace and easing as the
+    // pictures opening on the home), the home fades out and the project fades in around it
+    var old = el('div', 'q-old', document.body);
+    old.style.left = hr.left + 'px'; old.style.top = hr.top + 'px'; old.style.width = hr.width + 'px'; old.style.height = hr.height + 'px';
+    old.appendChild(home);
+    history.pushState({q: 'project'}, '', quietHref(slug, k ? k + 1 : 0));
+    document.body.classList.remove('qh-one', 'in-unveil', 'in-rise');
+    document.body.setAttribute('data-page', 'project');
+    main.classList.add('q-away');
+    buildQuietProject(slug, k);
+    var target = document.querySelector('.p-layer.on img');
+    function go(){
+      var r1 = target ? target.getBoundingClientRect() : r0;
+      var fly = el('img', 'q-fly', document.body); fly.src = img.src; fly.alt = '';
+      fly.style.left = r1.left + 'px'; fly.style.top = r1.top + 'px'; fly.style.width = r1.width + 'px'; fly.style.height = r1.height + 'px';
+      fly.style.transform = 'translate(' + (r0.left - r1.left) + 'px,' + (r0.top - r1.top) + 'px) scale(' + (r0.width / r1.width) + ',' + (r0.height / r1.height) + ')';
+      img.style.visibility = 'hidden'; if(target) target.style.visibility = 'hidden';
+      void fly.offsetWidth;
+      fly.classList.add('go'); fly.style.transform = '';
+      old.classList.add('out'); main.classList.remove('q-away');
+      setTimeout(function(){ if(target) target.style.visibility = ''; fly.remove(); old.remove(); }, 1150);
+    }
+    if(!target || (target.complete && target.naturalWidth)) requestAnimationFrame(go);
+    else { target.addEventListener('load', go); target.addEventListener('error', go); }
+  }
+  addEventListener('popstate', function(){ location.reload(); });
   function ratioOf(img){ return img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1.5; }
   function loadAll(list){
     return Promise.all(list.map(function(it){
@@ -76,7 +112,7 @@
       fade(function(L){
         var e = it ? el('img', '', L) : el('div', 'plate', L, 'In preparation');
         if(it){ e.alt = P[s].title; e.src = it.src; }
-        e.addEventListener('click', function(){ location.href = quietHref(s, at ? at + 1 : 0); });
+        e.addEventListener('click', function(){ enter(it ? e : null, quietHref(s, at ? at + 1 : 0)); });
       }, instant);
       var m = markOf(cur); if(m) m.style.setProperty('--p', ((at + 1) / list.length).toFixed(3));
     }
@@ -155,7 +191,7 @@
       var f = el('figure', 'qr-fig', row), par = el('div', 'qr-par', f);
       f.style.width = 'min(' + w + '%, calc(' + (o.r * 74).toFixed(1) + 'vh))';
       var im = el('img', '', par); im.alt = o.it.caption || P[s].title; im.src = o.it.src;
-      f.addEventListener('click', function(){ location.href = quietHref(s, o.k0 ? o.k0 + 1 : 0); });
+      f.addEventListener('click', function(){ enter(im, quietHref(s, o.k0 ? o.k0 + 1 : 0)); });
       f.slug = s; f.k = k; par.speed = (rnd() - .5) * .22;
       figs.push(f); return f;
     }
@@ -247,7 +283,7 @@
       if(old){ old.classList.remove('in'); old.classList.add('out', d < 0 ? 'down' : 'up'); setTimeout(function(){ old.remove(); }, 1100); }
       var f = el('figure', 'qo-fig' + (d < 0 ? ' from-up' : ''), st); f.o = o;
       var im = el('img', '', f); im.alt = o.it.caption || P[o.slug].title; im.src = o.it.src;
-      f.addEventListener('click', function(){ location.href = quietHref(o.slug, o.k0 ? o.k0 + 1 : 0); });
+      f.addEventListener('click', function(){ into(im, o.slug, o.k0); });
       place(f, o);
       setTimeout(function(){ f.classList.add('in'); }, old ? 420 : 60);
       curEl = f; at = i;
@@ -278,6 +314,7 @@
     // short pause in the wheel since the last one, or a clearly new push
     var lastD = 0;
     addEventListener('wheel', function(e){
+      if(PAGE !== 'home') return;
       e.preventDefault();
       var d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX, now = Date.now(), gap = now - lastWheel;
       lastWheel = now;
@@ -287,6 +324,7 @@
       step(d > 0 ? 1 : -1);
     }, {passive: false});
     addEventListener('keydown', function(e){
+      if(PAGE !== 'home') return;
       if(['ArrowDown', 'ArrowRight', 'PageDown', ' '].indexOf(e.key) > -1){ step(1); e.preventDefault(); }
       if(['ArrowUp', 'ArrowLeft', 'PageUp'].indexOf(e.key) > -1){ step(-1); e.preventDefault(); }
       if(e.key === 'Enter' && curEl) curEl.click();
@@ -300,7 +338,7 @@
       var d = Math.abs(dy) > Math.abs(dx) ? dy : dx;
       if(Math.abs(d) > 35) step(d < 0 ? 1 : -1);
     }, {passive: true});
-    addEventListener('resize', function(){ if(curEl) place(curEl, curEl.o); });
+    addEventListener('resize', function(){ if(PAGE === 'home' && curEl) place(curEl, curEl.o); });
   }
 
   // a project: the same marks, its own opened into one mark per picture; one picture at a time, as large as fits.
@@ -312,7 +350,7 @@
     return it.kind === 'drawing' ? 'Drawing' : it.kind === 'physical' ? 'Physical model' : 'Photograph';
   }
   addEventListener('resize', function(){ Array.prototype.forEach.call(document.querySelectorAll('.qf'), function(f){ if(f.fit) f.fit(); }); });
-  function buildQuietProject(slug){
+  function buildQuietProject(slug, startAt){
     var p = P[slug], all = pictures(slug), n = Math.max(1, all.length);
     var i0 = SLUGS.indexOf(slug);
     document.title = p.title + ' — Gonzalo Cáceres';
@@ -378,6 +416,27 @@
     plus.addEventListener('click', function(e){ e.stopPropagation(); toggle(); });
     card.addEventListener('click', function(e){ e.stopPropagation(); });
     var at = -1, lock = 0;
+    // how the page shows there is more above or below (test, 2026-10-26; the pictures go by vertically, so no side
+    // arrows): &nav=
+    //   chev  a thin chevron centred over the picture area (back) and one under it (on); each hides at its end
+    //   hint  only on arrival: a short line drawing down under the picture with "Scroll"; gone after the first step
+    //   none  nothing but the small marks in the index (his pick, 2026-10-26)
+    var NAV = (Q.get('nav') || 'none').toLowerCase(); if(['chev', 'hint', 'none'].indexOf(NAV) === -1) NAV = 'none';
+    wrap.classList.add('qnav-' + NAV);
+    var up = null, dn = null, hint = null;
+    if(NAV === 'chev'){
+      up = el('button', 'qv up', st); dn = el('button', 'qv dn', st); up.type = dn.type = 'button';
+      up.setAttribute('aria-label', 'Previous picture'); dn.setAttribute('aria-label', 'Next picture');
+      up.innerHTML = '<svg viewBox="0 0 28 12" width="28" height="12"><path d="M2 11L14 1l12 10"/></svg>';
+      dn.innerHTML = '<svg viewBox="0 0 28 12" width="28" height="12"><path d="M2 1l12 10L26 1"/></svg>';
+      up.addEventListener('click', function(e){ e.stopPropagation(); go(at - 1); });
+      dn.addEventListener('click', function(e){ e.stopPropagation(); go(at + 1); });
+    }
+    if(NAV === 'hint' && n > 1){
+      hint = el('button', 'qv-hint', st); hint.type = 'button';
+      el('span', 'k', hint, 'Scroll'); el('i', '', hint);
+      hint.addEventListener('click', function(e){ e.stopPropagation(); go(at + 1); });
+    }
     function go(k){
       // a project ends at its last picture (his call, 2026-10-26): no scrolling on into the next one; the marks go there
       if(k >= n || k < 0) return;
@@ -397,8 +456,9 @@
         else el('div', 'plate', f, 'In preparation');
       }, first);
       dots.forEach(function(d, j){ d.classList.toggle('cur', j === k); });
+      if(up){ up.classList.toggle('off', k === 0); dn.classList.toggle('off', k === n - 1); }
+      if(hint && !first) hint.classList.add('off');
     }
-    st.addEventListener('mousemove', function(e){ var r = st.getBoundingClientRect(), b = e.clientX < r.left + r.width * .35; st.classList.toggle('back', b); st.classList.toggle('none', b ? at === 0 : at === n - 1); });
     st.addEventListener('click', function(e){
       if(isOpen() && D === 'float'){ toggle(false); return; }
       var r = st.getBoundingClientRect(); go(at + (e.clientX < r.left + r.width * .35 ? -1 : 1));
@@ -419,7 +479,7 @@
     var sx = null;
     st.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive: true});
     st.addEventListener('touchend', function(e){ if(sx == null) return; var dx = e.changedTouches[0].clientX - sx; sx = null; if(Math.abs(dx) > 40) go(at + (dx < 0 ? 1 : -1)); }, {passive: true});
-    var start = Q.get('i'); go(start === 'last' ? n - 1 : Math.max(0, Math.min(n - 1, (parseInt(start, 10) || 1) - 1)));
+    var start = Q.get('i'); go(startAt != null ? Math.min(n - 1, startAt) : start === 'last' ? n - 1 : Math.max(0, Math.min(n - 1, (parseInt(start, 10) || 1) - 1)));
   }
 
   // the intro. The old one (the name large in the middle, its letters flipping in like an airport board, then

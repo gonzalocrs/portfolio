@@ -169,6 +169,28 @@
   .ri-tn button{height:100%;opacity:.32;transition:opacity .3s ease}
   .ri-tn button.on,.ri-tn button:hover{opacity:1}
   .ri-tn button img{height:100%;width:auto;max-width:none;max-height:none;pointer-events:auto}
+  /* parts of a project (cluster, drift, living) */
+  @keyframes riIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .ri-more{position:absolute;right:0;bottom:0;color:var(--mute)}
+  .rm-cluster .ri-more{opacity:0}
+  .rm-cluster .p-layer.on .ri-more{animation:riIn .9s ease forwards}
+  .rm-cluster .p-layer{display:block}
+  .ri-slot{position:absolute;opacity:0}
+  .p-layer.on .ri-slot{animation:riIn .9s cubic-bezier(.2,.7,.2,1) forwards}
+  .ri-slot img{width:100%;height:100%;max-width:none;max-height:none}
+  .ri-slot .plate{width:100%;height:auto}
+  .rm-drift{padding-right:0}
+  .rm-drift .p-stage{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent)}
+  .ri-drift{display:flex;gap:clamp(1.2rem,2vw,2rem);height:min(100%,50vh);align-items:flex-start;will-change:transform}
+  .ri-drift img,.ri-drift .plate{flex:none;height:100%;width:auto;max-width:none;max-height:none}
+  .ri-drift .plate{aspect-ratio:3/2}
+  .ri-living{display:grid;grid-template-columns:1.25fr 1fr;grid-template-rows:1fr .8fr;gap:16px;width:100%;height:calc(100% - 2rem)}
+  .ri-cell{position:relative;min-height:0;opacity:0}
+  .p-layer.on .ri-cell{animation:riIn .9s cubic-bezier(.2,.7,.2,1) forwards}
+  .ri-cell img,.ri-cell .plate{position:absolute;left:0;top:0;max-width:100%;max-height:100%;width:auto;height:auto;transition:opacity .9s ease}
+  .ri-cell img.ri-new{opacity:0;animation:riFade .9s ease forwards}
+  .ri-cell img.ri-out{opacity:0}
+  @keyframes riFade{to{opacity:1}}
   /* type: only the names, in one quiet column; nothing else on the page until you point at one, then the others
      go pale and its picture appears in the space to the right, top on that name's line */
   .ty{flex:1;position:relative;padding:clamp(2rem,9vh,6rem) var(--gut) 1rem;min-height:0}
@@ -477,7 +499,7 @@
     function auto(){
       clearInterval(timer);
       if(noAuto) return;
-      timer = setInterval(function(){ var i = withPics.indexOf(cur); show(withPics[(i + 1) % withPics.length]); }, 4500);
+      timer = setInterval(function(){ var i = withPics.indexOf(cur); show(withPics[(i + 1) % withPics.length]); }, (opts && opts.every) || 4500);
     }
     items.forEach(function(t){
       t.addEventListener('mouseenter', function(){ clearInterval(timer); show(t.slug); });
@@ -514,7 +536,7 @@
   //   sheet   the project's pictures all at once, small, in rows of one height filling the space, like his home page
   //   thumbs  one large picture with the project's others in a fine row of small ones under it; point at one to see it
   var RIMG = (Q.get('img') || 'seq').toLowerCase();
-  if(['cover', 'seq', 'strip', 'sheet', 'thumbs'].indexOf(RIMG) === -1) RIMG = 'seq';
+  if(['cover', 'seq', 'strip', 'sheet', 'thumbs', 'cluster', 'drift', 'living'].indexOf(RIMG) === -1) RIMG = 'seq';
   function ratioOf(img){ return img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1.5; }
   function loadAll(list){
     return Promise.all(list.map(function(it){
@@ -640,6 +662,120 @@
           }, instant);
         });
       }, {pauseOn: st});
+      return;
+    }
+
+    // three ways to show part of a project, not all of it, to make you want the rest:
+    // a few of the project's pictures, spread from first to last
+    function some(all, k){
+      if(all.length <= k) return all.slice();
+      var out = [];
+      for(var i = 0; i < k; i++) out.push(all[Math.round(i * (all.length - 1) / (k - 1))]);
+      return out;
+    }
+    function more(L, n){ if(n > 0) el('span', 'ri-more n', L, '+' + n); }
+
+    if(RIMG === 'cluster'){
+      // up to four pictures, each whole, fitted together on shared edges: a large one; a second beside it standing on
+      // the same bottom line; a third under the first, its top one gap below; a fourth beside the third, tops level.
+      // They arrive one after another; a small "+n" says how many more are inside
+      function arrange(got, W, H){
+        var g = 16, r = got.map(function(o){ return o.r; }), R = [];
+        for(var k = 1; k > .3; k -= .04){
+          R = [];
+          var h1 = H * .62 * k, w1 = Math.min(W * .66, r[0] * h1); h1 = w1 / r[0];
+          R.push({x: 0, y: 0, w: w1, h: h1});
+          if(r[1]){ var h2 = h1 * .62, w2 = r[1] * h2; R.push({x: w1 + g, y: h1 - h2, w: w2, h: h2}); }
+          if(r[2]){ var h3 = H * .3 * k, w3 = r[2] * h3, x3 = Math.max(0, w1 * .32); R.push({x: x3, y: h1 + g, w: w3, h: h3}); }
+          if(r[3]){ var p = R[2], h4 = p.h * .72, w4 = r[3] * h4; R.push({x: p.x + p.w + g, y: p.y, w: w4, h: h4}); }
+          var fits = R.every(function(q){ return q.x + q.w <= W + .5 && q.y + q.h <= H + .5; });
+          if(fits) break;
+        }
+        return R;
+      }
+      indexer(scale, items, function(slug, instant){
+        var me = ++token, all = pictures(slug), pick = some(all, 4);
+        loadAll(pick).then(function(got){
+          if(me !== token) return;
+          fade(function(L){
+            if(!got.length){ picEl(L, null, slug); return; }
+            var R = arrange(got, st.clientWidth, st.clientHeight - 24);
+            got.forEach(function(o, i){
+              var q = R[i], box = el('div', 'ri-slot', L);
+              box.style.left = q.x + 'px'; box.style.top = q.y + 'px'; box.style.width = q.w + 'px'; box.style.height = q.h + 'px';
+              box.style.animationDelay = (i * .16) + 's';
+              picEl(box, o.it, slug);
+            });
+            // "+n" just after the last picture, on its bottom line
+            if(all.length > pick.length){
+              var q = R[got.length - 1], m = el('span', 'ri-more n', L, '+' + (all.length - pick.length));
+              m.style.left = (q.x + q.w + 12) + 'px'; m.style.top = (q.y + q.h - 12) + 'px'; m.style.right = 'auto'; m.style.bottom = 'auto';
+              m.style.animationDelay = (got.length * .16) + 's';
+            }
+          }, instant);
+        });
+      }, {pauseOn: st, every: 6500});
+      return;
+    }
+
+    if(RIMG === 'drift'){
+      // the project's pictures in one row that keeps gliding slowly to the left, only two or three in view at a
+      // time; it stops while you point at it; it loops, so it never runs out
+      var drift = {x: 0, row: null, w: 0, on: true, last: 0};
+      function frame(t){
+        var dt = drift.last ? Math.min(64, t - drift.last) : 16; drift.last = t;
+        if(drift.row && drift.on && drift.w){
+          drift.x -= dt * .035;
+          if(-drift.x >= drift.w) drift.x += drift.w;
+          drift.row.style.transform = 'translateX(' + drift.x + 'px)';
+        }
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+      st.addEventListener('mouseenter', function(){ drift.on = false; });
+      st.addEventListener('mouseleave', function(){ drift.on = true; });
+      indexer(scale, items, function(slug, instant){
+        fade(function(L){
+          var all = pictures(slug), row = el('div', 'ri-drift', L);
+          if(!all.length){ picEl(row, null, slug); drift.row = null; return; }
+          // two copies, so the loop has no seam
+          all.concat(all).forEach(function(it){ picEl(row, it, slug); });
+          drift.row = row; drift.x = 0; drift.w = 0;
+          var measure = function(){ var half = row.children[all.length]; drift.w = half ? half.offsetLeft : 0; };
+          row.querySelectorAll('img').forEach(function(i){ i.addEventListener('load', measure); });
+          setTimeout(measure, 50);
+        }, instant);
+      }, {pauseOn: st, every: 9000});
+      return;
+    }
+
+    if(RIMG === 'living'){
+      // a small sheet of four places; every few seconds one of them changes to another picture of the project you
+      // haven't seen yet, so it is never the whole project and never still
+      var swap = null;
+      indexer(scale, items, function(slug, instant){
+        clearInterval(swap);
+        fade(function(L){
+          var all = pictures(slug), k = Math.min(4, all.length), shown = all.slice(0, k), rest = all.slice(k);
+          var grid = el('div', 'ri-living', L);
+          if(!all.length){ picEl(grid, null, slug); return; }
+          var cells = shown.map(function(it, i){
+            var c = el('div', 'ri-cell', grid); c.style.animationDelay = (i * .14) + 's';
+            picEl(c, it, slug); return c;
+          });
+          more(L, rest.length);
+          if(!rest.length) return;
+          var turn = 0;
+          swap = setInterval(function(){
+            var c = cells[turn % cells.length]; turn++;
+            var outgoing = shown[cells.indexOf(c)], incoming = rest.shift();
+            rest.push(outgoing); shown[cells.indexOf(c)] = incoming;
+            var old = c.firstChild; old.classList.add('ri-out');
+            var neu = picEl(c, incoming, slug); neu.classList.add('ri-new');
+            setTimeout(function(){ if(old.parentNode) old.remove(); neu.classList.remove('ri-new'); }, 900);
+          }, 2200);
+        }, instant);
+      }, {pauseOn: st, every: 9000});
       return;
     }
 
@@ -813,7 +949,7 @@
     document.body.classList.add('l-' + LAY, 'lay');
     var lo = document.querySelector('.opts');
     lo.innerHTML = 'Layout' + Object.keys(LAYS).map(function(k){ return '<a href="?v=a&l=' + k + '"' + (k === LAY ? ' class="on"' : '') + '>' + k + '</a>'; }).join('');
-    if(LAY === 'ruler') lo.innerHTML = 'Pictures' + ['seq', 'strip', 'sheet', 'thumbs', 'cover'].map(function(k){ return '<a href="?v=a&l=ruler&img=' + k + '"' + (k === RIMG ? ' class="on"' : '') + '>' + k + '</a>'; }).join('') + '<span style="margin-left:1.2rem;color:var(--faint)">r6</span>';
+    if(LAY === 'ruler') lo.innerHTML = 'Pictures' + ['seq', 'cluster', 'drift', 'living', 'sheet'].map(function(k){ return '<a href="?v=a&l=ruler&img=' + k + '"' + (k === RIMG ? ' class="on"' : '') + '>' + k + '</a>'; }).join('') + '<span style="margin-left:1.2rem;color:var(--faint)">r7</span>';
     LAYS[LAY]();
   }
   else if(V === 'a') buildA();

@@ -477,6 +477,41 @@
     else setTimeout(go, 30);
   }
 
+  // About (2026-10-26): the marks with About open; his words stand where a project's words do, the GCV mark where the
+  // picture would be. "Get in touch +", a scroll down or Enter turns the mark into the form (topics, fields, Send; the
+  // sending itself is contact.js); the ×, a scroll up or Esc turns it back
+  function buildAbout(){
+    var wrap = document.querySelector('.qab'), nav = wrap.querySelector('.qt-ticks');
+    quietMarks(nav, null, function(s){ return quietHref(s); });
+    var ab = nav.querySelector('.qk.qa'); ab.classList.add('cur'); ab.setAttribute('aria-current', 'page');
+    var touch = document.getElementById('touch'), lock = 0;
+    function isOpen(){ return wrap.classList.contains('open'); }
+    function toggle(on){
+      on = on == null ? !isOpen() : on;
+      if(on === isOpen()) return;
+      wrap.classList.toggle('open', on);
+      touch.querySelector('span').textContent = on ? 'Close' : 'Get in touch';
+      if(on) setTimeout(function(){ var c = wrap.querySelector('.choice'); if(c && innerWidth > 700) c.focus({preventScroll: true}); }, 500);
+    }
+    touch.addEventListener('click', function(){ toggle(); });
+    addEventListener('wheel', function(e){
+      if(innerWidth <= 700) return;
+      var t = e.target;
+      if(t.tagName === 'TEXTAREA' && t.scrollHeight > t.clientHeight) return;
+      e.preventDefault();
+      if(Math.abs(e.deltaY) < 8) return;
+      var now = Date.now(); if(now - lock < 800) return; lock = now;
+      toggle(e.deltaY > 0);
+    }, {passive: false});
+    addEventListener('keydown', function(e){
+      if(/INPUT|TEXTAREA/.test(document.activeElement.tagName)){ if(e.key === 'Escape') document.activeElement.blur(); return; }
+      if(e.key === 'Escape') toggle(false);
+      if(e.key === 'ArrowDown' || e.key === 'PageDown'){ toggle(true); e.preventDefault(); }
+      if(e.key === 'ArrowUp' || e.key === 'PageUp'){ toggle(false); e.preventDefault(); }
+    });
+  }
+
+  if(document.body.getAttribute('data-page') === 'about'){ buildAbout(); return; }
   if(document.body.getAttribute('data-page') === 'project'){
     var slug = Q.get('p');
     if(!P[slug]){ location.replace('/'); return; }

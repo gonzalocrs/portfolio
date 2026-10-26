@@ -68,29 +68,32 @@
   function into(img, slug, k){
     if(PAGE !== 'home') return;
     PAGE = 'project';
-    var r0 = img.getBoundingClientRect(), fly = el('img', 'q-fly', document.body);
-    fly.src = img.src; fly.alt = '';
-    fly.style.left = r0.left + 'px'; fly.style.top = r0.top + 'px'; fly.style.width = r0.width + 'px'; fly.style.height = r0.height + 'px';
-    img.style.visibility = 'hidden';
+    var r0 = img.getBoundingClientRect(), home = main.firstElementChild, hr = home.getBoundingClientRect();
+    // the home stays where it is, on a layer of its own, to fade out; the project is laid out underneath, unseen, so the
+    // picture knows where it lands before it sets off; then one motion: the picture flies (same pace and easing as the
+    // pictures opening on the home), the home fades out and the project fades in around it
+    var old = el('div', 'q-old', document.body);
+    old.style.left = hr.left + 'px'; old.style.top = hr.top + 'px'; old.style.width = hr.width + 'px'; old.style.height = hr.height + 'px';
+    old.appendChild(home);
+    history.pushState({q: 'project'}, '', quietHref(slug, k ? k + 1 : 0));
+    document.body.classList.remove('qh-one', 'in-unveil', 'in-rise');
+    document.body.setAttribute('data-page', 'project');
     main.classList.add('q-away');
-    setTimeout(function(){
-      history.pushState({q: 'project'}, '', quietHref(slug, k ? k + 1 : 0));
-      document.body.classList.remove('qh-one', 'in-unveil', 'in-rise');
-      document.body.setAttribute('data-page', 'project');
-      main.innerHTML = '';
-      buildQuietProject(slug, k);
-      var target = document.querySelector('.p-layer.on img');
-      function land(){
-        var r1 = target.getBoundingClientRect();
-        target.style.visibility = 'hidden';
-        fly.style.left = r1.left + 'px'; fly.style.top = r1.top + 'px'; fly.style.width = r1.width + 'px'; fly.style.height = r1.height + 'px';
-        main.classList.remove('q-away');
-        setTimeout(function(){ target.style.visibility = ''; fly.remove(); }, 820);
-      }
-      if(!target){ main.classList.remove('q-away'); fly.remove(); return; }
-      if(target.complete && target.naturalWidth) requestAnimationFrame(land);
-      else { target.addEventListener('load', land); target.addEventListener('error', land); }
-    }, 380);
+    buildQuietProject(slug, k);
+    var target = document.querySelector('.p-layer.on img');
+    function go(){
+      var r1 = target ? target.getBoundingClientRect() : r0;
+      var fly = el('img', 'q-fly', document.body); fly.src = img.src; fly.alt = '';
+      fly.style.left = r1.left + 'px'; fly.style.top = r1.top + 'px'; fly.style.width = r1.width + 'px'; fly.style.height = r1.height + 'px';
+      fly.style.transform = 'translate(' + (r0.left - r1.left) + 'px,' + (r0.top - r1.top) + 'px) scale(' + (r0.width / r1.width) + ',' + (r0.height / r1.height) + ')';
+      img.style.visibility = 'hidden'; if(target) target.style.visibility = 'hidden';
+      void fly.offsetWidth;
+      fly.classList.add('go'); fly.style.transform = '';
+      old.classList.add('out'); main.classList.remove('q-away');
+      setTimeout(function(){ if(target) target.style.visibility = ''; fly.remove(); old.remove(); }, 1150);
+    }
+    if(!target || (target.complete && target.naturalWidth)) requestAnimationFrame(go);
+    else { target.addEventListener('load', go); target.addEventListener('error', go); }
   }
   addEventListener('popstate', function(){ location.reload(); });
   function ratioOf(img){ return img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1.5; }
@@ -413,13 +416,15 @@
     plus.addEventListener('click', function(e){ e.stopPropagation(); toggle(); });
     card.addEventListener('click', function(e){ e.stopPropagation(); });
     var at = -1, lock = 0;
-    // two small arrows at the sides (test, 2026-10-26, in place of the arrow-shaped pointer); each hides at its end
-    var prev = el('button', 'qn prev', st), next = el('button', 'qn next', st);
-    prev.type = next.type = 'button'; prev.setAttribute('aria-label', 'Previous picture'); next.setAttribute('aria-label', 'Next picture');
-    prev.innerHTML = '<svg viewBox="0 0 14 28" width="14" height="28"><path d="M12 2L2 14l10 12"/></svg>';
-    next.innerHTML = '<svg viewBox="0 0 14 28" width="14" height="28"><path d="M2 2l10 12L2 26"/></svg>';
-    prev.addEventListener('click', function(e){ e.stopPropagation(); go(at - 1); });
-    next.addEventListener('click', function(e){ e.stopPropagation(); go(at + 1); });
+    // two small arrows (test, 2026-10-26, in place of the arrow-shaped pointer), a short step out from the picture's own
+    // edges, at its middle; none before the first picture or after the last
+    function arrow(f, d){
+      var b = el('button', 'qn ' + (d < 0 ? 'prev' : 'next'), f); b.type = 'button';
+      b.setAttribute('aria-label', d < 0 ? 'Previous picture' : 'Next picture');
+      b.innerHTML = d < 0 ? '<svg viewBox="0 0 14 28" width="14" height="28"><path d="M12 2L2 14l10 12"/></svg>' : '<svg viewBox="0 0 14 28" width="14" height="28"><path d="M2 2l10 12L2 26"/></svg>';
+      b.addEventListener('click', function(e){ e.stopPropagation(); go(at + d); });
+      return b;
+    }
     function go(k){
       // a project ends at its last picture (his call, 2026-10-26): no scrolling on into the next one; the marks go there
       if(k >= n || k < 0) return;
@@ -433,13 +438,18 @@
         if(it){
           var im = el('img', '', f); im.alt = it.caption || p.title; im.src = it.src;
           var cap = el('figcaption', 'k', f, it.caption || kindOf(it));
-          var fit = function(){ cap.style.width = im.offsetWidth ? im.offsetWidth + 'px' : ''; };
+          var pa = k > 0 ? arrow(f, -1) : null, na = k < n - 1 ? arrow(f, 1) : null;
+          var fit = function(){
+            cap.style.width = im.offsetWidth ? im.offsetWidth + 'px' : '';
+            var y = im.offsetTop + im.offsetHeight / 2;
+            if(pa){ pa.style.left = im.offsetLeft + 'px'; pa.style.top = y + 'px'; }
+            if(na){ na.style.left = (im.offsetLeft + im.offsetWidth) + 'px'; na.style.top = y + 'px'; }
+          };
           im.addEventListener('load', fit); f.fit = fit;
         }
         else el('div', 'plate', f, 'In preparation');
       }, first);
       dots.forEach(function(d, j){ d.classList.toggle('cur', j === k); });
-      prev.classList.toggle('off', k === 0); next.classList.toggle('off', k === n - 1);
     }
     st.addEventListener('click', function(e){
       if(isOpen() && D === 'float'){ toggle(false); return; }

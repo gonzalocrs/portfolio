@@ -351,11 +351,12 @@
     var photos = grid.filter(function(it){ return !isDrawing(it) && !/\/physical\//.test(it.src); });
     if(!grid.length){ drawings = g.drawings || []; physical = g.physical || []; photos = g.photos || []; }
     if(!physical.length && g.physical) physical = g.physical;
-    [p.hero ? [{src: p.hero}] : [], p.diagram && p.diagram.src ? [p.diagram] : [], drawings, physical, photos].forEach(function(list){
+    [p.hero ? [{src: p.hero}] : [], p.diagram && p.diagram.src ? [{src: p.diagram.src, caption: p.diagram.caption, drawing: true}] : [], drawings, physical, photos].forEach(function(list){
       list.forEach(function(it){
         var s = it.src && web(it.src);
         if(!s || seen[s]) return; seen[s] = 1;
-        out.push({src: s, drawing: isDrawing(it), caption: it.caption || ''});
+        var dr = isDrawing(it);
+        out.push({src: s, drawing: dr, kind: dr ? 'drawing' : /\/physical\//.test(s) ? 'physical' : 'photo', caption: it.caption || ''});
       });
     });
     return out;
@@ -688,30 +689,59 @@
         cuts.concat([rs.length]).forEach(function(c){ rows.push(rs.slice(at, c)); at = c; });
         return rows.map(function(row){ var sum = row.reduce(function(a, b){ return a + b; }, 0); return (W - g * (row.length - 1)) / sum; });
       }
+      function perms(a){ if(a.length < 2) return [a]; var o = []; a.forEach(function(x, i){ perms(a.slice(0, i).concat(a.slice(i + 1))).forEach(function(p){ o.push([x].concat(p)); }); }); return o; }
+      // candidate arrangements, each a set of rectangles made on shared edges (rows of one height each, or one
+      // picture the full height beside a column of the others at one width), scaled to fit the space; the one that
+      // covers most of the space wins
       function arrange(got, W, H){
         var g = 16, best = null;
-        for(var k = Math.min(3, got.length); k <= Math.min(6, got.length); k++){
-          var set = some(got, k), rs = set.map(function(o){ return o.r; }), splits = [[]];
-          for(var i = 1; i < k; i++){ splits.push([i]); for(var j = i + 1; j < k; j++) splits.push([i, j]); }
-          splits.forEach(function(cuts){
-            var hs = rowsOf(rs, W, g, cuts), total = hs.reduce(function(a, b){ return a + b; }, 0) + g * (hs.length - 1);
-            var fit = total <= H ? total / H : H / total;
-            // a row much taller than half the space, or tiny pictures, reads badly
-            if(hs.some(function(h){ return h < H * .16; })) fit -= .25;
-            var score = fit - k * .012;
-            if(!best || score > best.score) best = {score: score, set: set, cuts: cuts, hs: hs, total: total};
-          });
+        function consider(R, bonus){
+          var tw = 0, th = 0;
+          R.forEach(function(q){ tw = Math.max(tw, q.x + q.w); th = Math.max(th, q.y + q.h); });
+          var sc = Math.min(W / tw, H / th), cover = (tw * sc / W) * (th * sc / H) + (bonus || 0);
+          if(!best || cover > best.cover) best = {cover: cover, R: R.map(function(q){ return {o: q.o, x: q.x * sc, y: q.y * sc, w: q.w * sc, h: q.h * sc}; })};
         }
-        var sc = Math.min(1, H / best.total), R = [], y = 0, at = 0;
-        best.cuts.concat([best.set.length]).forEach(function(c, ri){
-          var h = best.hs[ri] * sc, x = 0;
-          best.set.slice(at, c).forEach(function(o){ var w = o.r * h; R.push({o: o, x: x, y: y, w: w, h: h}); x += w + g * sc; });
-          y += h + g * sc; at = c;
+        function rows(set, cuts){
+          var R = [], y = 0, at = 0;
+          var hs = rowsOf(set.map(function(o){ return o.r; }), W, g, cuts);
+          cuts.concat([set.length]).forEach(function(c, ri){
+            var x = 0;
+            set.slice(at, c).forEach(function(o){ R.push({o: o, x: x, y: y, w: o.r * hs[ri], h: hs[ri]}); x += o.r * hs[ri] + g; });
+            y += hs[ri] + g; at = c;
+          });
+          return R;
+        }
+        function column(set, x, w){ var y = 0; return set.map(function(o){ var q = {o: o, x: x, y: y, w: w, h: w / o.r}; y += q.h + g; return q; }); }
+        perms(got).forEach(function(set){
+          var k = set.length, keep = set[0] === got[0] ? .004 : 0;
+          var splits = [[]];
+          for(var i = 1; i < k; i++){ splits.push([i]); for(var j = i + 1; j < k; j++) splits.push([i, j]); }
+          splits.forEach(function(cuts){ consider(rows(set, cuts), keep); });
+          if(k >= 2){
+            // one picture the full height, the others stacked beside it at one width: on the left, then on the right
+            var big = set[0], rest = set.slice(1), Hh = H, cw = (Hh - g * (rest.length - 1)) / rest.reduce(function(a, o){ return a + 1 / o.r; }, 0);
+            var bw = big.r * Hh;
+            consider([{o: big, x: 0, y: 0, w: bw, h: Hh}].concat(column(rest, bw + g, cw)), keep);
+            consider(column(rest, 0, cw).concat([{o: big, x: cw + g, y: 0, w: bw, h: Hh}]), keep);
+          }
         });
-        return R;
+        return best.R;
+      }
+      // one of each kind: a photograph or render, a drawing (a plan, section or elevation before a sketch), a model
+      function trio(all){
+        function first(f){ return all.filter(f)[0]; }
+        var photo = first(function(it){ return it.kind === 'photo'; });
+        var drawing = first(function(it){ return it.kind === 'drawing' && /\.(svg|png|webp)$/i.test(it.src); }) || first(function(it){ return it.kind === 'drawing'; });
+        var model = first(function(it){ return it.kind === 'physical'; });
+        // a project without a model (built work) gives that place to a second photograph or render, a render first
+        if(!model){
+          var others = all.filter(function(it){ return it.kind === 'photo' && it !== photo; });
+          model = others.filter(function(it){ return /render/i.test(it.src); })[0] || others[0];
+        }
+        return [photo, drawing, model].filter(Boolean);
       }
       indexer(scale, items, function(slug, instant){
-        var me = ++token, all = pictures(slug), pool = some(all, 6);
+        var me = ++token, all = pictures(slug), pool = trio(all);
         loadAll(pool).then(function(got){
           if(me !== token) return;
           fade(function(L){
@@ -966,7 +996,7 @@
     document.body.classList.add('l-' + LAY, 'lay');
     var lo = document.querySelector('.opts');
     lo.innerHTML = 'Layout' + Object.keys(LAYS).map(function(k){ return '<a href="?v=a&l=' + k + '"' + (k === LAY ? ' class="on"' : '') + '>' + k + '</a>'; }).join('');
-    if(LAY === 'ruler') lo.innerHTML = 'Pictures' + ['cluster', 'seq'].map(function(k){ return '<a href="?v=a&l=ruler&img=' + k + '"' + (k === RIMG ? ' class="on"' : '') + '>' + k + '</a>'; }).join('') + '<span style="margin-left:1.2rem;color:var(--faint)">r8</span>';
+    if(LAY === 'ruler') lo.innerHTML = 'Pictures' + ['cluster', 'seq'].map(function(k){ return '<a href="?v=a&l=ruler&img=' + k + '"' + (k === RIMG ? ' class="on"' : '') + '>' + k + '</a>'; }).join('') + '<span style="margin-left:1.2rem;color:var(--faint)">r9</span>';
     LAYS[LAY]();
   }
   else if(V === 'a') buildA();

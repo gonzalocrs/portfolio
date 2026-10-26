@@ -166,19 +166,12 @@
     .gv-mark{width:170px;font-size:10.5px}
   }
 
-/* wide-screen trials (?w=, see quiet.js) */
-.w-centre .qt-stage .p-layer,.w-frame .qt-stage .p-layer,.w-words .qt-stage .p-layer,.w-pair .qt-stage .p-layer{justify-content:center}
-.w-frame{--fw:calc(26rem + (100vh - 9rem) * 1.62)}
-.w-frame .bar,.w-frame main{width:100%;max-width:var(--fw);margin-left:auto;margin-right:auto}
-.w-pair .qt-stage .p-layer{gap:clamp(1rem,2vw,2rem)}
-.w-pair .qt-stage .p-layer img{flex:none}
-.w-pair .qt-stage .p-layer img.qw-more{width:auto;max-width:none;max-height:none}
-.qs.vis i{width:1.1rem;background:var(--ink)}
-@media (max-width:700px){ .w-pair .qt-stage .p-layer img.qw-more{display:none} }
-
-/* gallery-air trials (?s=, see quiet.js): the pictures centred in the space; hang stands them on one low line */
-.s-mat .qt-stage .p-layer,.s-area .qt-stage .p-layer,.s-hang .qt-stage .p-layer{justify-content:center}
-.s-hang .qt-stage .p-layer{align-items:flex-end;padding-bottom:10vh}
-.s-mat .qt-stage .p-layer img.qw-more,.s-area .qt-stage .p-layer img.qw-more,.s-hang .qt-stage .p-layer img.qw-more{flex:none;width:auto;max-width:none;max-height:none}
-.s-mat .qt-stage .p-layer,.s-area .qt-stage .p-layer,.s-hang .qt-stage .p-layer{gap:clamp(1rem,2vw,2rem)}
-@media (max-width:700px){ .s-hang .qt-stage .p-layer{padding-bottom:0} }
+/* the picture in the middle of the space right of the marks (home and projects; 2026-10-26, for wide screens) */
+.qt-stage .p-layer{justify-content:center}
+/* inside a project: a little smaller than the space, with a caption under it */
+.qp .qt-stage .p-layer{padding:3vh 4%}
+.qf{margin:0;height:100%;max-width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.qf img{display:block;max-width:100%;max-height:calc(100% - 2.6rem);width:auto;height:auto;cursor:inherit;pointer-events:auto}
+.qf figcaption{margin-top:.8rem;max-width:100%;text-align:center;line-height:1.3}
+.qf .plate{height:calc(100% - 2.6rem);aspect-ratio:3/2;max-width:100%}
+@media (max-width:700px){ .qp .qt-stage .p-layer{padding:0} .qf figcaption{margin-top:.5rem} }

@@ -1406,7 +1406,7 @@
   }
 
   // the intro, for quiet. The old one (the name large in the middle, its letters flipping in like an airport board, then
-  // gliding to the header) is replaced by something quieter, one of two (&intro=):
+  // gliding to the header) is replaced by something quieter. He kept line (2026-10-26); marks stays reachable by address:
   //   line   one thin line draws across where the picture will be; the picture opens up and down out of it while the
   //          marks draw in one by one; then the name
   //   marks  an empty page; the ten marks draw in one by one, top to bottom; then the name; then the picture
@@ -1469,7 +1469,7 @@
     if(LAY === 'ruler') document.getElementById('home').setAttribute('href', '?v=a&l=ruler');
     if(LAY === 'quiet'){
       document.getElementById('home').setAttribute('href', '?v=a&l=quiet');
-      lo.innerHTML = (P[Q.get('p')] ? '' : 'Intro<a href="?v=a&l=quiet&intro=line">line</a><a href="?v=a&l=quiet&intro=marks">marks</a><span style="margin-right:1.2rem"></span>') + '<a href="draft-ruler.html?v=a&l=ruler">ruler draft</a><span style="margin-left:1.2rem;color:var(--faint)">q2</span>';
+      lo.innerHTML = (P[Q.get('p')] ? '' : '<a href="?v=a&l=quiet&intro=line">replay intro</a><span style="margin-right:1.2rem"></span>') + '<a href="draft-ruler.html?v=a&l=ruler">ruler draft</a><span style="margin-left:1.2rem;color:var(--faint)">q3</span>';
       if(P[Q.get('p')]) buildQuietProject(Q.get('p')); else quietIntro(buildQuiet());
       RP = null; LAY = '';
     }

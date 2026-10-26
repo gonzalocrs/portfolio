@@ -369,6 +369,7 @@
   .qp-card .tx p.lede{font-weight:400;font-size:1rem;line-height:1.45}
   /* where the words open (&d=), once the "+" is pressed; either way the pictures keep going while the words are open
      (wheel, keys, a click on the picture, the small marks), and only the × or Esc closes them:
+     He kept beside (2026-10-26); fold stays reachable by address.
      fold    the picture closes quickly into one thin line (the intro played backwards), the line rises to the name, the
              words hang under it and the picture opens again out of a line beside them
      beside  the picture steps right; the words stand in the space it leaves, starting on the name's line
@@ -1377,7 +1378,7 @@
     var dots = [];
     for(var k = 0; k < n; k++){ (function(k){ var b = el('button', 'qs', subs); b.type = 'button'; el('i', '', b); b.setAttribute('aria-label', 'Picture ' + (k + 1)); b.addEventListener('click', function(){ go(k); }); dots.push(b); })(k); }
     // the words, behind the "+", opened one of four ways (&d=, see the CSS); on a phone always the floating card
-    var D = (Q.get('d') || 'fold').toLowerCase(); if(['fold', 'beside'].indexOf(D) === -1) D = 'fold';
+    var D = (Q.get('d') || 'beside').toLowerCase(); if(['fold', 'beside'].indexOf(D) === -1) D = 'beside';
     if(innerWidth <= 700) D = 'float';
     wrap.classList.add('qd-' + D);
     var card = el('aside', 'qp-card', st), meta = el('div', 'meta', card);
@@ -1519,8 +1520,7 @@
     if(LAY === 'ruler') document.getElementById('home').setAttribute('href', '?v=a&l=ruler');
     if(LAY === 'quiet'){
       document.getElementById('home').setAttribute('href', '?v=a&l=quiet');
-      var QD = (Q.get('d') || 'fold').toLowerCase();
-      lo.innerHTML = (P[Q.get('p')] ? 'Words' + ['fold', 'beside'].map(function(k){ return '<a href="?v=a&l=quiet&p=' + Q.get('p') + '&d=' + k + '"' + (k === QD ? ' class="on"' : '') + '>' + k + '</a>'; }).join('') + '<span style="margin-right:1.2rem"></span>' : '<a href="?v=a&l=quiet&intro=line">replay intro</a><span style="margin-right:1.2rem"></span>') + '<a href="draft-ruler.html?v=a&l=ruler">ruler draft</a><span style="margin-left:1.2rem;color:var(--faint)">q5</span>';
+      lo.innerHTML = (P[Q.get('p')] ? '' : '<a href="?v=a&l=quiet&intro=line">replay intro</a><span style="margin-right:1.2rem"></span>') + '<a href="draft-ruler.html?v=a&l=ruler">ruler draft</a><span style="margin-left:1.2rem;color:var(--faint)">q6</span>';
       if(P[Q.get('p')]) buildQuietProject(Q.get('p')); else quietIntro(buildQuiet());
       RP = null; LAY = '';
     }

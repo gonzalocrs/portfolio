@@ -409,4 +409,4 @@ def build(cfg, sources):
             sheet.rings('cut', [[[T(x, y) for x, y in r] for r in rings] for rings in _rings(sol)])
         print(f"  plan {pi + 1}: walls {len(P['wall'])}, columns {len(P['col'])}, windows {len(P['win'])}, "
               f"stairs {len(P['stair'])}, fixtures {len(P['fix'])}, closets {len(P['closet'])}")
-    return sheet.render(style.css(style.PLAN), style.PLAN_ORDER)
+    return sheet.render(style.css(style.PLAN, sheet.w), style.PLAN_ORDER)

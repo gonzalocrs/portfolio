@@ -3,6 +3,8 @@
 Turns CAD plans and elevations (DWG or DXF) into SVG drawings in the portfolio's drawing language. The output is
 vector, so it stays sharp at any size. Line widths are screen pixels (non-scaling strokes), so even the finest
 line stays at least half a pixel at the small size the site shows the drawings at.
+Because of that, a drawing shown smaller would crowd its lines and read heavier; the SVG's own media queries
+(`THIN` in style.py) step every line thinner below set shown widths, so it keeps the same light tone at any size.
 
 ```
 python tools/drawings/build.py sierra-hotel            # every drawing of a project

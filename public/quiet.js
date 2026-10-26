@@ -201,6 +201,90 @@
     if(withPics[0]){ var m0 = markOf(withPics[0]); if(m0){ m0.classList.add('cur'); cur = withPics[0]; } }
   }
 
+  // home trial ?home=roll, one at a time (2026-10-26, his follow-up: "each time i scroll one fades and another
+  // appears, don't make two appear at the same time"): the same placing (left, right or near the middle, its own size and
+  // height), but there is only ever one picture: a scroll fades it out as it rises away and the next one opens up out of
+  // its bottom edge somewhere else. The page itself doesn't move. Back with a scroll up. &flow keeps the scrolling page.
+  function buildRollOne(){
+    var IN = (Q.get('in') || 'unveil').toLowerCase(); if(['unveil', 'rise'].indexOf(IN) === -1) IN = 'unveil';
+    document.body.classList.add('qh-one', 'in-' + IN);
+    var wrap = el('div', 'qt', main), nav = el('nav', 'qt-ticks', wrap), st = el('div', 'qo-stage', wrap);
+    var marks = quietMarks(nav, null, function(s){ return quietHref(s); });
+    var seed = 11; function rnd(){ seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    function pick(a){ return a[Math.floor(rnd() * a.length)]; }
+    var seq = [], at = -1, curEl = null, lastStep = 0, lastWheel = 0, lastSide = null;
+    function size(r){ return r >= 1.6 ? pick([62, 70, 78]) : r >= 1.15 ? pick([50, 56, 62]) : r >= .85 ? pick([40, 46]) : pick([32, 38]); }
+    function side(){ var s; do { s = pick(['l', 'r', 'r', 'l', 'm']); } while(s === lastSide); lastSide = s; return s; }
+    function markOf(s){ return marks.filter(function(m){ return m.slug === s; })[0]; }
+    // where a picture stands: its width and its height on the screen are chosen once, the pixels worked out each time
+    function place(f, o){
+      var W = st.clientWidth, H = st.clientHeight, phone = innerWidth <= 700;
+      var w = Math.min(W * (phone ? o.pw : o.w) / 100, H * (phone ? .8 : .72) * o.r), h = w / o.r;
+      var room = Math.max(0, W - w), x = o.side === 'l' ? room * o.off : o.side === 'r' ? room * (1 - o.off) : room / 2 + (o.off - .1) * room * .4;
+      f.style.width = w + 'px'; f.style.left = Math.max(0, Math.min(room, x)) + 'px'; f.style.top = (Math.max(0, H - h) * o.y) + 'px';
+    }
+    function show(i, d){
+      if(!seq.length) return;
+      i = (i + seq.length) % seq.length;
+      var o = seq[i], old = curEl;
+      if(old){ old.classList.remove('in'); old.classList.add('out', d < 0 ? 'down' : 'up'); setTimeout(function(){ old.remove(); }, 1100); }
+      var f = el('figure', 'qo-fig' + (d < 0 ? ' from-up' : ''), st); f.o = o;
+      var im = el('img', '', f); im.alt = o.it.caption || P[o.slug].title; im.src = o.it.src;
+      f.addEventListener('click', function(){ location.href = quietHref(o.slug, o.k ? o.k + 1 : 0); });
+      place(f, o);
+      setTimeout(function(){ f.classList.add('in'); }, old ? 420 : 60);
+      curEl = f; at = i;
+      marks.forEach(function(m){ m.classList.toggle('cur', m.slug === o.slug); if(m.slug !== o.slug) m.style.removeProperty('--p'); });
+      var m = markOf(o.slug); if(m) m.style.setProperty('--p', ((o.k + 1) / o.n).toFixed(3));
+    }
+    function step(d){ var now = Date.now(); if(now - lastStep < 900) return; lastStep = now; show(at + d, d); }
+    var withPics = SLUGS.filter(coverOf);
+    Promise.all(withPics.map(function(s){ return loadAll(pictures(s)); })).then(function(all){
+      all.forEach(function(got, j){
+        got.forEach(function(o, k){
+          var sd = j === 0 && k === 0 ? 'm' : side();
+          seq.push({it: o.it, r: o.r, slug: withPics[j], k: k, n: got.length, side: sd, w: j === 0 && k === 0 ? (o.r >= 1.15 ? 72 : 44) : size(o.r),
+            pw: pick([78, 86, 94]), off: pick([0, .06, .12]), y: sd === 'm' ? .45 : pick([.15, .35, .55, .8])});
+        });
+      });
+      show(0, 1);
+    });
+    marks.forEach(function(m){
+      m.addEventListener('click', function(e){
+        var i = -1; seq.some(function(o, j){ if(o.slug === m.slug){ i = j; return true; } });
+        if(i < 0) return;
+        e.preventDefault(); if(i !== at){ lastStep = Date.now(); show(i, i > at ? 1 : -1); }
+      });
+    });
+    // one step per scroll: a trackpad keeps sending wheel events for a while after the fingers lift, so a step needs a
+    // short pause in the wheel since the last one, or a clearly new push
+    var lastD = 0;
+    addEventListener('wheel', function(e){
+      e.preventDefault();
+      var d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX, now = Date.now(), gap = now - lastWheel;
+      lastWheel = now;
+      var fresh = gap > 160 || Math.abs(d) > Math.abs(lastD) * 1.6 + 4;
+      lastD = d;
+      if(Math.abs(d) < 6 || !fresh) return;
+      step(d > 0 ? 1 : -1);
+    }, {passive: false});
+    addEventListener('keydown', function(e){
+      if(['ArrowDown', 'ArrowRight', 'PageDown', ' '].indexOf(e.key) > -1){ step(1); e.preventDefault(); }
+      if(['ArrowUp', 'ArrowLeft', 'PageUp'].indexOf(e.key) > -1){ step(-1); e.preventDefault(); }
+      if(e.key === 'Enter' && curEl) curEl.click();
+    });
+    var sy = null, sx = null;
+    st.addEventListener('touchstart', function(e){ sy = e.touches[0].clientY; sx = e.touches[0].clientX; }, {passive: true});
+    st.addEventListener('touchmove', function(e){ e.preventDefault(); }, {passive: false});
+    st.addEventListener('touchend', function(e){
+      if(sy == null) return;
+      var dy = e.changedTouches[0].clientY - sy, dx = e.changedTouches[0].clientX - sx; sy = sx = null;
+      var d = Math.abs(dy) > Math.abs(dx) ? dy : dx;
+      if(Math.abs(d) > 35) step(d < 0 ? 1 : -1);
+    }, {passive: true});
+    addEventListener('resize', function(){ if(curEl) place(curEl, curEl.o); });
+  }
+
   // a project: the same marks, its own opened into one mark per picture; one picture at a time, as large as fits.
   // A click on the right half of the picture goes on, the left half back (the pointer shows which); the wheel,
   // arrow keys and a swipe do the same; past the last picture comes the next project. "+" shows the words.
@@ -383,7 +467,7 @@
     // old addresses of a project on the home page (?show= / ?open=) go to its page
     var old = Q.get('show') || Q.get('open');
     if(old && P[old]){ location.replace(quietHref(old)); return; }
-    if(Q.get('home') === 'roll') buildRoll();
+    if(Q.get('home') === 'roll') (Q.has('flow') ? buildRoll : buildRollOne)();
     else quietIntro(buildQuiet());
   }
 })();

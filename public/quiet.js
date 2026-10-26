@@ -508,7 +508,7 @@
       // the group, centred in the space: the ring; each word the same small step out from the ring, level with its
       // stitch (top right and bottom right at 45°, right in the middle), so the three follow the ring's curve; a wider
       // step, then the fields. The ring is 70 of the mark's 200 units (logo-works.js RING)
-      var rem = parseFloat(getComputedStyle(document.documentElement).fontSize), ring = .35, g1 = 1.1 * rem, gap = 3.5 * rem;
+      var rem = parseFloat(getComputedStyle(document.documentElement).fontSize), ring = .35, g1 = 2.2 * rem, gap = 3.5 * rem;
       var ANG = [-45, 0, 45], fw = flds.offsetWidth;
       // how far right of the ring's centre the words reach, for a ring of radius r
       function reach(r){ return Math.max.apply(null, words.map(function(b, i){ return r * Math.cos(ANG[i] * Math.PI / 180) + g1 + b.offsetWidth; })); }

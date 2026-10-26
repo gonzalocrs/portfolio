@@ -418,10 +418,10 @@
     var at = -1, lock = 0;
     // how the page shows there is more above or below (test, 2026-10-26; the pictures go by vertically, so no side
     // arrows): &nav=
-    //   chev  a thin chevron centred over the picture area (back) and one under it (on); each hides at its end (default)
+    //   chev  a thin chevron centred over the picture area (back) and one under it (on); each hides at its end
     //   hint  only on arrival: a short line drawing down under the picture with "Scroll"; gone after the first step
-    //   none  nothing but the small marks in the index
-    var NAV = (Q.get('nav') || 'chev').toLowerCase(); if(['chev', 'hint', 'none'].indexOf(NAV) === -1) NAV = 'chev';
+    //   none  nothing but the small marks in the index (his pick, 2026-10-26)
+    var NAV = (Q.get('nav') || 'none').toLowerCase(); if(['chev', 'hint', 'none'].indexOf(NAV) === -1) NAV = 'none';
     wrap.classList.add('qnav-' + NAV);
     var up = null, dn = null, hint = null;
     if(NAV === 'chev'){

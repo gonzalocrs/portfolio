@@ -6,8 +6,10 @@ https://portfolio.gonzalo-crs.workers.dev. GitHub: `gonzalocrs/portfolio`, branc
 
 ## Layout
 
-- `public/index.html`: home (title index + preview collage, intro animation of the signature).
-- `public/project.html` + `public/project.js`: one template for every project, filled from `?p=<slug>`.
+- `public/index.html` + `public/project.html` (`?p=<slug>`, optional `&i=<n>`): since 2026-10-26 both run `public/quiet.js` +
+  `public/quiet.css` (the "quiet" design: a column of short marks as the index, one picture at a time, the words behind a
+  "+", a line intro on the home page; `?intro` replays it). `project.js`, `museum.js/css` and `embed.js` belong to the
+  previous design (branch `backup/live-2026-10-26`) and are no longer loaded by these two pages.
 - `public/projects.js`: **all project content** (one entry per project). This is the file you edit most.
 - `public/about.html`, `contact.html`, `contact.js`, `signature.js`: other pages.
 - `public/img/<slug>/`: images for each project.

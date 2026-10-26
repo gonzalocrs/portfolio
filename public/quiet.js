@@ -416,14 +416,26 @@
     plus.addEventListener('click', function(e){ e.stopPropagation(); toggle(); });
     card.addEventListener('click', function(e){ e.stopPropagation(); });
     var at = -1, lock = 0;
-    // two small arrows (test, 2026-10-26, in place of the arrow-shaped pointer), a short step out from the picture's own
-    // edges, at its middle; none before the first picture or after the last
-    function arrow(f, d){
-      var b = el('button', 'qn ' + (d < 0 ? 'prev' : 'next'), f); b.type = 'button';
-      b.setAttribute('aria-label', d < 0 ? 'Previous picture' : 'Next picture');
-      b.innerHTML = d < 0 ? '<svg viewBox="0 0 14 28" width="14" height="28"><path d="M12 2L2 14l10 12"/></svg>' : '<svg viewBox="0 0 14 28" width="14" height="28"><path d="M2 2l10 12L2 26"/></svg>';
-      b.addEventListener('click', function(e){ e.stopPropagation(); go(at + d); });
-      return b;
+    // how the page shows there is more above or below (test, 2026-10-26; the pictures go by vertically, so no side
+    // arrows): &nav=
+    //   chev  a thin chevron centred over the picture area (back) and one under it (on); each hides at its end (default)
+    //   hint  only on arrival: a short line drawing down under the picture with "Scroll"; gone after the first step
+    //   none  nothing but the small marks in the index
+    var NAV = (Q.get('nav') || 'chev').toLowerCase(); if(['chev', 'hint', 'none'].indexOf(NAV) === -1) NAV = 'chev';
+    wrap.classList.add('qnav-' + NAV);
+    var up = null, dn = null, hint = null;
+    if(NAV === 'chev'){
+      up = el('button', 'qv up', st); dn = el('button', 'qv dn', st); up.type = dn.type = 'button';
+      up.setAttribute('aria-label', 'Previous picture'); dn.setAttribute('aria-label', 'Next picture');
+      up.innerHTML = '<svg viewBox="0 0 28 12" width="28" height="12"><path d="M2 11L14 1l12 10"/></svg>';
+      dn.innerHTML = '<svg viewBox="0 0 28 12" width="28" height="12"><path d="M2 1l12 10L26 1"/></svg>';
+      up.addEventListener('click', function(e){ e.stopPropagation(); go(at - 1); });
+      dn.addEventListener('click', function(e){ e.stopPropagation(); go(at + 1); });
+    }
+    if(NAV === 'hint' && n > 1){
+      hint = el('button', 'qv-hint', st); hint.type = 'button';
+      el('span', 'k', hint, 'Scroll'); el('i', '', hint);
+      hint.addEventListener('click', function(e){ e.stopPropagation(); go(at + 1); });
     }
     function go(k){
       // a project ends at its last picture (his call, 2026-10-26): no scrolling on into the next one; the marks go there
@@ -438,18 +450,14 @@
         if(it){
           var im = el('img', '', f); im.alt = it.caption || p.title; im.src = it.src;
           var cap = el('figcaption', 'k', f, it.caption || kindOf(it));
-          var pa = k > 0 ? arrow(f, -1) : null, na = k < n - 1 ? arrow(f, 1) : null;
-          var fit = function(){
-            cap.style.width = im.offsetWidth ? im.offsetWidth + 'px' : '';
-            var y = im.offsetTop + im.offsetHeight / 2;
-            if(pa){ pa.style.left = im.offsetLeft + 'px'; pa.style.top = y + 'px'; }
-            if(na){ na.style.left = (im.offsetLeft + im.offsetWidth) + 'px'; na.style.top = y + 'px'; }
-          };
+          var fit = function(){ cap.style.width = im.offsetWidth ? im.offsetWidth + 'px' : ''; };
           im.addEventListener('load', fit); f.fit = fit;
         }
         else el('div', 'plate', f, 'In preparation');
       }, first);
       dots.forEach(function(d, j){ d.classList.toggle('cur', j === k); });
+      if(up){ up.classList.toggle('off', k === 0); dn.classList.toggle('off', k === n - 1); }
+      if(hint && !first) hint.classList.add('off');
     }
     st.addEventListener('click', function(e){
       if(isOpen() && D === 'float'){ toggle(false); return; }

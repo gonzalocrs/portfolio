@@ -116,9 +116,10 @@
     var marks = quietMarks(nav, null, function(s){ return quietHref(s); });
     var withPics = SLUGS.filter(coverOf), cur = null, list = [], at = 0, hold = false, timer = null, lock = 0;
     function markOf(s){ return marks.filter(function(m){ return m.slug === s; })[0]; }
+    var shownL = null;
     function paint(instant){
       var it = list[at], s = cur;
-      fade(function(L){
+      shownL = fade(function(L){
         var e = it ? el('img', '', L) : el('div', 'plate', L, 'In preparation');
         if(it){ e.alt = P[s].title; e.src = it.src; }
         e.addEventListener('click', function(){ location.href = quietHref(s, at ? at + 1 : 0); });
@@ -133,8 +134,10 @@
       paint(instant);
       clearInterval(timer); timer = setInterval(tick, 3200);
     }
+    // with pair, the pictures already beside it are skipped: the next step starts after the last one on screen
     function tick(){
-      if(at + 1 < list.length){ at++; paint(); return; }
+      var seen = shownL && shownL.qwSeen != null ? Math.max(at, shownL.qwSeen) : at;
+      if(seen + 1 < list.length){ at = seen + 1; paint(); return; }
       if(hold){ at = 0; paint(); return; }
       step(1);
     }

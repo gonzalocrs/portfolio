@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gonzalo Cáceres — Architecture</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@200;300;400;500;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="museum.css">
+<!--
+  Home page trials after fernando-garrido.com, crossed with the site as it is (not linked from anywhere):
+    mockups.html?v=a   Numbered index: every project at once in one numbered list (his 01..10), beside one large
+                       picture that changes with the title pointed at (the live home, D, otherwise as it is)
+    mockups.html?v=b   Field: all the pictures of all the work at one small height, flowing in rows like a sheet,
+                       under one numbered line of the project names; pointing at either picks out that project
+    mockups.html?v=c   Strip: one picture per project in one tall row, run sideways. A project opens as his project
+                       pages do: its pictures first in one row at one height, then the name, the credits and the text
+    mockups.html?v=c&p=<slug>  a project in C
+  A and B open a project in the museum visit, as the live site does. Pictures are never cropped.
+-->
+<style>
+  :root{
+    --paper:#ffffff;
+    --ink:#0f1216;
+    --rule:#d8d6d1;
+    --mute:#7b7d80;
+    --faint:#b9bbbe;
+    --plate:#f1f0ed;
+    --live:var(--ink);
+    --font:"Archivo","Helvetica Neue",Arial,sans-serif;
+    --mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
+    --gut:clamp(1rem,4vw,2.5rem);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-tap-highlight-color:transparent}
+  ::selection{background:rgba(15,18,22,.12)}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.4;
+    -webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column;
+  }
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+  :focus-visible{outline:2px solid var(--live);outline-offset:3px}
+  img{display:block}
+
+  /* ---------- top bar and wordmark, as on the live site ---------- */
+  .bar{
+    display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1.1rem var(--gut);
+    font-family:var(--mono);font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;
+  }
+  .bar nav{display:flex;align-items:center;gap:1.25rem}
+  .bar a:hover{color:var(--live)}
+  .gv-mark{display:block;width:230px;font-family:'Archivo',sans-serif;font-weight:300;font-size:14px;color:var(--ink);text-decoration:none;text-transform:none;letter-spacing:0}
+  .gv-mark__line{display:flex;justify-content:space-between;line-height:1}
+  .gv-mark__gap{flex:0 0 .8em}
+  .gv-mark__line + .gv-mark__line > span:first-child{margin-left:.047em}
+  .gv-mark__line + .gv-mark__line > span:last-child{margin-right:.046em}
+  .gv-mark__flip{display:inline-block;transform:scaleX(-1);transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+  .gv-mark:hover .gv-mark__flip,.gv-mark:focus-visible .gv-mark__flip{transform:scaleX(1)}
+
+  main{flex:1;display:flex;flex-direction:column;min-height:0}
+  footer{
+    display:flex;justify-content:space-between;gap:1rem;padding:1.1rem var(--gut);
+    font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.03em;color:var(--mute);
+  }
+  .opts a{margin-left:.7rem}
+  .opts a.on{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+  .opts a:hover{color:var(--ink)}
+
+  /* the small things every option shares */
+  .n{font-family:var(--mono);font-size:.66rem;font-weight:400;letter-spacing:.04em;color:var(--mute)}
+  .k{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute)}
+  .plate{background:var(--plate);display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+
+  /* =================== A: numbered index =================== */
+  .a{flex:1;display:grid;grid-template-columns:minmax(15rem,21rem) 1fr;gap:clamp(1.5rem,4vw,4rem);
+     padding:clamp(2rem,7vh,4.5rem) var(--gut) 0;min-height:0}
+  .a-index{list-style:none;margin:0;padding:0;align-self:start}
+  .a-index .grp{margin:1.6rem 0 .45rem}
+  .a-index .grp:first-child{margin-top:0}
+  .a-index a{display:grid;grid-template-columns:2.1rem 1fr;align-items:baseline;padding:.16rem 0;color:var(--ink);transition:color .35s ease}
+  .a-index b{font-weight:800;font-size:clamp(1.15rem,1.45vw,1.4rem);letter-spacing:-.02em;line-height:1.15}
+  .a-index.pointing a{color:var(--faint)}
+  .a-index.pointing a .n{color:var(--faint)}
+  .a-index.pointing a.cur,.a-index.pointing a.cur .n{color:var(--ink)}
+  .a-stage{position:relative;min-height:0}
+  .a-layer{position:absolute;inset:0;opacity:0;transition:opacity .9s ease;pointer-events:none}
+  .a-layer.on{opacity:1;pointer-events:auto}
+  .a-box{position:absolute;left:0;right:0;top:0;bottom:4.2rem;display:flex;align-items:flex-end;cursor:pointer}
+  .a-box img{max-width:100%;max-height:100%;object-fit:contain}
+  .a-box .plate{width:min(100%,calc((100vh - 16rem) * 1.5));aspect-ratio:3/2;max-height:100%}
+  .a-cap{position:absolute;left:0;right:0;bottom:0;height:4.2rem;display:flex;align-items:baseline;gap:1rem;padding-top:1rem;cursor:pointer}
+  .a-cap b{font-weight:800;font-size:clamp(1.15rem,1.5vw,1.35rem);letter-spacing:-.02em;line-height:1}
+
+  /* =================== B: field =================== */
+  .b-line{display:flex;flex-wrap:wrap;gap:.35rem 1.7rem;padding:clamp(1.6rem,5vh,3rem) var(--gut) 0;max-width:72rem}
+  .b-line a{display:inline-flex;align-items:baseline;gap:.45rem;transition:color .3s ease}
+  .b-line b{font-weight:800;font-size:clamp(1rem,1.2vw,1.15rem);letter-spacing:-.015em}
+  .b-line a.empty{color:var(--faint)}
+  .b-line a.empty .n{color:var(--faint)}
+  body.pointing .b-line a{color:var(--faint)}
+  body.pointing .b-line a .n{color:var(--faint)}
+  body.pointing .b-line a.cur,body.pointing .b-line a.cur .n{color:var(--ink)}
+  .b-field{display:flex;flex-wrap:wrap;align-items:flex-end;gap:2.6rem 1.6rem;padding:clamp(2rem,6vh,3.5rem) var(--gut) 3rem}
+  .b-pic{display:block;height:clamp(140px,23vh,250px);transition:opacity .45s ease}
+  .b-pic img{height:100%;width:auto}
+  body.pointing .b-pic{opacity:.14}
+  body.pointing .b-pic.cur{opacity:1}
+
+  /* =================== C: strip =================== */
+  .c-strip{display:flex;align-items:flex-end;gap:clamp(1.2rem,2.2vw,2.2rem);overflow-x:auto;overflow-y:hidden;
+    padding:0 var(--gut);scrollbar-width:none;overscroll-behavior-x:contain}
+  .c-strip::-webkit-scrollbar{display:none}
+  .c-item{flex:0 0 auto;margin:0;cursor:pointer}
+  .c-item .c-box{height:var(--h);display:flex;align-items:flex-end}
+  .c-item img{height:100%;width:auto}
+  .c-item .plate{height:100%;aspect-ratio:3/2}
+  .c-item figcaption{display:flex;align-items:baseline;gap:.7rem;padding-top:.9rem;height:3.2rem;white-space:nowrap}
+  .c-item figcaption b{font-weight:800;font-size:clamp(1.05rem,1.3vw,1.25rem);letter-spacing:-.02em}
+  .c-home{flex:1;display:flex;flex-direction:column;justify-content:center;padding-bottom:1.2rem;--h:clamp(260px,46vh,520px)}
+  .c-foot{display:flex;align-items:center;gap:1rem;padding:.4rem var(--gut) 0}
+  .c-rail{position:relative;flex:1;height:1px;background:var(--rule)}
+  .c-rail span{position:absolute;top:-.5px;height:2px;background:var(--ink);left:0;width:10%;transition:left .15s linear}
+  .c-arrow{width:1.6rem;height:1.6rem;display:flex;align-items:center;justify-content:center;color:var(--mute);transition:color .2s,opacity .3s}
+  .c-arrow:hover{color:var(--ink)}
+  .c-arrow[disabled]{opacity:.25;cursor:default}
+  .c-arrow svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.3;fill:none}
+
+  /* a project in C: the pictures first, then the words */
+  .cp{padding-top:clamp(1rem,3vh,2rem)}
+  .cp .c-strip{--h:clamp(260px,56vh,640px);cursor:default}
+  .cp .c-strip .c-item{cursor:zoom-in}
+  .cp .c-item figcaption{display:none}
+  .cp-text{display:grid;grid-template-columns:minmax(14rem,21rem) minmax(0,36rem);gap:clamp(2rem,6vw,6rem);
+    padding:clamp(2rem,6vh,3.5rem) var(--gut) 1rem}
+  .cp-head h1{display:flex;align-items:baseline;gap:.8rem;margin:0;font-weight:800;font-size:clamp(1.6rem,2.3vw,2.2rem);letter-spacing:-.025em;line-height:1.05}
+  .cp-head .k{margin:.7rem 0 1.6rem}
+  .cp-head p.cr{margin:0 0 .3rem;font-weight:300;font-size:.95rem}
+  .cp-head p.cr b{font-weight:800}
+  .cp-body p{margin:0 0 1.1rem;font-weight:300;font-size:1rem;line-height:1.6}
+  .cp-body p.lede{font-weight:400;font-size:1.15rem;line-height:1.45}
+  .cp-next{display:flex;align-items:baseline;gap:.8rem;justify-content:flex-end;padding:3.5rem var(--gut) 1rem}
+  .cp-next .k{color:var(--mute)}
+  .cp-next b{font-weight:800;font-size:1.25rem;letter-spacing:-.02em}
+  .cp-next:hover .k{color:var(--ink)}
+  .zoom{position:fixed;inset:0;z-index:80;background:var(--paper);display:flex;align-items:center;justify-content:center;padding:2rem;cursor:zoom-out}
+  .zoom img{max-width:100%;max-height:100%;object-fit:contain}
+
+  @media (max-width:900px){
+    .gv-mark{width:170px;font-size:10.5px}
+    .a{grid-template-columns:1fr;padding-top:1rem;gap:1.5rem}
+    .a-stage{order:-1;height:62vw;min-height:220px}
+    .a-box{bottom:3.4rem}
+    .a-cap{height:3.4rem}
+    .b-pic{height:clamp(96px,20vw,150px)}
+    .b-field{gap:1.6rem 1rem}
+    /* phone: one picture per screen width, whole, swiped one at a time */
+    .c-strip{scroll-snap-type:x mandatory;scroll-padding:0 var(--gut);gap:1rem;align-items:flex-start}
+    .c-item{scroll-snap-align:start}
+    .c-item .c-box{height:auto;width:calc(100vw - 2 * var(--gut));aspect-ratio:4/3;align-items:flex-end}
+    .cp .c-item .c-box{align-items:center}
+    .c-item img{width:auto;height:auto;max-width:100%;max-height:100%}
+    .c-item .plate{width:100%;height:auto}
+    .cp-text{grid-template-columns:1fr;gap:1.5rem}
+    .cp-next{justify-content:flex-start}
+  }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <a href="/" class="gv-mark" id="home">
+    <span class="gv-mark__line">
+      <span>G</span><span>O</span><span class="gv-mark__flip">N</span><span>Z</span><span>A</span><span>L</span><span>O</span>
+      <span class="gv-mark__gap">&nbsp;</span>
+      <span>C</span><span>Á</span><span>C</span><span>E</span><span class="gv-mark__flip">R</span><span>E</span><span>S</span>
+    </span>
+    <span class="gv-mark__line">
+      <span>V</span><span>A</span><span class="gv-mark__flip">L</span><span>C</span><span>Á</span><span>R</span><span>C</span><span>E</span><span>L</span>
+    </span>
+  </a>
+  <nav><a href="about.html">About</a></nav>
+</header>
+
+<main id="main"></main>
+
+<footer>
+  <span>Architecture and development. Based in New York.</span>
+  <span class="opts">Mockup<a href="?v=a" data-v="a">A</a><a href="?v=b" data-v="b">B</a><a href="?v=c" data-v="c">C</a></span>
+</footer>
+
+<script src="projects.js"></script>
+<script src="signature.js"></script>
+<script src="museum.js"></script>
+<script>
+(function(){
+  var P = window.PROJECTS || {}, SLUGS = Object.keys(P);
+  var Q = new URLSearchParams(location.search);
+  var V = (Q.get('v') || 'a').toLowerCase(); if(!/^[abc]$/.test(V)) V = 'a';
+  var PAGE = V === 'c' && P[Q.get('p')] ? Q.get('p') : null;
+  var main = document.getElementById('main');
+  document.body.classList.add('v-' + V);
+  document.querySelectorAll('.opts a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-v') === V); });
+  document.getElementById('home').setAttribute('href', '?v=' + V);
+
+  // ---- the project material, the same way the museum visit reads it ----
+  function web(src){
+    if(src === 'img/anticlastic-roof-structure/hero.jpg') return 'img/anticlastic-roof-structure/hero-web.jpg';
+    return src.replace(/\/physical\/(?!web\/)([^\/]+)$/, '/physical/web/$1');
+  }
+  // the small copy next to a photo (tools/thumbs.sh); drawings are already light
+  function thumb(src){ return /\.jpe?g$/i.test(src) ? src.replace(/\/physical\/web\//, '/physical/').replace(/\/([^\/]+)\.jpe?g$/i, '/thumbs/$1.jpg') : src; }
+  function isDrawing(it){ return it.drawing || /\.(svg|png|webp)$/i.test(it.src); }
+  function flat(list){ var o = []; (list || []).forEach(function(it){ Array.isArray(it) ? o.push.apply(o, it) : o.push(it); }); return o; }
+  function pictures(slug){
+    var p = P[slug], grid = flat(p.grid), g = p.gallery || {}, seen = {}, out = [];
+    var drawings = grid.filter(isDrawing), physical = grid.filter(function(it){ return !isDrawing(it) && /\/physical\//.test(it.src); });
+    var photos = grid.filter(function(it){ return !isDrawing(it) && !/\/physical\//.test(it.src); });
+    if(!grid.length){ drawings = g.drawings || []; physical = g.physical || []; photos = g.photos || []; }
+    if(!physical.length && g.physical) physical = g.physical;
+    [p.hero ? [{src: p.hero}] : [], p.diagram && p.diagram.src ? [p.diagram] : [], drawings, physical, photos].forEach(function(list){
+      list.forEach(function(it){
+        var s = it.src && web(it.src);
+        if(!s || seen[s]) return; seen[s] = 1;
+        out.push({src: s, drawing: isDrawing(it), caption: it.caption || ''});
+      });
+    });
+    return out;
+  }
+  function coverOf(slug){ var p = P[slug], all = pictures(slug); return all.length ? (p.cover ? {src: p.cover} : all[0]) : null; }
+  function el(tag, cls, parent, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; if(parent) parent.appendChild(e); return e; }
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  function num(slug){ return pad(SLUGS.indexOf(slug) + 1); }
+  function visit(slug, from, src){
+    if(window.gcMuseum) gcMuseum.open(slug, from && from.getBoundingClientRect(), src);
+    else location.href = '/?visit=' + slug;
+  }
+
+  // =================== A: numbered index ===================
+  function buildA(){
+    var wrap = el('div', 'a', main), list = el('ol', 'a-index', wrap), stage = el('div', 'a-stage', wrap);
+    var links = [], group = null;
+    SLUGS.forEach(function(slug){
+      var p = P[slug];
+      if(p.group !== group){ group = p.group; el('li', 'grp k', list, group); }
+      var li = el('li', '', list), a = el('a', '', li);
+      a.href = '/?visit=' + slug; a.slug = slug;
+      el('span', 'n', a, num(slug)); el('b', '', a, p.title);
+      links.push(a);
+    });
+    var layers = [0, 1].map(function(){
+      var L = el('div', 'a-layer', stage);
+      L.box = el('div', 'a-box', L); L.cap = el('div', 'a-cap', L);
+      L.t = el('b', '', L.cap); L.k = el('span', 'k', L.cap);
+      L.addEventListener('click', function(){ if(L.slug) visit(L.slug, L.box.firstChild, L.src); });
+      return L;
+    });
+    var cur = null, timer = null;
+    function show(slug, instant){
+      if(slug === cur) return;
+      cur = slug;
+      links.forEach(function(a){ a.classList.toggle('cur', a.slug === slug); });
+      var on = layers[0].classList.contains('on') ? layers[0] : layers[1];
+      var L = instant ? on : (on === layers[0] ? layers[1] : layers[0]);
+      var c = coverOf(slug), p = P[slug];
+      L.slug = slug; L.src = c && c.src; L.box.innerHTML = '';
+      if(c){ var img = el('img', '', L.box); img.alt = p.title; img.src = c.src; }
+      else el('div', 'plate', L.box, 'In preparation');
+      L.t.textContent = p.title; L.k.textContent = p.kicker || '';
+      if(L !== on){ on.classList.remove('on'); }
+      L.classList.add('on');
+    }
+    // like the live home: it moves on by itself every few seconds while nothing is pointed at
+    var withPics = SLUGS.filter(coverOf);
+    function auto(){
+      clearInterval(timer);
+      timer = setInterval(function(){ var i = withPics.indexOf(cur); show(withPics[(i + 1) % withPics.length]); }, 4500);
+    }
+    links.forEach(function(a){
+      a.addEventListener('mouseenter', function(){ clearInterval(timer); list.classList.add('pointing'); show(a.slug); });
+      a.addEventListener('focus', function(){ list.classList.add('pointing'); show(a.slug); });
+      a.addEventListener('click', function(e){ e.preventDefault(); visit(a.slug, null, null); });
+    });
+    list.addEventListener('mouseleave', function(){ auto(); });
+    list.classList.add('pointing');
+    show(withPics[0], true);
+    auto();
+  }
+
+  // =================== B: field ===================
+  function buildB(){
+    var line = el('nav', 'b-line', main), field = el('div', 'b-field', main), names = {}, pics = [];
+    SLUGS.forEach(function(slug){
+      var p = P[slug], all = pictures(slug), a = el('a', all.length ? '' : 'empty', line);
+      a.href = '/?visit=' + slug;
+      el('span', 'n', a, num(slug)); el('b', '', a, p.title);
+      names[slug] = a;
+      a.addEventListener('click', function(e){ e.preventDefault(); if(all.length) visit(slug, null, null); });
+      a.addEventListener('mouseenter', function(){ if(all.length) point(slug); });
+      a.addEventListener('mouseleave', function(){ point(null); });
+      all.forEach(function(it){
+        var b = el('a', 'b-pic', field), img = el('img', '', b);
+        b.href = '/?visit=' + slug; b.slug = slug;
+        img.alt = p.title; img.loading = 'lazy'; img.src = thumb(it.src);
+        img.onerror = function(){ img.onerror = null; img.src = it.src; };
+        b.addEventListener('mouseenter', function(){ point(slug); });
+        b.addEventListener('mouseleave', function(){ point(null); });
+        b.addEventListener('click', function(e){ e.preventDefault(); visit(slug, img, it.src); });
+        pics.push(b);
+      });
+    });
+    function point(slug){
+      document.body.classList.toggle('pointing', !!slug);
+      pics.forEach(function(b){ b.classList.toggle('cur', b.slug === slug); });
+      Object.keys(names).forEach(function(k){ names[k].classList.toggle('cur', k === slug); });
+    }
+  }
+
+  // =================== C: strip ===================
+  // one row at one height, run sideways: by a sideways swipe, the wheel (on the home row), the arrows or the keys
+  function railFor(strip, parent, wheel){
+    var foot = el('div', 'c-foot', parent);
+    var prev = el('button', 'c-arrow', foot), rail = el('div', 'c-rail', foot), next = el('button', 'c-arrow', foot);
+    prev.innerHTML = '<svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg>'; prev.setAttribute('aria-label', 'Previous');
+    next.innerHTML = '<svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5"/></svg>'; next.setAttribute('aria-label', 'Next');
+    var bar = el('span', '', rail);
+    function items(){ return Array.prototype.slice.call(strip.children); }
+    function go(dir){
+      var x = strip.scrollLeft, pad = parseFloat(getComputedStyle(strip).paddingLeft), to = null;
+      var list = items().map(function(i){ return i.offsetLeft - pad; });
+      if(dir > 0){ to = list.filter(function(o){ return o > x + 4; })[0]; if(to == null) to = strip.scrollWidth; }
+      else { to = list.filter(function(o){ return o < x - 4; }).pop(); if(to == null) to = 0; }
+      strip.scrollTo({left: to, behavior: 'smooth'});
+    }
+    prev.addEventListener('click', function(){ go(-1); });
+    next.addEventListener('click', function(){ go(1); });
+    function sync(){
+      var max = strip.scrollWidth - strip.clientWidth, w = strip.clientWidth / strip.scrollWidth;
+      bar.style.width = (w * 100) + '%';
+      bar.style.left = (max > 0 ? strip.scrollLeft / max * (1 - w) * 100 : 0) + '%';
+      prev.disabled = strip.scrollLeft < 4; next.disabled = strip.scrollLeft > max - 4;
+      foot.style.visibility = max > 4 ? 'visible' : 'hidden';
+    }
+    strip.addEventListener('scroll', sync, {passive: true});
+    window.addEventListener('resize', sync);
+    strip.querySelectorAll('img').forEach(function(i){ i.addEventListener('load', sync); });
+    if(wheel) strip.addEventListener('wheel', function(e){
+      if(Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+      e.preventDefault(); strip.scrollLeft += e.deltaY;
+    }, {passive: false});
+    document.addEventListener('keydown', function(e){
+      if(document.querySelector('.zoom') || (window.gcMuseum && gcMuseum.isOpen())) return;
+      if(e.key === 'ArrowRight'){ go(1); e.preventDefault(); }
+      if(e.key === 'ArrowLeft'){ go(-1); e.preventDefault(); }
+    });
+    sync();
+  }
+  function buildC(){
+    var home = el('div', 'c-home', main), strip = el('div', 'c-strip', home);
+    SLUGS.forEach(function(slug){
+      var p = P[slug], c = coverOf(slug), f = el('figure', 'c-item', strip), box = el('div', 'c-box', f);
+      if(c){ var img = el('img', '', box); img.alt = p.title; img.src = c.src; }
+      else el('div', 'plate', box, 'In preparation');
+      var cap = el('figcaption', '', f);
+      el('span', 'n', cap, num(slug)); el('b', '', cap, p.title); el('span', 'k', cap, p.kicker || '');
+      f.addEventListener('click', function(){ location.href = '?v=c&p=' + slug; });
+    });
+    railFor(strip, home, true);
+  }
+  function buildProject(slug){
+    var p = P[slug], wrap = el('article', 'cp', main), strip = el('div', 'c-strip', wrap), all = pictures(slug);
+    if(!all.length){ var f0 = el('figure', 'c-item', strip); el('div', 'plate', el('div', 'c-box', f0), 'In preparation'); }
+    all.forEach(function(it){
+      var f = el('figure', 'c-item', strip), img = el('img', '', el('div', 'c-box', f));
+      img.alt = it.caption || p.title; img.src = it.src;
+      f.addEventListener('click', function(){
+        var z = el('div', 'zoom', document.body), zi = el('img', '', z); zi.src = it.src; zi.alt = img.alt;
+        z.addEventListener('click', function(){ z.remove(); });
+      });
+    });
+    railFor(strip, wrap, false);
+    // the words after the pictures: the name, the place and year, the credits (names bold), then his text as it is
+    var text = el('div', 'cp-text', wrap), head = el('div', 'cp-head', text), body = el('div', 'cp-body', text);
+    var h = el('h1', '', head); el('span', 'n', h, num(slug)); el('span', '', h, p.title);
+    el('p', 'k', head, p.kicker || '');
+    (p.credits || []).forEach(function(r){
+      if(r[0] === 'Year') return;
+      var c = el('p', 'cr', head); el('b', '', c, r[0]); c.appendChild(document.createTextNode('  ' + r[1]));
+    });
+    if(p.lede) el('p', 'lede', body, p.lede);
+    (p.text ? (Array.isArray(p.text) ? p.text : [p.text]) : []).forEach(function(t){ el('p', '', body, t); });
+    var i = SLUGS.indexOf(slug), nx = SLUGS[(i + 1) % SLUGS.length];
+    var n = el('a', 'cp-next', main); n.href = '?v=c&p=' + nx;
+    el('span', 'k', n, 'Next project'); el('span', 'n', n, num(nx)); el('b', '', n, P[nx].title);
+    document.title = p.title + ' — Gonzalo Cáceres';
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ var z = document.querySelector('.zoom'); if(z) z.remove(); } });
+  }
+
+  if(V === 'a') buildA();
+  else if(V === 'b') buildB();
+  else if(PAGE) buildProject(PAGE);
+  else buildC();
+})();
+</script>
+</body>
+</html>

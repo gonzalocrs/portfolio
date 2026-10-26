@@ -253,6 +253,27 @@
   .rp-fig img{display:block;max-width:100%;max-height:86vh;width:auto;height:auto}
   .rp-fig figcaption{margin-top:.7rem}
   .rp-fig .plate{width:100%;aspect-ratio:3/2}
+  /* yard (after his Yard Grotesque page): the index on the left, the pictures then the words on the right */
+  .yd{display:grid;grid-template-columns:minmax(14rem,19rem) 1fr;gap:clamp(1.5rem,4vw,4rem);padding:clamp(1rem,3vh,2rem) var(--gut) 0}
+  .yd-col{position:sticky;top:1.5rem;align-self:start;height:calc(100vh - 8.5rem);display:flex;flex-direction:column}
+  .yd-col .ru-scale .tr{color:inherit}
+  .yd-col .ab{padding:1.1rem 0 .2rem 1rem}
+  .yd-col .ab span:last-child{font-size:clamp(1.05rem,1.3vw,1.25rem)}
+  .yd-main{min-width:0;padding-bottom:3rem}
+  .yd-sheet{display:flex;flex-direction:column;gap:14px}
+  .yd-row{display:flex;gap:14px}
+  .yd-row img{display:block;flex:none;cursor:zoom-in}
+  .yd-sheet > .plate{width:100%;aspect-ratio:3/1}
+  .yd-text{max-width:34rem;margin-top:clamp(2.5rem,7vh,4rem)}
+  .yd-text h1{margin:0 0 .9rem;font-weight:800;font-size:clamp(1.3rem,1.7vw,1.6rem);letter-spacing:-.025em;line-height:1.1}
+  .yd-cr{margin-bottom:1.3rem}
+  .yd-cr p{margin:0 0 .15rem;font-weight:300;font-size:.92rem}
+  .yd-cr b{font-weight:800}
+  .yd-text > p{margin:0 0 1rem;font-weight:300;font-size:.98rem;line-height:1.6}
+  .yd-text > p.lede{font-weight:400;font-size:1.05rem;line-height:1.5}
+  .yd-text > p.yd-year{font-weight:300;margin-top:1.4rem}
+  .yd-next{margin-top:3.5rem}
+  .yd-next span:last-child{font-size:clamp(1.05rem,1.3vw,1.25rem)}
   /* =================== B: field =================== */
   .b-line{display:flex;flex-wrap:wrap;gap:.35rem 1.7rem;padding:clamp(1.6rem,5vh,3rem) var(--gut) 0;max-width:72rem}
   .b-line a{display:inline-flex;align-items:baseline;gap:.45rem;transition:color .3s ease}
@@ -322,6 +343,9 @@
     .ru-scale .tr:not(.cur) b,.ru-scale .tr:not(.cur) .k{display:none}
     .ty{display:flex;flex-direction:column;padding-top:1.5rem}
     .ty-list b,.ty-list .ab span:last-child{font-size:clamp(1.4rem,7vw,2rem)}
+    .yd{grid-template-columns:1fr}
+    .yd-col{position:static;height:auto;order:2}
+    .yd-col .ru-scale .tr{flex:none;min-height:2.2rem}
     .rp{grid-template-columns:1fr;gap:1.2rem}
     .rp-stage{order:-1;height:72vw}
     .rp-step .rp-col{overflow:visible}
@@ -930,7 +954,62 @@
   //   step    one picture at a time in the space on the right, as on the home page: a scroll, an arrow key, a
   //           click on the picture or on the line moves one picture; after the last comes the next project
   //   scroll  the label stays put while all the pictures go by under each other, whole; the dark stretch follows
-  var PV = (Q.get('pv') || 'step').toLowerCase(); if(PV !== 'scroll') PV = 'step';
+  var PV = (Q.get('pv') || 'step').toLowerCase(); if(PV !== 'scroll' && PV !== 'yard') PV = 'step';
+  // yard: after his Yard Grotesque page. The site's index stays on the left as the same upright ruler, the project
+  // marked on it (his numbered menu is on every page); on the right, first all the project's pictures together,
+  // whole, in rows of one height that run the full width; then, under them, the words, short and plain: the name,
+  // the credits, the text, the year
+  function buildYard(slug){
+    var p = P[slug], all = pictures(slug);
+    document.title = p.title + ' — Gonzalo Cáceres';
+    var wrap = el('div', 'yd', main), col = el('aside', 'yd-col', wrap), scale = el('div', 'ru-scale', col), group = null;
+    SLUGS.forEach(function(s){
+      var q = P[s], t = el('a', 'tr' + (s === slug ? ' cur' : ''), scale); t.href = '?v=a&l=ruler&p=' + s + '&pv=yard';
+      if(q.group !== group){ group = q.group; el('span', 'ru-grp', t, group); }
+      el('span', 'n', t, num(s)); el('b', '', t, q.title); el('span', 'k', t, q.kicker || '');
+    });
+    scale.classList.add('faintable', 'pointing');
+    aboutEntry(col);
+    var right = el('div', 'yd-main', wrap), sheet = el('div', 'yd-sheet', right);
+    var text = el('div', 'yd-text', right);
+    el('h1', '', text, p.title);
+    var cr = el('div', 'yd-cr', text), year = '';
+    (p.credits || []).forEach(function(r){
+      if(r[0] === 'Year'){ year = r[1]; return; }
+      var c = el('p', '', cr); el('b', '', c, r[0]); c.appendChild(document.createTextNode('  ' + r[1]));
+    });
+    if(p.lede) el('p', 'lede', text, p.lede);
+    (p.text ? (Array.isArray(p.text) ? p.text : [p.text]) : []).forEach(function(t){ el('p', '', text, t); });
+    if(year) el('p', 'yd-year', text, year + '.');
+    var i0 = SLUGS.indexOf(slug), nx = SLUGS[(i0 + 1) % SLUGS.length];
+    var nk = el('a', 'ab yd-next', right); nk.href = '?v=a&l=ruler&p=' + nx + '&pv=yard';
+    el('span', 'n', nk, num(nx)); el('span', '', nk, P[nx].title);
+    // rows of one height, each filled to the full width (the last one left at the usual height)
+    function lay(got){
+      sheet.innerHTML = '';
+      if(!got.length){ el('div', 'plate', sheet, 'In preparation'); return; }
+      var W = sheet.clientWidth, g = 14, target = Math.max(180, innerHeight * .34), row = [], sum = 0;
+      function flush(last){
+        var h = last ? Math.min(target, (W - g * (row.length - 1)) / sum) : (W - g * (row.length - 1)) / sum;
+        var r = el('div', 'yd-row', sheet);
+        row.forEach(function(o){
+          var im = el('img', '', r); im.src = o.it.src; im.alt = o.it.caption || p.title; im.style.height = h + 'px'; im.style.width = (o.r * h) + 'px';
+          im.addEventListener('click', function(){ var z = el('div', 'zoom', document.body), zi = el('img', '', z); zi.src = o.it.src; z.addEventListener('click', function(){ z.remove(); }); });
+        });
+        row = []; sum = 0;
+      }
+      got.forEach(function(o){
+        row.push(o); sum += o.r;
+        if((W - g * (row.length - 1)) / sum <= target) flush(false);
+      });
+      if(row.length) flush(true);
+    }
+    var loaded = [];
+    loadAll(all).then(function(got){ loaded = got; lay(got); });
+    addEventListener('resize', function(){ lay(loaded); });
+    addEventListener('keydown', function(e){ if(e.key === 'Escape'){ var z = document.querySelector('.zoom'); if(z) z.remove(); } });
+  }
+
   function buildRuledProject(slug){
     var p = P[slug], all = pictures(slug), n = Math.max(1, all.length);
     var i0 = SLUGS.indexOf(slug), nx = SLUGS[(i0 + 1) % SLUGS.length];
@@ -1121,9 +1200,9 @@
     lo.innerHTML = 'Layout' + Object.keys(LAYS).map(function(k){ return '<a href="?v=a&l=' + k + '"' + (k === LAY ? ' class="on"' : '') + '>' + k + '</a>'; }).join('');
     var RP = LAY === 'ruler' && P[Q.get('p')] ? Q.get('p') : null;
     if(LAY === 'ruler') document.getElementById('home').setAttribute('href', '?v=a&l=ruler');
-    if(RP) lo.innerHTML = 'Project' + ['step', 'scroll'].map(function(k){ return '<a href="?v=a&l=ruler&p=' + RP + '&pv=' + k + '"' + (k === PV ? ' class="on"' : '') + '>' + k + '</a>'; }).join('') + '<span style="margin-left:1.2rem;color:var(--faint)">r10</span>';
-    else if(LAY === 'ruler') lo.innerHTML = '<span style="color:var(--faint)">r10</span>';
-    if(RP){ document.body.classList.add('rp-page'); buildRuledProject(RP); }
+    if(RP) lo.innerHTML = 'Project' + ['step', 'scroll', 'yard'].map(function(k){ return '<a href="?v=a&l=ruler&p=' + RP + '&pv=' + k + '"' + (k === PV ? ' class="on"' : '') + '>' + k + '</a>'; }).join('') + '<span style="margin-left:1.2rem;color:var(--faint)">r11</span>';
+    else if(LAY === 'ruler') lo.innerHTML = '<span style="color:var(--faint)">r11</span>';
+    if(RP){ document.body.classList.add('rp-page'); if(PV === 'yard') buildYard(RP); else buildRuledProject(RP); }
     else LAYS[LAY]();
   }
   else if(V === 'a') buildA();

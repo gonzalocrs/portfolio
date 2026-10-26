@@ -231,3 +231,9 @@ body.l-quiet.qh-roll{height:auto;overflow:visible}
 }
 .in-unveil .qo-fig.out img{clip-path:inset(0 0 0 0)}
 .qp .qt-stage.none,.qp .qt-stage.none img{cursor:default}
+/* beside: the words stand centred top to bottom in the space, wherever the name is (his note, 2026-10-26); when they
+   are longer than the space they start at the top and scroll */
+.qd-beside .qp-card{top:0;display:flex;flex-direction:column}
+.qd-beside .qp-card > :first-child{margin-top:auto}
+.qd-beside .qp-card > :last-child{margin-bottom:auto}
+@media (max-width:700px){ .qp.qd-beside .qp-card{top:auto;display:block} .qd-beside .qp-card > :first-child{margin-top:0} }

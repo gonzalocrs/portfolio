@@ -507,20 +507,23 @@
       if(innerWidth <= 700){ [mark, touch, flds].concat(words).forEach(function(e){ e.style.transform = ''; }); tones(); return; }
       var on = isOpen(), W = side.clientWidth, S = mark.offsetWidth;
       var cx0 = mark.offsetLeft + S / 2, cy = mark.offsetTop + S / 2;
-      var ww = Math.max.apply(null, words.map(function(b){ return b.offsetWidth; })), fw = flds.offsetWidth, gap = Math.max(40, W * .05);
+      // the group, centred in the space: the ring, a small step, the three words in one column (each at the height of
+      // its stitch), a wider step, the fields. The ring itself is about two thirds of the mark's square
+      var rem = parseFloat(getComputedStyle(document.documentElement).fontSize), ring = .33, g1 = 1.6 * rem, gap = 3.5 * rem;
+      var ww = Math.max.apply(null, words.map(function(b){ return b.offsetWidth; })), fw = flds.offsetWidth;
       // on a narrower window the open mark and form take the whole room and his words step back meanwhile
-      var x0 = 0, full = on && (W - fw - gap - ww - 24) / S < .55;
+      var x0 = 0, need = function(k){ return 2 * ring * S * k + g1 + ww + gap + fw; }, full = on && need(.55) > W;
       wrap.classList.toggle('full', full);
       if(full){ x0 = -side.offsetLeft; W += side.offsetLeft; }
-      var k = Math.max(.3, Math.min(1, (W - fw - gap - ww - 24) / S, W * .42 / S)), R = S * k, wr = Math.max(R, R * AT[1][0] / 200 + 24 + ww);
-      var gx = x0 + Math.max(0, (W - wr - gap - fw) / 2), rx = gx + R / 2;
+      var k = Math.max(.3, Math.min(1, (W - g1 - ww - gap - fw) / (2 * ring * S), W * .42 / S)), R = S * k;
+      var gx = x0 + Math.max(0, (W - need(k)) / 2), rx = gx + ring * R, wx = rx + ring * R + g1;
       mark.style.transform = on ? 'translate(' + Math.round(rx - cx0) + 'px,0) scale(' + k.toFixed(3) + ')' : '';
-      touch.style.transform = on ? 'translate(' + Math.round(rx - cx0) + 'px,' + Math.round(-(S - R) / 2) + 'px)' : '';
+      touch.style.transform = on ? 'translate(' + Math.round(rx - cx0) + 'px,' + Math.round(-ring * (S - R)) + 'px)' : '';
       words.forEach(function(b, i){
-        var x = rx - R / 2 + AT[i][0] / 200 * R + 24 + (on ? 0 : -16), y = cy - R / 2 + AT[i][1] / 200 * R - b.offsetHeight / 2;
-        b.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px)'; b.tabIndex = on ? 0 : -1;
+        var y = cy - R / 2 + AT[i][1] / 200 * R - b.offsetHeight / 2;
+        b.style.transform = 'translate(' + Math.round(wx + (on ? 0 : -16)) + 'px,' + Math.round(y) + 'px)'; b.tabIndex = on ? 0 : -1;
       });
-      flds.style.transform = 'translate(' + Math.round(gx + wr + gap + (on ? 0 : 30)) + 'px,' + Math.round(cy - flds.offsetHeight / 2) + 'px)';
+      flds.style.transform = 'translate(' + Math.round(wx + ww + gap + (on ? 0 : 30)) + 'px,' + Math.round(cy - flds.offsetHeight / 2) + 'px)';
       tones();
     }
     words.forEach(function(b, i){

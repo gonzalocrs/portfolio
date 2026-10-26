@@ -315,3 +315,7 @@ body.l-quiet.qh-roll{height:auto;overflow:visible}
 @media (max-width:700px){ .qab .qk.qa.cur span{display:block} }
 .qab-words{transition:opacity .6s ease}
 .qab.open.full .qab-words{opacity:0;pointer-events:none}
+.qab-mark{pointer-events:none}
+/* "Get in touch" a short step under the ring itself (the ring is about two thirds of the mark's square) */
+.qab-touch{margin-top:calc(2rem - min(46vh,70%) * .17)}
+@media (max-width:700px){ .qab-touch{margin-top:calc(1.6rem - min(48vw,14rem) * .17)} }

@@ -45,3 +45,9 @@
 
 /logo-works.js
   Cache-Control: no-cache
+
+/quiet.js
+  Cache-Control: no-cache
+
+/quiet.css
+  Cache-Control: no-cache

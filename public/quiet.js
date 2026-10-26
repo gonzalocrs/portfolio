@@ -60,6 +60,16 @@
     return marks;
   }
   function quietHref(s, i){ return 'project.html?p=' + s + (i ? '&i=' + i : ''); }
+  // going into a project from a picture on the home (test, 2026-10-26): where the browser can carry a picture from one
+  // page to the next (cross-document view transitions), the picture glides from its place on the home to its place in
+  // the project while the rest fades across; elsewhere the home fades out and the project fades in
+  var VT = 'CSSViewTransitionRule' in window;
+  function enter(img, href){
+    try{ sessionStorage.setItem('gc-enter', '1'); }catch(e){}
+    if(VT){ if(img) img.style.viewTransitionName = 'qpic'; location.href = href; return; }
+    document.body.classList.add('q-leave');
+    setTimeout(function(){ location.href = href; }, 380);
+  }
   function ratioOf(img){ return img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1.5; }
   function loadAll(list){
     return Promise.all(list.map(function(it){
@@ -76,7 +86,7 @@
       fade(function(L){
         var e = it ? el('img', '', L) : el('div', 'plate', L, 'In preparation');
         if(it){ e.alt = P[s].title; e.src = it.src; }
-        e.addEventListener('click', function(){ location.href = quietHref(s, at ? at + 1 : 0); });
+        e.addEventListener('click', function(){ enter(it ? e : null, quietHref(s, at ? at + 1 : 0)); });
       }, instant);
       var m = markOf(cur); if(m) m.style.setProperty('--p', ((at + 1) / list.length).toFixed(3));
     }
@@ -155,7 +165,7 @@
       var f = el('figure', 'qr-fig', row), par = el('div', 'qr-par', f);
       f.style.width = 'min(' + w + '%, calc(' + (o.r * 74).toFixed(1) + 'vh))';
       var im = el('img', '', par); im.alt = o.it.caption || P[s].title; im.src = o.it.src;
-      f.addEventListener('click', function(){ location.href = quietHref(s, o.k0 ? o.k0 + 1 : 0); });
+      f.addEventListener('click', function(){ enter(im, quietHref(s, o.k0 ? o.k0 + 1 : 0)); });
       f.slug = s; f.k = k; par.speed = (rnd() - .5) * .22;
       figs.push(f); return f;
     }
@@ -247,7 +257,7 @@
       if(old){ old.classList.remove('in'); old.classList.add('out', d < 0 ? 'down' : 'up'); setTimeout(function(){ old.remove(); }, 1100); }
       var f = el('figure', 'qo-fig' + (d < 0 ? ' from-up' : ''), st); f.o = o;
       var im = el('img', '', f); im.alt = o.it.caption || P[o.slug].title; im.src = o.it.src;
-      f.addEventListener('click', function(){ location.href = quietHref(o.slug, o.k0 ? o.k0 + 1 : 0); });
+      f.addEventListener('click', function(){ enter(im, quietHref(o.slug, o.k0 ? o.k0 + 1 : 0)); });
       place(f, o);
       setTimeout(function(){ f.classList.add('in'); }, old ? 420 : 60);
       curEl = f; at = i;
@@ -377,7 +387,15 @@
     }
     plus.addEventListener('click', function(e){ e.stopPropagation(); toggle(); });
     card.addEventListener('click', function(e){ e.stopPropagation(); });
-    var at = -1, lock = 0;
+    var at = -1, lock = 0, arrived = false;
+    try{ arrived = sessionStorage.getItem('gc-enter') === '1'; sessionStorage.removeItem('gc-enter'); }catch(e){}
+    // two small arrows at the sides (test, 2026-10-26, in place of the arrow-shaped pointer); each hides at its end
+    var prev = el('button', 'qn prev', st), next = el('button', 'qn next', st);
+    prev.type = next.type = 'button'; prev.setAttribute('aria-label', 'Previous picture'); next.setAttribute('aria-label', 'Next picture');
+    prev.innerHTML = '<svg viewBox="0 0 14 28" width="14" height="28"><path d="M12 2L2 14l10 12"/></svg>';
+    next.innerHTML = '<svg viewBox="0 0 14 28" width="14" height="28"><path d="M2 2l10 12L2 26"/></svg>';
+    prev.addEventListener('click', function(e){ e.stopPropagation(); go(at - 1); });
+    next.addEventListener('click', function(e){ e.stopPropagation(); go(at + 1); });
     function go(k){
       // a project ends at its last picture (his call, 2026-10-26): no scrolling on into the next one; the marks go there
       if(k >= n || k < 0) return;
@@ -390,6 +408,7 @@
         var f = el('figure', 'qf', L);
         if(it){
           var im = el('img', '', f); im.alt = it.caption || p.title; im.src = it.src;
+          if(first && arrived){ if(VT){ im.style.viewTransitionName = 'qpic'; setTimeout(function(){ im.style.viewTransitionName = ''; }, 1500); } else document.body.classList.add('q-enter'); }
           var cap = el('figcaption', 'k', f, it.caption || kindOf(it));
           var fit = function(){ cap.style.width = im.offsetWidth ? im.offsetWidth + 'px' : ''; };
           im.addEventListener('load', fit); f.fit = fit;
@@ -397,8 +416,8 @@
         else el('div', 'plate', f, 'In preparation');
       }, first);
       dots.forEach(function(d, j){ d.classList.toggle('cur', j === k); });
+      prev.classList.toggle('off', k === 0); next.classList.toggle('off', k === n - 1);
     }
-    st.addEventListener('mousemove', function(e){ var r = st.getBoundingClientRect(), b = e.clientX < r.left + r.width * .35; st.classList.toggle('back', b); st.classList.toggle('none', b ? at === 0 : at === n - 1); });
     st.addEventListener('click', function(e){
       if(isOpen() && D === 'float'){ toggle(false); return; }
       var r = st.getBoundingClientRect(); go(at + (e.clientX < r.left + r.width * .35 ? -1 : 1));

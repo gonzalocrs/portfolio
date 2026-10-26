@@ -319,3 +319,26 @@ body.l-quiet.qh-roll{height:auto;overflow:visible}
 /* "Get in touch" a short step under the ring itself (the ring is about two thirds of the mark's square) */
 .qab-touch{margin-top:calc(2rem - min(46vh,70%) * .15)}
 @media (max-width:700px){ .qab-touch{margin-top:calc(1.6rem - min(48vw,14rem) * .15)} }
+
+/* test (2026-10-26): from a home picture into its project. Where the browser can (cross-document view transitions), the
+   picture glides from the home to its place in the project while the rest fades across; elsewhere a plain fade */
+@view-transition{navigation:auto}
+::view-transition-group(qpic){animation-duration:.75s;animation-timing-function:cubic-bezier(.3,.7,.2,1)}
+::view-transition-old(root){animation:.4s ease both q-out}
+::view-transition-new(root){animation:.6s ease .15s both q-in}
+@keyframes q-out{to{opacity:0}}
+@keyframes q-in{from{opacity:0}}
+body.q-leave main{opacity:0;transition:opacity .35s ease}
+body.q-enter main{animation:q-in .6s ease both}
+/* the project's pictures: two small arrows at the sides in place of the arrow-shaped pointer */
+.qp .qt-stage,.qp .qt-stage.back,.qp .qt-stage img{cursor:default}
+.qp .qt-stage img{cursor:pointer}
+.qn{position:absolute;top:50%;z-index:2;width:3rem;height:5rem;margin-top:-2.5rem;display:flex;align-items:center;justify-content:center;color:var(--faint);transition:color .25s,opacity .4s,left .7s cubic-bezier(.2,.7,.2,1)}
+.qn svg{display:block;fill:none;stroke:currentColor;stroke-width:1;overflow:visible}
+.qn:hover,.qn:focus-visible{color:var(--ink)}
+.qn.prev{left:-1rem}
+.qn.next{right:-1rem}
+.qn.off{opacity:0;pointer-events:none}
+.qd-beside.open .qn.prev{left:calc(var(--px,24rem) - 1rem)}
+.qp .qt-stage .p-layer{padding-left:calc(4% + 1.5rem);padding-right:calc(4% + 1.5rem)}
+@media (max-width:700px){ .qn{width:2rem;height:3rem;margin-top:-1.5rem} .qn.prev{left:-.6rem} .qn.next{right:-.6rem} .qn svg{width:10px;height:20px} .qp .qt-stage .p-layer{padding:0 1.4rem} }

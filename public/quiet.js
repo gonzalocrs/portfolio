@@ -477,6 +477,87 @@
     else setTimeout(go, 30);
   }
 
+  // About (2026-10-26): the marks with About open; his words stand where a project's words do, the GCV mark where the
+  // picture would be. "Get in touch +" or a scroll down opens the mark to the right: a topic beside each of its three
+  // right-hand stitches, the fields beside them (the sending itself is contact.js); the ×, a scroll up or Esc closes it
+  function buildAbout(){
+    var wrap = document.querySelector('.qab'), nav = wrap.querySelector('.qt-ticks');
+    quietMarks(nav, null, function(s){ return quietHref(s); });
+    var ab = nav.querySelector('.qk.qa'); ab.classList.add('cur'); ab.setAttribute('aria-current', 'page');
+    var touch = document.getElementById('touch'), lock = 0;
+    function isOpen(){ return wrap.classList.contains('open'); }
+    function toggle(on){
+      on = on == null ? !isOpen() : on;
+      if(on === isOpen()) return;
+      wrap.classList.toggle('open', on);
+      touch.querySelector('span').textContent = on ? 'Close' : 'Get in touch';
+      layout();
+      if(on) setTimeout(function(){ var c = wrap.querySelector('.choice'); if(c && innerWidth > 700) c.focus({preventScroll: true}); }, 500);
+    }
+    // the layout, as on the About page before (2026-10-18, his pick "A"): each topic's word beside its stitch
+    var side = wrap.querySelector('.qab-side'), mark = wrap.querySelector('.qab-mark'), flds = wrap.querySelector('.qab-fields'),
+        flow = document.getElementById('flow'), words = Array.prototype.slice.call(wrap.querySelectorAll('.choice')), hov = -1;
+    function tones(){
+      var m = window.gcMark, open = isOpen() && !flow.classList.contains('sent');
+      if(m) words.forEach(function(b, i){ m.tone(i, !open || b.getAttribute('aria-pressed') === 'true' ? 1 : hov === i ? .55 : 0); });
+    }
+    function layout(){
+      if(innerWidth <= 700){ [mark, touch, flds].concat(words).forEach(function(e){ e.style.transform = ''; }); tones(); return; }
+      var on = isOpen(), W = side.clientWidth, S = mark.offsetWidth;
+      var cx0 = mark.offsetLeft + S / 2, cy = mark.offsetTop + S / 2;
+      // the group, centred in the space: the ring; each word the same small step out from the ring, level with its
+      // stitch (top right and bottom right at 45°, right in the middle), so the three follow the ring's curve; a wider
+      // step, then the fields. The ring is 70 of the mark's 200 units (logo-works.js RING)
+      var rem = parseFloat(getComputedStyle(document.documentElement).fontSize), ring = .35, g1 = 2.2 * rem, gap = 3.5 * rem;
+      var ANG = [-45, 0, 45], fw = flds.offsetWidth;
+      // how far right of the ring's centre the words reach, for a ring of radius r
+      function reach(r){ return Math.max.apply(null, words.map(function(b, i){ return r * Math.cos(ANG[i] * Math.PI / 180) + g1 + b.offsetWidth; })); }
+      // on a narrower window the open mark and form take the whole room and his words step back meanwhile
+      var x0 = 0, need = function(k){ return ring * S * k + reach(ring * S * k) + gap + fw; }, full = on && need(.55) > W;
+      wrap.classList.toggle('full', full);
+      if(full){ x0 = -side.offsetLeft; W += side.offsetLeft; }
+      var k = 1; while(k > .3 && (need(k) > W || S * k > W * .42)) k -= .02;
+      var R = S * k, r = ring * R, gx = x0 + Math.max(0, (W - need(k)) / 2), rx = gx + r;
+      mark.style.transform = on ? 'translate(' + Math.round(rx - cx0) + 'px,0) scale(' + k.toFixed(3) + ')' : '';
+      touch.style.transform = on ? 'translate(' + Math.round(rx - cx0) + 'px,' + Math.round(-ring * (S - R)) + 'px)' : '';
+      words.forEach(function(b, i){
+        var a = ANG[i] * Math.PI / 180, x = rx + r * Math.cos(a) + g1, y = cy + r * Math.sin(a) - b.offsetHeight / 2;
+        b.style.transform = 'translate(' + Math.round(x + (on ? 0 : -16)) + 'px,' + Math.round(y) + 'px)'; b.tabIndex = on ? 0 : -1;
+      });
+      var wx = rx, ww = reach(r);
+      flds.style.transform = 'translate(' + Math.round(wx + ww + gap + (on ? 0 : 30)) + 'px,' + Math.round(cy - flds.offsetHeight / 2) + 'px)';
+      tones();
+    }
+    words.forEach(function(b, i){
+      b.addEventListener('click', function(){ setTimeout(tones, 0); });
+      b.addEventListener('mouseenter', function(){ hov = i; tones(); });
+      b.addEventListener('mouseleave', function(){ hov = -1; tones(); });
+    });
+    new MutationObserver(tones).observe(flow, {attributes: true, attributeFilter: ['class']});
+    addEventListener('resize', layout);
+    if(document.fonts) document.fonts.ready.then(layout);
+    [mark, touch, flds].concat(words).forEach(function(e){ e.style.transition = 'none'; });
+    layout(); void side.offsetWidth;
+    [mark, touch, flds].concat(words).forEach(function(e){ e.style.transition = ''; });
+    touch.addEventListener('click', function(){ toggle(); });
+    addEventListener('wheel', function(e){
+      if(innerWidth <= 700) return;
+      var t = e.target;
+      if(t.tagName === 'TEXTAREA' && t.scrollHeight > t.clientHeight) return;
+      e.preventDefault();
+      if(Math.abs(e.deltaY) < 8) return;
+      var now = Date.now(); if(now - lock < 800) return; lock = now;
+      toggle(e.deltaY > 0);
+    }, {passive: false});
+    addEventListener('keydown', function(e){
+      if(/INPUT|TEXTAREA/.test(document.activeElement.tagName)){ if(e.key === 'Escape') document.activeElement.blur(); return; }
+      if(e.key === 'Escape') toggle(false);
+      if(e.key === 'ArrowDown' || e.key === 'PageDown'){ toggle(true); e.preventDefault(); }
+      if(e.key === 'ArrowUp' || e.key === 'PageUp'){ toggle(false); e.preventDefault(); }
+    });
+  }
+
+  if(document.body.getAttribute('data-page') === 'about'){ buildAbout(); return; }
   if(document.body.getAttribute('data-page') === 'project'){
     var slug = Q.get('p');
     if(!P[slug]){ location.replace('/'); return; }

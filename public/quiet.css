@@ -167,7 +167,7 @@
   }
 
 /* wide-screen trials (?w=, see quiet.js) */
-.w-centre .qt-stage .p-layer,.w-frame .qt-stage .p-layer,.w-words .qt-stage .p-layer{justify-content:center}
+.w-centre .qt-stage .p-layer,.w-frame .qt-stage .p-layer,.w-words .qt-stage .p-layer,.w-pair .qt-stage .p-layer{justify-content:center}
 .w-frame{--fw:calc(26rem + (100vh - 9rem) * 1.62)}
 .w-frame .bar,.w-frame main{width:100%;max-width:var(--fw);margin-left:auto;margin-right:auto}
 .w-pair .qt-stage .p-layer{gap:clamp(1rem,2vw,2rem)}

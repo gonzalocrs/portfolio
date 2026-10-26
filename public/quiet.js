@@ -70,17 +70,25 @@
   // pair: the picture shown and the next one or two of the list, side by side at one height, whole; as many as give
   // the most picture on the screen (one alone when it already fills the space)
   function fillRow(L, list, k, onPick){
-    if(W !== 'pair' || innerWidth <= 700) return;
+    if(W !== 'pair') return;
     var first = L.querySelector('img'); if(!first) return;
+    L.qwArgs = [list, k, onPick];
+    var token = L.qwToken = (L.qwToken || 0) + 1;
+    // start again from the one picture as it would be alone (also after the window changed size)
+    Array.prototype.forEach.call(L.querySelectorAll('.qw-more'), function(m){ m.remove(); });
+    first.style.height = ''; first.style.width = '';
+    L.qwSeen = k; if(L.qwDone) L.qwDone();
+    if(innerWidth <= 700) return;
     var cand = list.slice(k, k + 3).filter(Boolean);
     loadAll(cand).then(function(got){
-      if(!L.contains(first)) return;
+      if(!L.contains(first) || token !== L.qwToken) return;
       var Wd = L.clientWidth, H = L.clientHeight, g = parseFloat(getComputedStyle(L).columnGap) || 24, best = 1, bestA = 0, bestH = 0;
       for(var m = 1; m <= got.length; m++){
         var sum = 0; for(var i = 0; i < m; i++) sum += got[i].r;
         var h = Math.min(H, (Wd - g * (m - 1)) / sum), area = h * h * sum;
         if(area > bestA * 1.15){ bestA = area; best = m; bestH = h; }
       }
+      if(best === 1) return;
       first.style.height = bestH + 'px'; first.style.width = 'auto';
       for(var j = 1; j < best; j++)(function(j){
         var im = el('img', 'qw-more', L); im.alt = ''; im.src = got[j].it.src; im.style.height = bestH + 'px';
@@ -89,6 +97,14 @@
       L.qwSeen = k + best - 1; if(L.qwDone) L.qwDone();
     });
   }
+  // when the window (or the room beside the words) changes size, the row is worked out again
+  function relayRows(){
+    Array.prototype.forEach.call(document.querySelectorAll('.qt-stage .p-layer.on'), function(L){
+      if(L.qwArgs) fillRow(L, L.qwArgs[0], L.qwArgs[1], L.qwArgs[2]);
+    });
+  }
+  var relayT = null;
+  addEventListener('resize', function(){ clearTimeout(relayT); relayT = setTimeout(relayRows, 120); });
   function ratioOf(img){ return img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1.5; }
   function loadAll(list){
     return Promise.all(list.map(function(it){
@@ -191,6 +207,7 @@
       if(on === isOpen()) return;
       st.style.setProperty('--ny', nameY() + 'px');
       if(D === 'beside') placeBeside();
+      if(W === 'pair') setTimeout(relayRows, 760);
       if(D !== 'fold'){ wrap.classList.toggle('open', on); return; }
       // fold: the picture closes into its middle line, the line rises to the name, the words come in under it and the
       // picture opens again beside them, out of a line; closing just lets the words go and the picture slide back

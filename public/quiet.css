@@ -251,19 +251,24 @@ body.l-quiet.qh-roll{height:auto;overflow:visible}
 .qab-words .med{margin:0 0 1.3rem;font-weight:300;font-size:.92rem;line-height:1.45}
 .qab-words .text{margin:0;font-weight:300;font-size:.88rem;line-height:1.55}
 .qab-side{position:relative;min-height:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.qab-mark{margin:0;width:min(46vh,70%);aspect-ratio:1;transition:opacity .6s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
+.qab-mark{margin:0;width:min(46vh,70%);aspect-ratio:1;transform-origin:center;transition:transform .9s cubic-bezier(.65,0,.35,1)}
 .qab-mark canvas{display:block;width:100%;height:100%}
 .qab-touch{margin-top:2.2rem;display:flex;align-items:center;gap:.2rem;font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute);transition:color .3s}
 .qab-touch:hover{color:var(--ink)}
 .qab-touch .qp-plus{font-size:.95rem}
 .qab.open .qab-touch .qp-plus{transform:rotate(45deg);color:var(--ink)}
-.qab-desk{position:absolute;left:50%;top:50%;width:min(22rem,100%);transform:translate(-50%,calc(-50% - 1.4rem + .8rem));opacity:0;pointer-events:none;transition:opacity .6s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
-.qab.open .qab-mark{opacity:0;transform:translateY(-1rem)}
-.qab.open .qab-desk{opacity:1;pointer-events:auto;transform:translate(-50%,calc(-50% - 1.4rem));transition-delay:.15s}
-.qab-desk .choices{display:flex;gap:1.4rem;margin-bottom:1.8rem}
-.qab-desk .choice{padding:0;font:300 .95rem/1.2 var(--font);color:var(--mute);transition:color .2s}
+/* open (desktop, placed by buildAbout): the mark steps left, smaller if it has to; a topic word stands beside each of its
+   three right-hand stitches (top right, right, bottom right: picked in ink, the others faint); the fields to their right */
+.qab-mark{position:relative;z-index:1}
+.qab-desk{position:absolute;inset:0;pointer-events:none}
+.qab-desk .choices{display:contents}
+.qab-desk .choice,.qab-fields{position:absolute;left:0;top:0;opacity:0;transition:transform .9s cubic-bezier(.65,0,.35,1),opacity .7s ease,color .2s}
+.qab.open .qab-desk .choice,.qab.open .qab-fields{opacity:1;pointer-events:auto}
+.qab-fields{width:15.5rem}
+.qab-desk .choice{padding:.2rem 0;font:300 .95rem/1.2 var(--font);color:var(--mute);white-space:nowrap}
 .qab-desk .choice:hover,.qab-desk .choice:focus-visible{color:var(--ink)}
 .qab-desk .choice[aria-pressed="true"]{color:var(--ink);font-weight:800}
+.qab-touch{position:relative;z-index:1;transition:color .3s,transform .9s cubic-bezier(.65,0,.35,1)}
 .qab-desk .fields{margin:0}
 .qab-desk .field{display:block;margin-bottom:1.1rem}
 .qab-desk .field .k{display:block}
@@ -291,7 +296,7 @@ body.l-quiet.qh-roll{height:auto;overflow:visible}
 .qab-desk .done{display:none}
 .qab-desk .done h2{margin:0;font-weight:800;font-size:clamp(1.2rem,1.6vw,1.5rem);letter-spacing:-.02em}
 .qab-desk .done p{margin:.6rem 0 0;font-weight:300;color:var(--mute)}
-.qab-desk.sent .choices,.qab-desk.sent .details{display:none}
+.qab-desk.sent .choice,.qab-desk.sent .details{display:none}
 .qab-desk.sent .done{display:block}
 @media (max-width:700px){
   .qab{display:flex;flex-direction:column;gap:1.8rem}
@@ -299,10 +304,14 @@ body.l-quiet.qh-roll{height:auto;overflow:visible}
   .qab-room{grid-template-columns:1fr;gap:2.4rem}
   .qab-words{overflow:visible;max-height:none}
   .qab-mark{width:min(48vw,14rem)}
-  .qab-desk{position:static;transform:none;width:100%;display:none}
-  .qab.open .qab-desk{display:block;transform:none;margin-top:1.4rem}
-  .qab.open .qab-mark{display:none}
+  .qab-desk{position:static;width:100%;display:none;pointer-events:auto}
+  .qab.open .qab-desk{display:block;margin-top:1.6rem}
+  .qab-desk .choices{display:flex;gap:1.4rem;margin-bottom:1.6rem}
+  .qab-desk .choice,.qab-fields{position:static;opacity:1;transform:none !important}
+  .qab-fields{width:100%}
   .qab-touch{order:2}
   .qab-side{padding-bottom:3rem}
 }
 @media (max-width:700px){ .qab .qk.qa.cur span{display:block} }
+.qab-words{transition:opacity .6s ease}
+.qab.open.full .qab-words{opacity:0;pointer-events:none}

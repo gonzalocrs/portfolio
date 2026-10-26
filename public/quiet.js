@@ -478,8 +478,8 @@
   }
 
   // About (2026-10-26): the marks with About open; his words stand where a project's words do, the GCV mark where the
-  // picture would be. "Get in touch +", a scroll down or Enter turns the mark into the form (topics, fields, Send; the
-  // sending itself is contact.js); the ×, a scroll up or Esc turns it back
+  // picture would be. "Get in touch +" or a scroll down opens the mark to the right: a topic beside each of its three
+  // right-hand stitches, the fields beside them (the sending itself is contact.js); the ×, a scroll up or Esc closes it
   function buildAbout(){
     var wrap = document.querySelector('.qab'), nav = wrap.querySelector('.qt-ticks');
     quietMarks(nav, null, function(s){ return quietHref(s); });
@@ -491,8 +491,49 @@
       if(on === isOpen()) return;
       wrap.classList.toggle('open', on);
       touch.querySelector('span').textContent = on ? 'Close' : 'Get in touch';
+      layout();
       if(on) setTimeout(function(){ var c = wrap.querySelector('.choice'); if(c && innerWidth > 700) c.focus({preventScroll: true}); }, 500);
     }
+    // the layout, as on the About page before (2026-10-18, his pick "A"): where each topic's word sits beside its
+    // stitch, in the mark's 200-unit square
+    var side = wrap.querySelector('.qab-side'), mark = wrap.querySelector('.qab-mark'), flds = wrap.querySelector('.qab-fields'),
+        flow = document.getElementById('flow'), words = Array.prototype.slice.call(wrap.querySelectorAll('.choice')), hov = -1;
+    var AT = [[148, 38], [178, 100], [148, 162]];
+    function tones(){
+      var m = window.gcMark, open = isOpen() && !flow.classList.contains('sent');
+      if(m) words.forEach(function(b, i){ m.tone(i, !open || b.getAttribute('aria-pressed') === 'true' ? 1 : hov === i ? .55 : 0); });
+    }
+    function layout(){
+      if(innerWidth <= 700){ [mark, touch, flds].concat(words).forEach(function(e){ e.style.transform = ''; }); tones(); return; }
+      var on = isOpen(), W = side.clientWidth, S = mark.offsetWidth;
+      var cx0 = mark.offsetLeft + S / 2, cy = mark.offsetTop + S / 2;
+      var ww = Math.max.apply(null, words.map(function(b){ return b.offsetWidth; })), fw = flds.offsetWidth, gap = Math.max(40, W * .05);
+      // on a narrower window the open mark and form take the whole room and his words step back meanwhile
+      var x0 = 0, full = on && (W - fw - gap - ww - 24) / S < .55;
+      wrap.classList.toggle('full', full);
+      if(full){ x0 = -side.offsetLeft; W += side.offsetLeft; }
+      var k = Math.max(.3, Math.min(1, (W - fw - gap - ww - 24) / S, W * .42 / S)), R = S * k, wr = Math.max(R, R * AT[1][0] / 200 + 24 + ww);
+      var gx = x0 + Math.max(0, (W - wr - gap - fw) / 2), rx = gx + R / 2;
+      mark.style.transform = on ? 'translate(' + Math.round(rx - cx0) + 'px,0) scale(' + k.toFixed(3) + ')' : '';
+      touch.style.transform = on ? 'translate(' + Math.round(rx - cx0) + 'px,' + Math.round(-(S - R) / 2) + 'px)' : '';
+      words.forEach(function(b, i){
+        var x = rx - R / 2 + AT[i][0] / 200 * R + 24 + (on ? 0 : -16), y = cy - R / 2 + AT[i][1] / 200 * R - b.offsetHeight / 2;
+        b.style.transform = 'translate(' + Math.round(x) + 'px,' + Math.round(y) + 'px)'; b.tabIndex = on ? 0 : -1;
+      });
+      flds.style.transform = 'translate(' + Math.round(gx + wr + gap + (on ? 0 : 30)) + 'px,' + Math.round(cy - flds.offsetHeight / 2) + 'px)';
+      tones();
+    }
+    words.forEach(function(b, i){
+      b.addEventListener('click', function(){ setTimeout(tones, 0); });
+      b.addEventListener('mouseenter', function(){ hov = i; tones(); });
+      b.addEventListener('mouseleave', function(){ hov = -1; tones(); });
+    });
+    new MutationObserver(tones).observe(flow, {attributes: true, attributeFilter: ['class']});
+    addEventListener('resize', layout);
+    if(document.fonts) document.fonts.ready.then(layout);
+    [mark, touch, flds].concat(words).forEach(function(e){ e.style.transition = 'none'; });
+    layout(); void side.offsetWidth;
+    [mark, touch, flds].concat(words).forEach(function(e){ e.style.transition = ''; });
     touch.addEventListener('click', function(){ toggle(); });
     addEventListener('wheel', function(e){
       if(innerWidth <= 700) return;

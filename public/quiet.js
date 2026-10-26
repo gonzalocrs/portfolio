@@ -117,6 +117,90 @@
     return {restart: function(){ clearInterval(timer); timer = setInterval(tick, 3200); }};
   }
 
+  // home trial (?home=roll, 2026-10-26, after fernando-garrido.com/YARD-GROTESQUE): the page scrolls; every project's
+  // pictures come one after another down the page, each alone (now and then two), set to the left, the right or near
+  // the middle at its own size, with room between them, and each opens as it arrives. The marks stay put on the left;
+  // the project passing has its name out and its mark filling. A mark scrolls to its project; a picture goes into it.
+  //   &in=unveil  drawn open from its bottom edge (default)
+  //   &in=rise    fades up into place
+  //   &in=drift   unveiled, then each one moves at its own pace as the page rolls
+  function buildRoll(){
+    var IN = (Q.get('in') || 'unveil').toLowerCase(); if(['unveil', 'rise', 'drift'].indexOf(IN) === -1) IN = 'unveil';
+    document.body.classList.add('qh-roll', 'in-' + IN);
+    var wrap = el('div', 'qt', main), nav = el('nav', 'qt-ticks', wrap), flow = el('div', 'qr-flow', wrap);
+    var marks = quietMarks(nav, null, function(s){ return quietHref(s); });
+    var seed = 11; function rnd(){ seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+    function pick(a){ return a[Math.floor(rnd() * a.length)]; }
+    var figs = [], cur = null, lastSide = null;
+    // width by shape, as a share of the field: wide pictures larger, upright ones narrower; never taller than the screen
+    function size(r){ return r >= 1.6 ? pick([58, 64, 72]) : r >= 1.15 ? pick([46, 52, 58]) : r >= .85 ? pick([38, 44]) : pick([30, 36]); }
+    function side(){ var s; do { s = pick(['l', 'r', 'r', 'l', 'm']); } while(s === lastSide); lastSide = s; return s; }
+    function fig(row, s, k, o, w){
+      var f = el('figure', 'qr-fig', row), par = el('div', 'qr-par', f);
+      f.style.width = 'min(' + w + '%, calc(' + (o.r * 74).toFixed(1) + 'vh))';
+      var im = el('img', '', par); im.alt = o.it.caption || P[s].title; im.src = o.it.src;
+      f.addEventListener('click', function(){ location.href = quietHref(s, k ? k + 1 : 0); });
+      f.slug = s; f.k = k; par.speed = (rnd() - .5) * .22;
+      figs.push(f); return f;
+    }
+    var withPics = SLUGS.filter(coverOf);
+    Promise.all(withPics.map(function(s){ return loadAll(pictures(s)); })).then(function(all){
+      all.forEach(function(got, j){
+        var s = withPics[j], k = 0;
+        while(k < got.length){
+          var o = got[k], q = got[k + 1], row = el('div', 'qr-row', flow);
+          row.style.marginTop = (j === 0 && k === 0) ? '0' : (k === 0 ? pick([34, 40]) : pick([14, 20, 26, 32])) + 'vh';
+          if(k === 0 && j === 0){ row.classList.add('m'); fig(row, s, k, o, o.r >= 1.15 ? 70 : 40); k++; continue; }
+          // now and then two smaller ones side by side, the second lower
+          if(q && o.r < 1.6 && q.r < 1.6 && rnd() < .35){
+            row.classList.add('two');
+            fig(row, s, k, o, Math.min(size(o.r), 44));
+            fig(row, s, k + 1, q, Math.min(size(q.r), 38)).style.marginTop = pick([12, 18, 24]) + 'vh';
+            k += 2; continue;
+          }
+          var sd = side(); row.classList.add(sd);
+          var f = fig(row, s, k, o, size(o.r));
+          if(sd !== 'm') f.style[sd === 'l' ? 'marginLeft' : 'marginRight'] = pick([0, 4, 9]) + '%';
+          k++;
+        }
+      });
+      el('div', 'qr-end', flow);
+      var io = new IntersectionObserver(function(es){
+        es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+      }, {rootMargin: '0px 0px -10% 0px', threshold: .06});
+      figs.forEach(function(f){ io.observe(f); });
+      sync();
+    });
+    function markOf(s){ return marks.filter(function(m){ return m.slug === s; })[0]; }
+    function sync(){
+      var vh = innerHeight, best = null, bd = 1e9;
+      figs.forEach(function(f){
+        var b = f.getBoundingClientRect(), d = Math.abs(b.top + b.height / 2 - vh / 2);
+        if(d < bd){ bd = d; best = f; }
+        if(IN === 'drift' && innerWidth > 700){ var par = f.firstChild; par.style.transform = 'translateY(' + ((b.top + b.height / 2 - vh / 2) * par.speed).toFixed(1) + 'px)'; }
+      });
+      if(!best) return;
+      var n = figs.filter(function(f){ return f.slug === best.slug; }).length;
+      if(cur !== best.slug){
+        cur = best.slug;
+        marks.forEach(function(m){ m.classList.toggle('cur', m.slug === cur); if(m.slug !== cur) m.style.removeProperty('--p'); });
+      }
+      var m = markOf(cur); if(m) m.style.setProperty('--p', ((best.k + 1) / n).toFixed(3));
+    }
+    marks.forEach(function(m){
+      m.addEventListener('click', function(e){
+        var f = figs.filter(function(x){ return x.slug === m.slug; })[0];
+        if(!f) return;
+        e.preventDefault();
+        var b = f.getBoundingClientRect();
+        scrollTo({top: scrollY + b.top - Math.max(0, (innerHeight - b.height) / 2), behavior: 'smooth'});
+      });
+    });
+    addEventListener('scroll', sync, {passive: true});
+    addEventListener('resize', sync);
+    if(withPics[0]){ var m0 = markOf(withPics[0]); if(m0){ m0.classList.add('cur'); cur = withPics[0]; } }
+  }
+
   // a project: the same marks, its own opened into one mark per picture; one picture at a time, as large as fits.
   // A click on the right half of the picture goes on, the left half back (the pointer shows which); the wheel,
   // arrow keys and a swipe do the same; past the last picture comes the next project. "+" shows the words.
@@ -299,6 +383,7 @@
     // old addresses of a project on the home page (?show= / ?open=) go to its page
     var old = Q.get('show') || Q.get('open');
     if(old && P[old]){ location.replace(quietHref(old)); return; }
-    quietIntro(buildQuiet());
+    if(Q.get('home') === 'roll') buildRoll();
+    else quietIntro(buildQuiet());
   }
 })();

@@ -175,3 +175,10 @@
 .w-pair .qt-stage .p-layer img.qw-more{width:auto;max-width:none;max-height:none}
 .qs.vis i{width:1.1rem;background:var(--ink)}
 @media (max-width:700px){ .w-pair .qt-stage .p-layer img.qw-more{display:none} }
+
+/* gallery-air trials (?s=, see quiet.js): the pictures centred in the space; hang stands them on one low line */
+.s-mat .qt-stage .p-layer,.s-area .qt-stage .p-layer,.s-hang .qt-stage .p-layer{justify-content:center}
+.s-hang .qt-stage .p-layer{align-items:flex-end;padding-bottom:10vh}
+.s-mat .qt-stage .p-layer img.qw-more,.s-area .qt-stage .p-layer img.qw-more,.s-hang .qt-stage .p-layer img.qw-more{flex:none;width:auto;max-width:none;max-height:none}
+.s-mat .qt-stage .p-layer,.s-area .qt-stage .p-layer,.s-hang .qt-stage .p-layer{gap:clamp(1rem,2vw,2rem)}
+@media (max-width:700px){ .s-hang .qt-stage .p-layer{padding-bottom:0} }

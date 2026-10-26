@@ -59,7 +59,7 @@
     var ab = el('a', 'qk qa', nav); ab.href = 'about.html'; el('i', '', ab, '+'); el('span', '', ab, 'About');
     return marks;
   }
-  function quietHref(s, i){ return 'project.html?p=' + s + (i ? '&i=' + i : '') + (W !== 'left' ? '&w=' + W : ''); }
+  function quietHref(s, i){ return 'project.html?p=' + s + (i ? '&i=' + i : '') + (W !== 'left' ? '&w=' + W : '') + (Q.get('s') ? '&s=' + Q.get('s') : ''); }
   // wide screens (trials, ?w=, 2026-10-26; without it the picture stays at the left as live):
   //   centre  the picture in the middle of the space right of the marks
   //   frame   the whole page (name, marks, picture) kept to a width that suits the screen's height, centred
@@ -69,27 +69,42 @@
   document.body.classList.add('w-' + W);
   // pair: the picture shown and the next one or two of the list, side by side at one height, whole; as many as give
   // the most picture on the screen (one alone when it already fills the space)
+  // gallery air (trials, ?s=, 2026-10-26: the pictures had grown too massive on a large screen):
+  //   mat   every picture inside a margin, at most about three quarters of the space's height
+  //   area  every picture (or row) given about the same area, so a wide photo and a tall drawing weigh alike
+  //   hang  as area, but the pictures stand on one line, low in the space, as if hung on a wall
+  var S = (Q.get('s') || '').toLowerCase(); if(['mat', 'area', 'hang'].indexOf(S) === -1) S = '';
+  if(S) document.body.classList.add('s-' + S);
   function fillRow(L, list, k, onPick){
-    if(W !== 'pair') return;
+    if(W !== 'pair' && !S) return;
     var first = L.querySelector('img'); if(!first) return;
     L.qwArgs = [list, k, onPick];
     var token = L.qwToken = (L.qwToken || 0) + 1;
     // start again from the one picture as it would be alone (also after the window changed size)
     Array.prototype.forEach.call(L.querySelectorAll('.qw-more'), function(m){ m.remove(); });
-    first.style.height = ''; first.style.width = '';
+    first.style.height = ''; first.style.width = ''; first.style.marginBottom = '';
     L.qwSeen = k; if(L.qwDone) L.qwDone();
-    if(innerWidth <= 700) return;
-    var cand = list.slice(k, k + 3).filter(Boolean);
+    if(innerWidth <= 700){ first.style.visibility = ''; return; }
+    if(S) first.style.visibility = 'hidden';
+    var cand = list.slice(k, W === 'pair' ? k + 3 : k + 1).filter(Boolean);
     loadAll(cand).then(function(got){
       if(!L.contains(first) || token !== L.qwToken) return;
       var Wd = L.clientWidth, H = L.clientHeight, g = parseFloat(getComputedStyle(L).columnGap) || 24, best = 1, bestA = 0, bestH = 0;
+      // the box the pictures may take
+      var bw = Wd * (S === 'mat' ? .84 : S ? .9 : 1), bh = H * (S === 'mat' ? .74 : S === 'hang' ? .72 : S ? .84 : 1);
       for(var m = 1; m <= got.length; m++){
         var sum = 0; for(var i = 0; i < m; i++) sum += got[i].r;
-        var h = Math.min(H, (Wd - g * (m - 1)) / sum), area = h * h * sum;
+        var h = Math.min(bh, (bw - g * (m - 1)) / sum), area = h * h * sum;
         if(area > bestA * 1.15){ bestA = area; best = m; bestH = h; }
       }
-      if(best === 1) return;
+      if(S === 'area' || S === 'hang'){
+        var sm = 0; for(var q = 0; q < best; q++) sm += got[q].r;
+        bestH = Math.min(bestH, Math.sqrt(Wd * H * .3 * (1 + .35 * (best - 1)) / sm));
+      }
+      first.style.visibility = '';
+      if(best === 1 && !S) return;
       first.style.height = bestH + 'px'; first.style.width = 'auto';
+      if(S === 'hang') first.style.marginBottom = '';
       for(var j = 1; j < best; j++)(function(j){
         var im = el('img', 'qw-more', L); im.alt = ''; im.src = got[j].it.src; im.style.height = bestH + 'px';
         im.addEventListener('click', function(e){ e.stopPropagation(); onPick(k + j); });

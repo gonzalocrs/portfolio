@@ -100,7 +100,7 @@
   body.ai-edge .a-stage{margin-top:calc(-1 * clamp(2rem,7vh,4.5rem))}
   .a-cap b{font-weight:800;font-size:clamp(1.15rem,1.5vw,1.35rem);letter-spacing:-.02em;line-height:1}
 
-  /* =================== A, whole layouts (&l=ruler|ledger|type|label) ===================
+  /* =================== A, whole layouts (&l=ruler|type|label) ===================
      the numbered index and one picture per project, composed four different ways */
   .p-stage{position:relative;min-height:0}
   .p-layer{position:absolute;inset:0;opacity:0;transition:opacity .9s ease;pointer-events:none;display:flex;align-items:flex-end;justify-content:flex-start}
@@ -113,61 +113,60 @@
   .faintable.pointing .tr .n,.faintable.pointing .tr .lt{color:var(--faint)}
   .faintable.pointing .tr.cur,.faintable.pointing .tr.cur .n,.faintable.pointing .tr.cur .lt{color:var(--ink)}
 
-  /* ruler: the picture large in the middle; the ten numbers spread along one line across the whole width under it,
-     like a scale; the line darkens over the project shown, its name appears there */
-  .ru{flex:1;display:flex;flex-direction:column;padding:clamp(1rem,3vh,2rem) var(--gut) 0;min-height:0}
-  .ru .p-stage{flex:1}
-  .ru .p-layer{justify-content:center}
-  .ru-scale{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));margin-top:1.6rem}
-  .ru-cap{display:none}
-  .ru-grp{grid-row:1;font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);padding-bottom:.5rem}
-  .ru-scale .tr{grid-row:2;text-align:left;border-top:1px solid var(--rule);padding-top:.6rem;position:relative;min-height:3.6rem}
-  .ru-scale .tr::before{content:"";position:absolute;left:0;right:0;top:-1px;height:2px;background:var(--ink);transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
-  .ru-scale .tr.cur::before{transform:scaleX(1)}
-  .ru-scale .tr .n{display:block}
-  .ru-scale .tr b{display:block;margin-top:.35rem;font-weight:800;font-size:clamp(1rem,1.2vw,1.15rem);letter-spacing:-.02em;white-space:nowrap;opacity:0;transition:opacity .4s ease}
-  .ru-scale .tr .k{display:block;margin-top:.2rem;white-space:nowrap;opacity:0;transition:opacity .4s ease}
-  .ru-scale .tr.cur b,.ru-scale .tr.cur .k{opacity:1}
+  /* About is not a project: it closes the index, as on the reference, in the same place as a title but light and
+     grey, after a "+" instead of a number (the header has no About link in these layouts) */
+  body.lay .bar nav{display:none}
+  .ab{display:inline-flex;align-items:baseline;gap:.6rem;color:var(--mute);transition:color .3s}
+  .ab .n{color:var(--mute)}
+  .ab span:last-child{font-weight:300;letter-spacing:0}
+  .ab:hover,.ab:hover .n{color:var(--ink)}
+
+  /* ruler: the scale stands upright on the left, a thin line from top to bottom with the ten numbers spaced along
+     it; the stretch of line beside the project shown darkens and its name and place appear there; the picture is
+     large to its right */
+  .ru{flex:1;display:grid;grid-template-columns:minmax(14rem,19rem) 1fr;gap:clamp(1.5rem,4vw,4rem);padding:clamp(1rem,3vh,2rem) var(--gut) 0;min-height:0}
+  .ru .p-layer{align-items:flex-start}
+  .ru-col{display:flex;flex-direction:column;min-height:0}
+  .ru-scale{flex:1;display:flex;flex-direction:column;border-left:1px solid var(--rule);min-height:0}
+  .ru-scale .tr{flex:1;position:relative;display:flex;flex-direction:column;justify-content:flex-start;text-align:left;padding:.15rem 0 0 1rem;min-height:2.2rem}
+  .ru-scale .tr::before{content:"";position:absolute;left:-1px;top:0;bottom:0;width:2px;background:var(--ink);transform:scaleY(0);transform-origin:top;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+  .ru-scale .tr.cur::before{transform:scaleY(1)}
   .ru-scale .tr .n{transition:color .3s}
   .ru-scale .tr:not(.cur) .n{color:var(--faint)}
   .ru-scale .tr:hover .n{color:var(--ink)}
+  .ru-scale .tr b{margin-top:.3rem;font-weight:800;font-size:clamp(1.05rem,1.3vw,1.25rem);letter-spacing:-.02em;white-space:nowrap;opacity:0;transition:opacity .4s ease}
+  .ru-scale .tr .k{margin-top:.2rem;white-space:nowrap;opacity:0;transition:opacity .4s ease}
+  .ru-scale .tr.cur b,.ru-scale .tr.cur .k{opacity:1}
+  .ru-grp{position:absolute;right:0;top:.2rem;font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:var(--faint)}
+  .ru-col .ab{padding:1.1rem 0 .2rem 1rem}
+  .ru-col .ab span:last-child{font-size:clamp(1.05rem,1.3vw,1.25rem)}
 
-  /* ledger: one band of picture across the top; under it the index as a full-width table, one ruled row per project */
-  .le{flex:1;display:flex;flex-direction:column;padding:clamp(1rem,3vh,2rem) var(--gut) 0;min-height:0}
-  .le .p-stage{flex:1;min-height:34vh}
-  .le-table{margin-top:1.4rem;border-bottom:1px solid var(--rule)}
-  .le-head,.le-table .tr{display:grid;grid-template-columns:3.2rem minmax(0,1.5fr) minmax(0,1.1fr) minmax(0,1fr) minmax(0,.8fr) 4rem;align-items:baseline;gap:1rem}
-  .le-head{padding-bottom:.45rem}
-  .le-head span{font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
-  .le-table .tr{border-top:1px solid var(--rule);padding:.42rem 0;width:100%;text-align:left}
-  .le-table .tr b{font-weight:800;font-size:clamp(1rem,1.15vw,1.1rem);letter-spacing:-.015em}
-  .le-table .tr .lt{font-weight:300;font-size:.92rem}
-  .le-table .tr .yr{text-align:right}
-
-  /* type: the names alone, very large, filling the page; the picture appears beside the name pointed at */
-  .ty{flex:1;position:relative;padding:clamp(1rem,3vh,2rem) var(--gut) 1rem;min-height:0}
+  /* type: only the names, in one quiet column; nothing else on the page until you point at one, then the others
+     go pale and its picture appears in the space to the right, top on that name's line */
+  .ty{flex:1;position:relative;padding:clamp(2rem,9vh,6rem) var(--gut) 1rem;min-height:0}
   .ty-list{list-style:none;margin:0;padding:0;position:relative;z-index:1}
-  .ty-list .tr{display:inline-flex;align-items:baseline;gap:.9rem;padding:0}
-  .ty-list b{font-weight:800;font-size:clamp(2rem,5.6vh,3.6rem);letter-spacing:-.035em;line-height:1.04}
+  .ty-list .tr{display:inline-flex;align-items:baseline;gap:.7rem;padding:0;text-align:left}
+  .ty-list b{font-weight:800;font-size:clamp(1.5rem,3.7vh,2.3rem);letter-spacing:-.03em;line-height:1.22}
+  .ty-list .ab{margin-top:1.6rem}
+  .ty-list .ab span:last-child{font-size:clamp(1.5rem,3.7vh,2.3rem);letter-spacing:-.02em}
   .ty .p-stage{position:absolute;left:0;top:0;width:0;height:0}
-  .ty .p-layer{inset:auto;left:0;top:0;width:var(--pw,40vw);height:var(--ph,40vh);align-items:flex-start;transition:opacity .6s ease}
-  .ty-cap{position:absolute;right:var(--gut);bottom:1rem;display:flex;gap:1rem;align-items:baseline}
+  .ty .p-layer{inset:auto;left:0;top:0;width:var(--pw,40vw);height:var(--ph,40vh);align-items:flex-start;transition:opacity .5s ease}
 
-  /* label: the picture fills the room; the index is the museum label beside it, small, at the foot of the wall */
-  .lb{flex:1;display:grid;grid-template-columns:1fr minmax(15rem,18rem);gap:clamp(1.5rem,3vw,3rem);padding:clamp(1rem,3vh,2rem) var(--gut) 0;min-height:0}
+  /* label: the picture hangs on the wall and the label sits beside it, as in a museum: picture and label share
+     one floor line, the picture pushed up against the label; the label holds the name, place and year of the
+     picture, then the numbered list, small */
+  .lb{flex:1;display:grid;grid-template-columns:1fr minmax(13rem,15rem);gap:clamp(1.5rem,2.5vw,2.5rem);padding:clamp(1rem,3vh,2rem) var(--gut) 1.4rem;min-height:0}
   .lb .p-stage{height:100%}
-  .lb .p-layer{align-items:flex-start}
-  .lb-label{align-self:start}
-  .lb-now{border-bottom:1px solid var(--rule);padding-bottom:1.1rem;margin-bottom:1.1rem}
-  .lb-now h2{margin:0;font-weight:800;font-size:1.5rem;letter-spacing:-.025em;line-height:1.1}
-  .lb-now .k{display:block;margin-top:.45rem}
-  .lb-now button{margin-top:.9rem;font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em}
-  .lb-now button:hover{text-decoration:underline;text-underline-offset:3px}
+  .lb .p-layer{justify-content:flex-end;align-items:flex-end}
+  .lb-label{align-self:end}
+  .lb-now{margin-bottom:2.2rem}
+  .lb-now h2{margin:0;font-weight:800;font-size:1.3rem;letter-spacing:-.02em;line-height:1.15}
+  .lb-now .k{display:block;margin-top:.4rem}
   .lb-list{list-style:none;margin:0;padding:0}
-  .lb-list .grp{margin:.9rem 0 .25rem}
-  .lb-list .grp:first-child{margin-top:0}
-  .lb-list .tr{display:grid;grid-template-columns:1.8rem 1fr;align-items:baseline;padding:.07rem 0;text-align:left;width:100%}
-  .lb-list .tr .lt{font-weight:400;font-size:.92rem}
+  .lb-list .tr{display:grid;grid-template-columns:1.7rem 1fr;align-items:baseline;padding:.05rem 0;text-align:left;width:100%}
+  .lb-list .tr .lt{font-weight:400;font-size:.86rem}
+  .lb-list .ab{display:grid;grid-template-columns:1.7rem 1fr;gap:0;margin-top:.9rem}
+  .lb-list .ab span:last-child{font-size:.86rem}
 
   /* =================== B: field =================== */
   .b-line{display:flex;flex-wrap:wrap;gap:.35rem 1.7rem;padding:clamp(1.6rem,5vh,3rem) var(--gut) 0;max-width:72rem}
@@ -231,21 +230,13 @@
     .b-pic{height:clamp(96px,20vw,150px)}
     .b-field{gap:1.6rem 1rem}
     /* the four layouts on a phone: the picture on top, the index under it */
-    .ru .p-stage,.le .p-stage,.lb .p-stage{flex:none;height:62vw;min-height:0}
-    .ru-scale .tr b,.ru-scale .tr .k{display:none}
-    .ru-scale .tr{min-height:2rem}
-    .ru-grp{font-size:.55rem}
-    .ru-cap{display:flex;gap:.8rem;align-items:baseline;padding-top:.6rem}
-    .ru-cap b{font-weight:800;font-size:1.15rem;letter-spacing:-.02em}
-    .le-head,.le-table .tr{grid-template-columns:2.2rem minmax(0,1fr) 3rem}
-    .le-head span:nth-child(3),.le-head span:nth-child(4),.le-head span:nth-child(5),
-    .le-table .tr .lt:not(.yr){display:none}
-    .ty{display:flex;flex-direction:column}
-    .ty .p-stage{position:relative;order:-1;width:auto;height:62vw;margin-bottom:1.2rem}
-    .ty .p-layer{inset:0 !important;width:auto !important;height:auto !important;align-items:flex-end}
-    .ty-list b{font-size:clamp(1.6rem,8vw,2.2rem)}
-    .ty-cap{position:static;padding-top:.8rem}
-    .lb{grid-template-columns:1fr}
+    .ru,.lb{grid-template-columns:1fr}
+    .ru .p-stage,.lb .p-stage{order:-1;height:62vw}
+    .ru .p-layer{align-items:flex-end}
+    .ru-scale .tr{flex:none;min-height:2.2rem}
+    .ru-scale .tr:not(.cur) b,.ru-scale .tr:not(.cur) .k{display:none}
+    .ty{display:flex;flex-direction:column;padding-top:1.5rem}
+    .ty-list b,.ty-list .ab span:last-child{font-size:clamp(1.4rem,7vw,2rem)}
     /* phone: one picture per screen width, whole, swiped one at a time */
     .c-strip{scroll-snap-type:x mandatory;scroll-padding:0 var(--gut);gap:1rem;align-items:flex-start}
     .c-item{scroll-snap-align:start}
@@ -433,13 +424,25 @@
       L.classList.add('on');
     }};
   }
-  function indexer(box, items, onShow){
-    var cur = null, timer = null, withPics = SLUGS.filter(coverOf);
+  // opts.rest: nothing is shown until something is pointed at, and nothing moves by itself
+  function indexer(box, items, onShow, opts){
+    var cur = null, timer = null, withPics = SLUGS.filter(coverOf), rest = opts && opts.rest;
     function show(slug, instant){
       if(slug === cur) return;
       cur = slug;
       items.forEach(function(t){ t.classList.toggle('cur', t.slug === slug); });
+      box.classList.toggle('pointing', !rest || !!slug);
       onShow(slug, instant);
+    }
+    if(rest){
+      items.forEach(function(t){
+        t.addEventListener('mouseenter', function(){ show(t.slug); });
+        t.addEventListener('focus', function(){ show(t.slug); });
+        t.addEventListener('click', function(e){ e.preventDefault(); visit(t.slug, null, null); });
+      });
+      box.addEventListener('mouseleave', function(){ show(null); });
+      box.classList.add('faintable');
+      return;
     }
     function auto(){
       clearInterval(timer);
@@ -458,74 +461,62 @@
   function credit(p, key){ var v = ''; (p.credits || []).forEach(function(r){ if(r[0] === key) v = r[1]; }); return v; }
   function entry(parent, slug, cls){ var t = el('button', 'tr' + (cls ? ' ' + cls : ''), parent); t.type = 'button'; t.slug = slug; return t; }
 
+  // the About entry that closes each index
+  function aboutEntry(parent){
+    var a = el('a', 'ab', parent); a.href = 'about.html';
+    el('span', 'n', a, '+'); el('span', '', a, 'About');
+    return a;
+  }
+
   function buildRuler(){
-    var wrap = el('div', 'ru', main), ps = picStage(wrap), scale = el('div', 'ru-scale', wrap), items = [], group = null;
-    SLUGS.forEach(function(slug, i){
-      var p = P[slug];
-      if(p.group !== group){
-        group = p.group;
-        var span = SLUGS.filter(function(s){ return P[s].group === group; }).length;
-        var g = el('div', 'ru-grp', scale, group); g.style.gridColumn = (i + 1) + ' / span ' + span;
-      }
-      var t = entry(scale, slug); t.style.gridColumn = String(i + 1);
+    var wrap = el('div', 'ru', main), col = el('div', 'ru-col', wrap), scale = el('div', 'ru-scale', col);
+    var ps = picStage(wrap), items = [], group = null;
+    SLUGS.forEach(function(slug){
+      var p = P[slug], t = entry(scale, slug);
+      if(p.group !== group){ group = p.group; el('span', 'ru-grp', t, group); }
       el('span', 'n', t, num(slug)); el('b', '', t, p.title); el('span', 'k', t, p.kicker || '');
       items.push(t);
     });
-    var cap = el('div', 'ru-cap', wrap), capT = el('b', '', cap), capK = el('span', 'k', cap);
-    indexer(scale, items, function(slug, instant){ ps.show(slug, instant); capT.textContent = P[slug].title; capK.textContent = P[slug].kicker || ''; });
-  }
-
-  function buildLedger(){
-    var wrap = el('div', 'le', main), ps = picStage(wrap), table = el('div', 'le-table', wrap), items = [];
-    var head = el('div', 'le-head', table);
-    ['No.', 'Project', 'Type', 'Location', 'Category', 'Year'].forEach(function(h, i){ var s = el('span', '', head, h); if(i === 5) s.style.textAlign = 'right'; });
-    SLUGS.forEach(function(slug){
-      var p = P[slug], t = entry(table, slug), place = credit(p, 'Location') || (p.kicker || '').split(',')[0];
-      el('span', 'n', t, num(slug)); el('b', '', t, p.title);
-      el('span', 'lt', t, credit(p, 'Type')); el('span', 'lt', t, place); el('span', 'lt', t, p.group);
-      el('span', 'lt yr', t, credit(p, 'Year') || (p.kicker || '').replace(/.*,\s*/, ''));
-      items.push(t);
-    });
-    indexer(table, items, function(slug, instant){ ps.show(slug, instant); });
+    aboutEntry(col);
+    indexer(scale, items, function(slug, instant){ ps.show(slug, instant); });
   }
 
   function buildType(){
     var wrap = el('div', 'ty', main), list = el('ol', 'ty-list', wrap), ps = picStage(wrap), items = [];
-    var cap = el('div', 'ty-cap', wrap), capK = el('span', 'k', cap);
     SLUGS.forEach(function(slug){
       var p = P[slug], li = el('li', '', list), t = entry(li, slug);
       el('span', 'n', t, num(slug)); el('b', '', t, p.title);
       items.push(t);
     });
-    // the picture stands just right of the name pointed at, its top on that line, kept inside the page
+    aboutEntry(el('li', '', list));
     function placeBy(t, L){
       if(innerWidth <= 900) return;
       var wr = wrap.getBoundingClientRect(), r = t.querySelector('b').getBoundingClientRect();
-      var x = r.right - wr.left + 28, w = wr.width - x - parseFloat(getComputedStyle(wrap).paddingRight);
-      var h = Math.min(wr.height * .62, 520), y = Math.max(8, Math.min(r.top - wr.top + 6, wr.height - h - 8));
-      L.style.left = x + 'px'; L.style.top = y + 'px'; L.style.setProperty('--pw', Math.max(120, w) + 'px'); L.style.setProperty('--ph', h + 'px');
+      var widest = Math.max.apply(null, items.map(function(i){ return i.getBoundingClientRect().right - wr.left; }));
+      var x = Math.max(widest + 64, wr.width * .42);
+      var w = wr.width - x - parseFloat(getComputedStyle(wrap).paddingRight);
+      var h = Math.min(wr.height * .5, 440), y = Math.max(8, Math.min(r.top - wr.top + 8, wr.height - h - 8));
+      L.style.left = x + 'px'; L.style.top = y + 'px'; L.style.setProperty('--pw', w + 'px'); L.style.setProperty('--ph', h + 'px');
     }
+    // at rest the page is only the names; pointing at one shows its picture, leaving the list empties it again
     indexer(list, items, function(slug, instant){
+      if(!slug){ ps.layers.forEach(function(L){ L.classList.remove('on'); }); return; }
       var t = items.filter(function(i){ return i.slug === slug; })[0];
       ps.show(slug, instant, function(L){ placeBy(t, L); });
-      capK.textContent = P[slug].kicker || '';
-    });
+    }, {rest: true});
   }
 
   function buildLabel(){
     var wrap = el('div', 'lb', main), ps = picStage(wrap), label = el('aside', 'lb-label', wrap);
-    var now = el('div', 'lb-now', label), h = el('h2', '', now), k = el('span', 'k', now), go = el('button', '', now, 'View project');
-    go.type = 'button';
-    var list = el('ol', 'lb-list', label), items = [], group = null, shown = null;
-    go.addEventListener('click', function(){ if(shown) visit(shown, null, null); });
+    var now = el('div', 'lb-now', label), h = el('h2', '', now), k = el('span', 'k', now);
+    var list = el('ol', 'lb-list', label), items = [];
     SLUGS.forEach(function(slug){
-      var p = P[slug];
-      if(p.group !== group){ group = p.group; el('li', 'grp k', list, group); }
-      var t = entry(el('li', '', list), slug);
+      var p = P[slug], t = entry(el('li', '', list), slug);
       el('span', 'n', t, num(slug)); el('span', 'lt', t, p.title);
       items.push(t);
     });
-    indexer(list, items, function(slug, instant){ shown = slug; ps.show(slug, instant); h.textContent = P[slug].title; k.textContent = P[slug].kicker || ''; });
+    aboutEntry(el('li', '', list));
+    indexer(list, items, function(slug, instant){ ps.show(slug, instant); h.textContent = P[slug].title; k.textContent = P[slug].kicker || ''; });
   }
 
   // =================== B: field ===================
@@ -637,9 +628,9 @@
     document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ var z = document.querySelector('.zoom'); if(z) z.remove(); } });
   }
 
-  var LAY = (Q.get('l') || '').toLowerCase(), LAYS = {ruler: buildRuler, ledger: buildLedger, type: buildType, label: buildLabel};
+  var LAY = (Q.get('l') || '').toLowerCase(), LAYS = {ruler: buildRuler, type: buildType, label: buildLabel};
   if(V === 'a' && LAYS[LAY]){
-    document.body.classList.add('l-' + LAY);
+    document.body.classList.add('l-' + LAY, 'lay');
     var lo = document.querySelector('.opts');
     lo.innerHTML = 'Layout' + Object.keys(LAYS).map(function(k){ return '<a href="?v=a&l=' + k + '"' + (k === LAY ? ' class="on"' : '') + '>' + k + '</a>'; }).join('');
     LAYS[LAY]();

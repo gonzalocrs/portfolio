@@ -390,6 +390,28 @@
     .qp .qk.cur span{display:flex;align-items:baseline;gap:.5rem}
     .qp-card{position:fixed;left:var(--gut);right:var(--gut);top:auto;bottom:1rem;width:auto;max-height:70svh;padding:1.2rem;box-shadow:0 10px 40px rgba(15,18,22,.12)}
   }
+  /* the quiet intro (see quietIntro): everything starts hidden, then comes in step by step */
+  .qi .gv-mark,.qi footer{opacity:0;transition:opacity .9s ease}
+  .qi.qi-name-in .gv-mark,.qi.qi-name-in footer{opacity:1}
+  .qi:not(.qi-name-in) .gv-mark,.qi:not(.qi-name-in) footer,.qi:not(.qi-pic-in) .qt-stage{transition:none}
+  .qi .qt-ticks > .qk i{width:0;transition:width .7s cubic-bezier(.2,.7,.2,1) var(--d,0ms),background .3s}
+  .qi .qt-ticks > .qk.qa i{opacity:0;transition:opacity .6s ease .75s}
+  .qi.qi-marks-in .qt-ticks > .qk i{width:.9rem}
+  .qi.qi-marks-in .qt-ticks > .qk.cur i{width:3rem}
+  .qi.qi-marks-in .qt-ticks > .qk.qa i{width:auto;opacity:1}
+  .qi .qt-ticks .qk span{opacity:0}
+  .qi.qi-name-in .qt-ticks .qk.cur span{opacity:1;transform:none}
+  .qi .qt-stage{opacity:0;transition:opacity 1.2s ease}
+  .qi.qi-pic-in .qt-stage{opacity:1}
+  .qi.qi-line .qt-stage{transition:none}
+  .qi-rule{position:absolute;height:1px;background:var(--ink);transform:scaleX(0);transform-origin:left;z-index:4;transition:transform .9s cubic-bezier(.7,0,.2,1),opacity .9s ease}
+  .qi-line-in .qi-rule{transform:scaleX(1)}
+  .qi-open .qi-rule{opacity:0}
+  @media (max-width:700px){
+    .qi .qt-ticks > .qk i{width:1px;height:0;transition:height .7s cubic-bezier(.2,.7,.2,1) var(--d,0ms)}
+    .qi.qi-marks-in .qt-ticks > .qk i{width:1px;height:.9rem}
+    .qi.qi-marks-in .qt-ticks > .qk.cur i{width:2px;height:2.2rem}
+  }
   .zoom{position:fixed;inset:0;z-index:80;background:var(--paper);display:flex;align-items:center;justify-content:center;padding:2rem;cursor:zoom-out}
   .zoom img{max-width:100%;max-height:100%;object-fit:contain}
 
@@ -1319,6 +1341,7 @@
     st.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive: true});
     st.addEventListener('touchend', function(e){ if(sx == null) return; var dx = e.changedTouches[0].clientX - sx; sx = null; if(Math.abs(dx) > 40) step(dx < 0 ? 1 : -1); }, {passive: true});
     show(withPics[0], true);
+    return {restart: function(){ clearInterval(timer); timer = setInterval(tick, 3200); }};
   }
 
   // a project: the same marks, its own opened into one mark per picture; one picture at a time, as large as fits.
@@ -1382,6 +1405,61 @@
     var start = Q.get('i'); go(start === 'last' ? n - 1 : Math.max(0, Math.min(n - 1, (parseInt(start, 10) || 1) - 1)));
   }
 
+  // the intro, for quiet. The old one (the name large in the middle, its letters flipping in like an airport board, then
+  // gliding to the header) is replaced by something quieter, one of two (&intro=):
+  //   line   one thin line draws across where the picture will be; the picture opens up and down out of it while the
+  //          marks draw in one by one; then the name
+  //   marks  an empty page; the ten marks draw in one by one, top to bottom; then the name; then the picture
+  // Once per visit (as the live site does); a link in the footer plays it again.
+  function quietIntro(home){
+    var kind = (Q.get('intro') || 'line').toLowerCase();
+    if(kind === 'off' || kind === 'none') return;
+    if(kind !== 'marks') kind = 'line';
+    var forced = Q.has('intro');
+    try{ if(!forced && sessionStorage.getItem('gc-qintro') === '1') return; sessionStorage.setItem('gc-qintro', '1'); }catch(e){}
+    if(matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var b = document.body, marks = Array.prototype.slice.call(document.querySelectorAll('.qt-ticks > .qk')), st = document.querySelector('.qt-stage');
+    var T = [];
+    function later(fn, ms){ T.push(setTimeout(fn, ms)); }
+    b.classList.add('qi', 'qi-' + kind);
+    marks.forEach(function(m, i){ m.style.setProperty('--d', (i * 70) + 'ms'); });
+    function img(){ return st.querySelector('.p-layer.on img, .p-layer.on .plate'); }
+    function end(){
+      b.classList.remove('qi', 'qi-' + kind, 'qi-marks-in', 'qi-name-in', 'qi-pic-in', 'qi-line-in', 'qi-open');
+      marks.forEach(function(m){ m.style.removeProperty('--d'); });
+      var im = img(); if(im) im.style.clipPath = '';
+      var ln = document.querySelector('.qi-rule'); if(ln) ln.remove();
+      home.restart();
+    }
+    if(kind === 'marks'){
+      later(function(){ b.classList.add('qi-marks-in'); }, 150);
+      later(function(){ b.classList.add('qi-name-in'); }, 1000);
+      later(function(){ b.classList.add('qi-pic-in'); }, 1400);
+      later(end, 2700);
+      return;
+    }
+    // line: wait for the first picture to know its size (never long)
+    var started = false;
+    function go(){
+      if(started) return; started = true;
+      var im = img(), sr = st.getBoundingClientRect(), r = im ? im.getBoundingClientRect() : sr;
+      var ln = el('div', 'qi-rule', st);
+      ln.style.left = (r.left - sr.left) + 'px'; ln.style.width = r.width + 'px'; ln.style.top = (r.top - sr.top + r.height / 2) + 'px';
+      if(im){ im.style.transition = 'none'; im.style.clipPath = 'inset(50% 0 50% 0)'; }
+      b.classList.add('qi-pic-in');
+      later(function(){ b.classList.add('qi-line-in'); }, 80);
+      later(function(){
+        if(im){ im.style.transition = 'clip-path 1.25s cubic-bezier(.7,0,.2,1)'; im.style.clipPath = 'inset(0 0 0 0)'; }
+        b.classList.add('qi-open', 'qi-marks-in');
+      }, 1000);
+      later(function(){ b.classList.add('qi-name-in'); }, 1900);
+      later(function(){ if(im) im.style.transition = ''; end(); }, 3000);
+    }
+    var im0 = img();
+    if(im0 && im0.tagName === 'IMG' && !im0.complete){ im0.addEventListener('load', go); setTimeout(go, 1200); }
+    else setTimeout(go, 30);
+  }
+
   var LAY = (Q.get('l') || '').toLowerCase(), LAYS = {ruler: buildRuler, type: buildType, label: buildLabel, quiet: buildQuiet};
   if(V === 'a' && LAYS[LAY]){
     document.body.classList.add('l-' + LAY, 'lay');
@@ -1391,8 +1469,8 @@
     if(LAY === 'ruler') document.getElementById('home').setAttribute('href', '?v=a&l=ruler');
     if(LAY === 'quiet'){
       document.getElementById('home').setAttribute('href', '?v=a&l=quiet');
-      lo.innerHTML = '<a href="draft-ruler.html?v=a&l=ruler">ruler draft</a><span style="margin-left:1.2rem;color:var(--faint)">q1</span>';
-      if(P[Q.get('p')]) buildQuietProject(Q.get('p')); else buildQuiet();
+      lo.innerHTML = (P[Q.get('p')] ? '' : 'Intro<a href="?v=a&l=quiet&intro=line">line</a><a href="?v=a&l=quiet&intro=marks">marks</a><span style="margin-right:1.2rem"></span>') + '<a href="draft-ruler.html?v=a&l=ruler">ruler draft</a><span style="margin-left:1.2rem;color:var(--faint)">q2</span>';
+      if(P[Q.get('p')]) buildQuietProject(Q.get('p')); else quietIntro(buildQuiet());
       RP = null; LAY = '';
     }
     if(RP) lo.innerHTML = 'Project' + ['step', 'scroll'].map(function(k){ return '<a href="?v=a&l=ruler&p=' + RP + '&pv=' + k + '"' + (k === PV ? ' class="on"' : '') + '>' + k + '</a>'; }).join('') + (PV === 'scroll' ? '<span style="margin-left:1.2rem">Appear</span>' + ['rise', 'unveil', 'drift'].map(function(k){ var cur = (Q.get('in') || 'rise').toLowerCase(); return '<a href="?v=a&l=ruler&p=' + RP + '&pv=scroll&in=' + k + '"' + (k === cur ? ' class="on"' : '') + '>' + k + '</a>'; }).join('') : '') + '<span style="margin-left:1.2rem;color:var(--faint)">r12</span>';

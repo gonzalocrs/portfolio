@@ -320,16 +320,11 @@ body.l-quiet.qh-roll{height:auto;overflow:visible}
 .qab-touch{margin-top:calc(2rem - min(46vh,70%) * .15)}
 @media (max-width:700px){ .qab-touch{margin-top:calc(1.6rem - min(48vw,14rem) * .15)} }
 
-/* test (2026-10-26): from a home picture into its project. Where the browser can (cross-document view transitions), the
-   picture glides from the home to its place in the project while the rest fades across; elsewhere a plain fade */
-@view-transition{navigation:auto}
-::view-transition-group(qpic){animation-duration:.75s;animation-timing-function:cubic-bezier(.3,.7,.2,1)}
-::view-transition-old(root){animation:.4s ease both q-out}
-::view-transition-new(root){animation:.6s ease .15s both q-in}
-@keyframes q-out{to{opacity:0}}
-@keyframes q-in{from{opacity:0}}
-body.q-leave main{opacity:0;transition:opacity .35s ease}
-body.q-enter main{animation:q-in .6s ease both}
+/* test (2026-10-26): from a home picture into its project without a reload (into() in quiet.js): the picture flies
+   from its place on the home to its place in the project; the home fades out under it and the project fades in */
+.q-fly{position:fixed;z-index:60;margin:0;object-fit:contain;pointer-events:none;transition:left .8s cubic-bezier(.65,0,.25,1),top .8s cubic-bezier(.65,0,.25,1),width .8s cubic-bezier(.65,0,.25,1),height .8s cubic-bezier(.65,0,.25,1)}
+main{transition:opacity .4s ease}
+main.q-away{opacity:0}
 /* the project's pictures: two small arrows at the sides in place of the arrow-shaped pointer */
 .qp .qt-stage,.qp .qt-stage.back,.qp .qt-stage img{cursor:default}
 .qp .qt-stage img{cursor:pointer}

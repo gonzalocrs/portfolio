@@ -60,16 +60,39 @@
     return marks;
   }
   function quietHref(s, i){ return 'project.html?p=' + s + (i ? '&i=' + i : ''); }
-  // going into a project from a picture on the home (test, 2026-10-26): where the browser can carry a picture from one
-  // page to the next (cross-document view transitions), the picture glides from its place on the home to its place in
-  // the project while the rest fades across; elsewhere the home fades out and the project fades in
-  var VT = 'CSSViewTransitionRule' in window;
-  function enter(img, href){
-    try{ sessionStorage.setItem('gc-enter', '1'); }catch(e){}
-    if(VT){ if(img) img.style.viewTransitionName = 'qpic'; location.href = href; return; }
-    document.body.classList.add('q-leave');
-    setTimeout(function(){ location.href = href; }, 380);
+  // going into a project from a picture on the home (test, 2026-10-26): the page doesn't reload. The picture lifts off
+  // the home and glides to its place in the project while the home fades away and the project fades in around it; the
+  // address changes to the project's, and Back returns to the home. (The older homes, ?home=stage|flow, still just go.)
+  var PAGE = document.body.getAttribute('data-page');
+  function enter(img, href){ location.href = href; }
+  function into(img, slug, k){
+    if(PAGE !== 'home') return;
+    PAGE = 'project';
+    var r0 = img.getBoundingClientRect(), fly = el('img', 'q-fly', document.body);
+    fly.src = img.src; fly.alt = '';
+    fly.style.left = r0.left + 'px'; fly.style.top = r0.top + 'px'; fly.style.width = r0.width + 'px'; fly.style.height = r0.height + 'px';
+    img.style.visibility = 'hidden';
+    main.classList.add('q-away');
+    setTimeout(function(){
+      history.pushState({q: 'project'}, '', quietHref(slug, k ? k + 1 : 0));
+      document.body.classList.remove('qh-one', 'in-unveil', 'in-rise');
+      document.body.setAttribute('data-page', 'project');
+      main.innerHTML = '';
+      buildQuietProject(slug, k);
+      var target = document.querySelector('.p-layer.on img');
+      function land(){
+        var r1 = target.getBoundingClientRect();
+        target.style.visibility = 'hidden';
+        fly.style.left = r1.left + 'px'; fly.style.top = r1.top + 'px'; fly.style.width = r1.width + 'px'; fly.style.height = r1.height + 'px';
+        main.classList.remove('q-away');
+        setTimeout(function(){ target.style.visibility = ''; fly.remove(); }, 820);
+      }
+      if(!target){ main.classList.remove('q-away'); fly.remove(); return; }
+      if(target.complete && target.naturalWidth) requestAnimationFrame(land);
+      else { target.addEventListener('load', land); target.addEventListener('error', land); }
+    }, 380);
   }
+  addEventListener('popstate', function(){ location.reload(); });
   function ratioOf(img){ return img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1.5; }
   function loadAll(list){
     return Promise.all(list.map(function(it){
@@ -257,7 +280,7 @@
       if(old){ old.classList.remove('in'); old.classList.add('out', d < 0 ? 'down' : 'up'); setTimeout(function(){ old.remove(); }, 1100); }
       var f = el('figure', 'qo-fig' + (d < 0 ? ' from-up' : ''), st); f.o = o;
       var im = el('img', '', f); im.alt = o.it.caption || P[o.slug].title; im.src = o.it.src;
-      f.addEventListener('click', function(){ enter(im, quietHref(o.slug, o.k0 ? o.k0 + 1 : 0)); });
+      f.addEventListener('click', function(){ into(im, o.slug, o.k0); });
       place(f, o);
       setTimeout(function(){ f.classList.add('in'); }, old ? 420 : 60);
       curEl = f; at = i;
@@ -288,6 +311,7 @@
     // short pause in the wheel since the last one, or a clearly new push
     var lastD = 0;
     addEventListener('wheel', function(e){
+      if(PAGE !== 'home') return;
       e.preventDefault();
       var d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX, now = Date.now(), gap = now - lastWheel;
       lastWheel = now;
@@ -297,6 +321,7 @@
       step(d > 0 ? 1 : -1);
     }, {passive: false});
     addEventListener('keydown', function(e){
+      if(PAGE !== 'home') return;
       if(['ArrowDown', 'ArrowRight', 'PageDown', ' '].indexOf(e.key) > -1){ step(1); e.preventDefault(); }
       if(['ArrowUp', 'ArrowLeft', 'PageUp'].indexOf(e.key) > -1){ step(-1); e.preventDefault(); }
       if(e.key === 'Enter' && curEl) curEl.click();
@@ -310,7 +335,7 @@
       var d = Math.abs(dy) > Math.abs(dx) ? dy : dx;
       if(Math.abs(d) > 35) step(d < 0 ? 1 : -1);
     }, {passive: true});
-    addEventListener('resize', function(){ if(curEl) place(curEl, curEl.o); });
+    addEventListener('resize', function(){ if(PAGE === 'home' && curEl) place(curEl, curEl.o); });
   }
 
   // a project: the same marks, its own opened into one mark per picture; one picture at a time, as large as fits.
@@ -322,7 +347,7 @@
     return it.kind === 'drawing' ? 'Drawing' : it.kind === 'physical' ? 'Physical model' : 'Photograph';
   }
   addEventListener('resize', function(){ Array.prototype.forEach.call(document.querySelectorAll('.qf'), function(f){ if(f.fit) f.fit(); }); });
-  function buildQuietProject(slug){
+  function buildQuietProject(slug, startAt){
     var p = P[slug], all = pictures(slug), n = Math.max(1, all.length);
     var i0 = SLUGS.indexOf(slug);
     document.title = p.title + ' — Gonzalo Cáceres';
@@ -387,8 +412,7 @@
     }
     plus.addEventListener('click', function(e){ e.stopPropagation(); toggle(); });
     card.addEventListener('click', function(e){ e.stopPropagation(); });
-    var at = -1, lock = 0, arrived = false;
-    try{ arrived = sessionStorage.getItem('gc-enter') === '1'; sessionStorage.removeItem('gc-enter'); }catch(e){}
+    var at = -1, lock = 0;
     // two small arrows at the sides (test, 2026-10-26, in place of the arrow-shaped pointer); each hides at its end
     var prev = el('button', 'qn prev', st), next = el('button', 'qn next', st);
     prev.type = next.type = 'button'; prev.setAttribute('aria-label', 'Previous picture'); next.setAttribute('aria-label', 'Next picture');
@@ -408,7 +432,6 @@
         var f = el('figure', 'qf', L);
         if(it){
           var im = el('img', '', f); im.alt = it.caption || p.title; im.src = it.src;
-          if(first && arrived){ if(VT){ im.style.viewTransitionName = 'qpic'; setTimeout(function(){ im.style.viewTransitionName = ''; }, 1500); } else document.body.classList.add('q-enter'); }
           var cap = el('figcaption', 'k', f, it.caption || kindOf(it));
           var fit = function(){ cap.style.width = im.offsetWidth ? im.offsetWidth + 'px' : ''; };
           im.addEventListener('load', fit); f.fit = fit;
@@ -438,7 +461,7 @@
     var sx = null;
     st.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive: true});
     st.addEventListener('touchend', function(e){ if(sx == null) return; var dx = e.changedTouches[0].clientX - sx; sx = null; if(Math.abs(dx) > 40) go(at + (dx < 0 ? 1 : -1)); }, {passive: true});
-    var start = Q.get('i'); go(start === 'last' ? n - 1 : Math.max(0, Math.min(n - 1, (parseInt(start, 10) || 1) - 1)));
+    var start = Q.get('i'); go(startAt != null ? Math.min(n - 1, startAt) : start === 'last' ? n - 1 : Math.max(0, Math.min(n - 1, (parseInt(start, 10) || 1) - 1)));
   }
 
   // the intro. The old one (the name large in the middle, its letters flipping in like an airport board, then

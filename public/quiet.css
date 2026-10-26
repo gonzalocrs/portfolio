@@ -230,3 +230,4 @@ body.l-quiet.qh-roll{height:auto;overflow:visible}
   .qh-one .qo-stage{touch-action:none}
 }
 .in-unveil .qo-fig.out img{clip-path:inset(0 0 0 0)}
+.qp .qt-stage.none,.qp .qt-stage.none img{cursor:default}

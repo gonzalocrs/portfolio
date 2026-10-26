@@ -299,7 +299,7 @@
 
   // a project: the same marks, its own opened into one mark per picture; one picture at a time, as large as fits.
   // A click on the right half of the picture goes on, the left half back (the pointer shows which); the wheel,
-  // arrow keys and a swipe do the same; past the last picture comes the next project. "+" shows the words.
+  // arrow keys and a swipe do the same; it stops at the first and last picture. "+" shows the words.
   // a caption for a picture that has none yet (to be replaced by his own): what kind of picture it is
   function kindOf(it){
     if(/render/i.test(it.src)) return 'Render';
@@ -308,7 +308,7 @@
   addEventListener('resize', function(){ Array.prototype.forEach.call(document.querySelectorAll('.qf'), function(f){ if(f.fit) f.fit(); }); });
   function buildQuietProject(slug){
     var p = P[slug], all = pictures(slug), n = Math.max(1, all.length);
-    var i0 = SLUGS.indexOf(slug), nx = SLUGS[(i0 + 1) % SLUGS.length], pv = SLUGS[(i0 - 1 + SLUGS.length) % SLUGS.length];
+    var i0 = SLUGS.indexOf(slug);
     document.title = p.title + ' — Gonzalo Cáceres';
     var wrap = el('div', 'qt qp', main), nav = el('nav', 'qt-ticks', wrap), st = el('div', 'p-stage qt-stage', wrap), fade = fader(st);
     var marks = quietMarks(nav, slug, function(s){ return quietHref(s); }), me = marks[i0];
@@ -373,8 +373,8 @@
     card.addEventListener('click', function(e){ e.stopPropagation(); });
     var at = -1, lock = 0;
     function go(k){
-      if(k >= n){ location.href = quietHref(nx); return; }
-      if(k < 0){ location.href = quietHref(pv, 'last'); return; }
+      // a project ends at its last picture (his call, 2026-10-26): no scrolling on into the next one; the marks go there
+      if(k >= n || k < 0) return;
       if(k === at) return;
       var first = at < 0; at = k;
       fade(function(L){
@@ -392,7 +392,7 @@
       }, first);
       dots.forEach(function(d, j){ d.classList.toggle('cur', j === k); });
     }
-    st.addEventListener('mousemove', function(e){ var r = st.getBoundingClientRect(); st.classList.toggle('back', e.clientX < r.left + r.width * .35); });
+    st.addEventListener('mousemove', function(e){ var r = st.getBoundingClientRect(), b = e.clientX < r.left + r.width * .35; st.classList.toggle('back', b); st.classList.toggle('none', b ? at === 0 : at === n - 1); });
     st.addEventListener('click', function(e){
       if(isOpen() && D === 'float'){ toggle(false); return; }
       var r = st.getBoundingClientRect(); go(at + (e.clientX < r.left + r.width * .35 ? -1 : 1));

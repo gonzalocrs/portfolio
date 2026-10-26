@@ -535,8 +535,8 @@
   //   strip   the project's pictures in one row at one height, as his project pages open, running off the right edge
   //   sheet   the project's pictures all at once, small, in rows of one height filling the space, like his home page
   //   thumbs  one large picture with the project's others in a fine row of small ones under it; point at one to see it
-  var RIMG = (Q.get('img') || 'seq').toLowerCase();
-  if(['cover', 'seq', 'strip', 'sheet', 'thumbs', 'cluster', 'drift', 'living'].indexOf(RIMG) === -1) RIMG = 'seq';
+  var RIMG = (Q.get('img') || 'cluster').toLowerCase();
+  if(['cover', 'seq', 'strip', 'sheet', 'thumbs', 'cluster', 'drift', 'living'].indexOf(RIMG) === -1) RIMG = 'cluster';
   function ratioOf(img){ return img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1.5; }
   function loadAll(list){
     return Promise.all(list.map(function(it){
@@ -679,38 +679,55 @@
       // up to four pictures, each whole, fitted together on shared edges: a large one; a second beside it standing on
       // the same bottom line; a third under the first, its top one gap below; a fourth beside the third, tops level.
       // They arrive one after another; a small "+n" says how many more are inside
+      // the pictures fill the whole space: they are set in rows, each row exactly as wide as the space (its pictures
+      // share one height, whole, never cropped); of the ways to split three to six of the project's pictures into two
+      // or three rows, the one whose height comes closest to the space's height wins, so the page is filled edge to
+      // edge without showing everything
+      function rowsOf(rs, W, g, cuts){
+        var rows = [], at = 0;
+        cuts.concat([rs.length]).forEach(function(c){ rows.push(rs.slice(at, c)); at = c; });
+        return rows.map(function(row){ var sum = row.reduce(function(a, b){ return a + b; }, 0); return (W - g * (row.length - 1)) / sum; });
+      }
       function arrange(got, W, H){
-        var g = 16, r = got.map(function(o){ return o.r; }), R = [];
-        for(var k = 1; k > .3; k -= .04){
-          R = [];
-          var h1 = H * .62 * k, w1 = Math.min(W * .66, r[0] * h1); h1 = w1 / r[0];
-          R.push({x: 0, y: 0, w: w1, h: h1});
-          if(r[1]){ var h2 = h1 * .62, w2 = r[1] * h2; R.push({x: w1 + g, y: h1 - h2, w: w2, h: h2}); }
-          if(r[2]){ var h3 = H * .3 * k, w3 = r[2] * h3, x3 = Math.max(0, w1 * .32); R.push({x: x3, y: h1 + g, w: w3, h: h3}); }
-          if(r[3]){ var p = R[2], h4 = p.h * .72, w4 = r[3] * h4; R.push({x: p.x + p.w + g, y: p.y, w: w4, h: h4}); }
-          var fits = R.every(function(q){ return q.x + q.w <= W + .5 && q.y + q.h <= H + .5; });
-          if(fits) break;
+        var g = 16, best = null;
+        for(var k = Math.min(3, got.length); k <= Math.min(6, got.length); k++){
+          var set = some(got, k), rs = set.map(function(o){ return o.r; }), splits = [[]];
+          for(var i = 1; i < k; i++){ splits.push([i]); for(var j = i + 1; j < k; j++) splits.push([i, j]); }
+          splits.forEach(function(cuts){
+            var hs = rowsOf(rs, W, g, cuts), total = hs.reduce(function(a, b){ return a + b; }, 0) + g * (hs.length - 1);
+            var fit = total <= H ? total / H : H / total;
+            // a row much taller than half the space, or tiny pictures, reads badly
+            if(hs.some(function(h){ return h < H * .16; })) fit -= .25;
+            var score = fit - k * .012;
+            if(!best || score > best.score) best = {score: score, set: set, cuts: cuts, hs: hs, total: total};
+          });
         }
+        var sc = Math.min(1, H / best.total), R = [], y = 0, at = 0;
+        best.cuts.concat([best.set.length]).forEach(function(c, ri){
+          var h = best.hs[ri] * sc, x = 0;
+          best.set.slice(at, c).forEach(function(o){ var w = o.r * h; R.push({o: o, x: x, y: y, w: w, h: h}); x += w + g * sc; });
+          y += h + g * sc; at = c;
+        });
         return R;
       }
       indexer(scale, items, function(slug, instant){
-        var me = ++token, all = pictures(slug), pick = some(all, 4);
-        loadAll(pick).then(function(got){
+        var me = ++token, all = pictures(slug), pool = some(all, 6);
+        loadAll(pool).then(function(got){
           if(me !== token) return;
           fade(function(L){
             if(!got.length){ picEl(L, null, slug); return; }
-            var R = arrange(got, st.clientWidth, st.clientHeight - 24);
-            got.forEach(function(o, i){
-              var q = R[i], box = el('div', 'ri-slot', L);
+            var R = arrange(got, st.clientWidth, st.clientHeight - 26);
+            R.forEach(function(q, i){
+              var box = el('div', 'ri-slot', L);
               box.style.left = q.x + 'px'; box.style.top = q.y + 'px'; box.style.width = q.w + 'px'; box.style.height = q.h + 'px';
-              box.style.animationDelay = (i * .16) + 's';
-              picEl(box, o.it, slug);
+              box.style.animationDelay = (i * .14) + 's';
+              picEl(box, q.o.it, slug);
             });
-            // "+n" just after the last picture, on its bottom line
-            if(all.length > pick.length){
-              var q = R[got.length - 1], m = el('span', 'ri-more n', L, '+' + (all.length - pick.length));
-              m.style.left = (q.x + q.w + 12) + 'px'; m.style.top = (q.y + q.h - 12) + 'px'; m.style.right = 'auto'; m.style.bottom = 'auto';
-              m.style.animationDelay = (got.length * .16) + 's';
+            // "+n" under the last picture's right corner
+            if(all.length > R.length){
+              var q = R[R.length - 1], m = el('span', 'ri-more n', L, '+' + (all.length - R.length));
+              m.style.left = 'auto'; m.style.right = Math.max(0, st.clientWidth - q.x - q.w) + 'px'; m.style.top = (q.y + q.h + 8) + 'px'; m.style.bottom = 'auto';
+              m.style.animationDelay = (R.length * .14) + 's';
             }
           }, instant);
         });
@@ -949,7 +966,7 @@
     document.body.classList.add('l-' + LAY, 'lay');
     var lo = document.querySelector('.opts');
     lo.innerHTML = 'Layout' + Object.keys(LAYS).map(function(k){ return '<a href="?v=a&l=' + k + '"' + (k === LAY ? ' class="on"' : '') + '>' + k + '</a>'; }).join('');
-    if(LAY === 'ruler') lo.innerHTML = 'Pictures' + ['seq', 'cluster', 'drift', 'living', 'sheet'].map(function(k){ return '<a href="?v=a&l=ruler&img=' + k + '"' + (k === RIMG ? ' class="on"' : '') + '>' + k + '</a>'; }).join('') + '<span style="margin-left:1.2rem;color:var(--faint)">r7</span>';
+    if(LAY === 'ruler') lo.innerHTML = 'Pictures' + ['cluster', 'seq'].map(function(k){ return '<a href="?v=a&l=ruler&img=' + k + '"' + (k === RIMG ? ' class="on"' : '') + '>' + k + '</a>'; }).join('') + '<span style="margin-left:1.2rem;color:var(--faint)">r8</span>';
     LAYS[LAY]();
   }
   else if(V === 'a') buildA();

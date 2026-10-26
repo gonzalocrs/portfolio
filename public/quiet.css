@@ -165,3 +165,13 @@
   @media (max-width:900px){
     .gv-mark{width:170px;font-size:10.5px}
   }
+
+/* wide-screen trials (?w=, see quiet.js) */
+.w-centre .qt-stage .p-layer,.w-frame .qt-stage .p-layer,.w-words .qt-stage .p-layer{justify-content:center}
+.w-frame{--fw:calc(26rem + (100vh - 9rem) * 1.62)}
+.w-frame .bar,.w-frame main{width:100%;max-width:var(--fw);margin-left:auto;margin-right:auto}
+.w-pair .qt-stage .p-layer{gap:clamp(1rem,2vw,2rem)}
+.w-pair .qt-stage .p-layer img{flex:none}
+.w-pair .qt-stage .p-layer img.qw-more{width:auto;max-width:none;max-height:none}
+.qs.vis i{width:1.1rem;background:var(--ink)}
+@media (max-width:700px){ .w-pair .qt-stage .p-layer img.qw-more{display:none} }

@@ -59,7 +59,42 @@
     var ab = el('a', 'qk qa', nav); ab.href = 'about.html'; el('i', '', ab, '+'); el('span', '', ab, 'About');
     return marks;
   }
-  function quietHref(s, i){ return 'project.html?p=' + s + (i ? '&i=' + i : ''); }
+  function quietHref(s, i){ return 'project.html?p=' + s + (i ? '&i=' + i : '') + (W !== 'left' ? '&w=' + W : ''); }
+  // wide screens (trials, ?w=, 2026-10-26; without it the picture stays at the left as live):
+  //   centre  the picture in the middle of the space right of the marks
+  //   frame   the whole page (name, marks, picture) kept to a width that suits the screen's height, centred
+  //   pair    the space the picture leaves is filled by the pictures that come next, whole, at the same height
+  //   words   on a project, the words open beside the picture by themselves whenever there is room
+  var W = (Q.get('w') || 'left').toLowerCase(); if(['centre', 'frame', 'pair', 'words'].indexOf(W) === -1) W = 'left';
+  document.body.classList.add('w-' + W);
+  // pair: the picture shown and the next one or two of the list, side by side at one height, whole; as many as give
+  // the most picture on the screen (one alone when it already fills the space)
+  function fillRow(L, list, k, onPick){
+    if(W !== 'pair' || innerWidth <= 700) return;
+    var first = L.querySelector('img'); if(!first) return;
+    var cand = list.slice(k, k + 3).filter(Boolean);
+    loadAll(cand).then(function(got){
+      if(!L.contains(first)) return;
+      var Wd = L.clientWidth, H = L.clientHeight, g = parseFloat(getComputedStyle(L).columnGap) || 24, best = 1, bestA = 0, bestH = 0;
+      for(var m = 1; m <= got.length; m++){
+        var sum = 0; for(var i = 0; i < m; i++) sum += got[i].r;
+        var h = Math.min(H, (Wd - g * (m - 1)) / sum), area = h * h * sum;
+        if(area > bestA * 1.15){ bestA = area; best = m; bestH = h; }
+      }
+      first.style.height = bestH + 'px'; first.style.width = 'auto';
+      for(var j = 1; j < best; j++)(function(j){
+        var im = el('img', 'qw-more', L); im.alt = ''; im.src = got[j].it.src; im.style.height = bestH + 'px';
+        im.addEventListener('click', function(e){ e.stopPropagation(); onPick(k + j); });
+      })(j);
+      L.qwSeen = k + best - 1; if(L.qwDone) L.qwDone();
+    });
+  }
+  function ratioOf(img){ return img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1.5; }
+  function loadAll(list){
+    return Promise.all(list.map(function(it){
+      return new Promise(function(res){ var i = new Image(); i.onload = function(){ res({it: it, r: ratioOf(i)}); }; i.onerror = function(){ res({it: it, r: 1.5}); }; i.src = it.src; });
+    }));
+  }
   function buildQuiet(){
     var wrap = el('div', 'qt', main), nav = el('nav', 'qt-ticks', wrap), st = el('div', 'p-stage qt-stage', wrap), fade = fader(st);
     var marks = quietMarks(nav, null, function(s){ return quietHref(s); });
@@ -71,6 +106,7 @@
         var e = it ? el('img', '', L) : el('div', 'plate', L, 'In preparation');
         if(it){ e.alt = P[s].title; e.src = it.src; }
         e.addEventListener('click', function(){ location.href = quietHref(s, at ? at + 1 : 0); });
+        fillRow(L, list, at, function(j){ location.href = quietHref(s, j + 1); });
       }, instant);
       var m = markOf(cur); if(m) m.style.setProperty('--p', ((at + 1) / list.length).toFixed(3));
     }
@@ -189,8 +225,10 @@
         var it = all[k];
         if(it){ var im = el('img', '', L); im.alt = it.caption || p.title; im.src = it.src; }
         else el('div', 'plate', L, 'In preparation');
+        L.qwDone = function(){ dots.forEach(function(d, j){ d.classList.toggle('vis', j > k && j <= L.qwSeen); }); };
+        fillRow(L, all, k, function(j){ go(j); });
       }, first);
-      dots.forEach(function(d, j){ d.classList.toggle('cur', j === k); });
+      dots.forEach(function(d, j){ d.classList.toggle('cur', j === k); d.classList.remove('vis'); });
     }
     st.addEventListener('mousemove', function(e){ var r = st.getBoundingClientRect(); st.classList.toggle('back', e.clientX < r.left + r.width * .35); });
     st.addEventListener('click', function(e){
@@ -213,6 +251,11 @@
     var sx = null;
     st.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive: true});
     st.addEventListener('touchend', function(e){ if(sx == null) return; var dx = e.changedTouches[0].clientX - sx; sx = null; if(Math.abs(dx) > 40) go(at + (dx < 0 ? 1 : -1)); }, {passive: true});
+    if(W === 'words' && D === 'beside'){
+      var roomy = function(){ var r = st.getBoundingClientRect(); return r.width / r.height > 1.9; };
+      setTimeout(function(){ if(roomy()) toggle(true); }, 400);
+      addEventListener('resize', function(){ if(roomy() !== isOpen()) toggle(roomy()); });
+    }
     var start = Q.get('i'); go(start === 'last' ? n - 1 : Math.max(0, Math.min(n - 1, (parseInt(start, 10) || 1) - 1)));
   }
 

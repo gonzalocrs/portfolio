@@ -124,10 +124,16 @@
   //   &in=unveil  drawn open from its bottom edge (default)
   //   &in=rise    fades up into place
   //   &in=drift   unveiled, then each one moves at its own pace as the page rolls
-  // the home shows only one or two pictures of each project (his note, 2026-10-26): its first picture, and when the
-  // project has three or more, the first one of the other kind (a drawing beside a photo, or a photo beside a drawing)
-  function homePicks(got){
+  // the home shows only one or two pictures of each project (his note, 2026-10-26): the ones he chose, otherwise its
+  // first picture and, when the project has three or more, the first one of the other kind (a drawing beside a photo, or a photo beside a drawing)
+  function homePicks(got, slug){
     if(!got.length) return [];
+    // his own pick (projects.js: home), when the project has one
+    var mine = (P[slug].home || []).map(function(src){
+      var i = -1; got.some(function(o, j){ if(o.it.src === web(src)){ i = j; return true; } });
+      return i < 0 ? null : {it: got[i].it, r: got[i].r, k0: i};
+    }).filter(Boolean);
+    if(mine.length) return mine;
     var first = got[0], out = [{it: first.it, r: first.r, k0: 0}];
     if(got.length >= 3){
       for(var i = 1; i < got.length; i++) if(got[i].it.drawing !== first.it.drawing){ out.push({it: got[i].it, r: got[i].r, k0: i}); break; }
@@ -156,7 +162,7 @@
     var withPics = SLUGS.filter(coverOf);
     Promise.all(withPics.map(function(s){ return loadAll(pictures(s)); })).then(function(all){
       all.forEach(function(got, j){
-        got = homePicks(got);
+        got = homePicks(got, withPics[j]);
         var s = withPics[j], k = 0;
         while(k < got.length){
           var o = got[k], q = got[k + 1], row = el('div', 'qr-row', flow);
@@ -252,7 +258,7 @@
     var withPics = SLUGS.filter(coverOf);
     Promise.all(withPics.map(function(s){ return loadAll(pictures(s)); })).then(function(all){
       all.forEach(function(got, j){
-        got = homePicks(got);
+        got = homePicks(got, withPics[j]);
         got.forEach(function(o, k){
           var sd = j === 0 && k === 0 ? 'm' : side();
           seq.push({it: o.it, r: o.r, slug: withPics[j], k: k, k0: o.k0, n: got.length, side: sd, w: j === 0 && k === 0 ? (o.r >= 1.15 ? 72 : 44) : size(o.r),

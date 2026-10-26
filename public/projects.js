@@ -8,6 +8,8 @@
               the full layout as a roadmap, with marked placeholders.
     hero      path to the main image, e.g. "img/sierra-hotel/hero.jpg"
     heroPositionPhone  optional: where a phone-shaped crop of the hero looks on the home page, e.g. "78% center"
+    home      optional: the one or two pictures the home page shows for this project, in order, e.g.
+              ["img/sierra-hotel/elevation.svg", "img/sierra-hotel/floor-plans.svg"]; without it the home picks them
     lede      one or two sentences under the title
     text      a short second paragraph
     grid      optional: [{src, size, drawing, fill, caption}, ...] shows every picture in one hand-arranged grid after
@@ -37,6 +39,7 @@ window.PROJECTS = {
     credits: [["Type", "Hospitality"], ["Location", "Cusco, Peru"], ["Year", "2023"], ["Studio", "Urba"], ["Design", "Gonzalo Cáceres Valcárcel"]],
     diagram: {src: "img/sierra-hotel/exploded-diagram.jpg", caption: "Exploded axonometric"},
     hero: "img/sierra-hotel/hero.jpg",
+    home: ["img/sierra-hotel/elevation.svg", "img/sierra-hotel/floor-plans.svg"],
     heroPosition: "center",
     heroPositionPhone: "78% center",   // where a phone-shaped crop of the hero looks (the building is on the right)
     // all the pictures in one grid after the text, (see project.js: grid)
@@ -113,6 +116,7 @@ window.PROJECTS = {
     credits: [["Type", "Structural Form-Finding, Material Research"], ["Practice", "Robert Marino Architects"], ["Year", "2026"], ["Design", "Gonzalo Cáceres Valcárcel"]],
     diagram: {src: "img/anticlastic-roof-structure/hand-drawing.jpg", caption: "Spherical vs. hyperbolic curvature study"},
     hero: "img/anticlastic-roof-structure/hero.jpg",
+    home: ["img/anticlastic-roof-structure/section.png", "img/anticlastic-roof-structure/hero.jpg"],
     heroPosition: "center",
     physicalNote: "Physical Form-Finding · Plywood · 1:12 Scale",
     // all the pictures in one grid after the text (see project.js: grid)

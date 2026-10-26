@@ -88,12 +88,16 @@
   .a-index.pointing a .n{color:var(--faint)}
   .a-index.pointing a.cur,.a-index.pointing a.cur .n{color:var(--ink)}
   .a-stage{position:relative;min-height:0}
+  /* the picture and its caption are placed by the script (see placeA), one of four ways (&img=top|block|centre|edge) */
   .a-layer{position:absolute;inset:0;opacity:0;transition:opacity .9s ease;pointer-events:none}
-  .a-layer.on{opacity:1;pointer-events:auto}
-  .a-box{position:absolute;left:0;right:0;top:0;bottom:4.2rem;display:flex;align-items:flex-end;cursor:pointer}
-  .a-box img{max-width:100%;max-height:100%;object-fit:contain}
-  .a-box .plate{width:min(100%,calc((100vh - 16rem) * 1.5));aspect-ratio:3/2;max-height:100%}
-  .a-cap{position:absolute;left:0;right:0;bottom:0;height:4.2rem;display:flex;align-items:baseline;gap:1rem;padding-top:1rem;cursor:pointer}
+  .a-layer.on{opacity:1}
+  .a-fig{position:absolute;left:0;top:0;margin:0;cursor:pointer;pointer-events:none}
+  .a-layer.on .a-fig{pointer-events:auto}
+  .a-box img,.a-box .plate{display:block;width:100%;height:100%}
+  .a-cap{display:flex;align-items:baseline;gap:1rem;padding-top:.85rem;white-space:nowrap}
+  /* edge: the picture's side of the page runs to the right edge of the screen and up to the header */
+  body.ai-edge .a{padding-right:0}
+  body.ai-edge .a-stage{margin-top:calc(-1 * clamp(2rem,7vh,4.5rem))}
   .a-cap b{font-weight:800;font-size:clamp(1.15rem,1.5vw,1.35rem);letter-spacing:-.02em;line-height:1}
 
   /* =================== B: field =================== */
@@ -153,9 +157,8 @@
   @media (max-width:900px){
     .gv-mark{width:170px;font-size:10.5px}
     .a{grid-template-columns:1fr;padding-top:1rem;gap:1.5rem}
-    .a-stage{order:-1;height:62vw;min-height:220px}
-    .a-box{bottom:3.4rem}
-    .a-cap{height:3.4rem}
+    .a-stage{order:-1;height:calc(62vw + 3.2rem);min-height:260px;margin:0 !important}
+    body.ai-edge .a{padding-right:var(--gut)}
     .b-pic{height:clamp(96px,20vw,150px)}
     .b-field{gap:1.6rem 1rem}
     /* phone: one picture per screen width, whole, swiped one at a time */
@@ -254,11 +257,43 @@
     });
     var layers = [0, 1].map(function(){
       var L = el('div', 'a-layer', stage);
-      L.box = el('div', 'a-box', L); L.cap = el('div', 'a-cap', L);
+      L.fig = el('figure', 'a-fig', L);
+      L.box = el('div', 'a-box', L.fig); L.cap = el('figcaption', 'a-cap', L.fig);
       L.t = el('b', '', L.cap); L.k = el('span', 'k', L.cap);
-      L.addEventListener('click', function(){ if(L.slug) visit(L.slug, L.box.firstChild, L.src); });
+      L.fig.addEventListener('click', function(){ if(L.slug) visit(L.slug, L.box.firstChild, L.src); });
       return L;
     });
+    // where the picture sits beside the list, whole, at its own proportions:
+    //   top    its top on the list's first line, as wide as the space allows, caption under it
+    //   block  exactly as tall as the list, top and bottom on the list's first and last lines: one block with it
+    //   centre in the middle of the space, smaller, like a picture hung on an empty wall
+    //   edge   as large as the space allows up to the screen's right edge and the header, against that corner
+    var IMG = (Q.get('img') || 'top').toLowerCase();
+    if(['top', 'block', 'centre', 'edge'].indexOf(IMG) === -1) IMG = 'top';
+    document.body.classList.add('ai-' + IMG);
+    // mockup only: the four ways, next to the A / B / C switch
+    var opts = document.querySelector('.opts');
+    opts.insertBefore(document.createTextNode('Picture'), opts.firstChild);
+    ['top', 'block', 'centre', 'edge'].forEach(function(m, i){
+      var a = document.createElement('a'); a.href = '?v=a&img=' + m; a.textContent = m; a.className = m === IMG ? 'on' : '';
+      opts.insertBefore(a, opts.childNodes[i + 1]);
+    });
+    opts.insertBefore(document.createTextNode('\u2003Mockup'), opts.childNodes[5]);
+    opts.removeChild(opts.childNodes[6]);
+    function fit(a, w, h){ return w / h > a ? {w: h * a, h: h} : {w: w, h: w / a}; }
+    function place(L){
+      if(!L.ratio) return;
+      var W = stage.clientWidth, H = stage.clientHeight, cap = 52, phone = innerWidth <= 900, mode = phone ? 'top' : IMG;
+      var sr = stage.getBoundingClientRect(), lr = list.getBoundingClientRect();
+      var lt = lr.top - sr.top, lh = lr.height, x = 0, y = 0, r;
+      if(mode === 'top'){ r = fit(L.ratio, W, H - cap); }
+      else if(mode === 'block'){ y = Math.max(0, lt); r = fit(L.ratio, W, Math.min(lh, H - cap - y)); }
+      else if(mode === 'centre'){ r = fit(L.ratio, W * .72, (H - cap) * .72); x = (W - r.w) / 2; y = (H - cap - r.h) / 2; }
+      else { r = fit(L.ratio, W, H - cap); x = W - r.w; }
+      L.box.style.width = r.w + 'px'; L.box.style.height = r.h + 'px';
+      L.fig.style.left = x + 'px'; L.fig.style.top = y + 'px';
+    }
+    addEventListener('resize', function(){ layers.forEach(place); });
     var cur = null, timer = null;
     function show(slug, instant){
       if(slug === cur) return;
@@ -267,9 +302,12 @@
       var on = layers[0].classList.contains('on') ? layers[0] : layers[1];
       var L = instant ? on : (on === layers[0] ? layers[1] : layers[0]);
       var c = coverOf(slug), p = P[slug];
-      L.slug = slug; L.src = c && c.src; L.box.innerHTML = '';
-      if(c){ var img = el('img', '', L.box); img.alt = p.title; img.src = c.src; }
-      else el('div', 'plate', L.box, 'In preparation');
+      L.slug = slug; L.src = c && c.src; L.box.innerHTML = ''; L.ratio = 0;
+      if(c){
+        var img = el('img', '', L.box); img.alt = p.title;
+        img.onload = function(){ if(L.slug === slug){ L.ratio = img.naturalWidth / img.naturalHeight || 1.5; place(L); } };
+        img.src = c.src;
+      } else { el('div', 'plate', L.box, 'In preparation'); L.ratio = 1.5; place(L); }
       L.t.textContent = p.title; L.k.textContent = p.kicker || '';
       if(L !== on){ on.classList.remove('on'); }
       L.classList.add('on');

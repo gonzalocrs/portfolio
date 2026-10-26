@@ -494,11 +494,9 @@
       layout();
       if(on) setTimeout(function(){ var c = wrap.querySelector('.choice'); if(c && innerWidth > 700) c.focus({preventScroll: true}); }, 500);
     }
-    // the layout, as on the About page before (2026-10-18, his pick "A"): where each topic's word sits beside its
-    // stitch, in the mark's 200-unit square
+    // the layout, as on the About page before (2026-10-18, his pick "A"): each topic's word beside its stitch
     var side = wrap.querySelector('.qab-side'), mark = wrap.querySelector('.qab-mark'), flds = wrap.querySelector('.qab-fields'),
         flow = document.getElementById('flow'), words = Array.prototype.slice.call(wrap.querySelectorAll('.choice')), hov = -1;
-    var AT = [[148, 38], [178, 100], [148, 162]];
     function tones(){
       var m = window.gcMark, open = isOpen() && !flow.classList.contains('sent');
       if(m) words.forEach(function(b, i){ m.tone(i, !open || b.getAttribute('aria-pressed') === 'true' ? 1 : hov === i ? .55 : 0); });
@@ -507,22 +505,26 @@
       if(innerWidth <= 700){ [mark, touch, flds].concat(words).forEach(function(e){ e.style.transform = ''; }); tones(); return; }
       var on = isOpen(), W = side.clientWidth, S = mark.offsetWidth;
       var cx0 = mark.offsetLeft + S / 2, cy = mark.offsetTop + S / 2;
-      // the group, centred in the space: the ring, a small step, the three words in one column (each at the height of
-      // its stitch), a wider step, the fields. The ring itself is about two thirds of the mark's square
-      var rem = parseFloat(getComputedStyle(document.documentElement).fontSize), ring = .33, g1 = 1.6 * rem, gap = 3.5 * rem;
-      var ww = Math.max.apply(null, words.map(function(b){ return b.offsetWidth; })), fw = flds.offsetWidth;
+      // the group, centred in the space: the ring; each word the same small step out from the ring, level with its
+      // stitch (top right and bottom right at 45°, right in the middle), so the three follow the ring's curve; a wider
+      // step, then the fields. The ring is 70 of the mark's 200 units (logo-works.js RING)
+      var rem = parseFloat(getComputedStyle(document.documentElement).fontSize), ring = .35, g1 = 1.1 * rem, gap = 3.5 * rem;
+      var ANG = [-45, 0, 45], fw = flds.offsetWidth;
+      // how far right of the ring's centre the words reach, for a ring of radius r
+      function reach(r){ return Math.max.apply(null, words.map(function(b, i){ return r * Math.cos(ANG[i] * Math.PI / 180) + g1 + b.offsetWidth; })); }
       // on a narrower window the open mark and form take the whole room and his words step back meanwhile
-      var x0 = 0, need = function(k){ return 2 * ring * S * k + g1 + ww + gap + fw; }, full = on && need(.55) > W;
+      var x0 = 0, need = function(k){ return ring * S * k + reach(ring * S * k) + gap + fw; }, full = on && need(.55) > W;
       wrap.classList.toggle('full', full);
       if(full){ x0 = -side.offsetLeft; W += side.offsetLeft; }
-      var k = Math.max(.3, Math.min(1, (W - g1 - ww - gap - fw) / (2 * ring * S), W * .42 / S)), R = S * k;
-      var gx = x0 + Math.max(0, (W - need(k)) / 2), rx = gx + ring * R, wx = rx + ring * R + g1;
+      var k = 1; while(k > .3 && (need(k) > W || S * k > W * .42)) k -= .02;
+      var R = S * k, r = ring * R, gx = x0 + Math.max(0, (W - need(k)) / 2), rx = gx + r;
       mark.style.transform = on ? 'translate(' + Math.round(rx - cx0) + 'px,0) scale(' + k.toFixed(3) + ')' : '';
       touch.style.transform = on ? 'translate(' + Math.round(rx - cx0) + 'px,' + Math.round(-ring * (S - R)) + 'px)' : '';
       words.forEach(function(b, i){
-        var y = cy - R / 2 + AT[i][1] / 200 * R - b.offsetHeight / 2;
-        b.style.transform = 'translate(' + Math.round(wx + (on ? 0 : -16)) + 'px,' + Math.round(y) + 'px)'; b.tabIndex = on ? 0 : -1;
+        var a = ANG[i] * Math.PI / 180, x = rx + r * Math.cos(a) + g1, y = cy + r * Math.sin(a) - b.offsetHeight / 2;
+        b.style.transform = 'translate(' + Math.round(x + (on ? 0 : -16)) + 'px,' + Math.round(y) + 'px)'; b.tabIndex = on ? 0 : -1;
       });
+      var wx = rx, ww = reach(r);
       flds.style.transform = 'translate(' + Math.round(wx + ww + gap + (on ? 0 : 30)) + 'px,' + Math.round(cy - flds.offsetHeight / 2) + 'px)';
       tones();
     }

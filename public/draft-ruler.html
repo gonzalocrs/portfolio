@@ -1,0 +1,1205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gonzalo Cáceres — Architecture</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@200;300;400;500;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="museum.css">
+<!--
+  Home page trials after fernando-garrido.com, crossed with the site as it is (not linked from anywhere):
+    mockups.html?v=a   Numbered index: every project at once in one numbered list (his 01..10), beside one large
+                       picture that changes with the title pointed at (the live home, D, otherwise as it is)
+    mockups.html?v=b   Field: all the pictures of all the work at one small height, flowing in rows like a sheet,
+                       under one numbered line of the project names; pointing at either picks out that project
+    mockups.html?v=c   Strip: one picture per project in one tall row, run sideways. A project opens as his project
+                       pages do: its pictures first in one row at one height, then the name, the credits and the text
+    mockups.html?v=c&p=<slug>  a project in C
+  A and B open a project in the museum visit, as the live site does. Pictures are never cropped.
+-->
+<style>
+  :root{
+    --paper:#ffffff;
+    --ink:#0f1216;
+    --rule:#d8d6d1;
+    --mute:#7b7d80;
+    --faint:#b9bbbe;
+    --plate:#f1f0ed;
+    --live:var(--ink);
+    --font:"Archivo","Helvetica Neue",Arial,sans-serif;
+    --mono:"IBM Plex Mono","SFMono-Regular",Consolas,monospace;
+    --gut:clamp(1rem,4vw,2.5rem);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-tap-highlight-color:transparent}
+  ::selection{background:rgba(15,18,22,.12)}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.4;
+    -webkit-font-smoothing:antialiased;min-height:100vh;display:flex;flex-direction:column;
+  }
+  a{color:inherit;text-decoration:none}
+  button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer}
+  :focus-visible{outline:2px solid var(--live);outline-offset:3px}
+  img{display:block}
+
+  /* ---------- top bar and wordmark, as on the live site ---------- */
+  .bar{
+    display:flex;justify-content:space-between;align-items:center;gap:1rem;padding:1.1rem var(--gut);
+    font-family:var(--mono);font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;
+  }
+  .bar nav{display:flex;align-items:center;gap:1.25rem}
+  .bar a:hover{color:var(--live)}
+  .gv-mark{display:block;width:230px;font-family:'Archivo',sans-serif;font-weight:300;font-size:14px;color:var(--ink);text-decoration:none;text-transform:none;letter-spacing:0}
+  .gv-mark__line{display:flex;justify-content:space-between;line-height:1}
+  .gv-mark__gap{flex:0 0 .8em}
+  .gv-mark__line + .gv-mark__line > span:first-child{margin-left:.047em}
+  .gv-mark__line + .gv-mark__line > span:last-child{margin-right:.046em}
+  .gv-mark__flip{display:inline-block;transform:scaleX(-1);transition:transform .45s cubic-bezier(.2,.8,.2,1)}
+  .gv-mark:hover .gv-mark__flip,.gv-mark:focus-visible .gv-mark__flip{transform:scaleX(1)}
+
+  main{flex:1;display:flex;flex-direction:column;min-height:0}
+  footer{
+    display:flex;flex-wrap:wrap;justify-content:space-between;gap:.4rem 1rem;padding:1.1rem var(--gut);overflow-x:clip;
+    font-family:var(--mono);font-size:.68rem;text-transform:uppercase;letter-spacing:.03em;color:var(--mute);
+  }
+  .opts a{margin-left:.7rem}
+  .opts a.on{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+  .opts a:hover{color:var(--ink)}
+
+  /* the small things every option shares */
+  .n{font-family:var(--mono);font-size:.66rem;font-weight:400;letter-spacing:.04em;color:var(--mute)}
+  .k{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;color:var(--mute)}
+  .plate{background:var(--plate);display:flex;align-items:center;justify-content:center;
+    font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mute)}
+
+  /* =================== A: numbered index =================== */
+  .a{flex:1;display:grid;grid-template-columns:minmax(15rem,21rem) 1fr;gap:clamp(1.5rem,4vw,4rem);
+     padding:clamp(2rem,7vh,4.5rem) var(--gut) 0;min-height:0}
+  .a-index{list-style:none;margin:0;padding:0;align-self:start}
+  .a-index .grp{margin:1.6rem 0 .45rem}
+  .a-index .grp:first-child{margin-top:0}
+  .a-index a{display:grid;grid-template-columns:2.1rem 1fr;align-items:baseline;padding:.16rem 0;color:var(--ink);transition:color .35s ease}
+  .a-index b{font-weight:800;font-size:clamp(1.15rem,1.45vw,1.4rem);letter-spacing:-.02em;line-height:1.15}
+  .a-index.pointing a{color:var(--faint)}
+  .a-index.pointing a .n{color:var(--faint)}
+  .a-index.pointing a.cur,.a-index.pointing a.cur .n{color:var(--ink)}
+  .a-stage{position:relative;min-height:0}
+  /* the picture and its caption are placed by the script (see placeA), one of four ways (&img=top|block|centre|edge) */
+  .a-layer{position:absolute;inset:0;opacity:0;transition:opacity .9s ease;pointer-events:none}
+  .a-layer.on{opacity:1}
+  .a-fig{position:absolute;left:0;top:0;margin:0;cursor:pointer;pointer-events:none}
+  .a-layer.on .a-fig{pointer-events:auto}
+  .a-box img,.a-box .plate{display:block;width:100%;height:100%}
+  .a-cap{display:flex;align-items:baseline;gap:1rem;padding-top:.85rem;white-space:nowrap}
+  /* edge: the picture's side of the page runs to the right edge of the screen and up to the header */
+  body.ai-edge .a{padding-right:0}
+  body.ai-edge .a-stage{margin-top:calc(-1 * clamp(2rem,7vh,4.5rem))}
+  .a-cap b{font-weight:800;font-size:clamp(1.15rem,1.5vw,1.35rem);letter-spacing:-.02em;line-height:1}
+
+  /* =================== A, whole layouts (&l=ruler|type|label) ===================
+     the numbered index and one picture per project, composed four different ways */
+  .p-stage{position:relative;min-height:0}
+  .p-layer{position:absolute;inset:0;opacity:0;transition:opacity .9s ease;pointer-events:none;display:flex;align-items:flex-end;justify-content:flex-start}
+  .p-layer.on{opacity:1}
+  .p-layer img{max-width:100%;max-height:100%;width:auto;height:auto;cursor:pointer;pointer-events:none}
+  .p-layer.on img,.p-layer.on .plate{pointer-events:auto}
+  .p-layer .plate{height:100%;max-width:100%;aspect-ratio:3/2;cursor:pointer}
+  .faintable a,.faintable button{transition:color .35s ease}
+  .faintable.pointing .tr{color:var(--faint)}
+  .faintable.pointing .tr .n,.faintable.pointing .tr .lt{color:var(--faint)}
+  .faintable.pointing .tr.cur,.faintable.pointing .tr.cur .n,.faintable.pointing .tr.cur .lt{color:var(--ink)}
+
+  /* About is not a project: it closes the index, as on the reference, in the same place as a title but light and
+     grey, after a "+" instead of a number (the header has no About link in these layouts) */
+  body.lay .bar nav{display:none}
+  .ab{display:inline-flex;align-items:baseline;gap:.6rem;color:var(--mute);transition:color .3s}
+  .ab .n{color:var(--mute)}
+  .ab span:last-child{font-weight:300;letter-spacing:0}
+  .ab:hover,.ab:hover .n{color:var(--ink)}
+
+  /* ruler: the scale stands upright on the left, a thin line from top to bottom with the ten numbers spaced along
+     it; the stretch of line beside the project shown darkens and its name and place appear there; the picture is
+     large to its right */
+  .ru{flex:1;display:grid;grid-template-columns:minmax(14rem,19rem) 1fr;gap:clamp(1.5rem,4vw,4rem);padding:clamp(1rem,3vh,2rem) var(--gut) 0;min-height:0}
+  .ru .p-layer{align-items:flex-start}
+  .ru-col{display:flex;flex-direction:column;min-height:0}
+  .ru-scale{flex:1;display:flex;flex-direction:column;border-left:1px solid var(--rule);min-height:0}
+  .ru-scale .tr{flex:1;position:relative;display:flex;flex-direction:column;justify-content:flex-start;text-align:left;padding:.15rem 0 0 1rem;min-height:2.2rem}
+  .ru-scale .tr::before{content:"";position:absolute;left:-1px;top:0;bottom:0;width:2px;background:var(--ink);transform:scaleY(0);transform-origin:top;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+  .ru-scale .tr.cur::before{transform:scaleY(1)}
+  .ru-scale .tr .n{transition:color .3s}
+  .ru-scale .tr:not(.cur) .n{color:var(--faint)}
+  .ru-scale .tr:hover .n{color:var(--ink)}
+  .ru-scale .tr b{margin-top:.3rem;font-weight:800;font-size:clamp(1.05rem,1.3vw,1.25rem);letter-spacing:-.02em;white-space:nowrap;opacity:0;transition:opacity .4s ease}
+  .ru-scale .tr .k{margin-top:.2rem;white-space:nowrap;opacity:0;transition:opacity .4s ease}
+  .ru-scale .tr.cur b,.ru-scale .tr.cur .k{opacity:1}
+  .ru-grp{position:absolute;right:0;top:.2rem;font-family:var(--mono);font-size:.6rem;text-transform:uppercase;letter-spacing:.06em;color:var(--faint)}
+  .ru-col .ab{padding:1.1rem 0 .2rem 1rem}
+  .ru-col .ab span:last-child{font-size:clamp(1.05rem,1.3vw,1.25rem)}
+
+  /* the picture side of the ruler (&img=) */
+  .ru .p-stage{min-height:0}
+  .ru .p-layer{background:var(--paper)}
+  .rm-seq .ru-scale .tr.cur::before{transform:scaleY(var(--p,1));transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+  .rm-seq .p-layer{transition:opacity 1.1s ease;background:var(--paper)}
+  .rm-strip{padding-right:0}
+  .rm-strip .p-stage{overflow:hidden}
+  /* the row scrolls sideways (trackpad swipe, or the wheel turned sideways by the script), no scrollbar */
+  .rm-strip .p-layer{overflow-x:auto;overflow-y:hidden;scrollbar-width:none;overscroll-behavior-x:contain}
+  .rm-strip .p-layer::-webkit-scrollbar{display:none}
+  .rm-strip .p-layer.on{pointer-events:auto}
+  .ri-row{padding-right:var(--gut)}
+  .rm-strip .p-layer{bottom:2.4rem}
+  .ru .ri-foot{position:absolute;left:0;right:var(--gut);top:calc(min(100% - 2.4rem, 48vh) + .9rem);padding:0;z-index:2}
+  .ri-row{display:flex;gap:clamp(.9rem,1.4vw,1.4rem);height:min(100%,48vh);align-items:flex-start}
+  .ri-row img,.ri-row .plate{flex:none;height:100%;width:auto;max-width:none;max-height:none;cursor:pointer}
+  .ri-row .plate{aspect-ratio:3/2}
+  .ri-sheet{display:flex;flex-wrap:wrap;align-content:flex-start;gap:14px;width:100%}
+  .ri-sheet img{height:var(--sh,180px);width:auto;max-width:none;max-height:none;cursor:pointer}
+  .ri-sheet .plate{height:var(--sh,180px);aspect-ratio:3/2}
+  .rm-thumbs .p-layer{flex-direction:column;align-items:flex-start;justify-content:flex-start}
+  .ri-big{flex:1;min-height:0;width:100%;display:flex;align-items:flex-start}
+  .ri-big img{max-width:100%;max-height:100%}
+  .ri-big .plate{height:100%}
+  .ri-tn{display:flex;gap:.6rem;margin-top:1.1rem;height:3.4rem;flex:none;max-width:100%;overflow:hidden}
+  .ri-tn button{height:100%;opacity:.32;transition:opacity .3s ease}
+  .ri-tn button.on,.ri-tn button:hover{opacity:1}
+  .ri-tn button img{height:100%;width:auto;max-width:none;max-height:none;pointer-events:auto}
+  /* parts of a project (cluster, drift, living) */
+  @keyframes riIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .ri-more{position:absolute;right:0;bottom:0;color:var(--mute)}
+  .rm-cluster .ri-more{opacity:0}
+  .rm-cluster .p-layer.on .ri-more{animation:riIn .9s ease forwards}
+  .rm-cluster .p-layer{display:block}
+  .ri-slot{position:absolute;opacity:0}
+  .p-layer.on .ri-slot{animation:riIn .9s cubic-bezier(.2,.7,.2,1) forwards}
+  .ri-slot img{width:100%;height:100%;max-width:none;max-height:none}
+  .ri-slot .plate{width:100%;height:auto}
+  .rm-drift{padding-right:0}
+  .rm-drift .p-stage{overflow:hidden;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent 0,#000 6%,#000 94%,transparent)}
+  .ri-drift{display:flex;gap:clamp(1.2rem,2vw,2rem);height:min(100%,50vh);align-items:flex-start;will-change:transform}
+  .ri-drift img,.ri-drift .plate{flex:none;height:100%;width:auto;max-width:none;max-height:none}
+  .ri-drift .plate{aspect-ratio:3/2}
+  .ri-living{display:grid;grid-template-columns:1.25fr 1fr;grid-template-rows:1fr .8fr;gap:16px;width:100%;height:calc(100% - 2rem)}
+  .ri-cell{position:relative;min-height:0;opacity:0}
+  .p-layer.on .ri-cell{animation:riIn .9s cubic-bezier(.2,.7,.2,1) forwards}
+  .ri-cell img,.ri-cell .plate{position:absolute;left:0;top:0;max-width:100%;max-height:100%;width:auto;height:auto;transition:opacity .9s ease}
+  .ri-cell img.ri-new{opacity:0;animation:riFade .9s ease forwards}
+  .ri-cell img.ri-out{opacity:0}
+  @keyframes riFade{to{opacity:1}}
+  /* type: only the names, in one quiet column; nothing else on the page until you point at one, then the others
+     go pale and its picture appears in the space to the right, top on that name's line */
+  .ty{flex:1;position:relative;padding:clamp(2rem,9vh,6rem) var(--gut) 1rem;min-height:0}
+  .ty-list{list-style:none;margin:0;padding:0;position:relative;z-index:1}
+  .ty-list .tr{display:inline-flex;align-items:baseline;gap:.7rem;padding:0;text-align:left}
+  .ty-list b{font-weight:800;font-size:clamp(1.5rem,3.7vh,2.3rem);letter-spacing:-.03em;line-height:1.22}
+  .ty-list .ab{margin-top:1.6rem}
+  .ty-list .ab span:last-child{font-size:clamp(1.5rem,3.7vh,2.3rem);letter-spacing:-.02em}
+  .ty .p-stage{position:absolute;left:0;top:0;width:0;height:0}
+  .ty .p-layer{inset:auto;left:0;top:0;width:var(--pw,40vw);height:var(--ph,40vh);align-items:flex-start;transition:opacity .5s ease}
+
+  /* label: the picture hangs on the wall and the label sits beside it, as in a museum: picture and label share
+     one floor line, the picture pushed up against the label; the label holds the name, place and year of the
+     picture, then the numbered list, small */
+  .lb{flex:1;display:grid;grid-template-columns:1fr minmax(13rem,15rem);gap:clamp(1.5rem,2.5vw,2.5rem);padding:clamp(1rem,3vh,2rem) var(--gut) 1.4rem;min-height:0}
+  .lb .p-stage{height:100%}
+  .lb .p-layer{justify-content:flex-end;align-items:flex-end}
+  .lb-label{align-self:end}
+  .lb-now{margin-bottom:2.2rem}
+  .lb-now h2{margin:0;font-weight:800;font-size:1.3rem;letter-spacing:-.02em;line-height:1.15}
+  .lb-now .k{display:block;margin-top:.4rem}
+  .lb-list{list-style:none;margin:0;padding:0}
+  .lb-list .tr{display:grid;grid-template-columns:1.7rem 1fr;align-items:baseline;padding:.05rem 0;text-align:left;width:100%}
+  .lb-list .tr .lt{font-weight:400;font-size:.86rem}
+  .lb-list .ab{display:grid;grid-template-columns:1.7rem 1fr;gap:0;margin-top:.9rem}
+  .lb-list .ab span:last-child{font-size:.86rem}
+
+  /* =================== a project, in the ruler's language =================== */
+  .rp{flex:1;display:grid;grid-template-columns:minmax(14rem,19rem) 1fr;gap:clamp(1.5rem,4vw,4rem);padding:clamp(1rem,3vh,2rem) var(--gut) 0;min-height:0}
+  .rp-col{position:relative;display:flex;flex-direction:column;min-height:0;padding-left:1rem}
+  .rp-step .rp-col{overflow-y:auto;scrollbar-width:none}
+  .rp-step .rp-col::-webkit-scrollbar{display:none}
+  .rp-scroll .rp-col{position:sticky;top:1.5rem;height:calc(100vh - 8.5rem);align-self:start;overflow-y:auto;scrollbar-width:none}
+  .rp-scroll .rp-col::-webkit-scrollbar{display:none}
+  .rp-line{position:absolute;left:0;top:0;bottom:0;width:1px;background:var(--rule)}
+  .rp-mark{position:absolute;left:-.5px;width:2px;background:var(--ink);top:0;height:0;transition:top .7s cubic-bezier(.2,.7,.2,1),height .7s cubic-bezier(.2,.7,.2,1)}
+  .rp-scroll .rp-mark{transition:none}
+  .rp-hit{position:absolute;left:-7px;width:15px}
+  .rp-label h1{display:flex;flex-direction:column;gap:.35rem;margin:.1rem 0 0;font-weight:800;font-size:clamp(1.3rem,1.7vw,1.6rem);letter-spacing:-.025em;line-height:1.1}
+  .rp-label > .k{margin:.45rem 0 1.4rem}
+  .rp-cr p{margin:0 0 .2rem;font-weight:300;font-size:.86rem}
+  .rp-cr b{font-weight:800}
+  .rp-text{margin-top:1.4rem}
+  .rp-text p{margin:0 0 .9rem;font-weight:300;font-size:.92rem;line-height:1.55}
+  .rp-text p.lede{font-weight:400;font-size:1rem;line-height:1.45}
+  .rp-text p.extra{display:none}
+  .rp-col.open .rp-text p.extra{display:block}
+  .rp-more{font-family:var(--mono);font-size:.66rem;text-transform:uppercase;letter-spacing:.05em;align-self:flex-start}
+  .rp-more:hover{text-decoration:underline;text-underline-offset:3px}
+  .rp-nk{margin-top:auto;padding-top:1.5rem;color:var(--faint)}
+  .rp-next{padding-top:.3rem}
+  .rp-next span:last-child{font-size:clamp(1.05rem,1.3vw,1.25rem)}
+  .rp-stage{min-height:0}
+  .rp-stage .p-layer{background:var(--paper);align-items:flex-start;transition:opacity 1.1s ease}
+  .rp-one{margin:0;display:flex;flex-direction:column;align-items:flex-start;max-width:100%;max-height:100%;height:100%}
+  .rp-one img{max-width:100%;max-height:calc(100% - 2.2rem);width:auto;height:auto;cursor:pointer;pointer-events:auto}
+  .rp-one .plate{height:calc(100% - 2.2rem);aspect-ratio:3/2;max-width:100%}
+  .rp-one figcaption{margin-top:.7rem}
+  /* scroll: the pictures laid out loosely on a 12-column field, each at its own size and place (whole, never cut),
+     sometimes two side by side at different heights; each comes in as it reaches the screen */
+  .rp-flow{padding-bottom:30vh;min-width:0}
+  .rp-row{display:grid;grid-template-columns:repeat(12,1fr);column-gap:clamp(1rem,2vw,2rem);align-items:start}
+  .rp-fig{margin:0;min-width:0}
+  .rp-fig img{display:block;width:100%;height:auto;cursor:zoom-in}
+  .rp-fig figcaption{margin-top:.7rem}
+  .rp-fig .plate{width:100%;aspect-ratio:3/2}
+  .rp-par{will-change:transform}
+  /* how they come in: rise (fade up), unveil (drawn open from the bottom edge), drift (rise, then each moves at its own
+     pace as the page scrolls) */
+  .rp-fig{opacity:0;transform:translateY(9vh);transition:opacity 1.3s ease,transform 1.6s cubic-bezier(.16,.8,.2,1)}
+  .rp-fig.in{opacity:1;transform:none}
+  .in-unveil .rp-fig{opacity:1;transform:translateY(3vh)}
+  .in-unveil .rp-fig img,.in-unveil .rp-fig .plate{clip-path:inset(100% 0 0 0);transition:clip-path 1.5s cubic-bezier(.7,0,.2,1)}
+  .in-unveil .rp-fig.in{transform:none}
+  .in-unveil .rp-fig.in img,.in-unveil .rp-fig.in .plate{clip-path:inset(0 0 0 0)}
+  .in-unveil .rp-fig figcaption{opacity:0;transition:opacity .8s ease 1.1s}
+  .in-unveil .rp-fig.in figcaption{opacity:1}
+  /* =================== B: field =================== */
+  .b-line{display:flex;flex-wrap:wrap;gap:.35rem 1.7rem;padding:clamp(1.6rem,5vh,3rem) var(--gut) 0;max-width:72rem}
+  .b-line a{display:inline-flex;align-items:baseline;gap:.45rem;transition:color .3s ease}
+  .b-line b{font-weight:800;font-size:clamp(1rem,1.2vw,1.15rem);letter-spacing:-.015em}
+  .b-line a.empty{color:var(--faint)}
+  .b-line a.empty .n{color:var(--faint)}
+  body.pointing .b-line a{color:var(--faint)}
+  body.pointing .b-line a .n{color:var(--faint)}
+  body.pointing .b-line a.cur,body.pointing .b-line a.cur .n{color:var(--ink)}
+  .b-field{display:flex;flex-wrap:wrap;align-items:flex-end;gap:2.6rem 1.6rem;padding:clamp(2rem,6vh,3.5rem) var(--gut) 3rem}
+  .b-pic{display:block;height:clamp(140px,23vh,250px);transition:opacity .45s ease}
+  .b-pic img{height:100%;width:auto}
+  body.pointing .b-pic{opacity:.14}
+  body.pointing .b-pic.cur{opacity:1}
+
+  /* =================== C: strip =================== */
+  .c-strip{display:flex;align-items:flex-end;gap:clamp(1.2rem,2.2vw,2.2rem);overflow-x:auto;overflow-y:hidden;
+    padding:0 var(--gut);scrollbar-width:none;overscroll-behavior-x:contain}
+  .c-strip::-webkit-scrollbar{display:none}
+  .c-item{flex:0 0 auto;margin:0;cursor:pointer}
+  .c-item .c-box{height:var(--h);display:flex;align-items:flex-end}
+  .c-item img{height:100%;width:auto}
+  .c-item .plate{height:100%;aspect-ratio:3/2}
+  .c-item figcaption{display:flex;align-items:baseline;gap:.7rem;padding-top:.9rem;height:3.2rem;white-space:nowrap}
+  .c-item figcaption b{font-weight:800;font-size:clamp(1.05rem,1.3vw,1.25rem);letter-spacing:-.02em}
+  .c-home{flex:1;display:flex;flex-direction:column;justify-content:center;padding-bottom:1.2rem;--h:clamp(260px,46vh,520px)}
+  .c-foot{display:flex;align-items:center;gap:1rem;padding:.4rem var(--gut) 0}
+  .c-rail{position:relative;flex:1;height:1px;background:var(--rule)}
+  .c-rail span{position:absolute;top:-.5px;height:2px;background:var(--ink);left:0;width:10%;transition:left .15s linear}
+  .c-arrow{width:1.6rem;height:1.6rem;display:flex;align-items:center;justify-content:center;color:var(--mute);transition:color .2s,opacity .3s}
+  .c-arrow:hover{color:var(--ink)}
+  .c-arrow[disabled]{opacity:.25;cursor:default}
+  .c-arrow svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.3;fill:none}
+
+  /* a project in C: the pictures first, then the words */
+  .cp{padding-top:clamp(1rem,3vh,2rem)}
+  .cp .c-strip{--h:clamp(260px,56vh,640px);cursor:default}
+  .cp .c-strip .c-item{cursor:zoom-in}
+  .cp .c-item figcaption{display:none}
+  .cp-text{display:grid;grid-template-columns:minmax(14rem,21rem) minmax(0,36rem);gap:clamp(2rem,6vw,6rem);
+    padding:clamp(2rem,6vh,3.5rem) var(--gut) 1rem}
+  .cp-head h1{display:flex;align-items:baseline;gap:.8rem;margin:0;font-weight:800;font-size:clamp(1.6rem,2.3vw,2.2rem);letter-spacing:-.025em;line-height:1.05}
+  .cp-head .k{margin:.7rem 0 1.6rem}
+  .cp-head p.cr{margin:0 0 .3rem;font-weight:300;font-size:.95rem}
+  .cp-head p.cr b{font-weight:800}
+  .cp-body p{margin:0 0 1.1rem;font-weight:300;font-size:1rem;line-height:1.6}
+  .cp-body p.lede{font-weight:400;font-size:1.15rem;line-height:1.45}
+  .cp-next{display:flex;align-items:baseline;gap:.8rem;justify-content:flex-end;padding:3.5rem var(--gut) 1rem}
+  .cp-next .k{color:var(--mute)}
+  .cp-next b{font-weight:800;font-size:1.25rem;letter-spacing:-.02em}
+  .cp-next:hover .k{color:var(--ink)}
+  .zoom{position:fixed;inset:0;z-index:80;background:var(--paper);display:flex;align-items:center;justify-content:center;padding:2rem;cursor:zoom-out}
+  .zoom img{max-width:100%;max-height:100%;object-fit:contain}
+
+  @media (max-width:900px){
+    .gv-mark{width:170px;font-size:10.5px}
+    .a{grid-template-columns:1fr;padding-top:1rem;gap:1.5rem}
+    .a-stage{order:-1;height:calc(62vw + 3.2rem);min-height:260px;margin:0 !important}
+    body.ai-edge .a{padding-right:var(--gut)}
+    .b-pic{height:clamp(96px,20vw,150px)}
+    .b-field{gap:1.6rem 1rem}
+    /* the four layouts on a phone: the picture on top, the index under it */
+    .ru,.lb{grid-template-columns:1fr}
+    .ru .p-stage,.lb .p-stage{order:-1;height:62vw}
+    .ru .p-layer{align-items:flex-end}
+    .ru-scale .tr{flex:none;min-height:2.2rem}
+    .ru-scale .tr:not(.cur) b,.ru-scale .tr:not(.cur) .k{display:none}
+    .ty{display:flex;flex-direction:column;padding-top:1.5rem}
+    .ty-list b,.ty-list .ab span:last-child{font-size:clamp(1.4rem,7vw,2rem)}
+    .rp{grid-template-columns:1fr;gap:1.2rem}
+    .rp-stage{order:-1;height:72vw}
+    .rp-step .rp-col{overflow:visible}
+    .rp-scroll .rp-col{position:static;height:auto}
+    .rp-flow{padding-bottom:3rem}
+    .rp-row{display:block}
+    .rp-fig{width:100% !important;margin:0 0 2.2rem !important}
+    .rp-fig.nw{width:68% !important}
+    .rp-fig.nw.rt{margin-left:auto !important}
+    /* phone: one picture per screen width, whole, swiped one at a time */
+    .c-strip{scroll-snap-type:x mandatory;scroll-padding:0 var(--gut);gap:1rem;align-items:flex-start}
+    .c-item{scroll-snap-align:start}
+    .c-item .c-box{height:auto;width:calc(100vw - 2 * var(--gut));aspect-ratio:4/3;align-items:flex-end}
+    .cp .c-item .c-box{align-items:center}
+    .c-item img{width:auto;height:auto;max-width:100%;max-height:100%}
+    .c-item .plate{width:100%;height:auto}
+    .cp-text{grid-template-columns:1fr;gap:1.5rem}
+    .cp-next{justify-content:flex-start}
+  }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <a href="/" class="gv-mark" id="home">
+    <span class="gv-mark__line">
+      <span>G</span><span>O</span><span class="gv-mark__flip">N</span><span>Z</span><span>A</span><span>L</span><span>O</span>
+      <span class="gv-mark__gap">&nbsp;</span>
+      <span>C</span><span>Á</span><span>C</span><span>E</span><span class="gv-mark__flip">R</span><span>E</span><span>S</span>
+    </span>
+    <span class="gv-mark__line">
+      <span>V</span><span>A</span><span class="gv-mark__flip">L</span><span>C</span><span>Á</span><span>R</span><span>C</span><span>E</span><span>L</span>
+    </span>
+  </a>
+  <nav><a href="about.html">About</a></nav>
+</header>
+
+<main id="main"></main>
+
+<footer>
+  <span>Architecture and development. Based in New York.</span>
+  <span class="opts">Mockup<a href="?v=a" data-v="a">A</a><a href="?v=b" data-v="b">B</a><a href="?v=c" data-v="c">C</a></span>
+</footer>
+
+<script src="projects.js"></script>
+<script src="signature.js"></script>
+<script src="museum.js"></script>
+<script>
+(function(){
+  var P = window.PROJECTS || {}, SLUGS = Object.keys(P);
+  var Q = new URLSearchParams(location.search);
+  var V = (Q.get('v') || 'a').toLowerCase(); if(!/^[abc]$/.test(V)) V = 'a';
+  var PAGE = V === 'c' && P[Q.get('p')] ? Q.get('p') : null;
+  var main = document.getElementById('main');
+  document.body.classList.add('v-' + V);
+  document.querySelectorAll('.opts a').forEach(function(a){ a.classList.toggle('on', a.getAttribute('data-v') === V); });
+  document.getElementById('home').setAttribute('href', '?v=' + V);
+
+  // ---- the project material, the same way the museum visit reads it ----
+  function web(src){
+    if(src === 'img/anticlastic-roof-structure/hero.jpg') return 'img/anticlastic-roof-structure/hero-web.jpg';
+    return src.replace(/\/physical\/(?!web\/)([^\/]+)$/, '/physical/web/$1');
+  }
+  // the small copy next to a photo (tools/thumbs.sh); drawings are already light
+  function thumb(src){ return /\.jpe?g$/i.test(src) ? src.replace(/\/physical\/web\//, '/physical/').replace(/\/([^\/]+)\.jpe?g$/i, '/thumbs/$1.jpg') : src; }
+  function isDrawing(it){ return it.drawing || /\.(svg|png|webp)$/i.test(it.src); }
+  function flat(list){ var o = []; (list || []).forEach(function(it){ Array.isArray(it) ? o.push.apply(o, it) : o.push(it); }); return o; }
+  function pictures(slug){
+    var p = P[slug], grid = flat(p.grid), g = p.gallery || {}, seen = {}, out = [];
+    var drawings = grid.filter(isDrawing), physical = grid.filter(function(it){ return !isDrawing(it) && /\/physical\//.test(it.src); });
+    var photos = grid.filter(function(it){ return !isDrawing(it) && !/\/physical\//.test(it.src); });
+    if(!grid.length){ drawings = g.drawings || []; physical = g.physical || []; photos = g.photos || []; }
+    if(!physical.length && g.physical) physical = g.physical;
+    [p.hero ? [{src: p.hero}] : [], p.diagram && p.diagram.src ? [{src: p.diagram.src, caption: p.diagram.caption, drawing: true}] : [], drawings, physical, photos].forEach(function(list){
+      list.forEach(function(it){
+        var s = it.src && web(it.src);
+        if(!s || seen[s]) return; seen[s] = 1;
+        var dr = isDrawing(it);
+        out.push({src: s, drawing: dr, kind: dr ? 'drawing' : /\/physical\//.test(s) ? 'physical' : 'photo', caption: it.caption || ''});
+      });
+    });
+    return out;
+  }
+  function coverOf(slug){ var p = P[slug], all = pictures(slug); return all.length ? (p.cover ? {src: p.cover} : all[0]) : null; }
+  function el(tag, cls, parent, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; if(parent) parent.appendChild(e); return e; }
+  function pad(n){ return (n < 10 ? '0' : '') + n; }
+  function num(slug){ return pad(SLUGS.indexOf(slug) + 1); }
+  function visit(slug, from, src){
+    // on the ruler home, a project opens as its own ruled page (the mockup), not the museum visit
+    if(document.body.classList.contains('l-ruler')){ location.href = '?v=a&l=ruler&p=' + slug; return; }
+    if(window.gcMuseum) gcMuseum.open(slug, from && from.getBoundingClientRect(), src);
+    else location.href = '/?visit=' + slug;
+  }
+
+  // =================== A: numbered index ===================
+  function buildA(){
+    var wrap = el('div', 'a', main), list = el('ol', 'a-index', wrap), stage = el('div', 'a-stage', wrap);
+    var links = [], group = null;
+    SLUGS.forEach(function(slug){
+      var p = P[slug];
+      if(p.group !== group){ group = p.group; el('li', 'grp k', list, group); }
+      var li = el('li', '', list), a = el('a', '', li);
+      a.href = '/?visit=' + slug; a.slug = slug;
+      el('span', 'n', a, num(slug)); el('b', '', a, p.title);
+      links.push(a);
+    });
+    var layers = [0, 1].map(function(){
+      var L = el('div', 'a-layer', stage);
+      L.fig = el('figure', 'a-fig', L);
+      L.box = el('div', 'a-box', L.fig); L.cap = el('figcaption', 'a-cap', L.fig);
+      L.t = el('b', '', L.cap); L.k = el('span', 'k', L.cap);
+      L.fig.addEventListener('click', function(){ if(L.slug) visit(L.slug, L.box.firstChild, L.src); });
+      return L;
+    });
+    // where the picture sits beside the list, whole, at its own proportions:
+    //   top    its top on the list's first line, as wide as the space allows, caption under it
+    //   block  exactly as tall as the list, top and bottom on the list's first and last lines: one block with it
+    //   centre in the middle of the space, smaller, like a picture hung on an empty wall
+    //   edge   as large as the space allows up to the screen's right edge and the header, against that corner
+    var IMG = (Q.get('img') || 'top').toLowerCase();
+    if(['top', 'block', 'centre', 'edge'].indexOf(IMG) === -1) IMG = 'top';
+    document.body.classList.add('ai-' + IMG);
+    // mockup only: the four ways, next to the A / B / C switch
+    var opts = document.querySelector('.opts');
+    opts.insertBefore(document.createTextNode('Picture'), opts.firstChild);
+    ['top', 'block', 'centre', 'edge'].forEach(function(m, i){
+      var a = document.createElement('a'); a.href = '?v=a&img=' + m; a.textContent = m; a.className = m === IMG ? 'on' : '';
+      opts.insertBefore(a, opts.childNodes[i + 1]);
+    });
+    opts.insertBefore(document.createTextNode('\u2003Mockup'), opts.childNodes[5]);
+    opts.removeChild(opts.childNodes[6]);
+    function fit(a, w, h){ return w / h > a ? {w: h * a, h: h} : {w: w, h: w / a}; }
+    function place(L){
+      if(!L.ratio) return;
+      var W = stage.clientWidth, H = stage.clientHeight, cap = 52, phone = innerWidth <= 900, mode = phone ? 'top' : IMG;
+      var sr = stage.getBoundingClientRect(), lr = list.getBoundingClientRect();
+      var lt = lr.top - sr.top, lh = lr.height, x = 0, y = 0, r;
+      if(mode === 'top'){ r = fit(L.ratio, W, H - cap); }
+      else if(mode === 'block'){ y = Math.max(0, lt); r = fit(L.ratio, W, Math.min(lh, H - cap - y)); }
+      else if(mode === 'centre'){ r = fit(L.ratio, W * .72, (H - cap) * .72); x = (W - r.w) / 2; y = (H - cap - r.h) / 2; }
+      else { r = fit(L.ratio, W, H - cap); x = W - r.w; }
+      L.box.style.width = r.w + 'px'; L.box.style.height = r.h + 'px';
+      L.fig.style.left = x + 'px'; L.fig.style.top = y + 'px';
+    }
+    addEventListener('resize', function(){ layers.forEach(place); });
+    var cur = null, timer = null;
+    function show(slug, instant){
+      if(slug === cur) return;
+      cur = slug;
+      links.forEach(function(a){ a.classList.toggle('cur', a.slug === slug); });
+      var on = layers[0].classList.contains('on') ? layers[0] : layers[1];
+      var L = instant ? on : (on === layers[0] ? layers[1] : layers[0]);
+      var c = coverOf(slug), p = P[slug];
+      L.slug = slug; L.src = c && c.src; L.box.innerHTML = ''; L.ratio = 0;
+      if(c){
+        var img = el('img', '', L.box); img.alt = p.title;
+        img.onload = function(){ if(L.slug === slug){ L.ratio = img.naturalWidth / img.naturalHeight || 1.5; place(L); } };
+        img.src = c.src;
+      } else { el('div', 'plate', L.box, 'In preparation'); L.ratio = 1.5; place(L); }
+      L.t.textContent = p.title; L.k.textContent = p.kicker || '';
+      if(L !== on){ on.classList.remove('on'); }
+      L.classList.add('on');
+    }
+    // like the live home: it moves on by itself every few seconds while nothing is pointed at
+    var withPics = SLUGS.filter(coverOf);
+    function auto(){
+      clearInterval(timer);
+      timer = setInterval(function(){ var i = withPics.indexOf(cur); show(withPics[(i + 1) % withPics.length]); }, 4500);
+    }
+    links.forEach(function(a){
+      a.addEventListener('mouseenter', function(){ clearInterval(timer); list.classList.add('pointing'); show(a.slug); });
+      a.addEventListener('focus', function(){ list.classList.add('pointing'); show(a.slug); });
+      a.addEventListener('click', function(e){ e.preventDefault(); visit(a.slug, null, null); });
+    });
+    list.addEventListener('mouseleave', function(){ auto(); });
+    list.classList.add('pointing');
+    show(withPics[0], true);
+    auto();
+  }
+
+  // =================== A, whole layouts ===================
+  // shared by the four: two picture layers that cross-fade, the index entries (.tr, each with .slug) that pick one
+  // when pointed at, and the same slow change by itself while nothing is pointed at
+  function picStage(parent){
+    var st = el('div', 'p-stage', parent), cur = null;
+    var layers = [0, 1].map(function(){ return el('div', 'p-layer', st); });
+    return {el: st, layers: layers, show: function(slug, instant, after){
+      var on = layers[0].classList.contains('on') ? layers[0] : layers[1];
+      var L = instant ? on : (on === layers[0] ? layers[1] : layers[0]);
+      var c = coverOf(slug), p = P[slug], pic;
+      L.innerHTML = '';
+      if(c){ pic = el('img', '', L); pic.alt = p.title; pic.src = c.src; }
+      else pic = el('div', 'plate', L, 'In preparation');
+      pic.addEventListener('click', function(){ visit(slug, pic, c && c.src); });
+      if(after) after(L, pic);
+      if(L !== on) on.classList.remove('on');
+      L.classList.add('on');
+    }};
+  }
+  // opts.rest: nothing is shown until something is pointed at, and nothing moves by itself
+  function indexer(box, items, onShow, opts){
+    var cur = null, timer = null, withPics = SLUGS.filter(coverOf), rest = opts && opts.rest;
+    function show(slug, instant){
+      if(slug === cur) return;
+      cur = slug;
+      items.forEach(function(t){ t.classList.toggle('cur', t.slug === slug); });
+      box.classList.toggle('pointing', !rest || !!slug);
+      onShow(slug, instant);
+    }
+    if(rest){
+      items.forEach(function(t){
+        t.addEventListener('mouseenter', function(){ show(t.slug); });
+        t.addEventListener('focus', function(){ show(t.slug); });
+        t.addEventListener('click', function(e){ e.preventDefault(); visit(t.slug, null, null); });
+      });
+      box.addEventListener('mouseleave', function(){ show(null); });
+      box.classList.add('faintable');
+      return;
+    }
+    // opts.noAuto: the caller moves on by itself (told when the pointer comes in and leaves)
+    var noAuto = opts && opts.noAuto;
+    function auto(){
+      clearInterval(timer);
+      if(noAuto) return;
+      timer = setInterval(function(){ var i = withPics.indexOf(cur); show(withPics[(i + 1) % withPics.length]); }, (opts && opts.every) || 4500);
+    }
+    items.forEach(function(t){
+      t.addEventListener('mouseenter', function(){ clearInterval(timer); show(t.slug); });
+      t.addEventListener('focus', function(){ show(t.slug); });
+      t.addEventListener('click', function(e){ e.preventDefault(); visit(t.slug, null, null); });
+    });
+    box.addEventListener('mouseenter', function(){ if(opts && opts.onEnter) opts.onEnter(); });
+    box.addEventListener('mouseleave', function(){ if(opts && opts.onLeave) opts.onLeave(); auto(); });
+    // opts.pauseOn: while the pointer is on this (the pictures), nothing moves on by itself
+    if(opts && opts.pauseOn){
+      opts.pauseOn.addEventListener('mouseenter', function(){ clearInterval(timer); if(opts.onEnter) opts.onEnter(); });
+      opts.pauseOn.addEventListener('mouseleave', function(){ if(opts.onLeave) opts.onLeave(); auto(); });
+    }
+    box.classList.add('faintable', 'pointing');
+    var ctl = {show: show};
+    setTimeout(function(){ show(withPics[0], true); auto(); }, 0);
+    return ctl;
+  }
+  function credit(p, key){ var v = ''; (p.credits || []).forEach(function(r){ if(r[0] === key) v = r[1]; }); return v; }
+  function entry(parent, slug, cls){ var t = el('button', 'tr' + (cls ? ' ' + cls : ''), parent); t.type = 'button'; t.slug = slug; return t; }
+
+  // the About entry that closes each index
+  function aboutEntry(parent){
+    var a = el('a', 'ab', parent); a.href = 'about.html';
+    el('span', 'n', a, '+'); el('span', '', a, 'About');
+    return a;
+  }
+
+  // the picture side of the ruler, one of several ways (&img=):
+  //   cover   one picture per project, as large as fits (the first round)
+  //   seq     the project's pictures one after another in the same place, a slow cross-fade; the dark stretch of the
+  //           ruler fills down as they pass, then the next project begins; pointing at a number holds that project
+  //   strip   the project's pictures in one row at one height, as his project pages open, running off the right edge
+  //   sheet   the project's pictures all at once, small, in rows of one height filling the space, like his home page
+  //   thumbs  one large picture with the project's others in a fine row of small ones under it; point at one to see it
+  var RIMG = (Q.get('img') || 'seq').toLowerCase();
+  if(['cover', 'seq', 'strip', 'sheet', 'thumbs', 'cluster', 'drift', 'living'].indexOf(RIMG) === -1) RIMG = 'seq';
+  function ratioOf(img){ return img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1.5; }
+  function loadAll(list){
+    return Promise.all(list.map(function(it){
+      return new Promise(function(res){ var i = new Image(); i.onload = function(){ res({it: it, img: i, r: ratioOf(i)}); }; i.onerror = function(){ res({it: it, img: i, r: 1.5}); }; i.src = it.src; });
+    }));
+  }
+  function picEl(parent, it, slug){
+    var p = P[slug], e;
+    if(it){ e = el('img', '', parent); e.alt = p.title; e.src = it.src; }
+    else e = el('div', 'plate', parent, 'In preparation');
+    e.addEventListener('click', function(){ visit(slug, e, it && it.src); });
+    return e;
+  }
+  function fader(st){
+    var layers = [0, 1].map(function(){ return el('div', 'p-layer', st); });
+    return function(build, instant){
+      var on = layers[0].classList.contains('on') ? layers[0] : layers[1];
+      var L = instant ? on : (on === layers[0] ? layers[1] : layers[0]);
+      L.innerHTML = ''; build(L);
+      if(L !== on) on.classList.remove('on');
+      L.classList.add('on');
+      return L;
+    };
+  }
+
+  function buildRuler(){
+    var wrap = el('div', 'ru rm-' + RIMG, main), col = el('div', 'ru-col', wrap), scale = el('div', 'ru-scale', col);
+    var items = [], group = null;
+    SLUGS.forEach(function(slug){
+      var p = P[slug], t = entry(scale, slug);
+      if(p.group !== group){ group = p.group; el('span', 'ru-grp', t, group); }
+      el('span', 'n', t, num(slug)); el('b', '', t, p.title); el('span', 'k', t, p.kicker || '');
+      items.push(t);
+    });
+    aboutEntry(col);
+    var st = el('div', 'p-stage', wrap), fade = fader(st), token = 0;
+    function itemOf(slug){ return items.filter(function(t){ return t.slug === slug; })[0]; }
+
+    if(RIMG === 'cover'){
+      indexer(scale, items, function(slug, instant){ fade(function(L){ picEl(L, coverOf(slug), slug); }, instant); }, {pauseOn: st});
+      return;
+    }
+
+    if(RIMG === 'seq'){
+      var hold = false, timer = null, list = [], at = 0, cur = null, ctl;
+      var withPics = SLUGS.filter(coverOf);
+      function paint(instant){
+        fade(function(L){ picEl(L, list[at], cur); }, instant);
+        var t = itemOf(cur); if(t) t.style.setProperty('--p', ((at + 1) / list.length).toFixed(3));
+      }
+      function tick(){
+        if(at + 1 < list.length){ at++; paint(); return; }
+        if(hold){ at = 0; paint(); return; }
+        ctl.show(withPics[(withPics.indexOf(cur) + 1) % withPics.length]);
+      }
+      ctl = indexer(scale, items, function(slug, instant){
+        items.forEach(function(t){ if(t.slug !== slug) t.style.removeProperty('--p'); });
+        cur = slug; list = pictures(slug); if(!list.length) list = [null]; at = 0;
+        paint(instant);
+        clearInterval(timer); timer = setInterval(tick, 3200);
+      }, {noAuto: true, pauseOn: st, onEnter: function(){ hold = true; }, onLeave: function(){ hold = false; }});
+      return;
+    }
+
+    if(RIMG === 'strip'){
+      indexer(scale, items, function(slug, instant){
+        fade(function(L){
+          var row = el('div', 'ri-row', L), all = pictures(slug);
+          (all.length ? all : [null]).forEach(function(it){ picEl(row, it, slug); });
+          L.scrollLeft = 0;
+        }, instant);
+      }, {pauseOn: st});
+      st.addEventListener('wheel', function(e){
+        var L = st.querySelector('.p-layer.on');
+        if(!L || Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+        e.preventDefault(); L.scrollLeft += e.deltaY;
+      }, {passive: false});
+      // under the row: a thin line showing where you are, and an arrow at each end that steps one picture
+      var foot = el('div', 'c-foot ri-foot', st), prev = el('button', 'c-arrow', foot), rail = el('div', 'c-rail', foot), next = el('button', 'c-arrow', foot), bar = el('span', '', rail);
+      prev.innerHTML = '<svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg>'; prev.setAttribute('aria-label', 'Previous');
+      next.innerHTML = '<svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5"/></svg>'; next.setAttribute('aria-label', 'Next');
+      function onL(){ return st.querySelector('.p-layer.on'); }
+      function go(dir){
+        var L = onL(); if(!L) return;
+        var x = L.scrollLeft, list = Array.prototype.map.call(L.firstChild.children, function(c){ return c.offsetLeft; }), to;
+        if(dir > 0){ to = list.filter(function(o){ return o > x + 4; })[0]; if(to == null) to = L.scrollWidth; }
+        else { to = list.filter(function(o){ return o < x - 4; }).pop(); if(to == null) to = 0; }
+        L.scrollTo({left: to, behavior: 'smooth'});
+      }
+      function sync(){
+        var L = onL(); if(!L) return;
+        var max = L.scrollWidth - L.clientWidth, w = Math.min(1, L.clientWidth / L.scrollWidth);
+        bar.style.width = (w * 100) + '%'; bar.style.left = (max > 0 ? L.scrollLeft / max * (1 - w) * 100 : 0) + '%';
+        prev.disabled = L.scrollLeft < 4; next.disabled = L.scrollLeft > max - 4;
+        foot.style.visibility = max > 4 ? 'visible' : 'hidden';
+      }
+      prev.addEventListener('click', function(){ go(-1); });
+      next.addEventListener('click', function(){ go(1); });
+      st.addEventListener('scroll', sync, true);
+      st.addEventListener('load', sync, true);
+      setInterval(sync, 500);
+      return;
+    }
+
+    if(RIMG === 'sheet'){
+      // rows of one height, as tall as lets all of them fit in the space; ragged on the right
+      function pack(L, got){
+        var W = st.clientWidth, H = st.clientHeight, g = 14, h = H;
+        function rowsAt(h){ var rows = 1, x = 0; got.forEach(function(o){ var w = h * o.r; if(x && x + w > W){ rows++; x = 0; } x += w + g; }); return rows; }
+        while(h > 40 && rowsAt(h) * h + (rowsAt(h) - 1) * g > H) h -= 4;
+        h = Math.min(h, H * .62);
+        L.style.setProperty('--sh', h + 'px');
+      }
+      indexer(scale, items, function(slug, instant){
+        var me = ++token, all = pictures(slug);
+        loadAll(all).then(function(got){
+          if(me !== token) return;
+          fade(function(L){
+            var box = el('div', 'ri-sheet', L);
+            if(!got.length){ picEl(box, null, slug); return; }
+            got.forEach(function(o){ picEl(box, o.it, slug); });
+            pack(L, got);
+          }, instant);
+        });
+      }, {pauseOn: st});
+      return;
+    }
+
+    // three ways to show part of a project, not all of it, to make you want the rest:
+    // a few of the project's pictures, spread from first to last
+    function some(all, k){
+      if(all.length <= k) return all.slice();
+      var out = [];
+      for(var i = 0; i < k; i++) out.push(all[Math.round(i * (all.length - 1) / (k - 1))]);
+      return out;
+    }
+    function more(L, n){ if(n > 0) el('span', 'ri-more n', L, '+' + n); }
+
+    if(RIMG === 'cluster'){
+      // up to four pictures, each whole, fitted together on shared edges: a large one; a second beside it standing on
+      // the same bottom line; a third under the first, its top one gap below; a fourth beside the third, tops level.
+      // They arrive one after another; a small "+n" says how many more are inside
+      // the pictures fill the whole space: they are set in rows, each row exactly as wide as the space (its pictures
+      // share one height, whole, never cropped); of the ways to split three to six of the project's pictures into two
+      // or three rows, the one whose height comes closest to the space's height wins, so the page is filled edge to
+      // edge without showing everything
+      function rowsOf(rs, W, g, cuts){
+        var rows = [], at = 0;
+        cuts.concat([rs.length]).forEach(function(c){ rows.push(rs.slice(at, c)); at = c; });
+        return rows.map(function(row){ var sum = row.reduce(function(a, b){ return a + b; }, 0); return (W - g * (row.length - 1)) / sum; });
+      }
+      function perms(a){ if(a.length < 2) return [a]; var o = []; a.forEach(function(x, i){ perms(a.slice(0, i).concat(a.slice(i + 1))).forEach(function(p){ o.push([x].concat(p)); }); }); return o; }
+      // candidate arrangements, each a set of rectangles made on shared edges (rows of one height each, or one
+      // picture the full height beside a column of the others at one width), scaled to fit the space; the one that
+      // covers most of the space wins
+      function arrange(got, W, H){
+        var g = 16, best = null;
+        function consider(R, bonus){
+          var tw = 0, th = 0;
+          R.forEach(function(q){ tw = Math.max(tw, q.x + q.w); th = Math.max(th, q.y + q.h); });
+          var sc = Math.min(W / tw, H / th), cover = (tw * sc / W) * (th * sc / H) + (bonus || 0);
+          if(!best || cover > best.cover) best = {cover: cover, R: R.map(function(q){ return {o: q.o, x: q.x * sc, y: q.y * sc, w: q.w * sc, h: q.h * sc}; })};
+        }
+        function rows(set, cuts){
+          var R = [], y = 0, at = 0;
+          var hs = rowsOf(set.map(function(o){ return o.r; }), W, g, cuts);
+          cuts.concat([set.length]).forEach(function(c, ri){
+            var x = 0;
+            set.slice(at, c).forEach(function(o){ R.push({o: o, x: x, y: y, w: o.r * hs[ri], h: hs[ri]}); x += o.r * hs[ri] + g; });
+            y += hs[ri] + g; at = c;
+          });
+          return R;
+        }
+        function column(set, x, w){ var y = 0; return set.map(function(o){ var q = {o: o, x: x, y: y, w: w, h: w / o.r}; y += q.h + g; return q; }); }
+        perms(got).forEach(function(set){
+          var k = set.length, keep = set[0] === got[0] ? .004 : 0;
+          var splits = [[]];
+          for(var i = 1; i < k; i++){ splits.push([i]); for(var j = i + 1; j < k; j++) splits.push([i, j]); }
+          splits.forEach(function(cuts){ consider(rows(set, cuts), keep); });
+          if(k >= 2){
+            // one picture the full height, the others stacked beside it at one width: on the left, then on the right
+            var big = set[0], rest = set.slice(1), Hh = H, cw = (Hh - g * (rest.length - 1)) / rest.reduce(function(a, o){ return a + 1 / o.r; }, 0);
+            var bw = big.r * Hh;
+            consider([{o: big, x: 0, y: 0, w: bw, h: Hh}].concat(column(rest, bw + g, cw)), keep);
+            consider(column(rest, 0, cw).concat([{o: big, x: cw + g, y: 0, w: bw, h: Hh}]), keep);
+          }
+        });
+        return best.R;
+      }
+      // one of each kind: a photograph or render, a drawing (a plan, section or elevation before a sketch), a model
+      function trio(all){
+        function first(f){ return all.filter(f)[0]; }
+        var photo = first(function(it){ return it.kind === 'photo'; });
+        var drawing = first(function(it){ return it.kind === 'drawing' && /\.(svg|png|webp)$/i.test(it.src); }) || first(function(it){ return it.kind === 'drawing'; });
+        var model = first(function(it){ return it.kind === 'physical'; });
+        // a project without a model (built work) gives that place to a second photograph or render, a render first
+        if(!model){
+          var others = all.filter(function(it){ return it.kind === 'photo' && it !== photo; });
+          model = others.filter(function(it){ return /render/i.test(it.src); })[0] || others[0];
+        }
+        return [photo, drawing, model].filter(Boolean);
+      }
+      indexer(scale, items, function(slug, instant){
+        var me = ++token, all = pictures(slug), pool = trio(all);
+        loadAll(pool).then(function(got){
+          if(me !== token) return;
+          fade(function(L){
+            if(!got.length){ picEl(L, null, slug); return; }
+            var R = arrange(got, st.clientWidth, st.clientHeight - 26);
+            R.forEach(function(q, i){
+              var box = el('div', 'ri-slot', L);
+              box.style.left = q.x + 'px'; box.style.top = q.y + 'px'; box.style.width = q.w + 'px'; box.style.height = q.h + 'px';
+              box.style.animationDelay = (i * .14) + 's';
+              picEl(box, q.o.it, slug);
+            });
+            // "+n" under the last picture's right corner
+            if(all.length > R.length){
+              var q = R[R.length - 1], m = el('span', 'ri-more n', L, '+' + (all.length - R.length));
+              m.style.left = 'auto'; m.style.right = Math.max(0, st.clientWidth - q.x - q.w) + 'px'; m.style.top = (q.y + q.h + 8) + 'px'; m.style.bottom = 'auto';
+              m.style.animationDelay = (R.length * .14) + 's';
+            }
+          }, instant);
+        });
+      }, {pauseOn: st, every: 6500});
+      return;
+    }
+
+    if(RIMG === 'drift'){
+      // the project's pictures in one row that keeps gliding slowly to the left, only two or three in view at a
+      // time; it stops while you point at it; it loops, so it never runs out
+      var drift = {x: 0, row: null, w: 0, on: true, last: 0};
+      function frame(t){
+        var dt = drift.last ? Math.min(64, t - drift.last) : 16; drift.last = t;
+        if(drift.row && drift.on && drift.w){
+          drift.x -= dt * .035;
+          if(-drift.x >= drift.w) drift.x += drift.w;
+          drift.row.style.transform = 'translateX(' + drift.x + 'px)';
+        }
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+      st.addEventListener('mouseenter', function(){ drift.on = false; });
+      st.addEventListener('mouseleave', function(){ drift.on = true; });
+      indexer(scale, items, function(slug, instant){
+        fade(function(L){
+          var all = pictures(slug), row = el('div', 'ri-drift', L);
+          if(!all.length){ picEl(row, null, slug); drift.row = null; return; }
+          // two copies, so the loop has no seam
+          all.concat(all).forEach(function(it){ picEl(row, it, slug); });
+          drift.row = row; drift.x = 0; drift.w = 0;
+          var measure = function(){ var half = row.children[all.length]; drift.w = half ? half.offsetLeft : 0; };
+          row.querySelectorAll('img').forEach(function(i){ i.addEventListener('load', measure); });
+          setTimeout(measure, 50);
+        }, instant);
+      }, {pauseOn: st, every: 9000});
+      return;
+    }
+
+    if(RIMG === 'living'){
+      // a small sheet of four places; every few seconds one of them changes to another picture of the project you
+      // haven't seen yet, so it is never the whole project and never still
+      var swap = null;
+      indexer(scale, items, function(slug, instant){
+        clearInterval(swap);
+        fade(function(L){
+          var all = pictures(slug), k = Math.min(4, all.length), shown = all.slice(0, k), rest = all.slice(k);
+          var grid = el('div', 'ri-living', L);
+          if(!all.length){ picEl(grid, null, slug); return; }
+          var cells = shown.map(function(it, i){
+            var c = el('div', 'ri-cell', grid); c.style.animationDelay = (i * .14) + 's';
+            picEl(c, it, slug); return c;
+          });
+          more(L, rest.length);
+          if(!rest.length) return;
+          var turn = 0;
+          swap = setInterval(function(){
+            var c = cells[turn % cells.length]; turn++;
+            var outgoing = shown[cells.indexOf(c)], incoming = rest.shift();
+            rest.push(outgoing); shown[cells.indexOf(c)] = incoming;
+            var old = c.firstChild; old.classList.add('ri-out');
+            var neu = picEl(c, incoming, slug); neu.classList.add('ri-new');
+            setTimeout(function(){ if(old.parentNode) old.remove(); neu.classList.remove('ri-new'); }, 900);
+          }, 2200);
+        }, instant);
+      }, {pauseOn: st, every: 9000});
+      return;
+    }
+
+    // thumbs
+    indexer(scale, items, function(slug, instant){
+      fade(function(L){
+        var all = pictures(slug), big = el('div', 'ri-big', L), row = el('div', 'ri-tn', L);
+        var bigImg = picEl(big, all[0] || null, slug);
+        if(all.length > 1) all.forEach(function(it, i){
+          var b = el('button', i ? '' : 'on', row), im = el('img', '', b); b.type = 'button';
+          im.src = thumb(it.src); im.alt = ''; im.onerror = function(){ im.onerror = null; im.src = it.src; };
+          b.addEventListener('mouseenter', function(){
+            bigImg.src = it.src;
+            Array.prototype.forEach.call(row.children, function(c){ c.classList.toggle('on', c === b); });
+          });
+          b.addEventListener('click', function(){ visit(slug, bigImg, it.src); });
+        });
+      }, instant);
+    }, {pauseOn: st});
+  }
+
+  function buildType(){
+    var wrap = el('div', 'ty', main), list = el('ol', 'ty-list', wrap), ps = picStage(wrap), items = [];
+    SLUGS.forEach(function(slug){
+      var p = P[slug], li = el('li', '', list), t = entry(li, slug);
+      el('span', 'n', t, num(slug)); el('b', '', t, p.title);
+      items.push(t);
+    });
+    aboutEntry(el('li', '', list));
+    function placeBy(t, L){
+      if(innerWidth <= 900) return;
+      var wr = wrap.getBoundingClientRect(), r = t.querySelector('b').getBoundingClientRect();
+      var widest = Math.max.apply(null, items.map(function(i){ return i.getBoundingClientRect().right - wr.left; }));
+      var x = Math.max(widest + 64, wr.width * .42);
+      var w = wr.width - x - parseFloat(getComputedStyle(wrap).paddingRight);
+      var h = Math.min(wr.height * .5, 440), y = Math.max(8, Math.min(r.top - wr.top + 8, wr.height - h - 8));
+      L.style.left = x + 'px'; L.style.top = y + 'px'; L.style.setProperty('--pw', w + 'px'); L.style.setProperty('--ph', h + 'px');
+    }
+    // at rest the page is only the names; pointing at one shows its picture, leaving the list empties it again
+    indexer(list, items, function(slug, instant){
+      if(!slug){ ps.layers.forEach(function(L){ L.classList.remove('on'); }); return; }
+      var t = items.filter(function(i){ return i.slug === slug; })[0];
+      ps.show(slug, instant, function(L){ placeBy(t, L); });
+    }, {rest: true});
+  }
+
+  function buildLabel(){
+    var wrap = el('div', 'lb', main), ps = picStage(wrap), label = el('aside', 'lb-label', wrap);
+    var now = el('div', 'lb-now', label), h = el('h2', '', now), k = el('span', 'k', now);
+    var list = el('ol', 'lb-list', label), items = [];
+    SLUGS.forEach(function(slug){
+      var p = P[slug], t = entry(el('li', '', list), slug);
+      el('span', 'n', t, num(slug)); el('span', 'lt', t, p.title);
+      items.push(t);
+    });
+    aboutEntry(el('li', '', list));
+    indexer(list, items, function(slug, instant){ ps.show(slug, instant); h.textContent = P[slug].title; k.textContent = P[slug].kicker || ''; });
+  }
+
+  // =================== a project, in the ruler's language (?v=a&l=ruler&p=<slug>&pv=step|scroll) ===================
+  // the left column is the project's label beside the same thin upright line as the home page; here the line
+  // stands for the project's pictures, and its dark stretch says where you are among them
+  //   step    one picture at a time in the space on the right, as on the home page: a scroll, an arrow key, a
+  //           click on the picture or on the line moves one picture; after the last comes the next project
+  //   scroll  the label stays put while all the pictures go by under each other, whole; the dark stretch follows
+  var PV = (Q.get('pv') || 'step').toLowerCase(); if(PV !== 'scroll') PV = 'step';
+  function buildRuledProject(slug){
+    var p = P[slug], all = pictures(slug), n = Math.max(1, all.length);
+    var i0 = SLUGS.indexOf(slug), nx = SLUGS[(i0 + 1) % SLUGS.length];
+    document.title = p.title + ' — Gonzalo Cáceres';
+    var wrap = el('div', 'rp rp-' + PV, main), col = el('aside', 'rp-col', wrap);
+    var line = el('div', 'rp-line', col), mark = el('span', 'rp-mark', line);
+    var label = el('div', 'rp-label', col);
+    var h = el('h1', '', label); el('span', 'n', h, num(slug)); el('span', '', h, p.title);
+    el('p', 'k', label, p.kicker || '');
+    var cr = el('div', 'rp-cr', label);
+    (p.credits || []).forEach(function(r){ if(r[0] === 'Year') return; var c = el('p', '', cr); el('b', '', c, r[0]); c.appendChild(document.createTextNode('  ' + r[1])); });
+    var paras = (p.lede ? [p.lede] : []).concat(p.text ? (Array.isArray(p.text) ? p.text : [p.text]) : []);
+    var body = el('div', 'rp-text', label), shown = PV === 'step' ? Math.min(paras.length, p.lede ? 2 : 1) : paras.length;
+    paras.forEach(function(t, i){ el('p', (p.lede && i === 0 ? 'lede' : '') + (i >= shown ? ' extra' : ''), body, t); });
+    if(paras.length > shown){
+      var more = el('button', 'rp-more', label, 'More info'); more.type = 'button';
+      more.addEventListener('click', function(){ var on = col.classList.toggle('open'); more.textContent = on ? 'Less' : 'More info'; });
+    }
+    var nextA = el('a', 'ab rp-next', col); nextA.href = '?v=a&l=ruler&p=' + nx + (PV === 'scroll' ? '&pv=scroll' + (Q.get('in') ? '&in=' + Q.get('in') : '') : '');
+    var nk = el('span', 'k rp-nk', col, 'Next project'); col.insertBefore(nk, nextA);
+    el('span', 'n', nextA, num(nx)); el('span', '', nextA, P[nx].title);
+    function setMark(top, height){ mark.style.top = (top * 100) + '%'; mark.style.height = (height * 100) + '%'; }
+
+    if(PV === 'scroll'){
+      var IN = (Q.get('in') || 'rise').toLowerCase(); if(['rise', 'unveil', 'drift'].indexOf(IN) === -1) IN = 'rise';
+      var flow = el('div', 'rp-flow in-' + IN, wrap), pars = [];
+      // a small seeded chance, so each project gets its own arrangement but the same one every visit
+      var seed = 7 + i0 * 31; function rnd(){ seed = (seed * 9301 + 49297) % 233280; return seed / 233280; }
+      function pick(a){ return a[Math.floor(rnd() * a.length)]; }
+      // width in columns (of 12) by shape: wide pictures large, upright ones narrow, drawings in between
+      function span(o){ return o.r >= 1.6 ? pick([8, 9, 10]) : o.r >= 1.15 ? pick([6, 7, 8]) : o.r >= .85 ? pick([5, 6]) : pick([4, 5]); }
+      function fig(row, o, from, cols, drop){
+        var f = el('figure', 'rp-fig' + (o && o.r < 1.15 ? ' nw' : '') + (from + cols > 9 ? ' rt' : ''), row);
+        f.style.gridColumn = from + ' / span ' + cols;
+        if(drop) f.style.marginTop = drop + 'vh';
+        var par = el('div', 'rp-par', f);
+        if(o){
+          var im = el('img', '', par); im.alt = o.it.caption || p.title; im.src = o.it.src;
+          im.addEventListener('click', function(){ var z = el('div', 'zoom', document.body), zi = el('img', '', z); zi.src = o.it.src; z.addEventListener('click', function(){ z.remove(); }); });
+          if(o.it.caption) el('figcaption', 'k', par, o.it.caption);
+        } else el('div', 'plate', par, 'In preparation');
+        par.speed = (rnd() - .5) * .16; pars.push(par);
+        return f;
+      }
+      function compose(got){
+        flow.innerHTML = ''; pars = [];
+        if(!got.length){ fig(el('div', 'rp-row', flow), null, 1, 12); return; }
+        var i = 0, last = -1;
+        while(i < got.length){
+          var o = got[i], q = got[i + 1], row = el('div', 'rp-row', flow);
+          row.style.marginTop = i ? pick([5, 8, 11, 15]) + 'vh' : '0';
+          if(i === 0){ fig(row, o, 1, o.r >= 1.15 ? 12 : 7); i++; continue; }
+          // two smaller ones side by side, the second lower
+          if(q && o.r < 1.6 && q.r < 1.6 && rnd() < .6){
+            var a = Math.min(span(o), 6), b = Math.min(span(q), 5), gap = 12 - a - b, l = Math.floor(rnd() * Math.max(1, gap));
+            var A = 1 + l, B = Math.min(13 - b, A + a + 1 + Math.floor(rnd() * Math.max(1, gap - l - 1)));
+            if(rnd() < .5){ fig(row, o, A, a); fig(row, q, B, b, pick([6, 10, 15])); }
+            else { fig(row, o, A, a, pick([6, 10, 15])); fig(row, q, B, b); }
+            i += 2; continue;
+          }
+          // one alone, pushed to a different side from the last one
+          var c = span(o), room = 12 - c, at;
+          do { at = pick([0, Math.round(room / 2), room, Math.round(room / 3)]); } while(room > 1 && at === last);
+          last = at; fig(row, o, 1 + at, c); i++;
+        }
+      }
+      var io = new IntersectionObserver(function(es){
+        es.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+      }, {rootMargin: '0px 0px -12% 0px', threshold: .08});
+      function observe(){
+        flow.querySelectorAll('.rp-row').forEach(function(r){
+          r.querySelectorAll('.rp-fig').forEach(function(f, j){ f.style.transitionDelay = (j * .28) + 's'; io.observe(f); });
+        });
+      }
+      var sync = function(){
+        var r = flow.getBoundingClientRect(), vh = innerHeight, tot = r.height + vh * .3;
+        var seen = Math.min(1, vh / tot), top = Math.max(0, Math.min(1 - seen, -r.top / tot));
+        setMark(top, seen);
+        if(IN === 'drift' && innerWidth > 700) pars.forEach(function(d){
+          var b = d.parentNode.getBoundingClientRect(), off = (b.top + b.height / 2 - vh / 2);
+          d.style.transform = 'translateY(' + (off * d.speed).toFixed(1) + 'px)';
+        });
+      };
+      loadAll(all).then(function(got){ compose(got); observe(); sync(); });
+      addEventListener('scroll', sync, {passive: true});
+      addEventListener('resize', sync);
+      addEventListener('keydown', function(e){ if(e.key === 'Escape'){ var z = document.querySelector('.zoom'); if(z) z.remove(); } });
+      sync();
+      return;
+    }
+
+    var st = el('div', 'p-stage rp-stage', wrap), fade = fader(st), at = -1, lock = 0;
+    for(var k = 0; k < n; k++){ (function(k){ var b = el('button', 'rp-hit', line); b.type = 'button'; b.style.top = (k / n * 100) + '%'; b.style.height = (100 / n) + '%'; b.setAttribute('aria-label', 'Picture ' + (k + 1)); b.addEventListener('click', function(){ go(k); }); })(k); }
+    function go(k){
+      if(k >= n){ location.href = nextA.href; return; }
+      k = Math.max(0, k); if(k === at) return;
+      var first = at < 0; at = k;
+      fade(function(L){
+        var it = all[k], f = el('figure', 'rp-one', L);
+        if(it){ var im = el('img', '', f); im.alt = it.caption || p.title; im.src = it.src; im.addEventListener('click', function(){ go(at + 1); }); }
+        else el('div', 'plate', f, 'In preparation');
+        if(it && it.caption) el('figcaption', 'k', f, it.caption);
+      }, first);
+      setMark(k / n, 1 / n);
+    }
+    addEventListener('wheel', function(e){
+      if(col.contains(e.target) && col.scrollHeight > col.clientHeight) return;
+      var d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      if(Math.abs(d) < 8) return;
+      e.preventDefault();
+      var now = Date.now(); if(now - lock < 750) return; lock = now;
+      go(at + (d > 0 ? 1 : -1));
+    }, {passive: false});
+    addEventListener('keydown', function(e){
+      if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){ go(at + 1); e.preventDefault(); }
+      if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ go(at - 1); e.preventDefault(); }
+    });
+    // a phone: a sideways swipe on the picture
+    var sx = null;
+    st.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive: true});
+    st.addEventListener('touchend', function(e){ if(sx == null) return; var dx = e.changedTouches[0].clientX - sx; sx = null; if(Math.abs(dx) > 40) go(at + (dx < 0 ? 1 : -1)); }, {passive: true});
+    go(0);
+  }
+
+  // =================== B: field ===================
+  function buildB(){
+    var line = el('nav', 'b-line', main), field = el('div', 'b-field', main), names = {}, pics = [];
+    SLUGS.forEach(function(slug){
+      var p = P[slug], all = pictures(slug), a = el('a', all.length ? '' : 'empty', line);
+      a.href = '/?visit=' + slug;
+      el('span', 'n', a, num(slug)); el('b', '', a, p.title);
+      names[slug] = a;
+      a.addEventListener('click', function(e){ e.preventDefault(); if(all.length) visit(slug, null, null); });
+      a.addEventListener('mouseenter', function(){ if(all.length) point(slug); });
+      a.addEventListener('mouseleave', function(){ point(null); });
+      all.forEach(function(it){
+        var b = el('a', 'b-pic', field), img = el('img', '', b);
+        b.href = '/?visit=' + slug; b.slug = slug;
+        img.alt = p.title; img.loading = 'lazy'; img.src = thumb(it.src);
+        img.onerror = function(){ img.onerror = null; img.src = it.src; };
+        b.addEventListener('mouseenter', function(){ point(slug); });
+        b.addEventListener('mouseleave', function(){ point(null); });
+        b.addEventListener('click', function(e){ e.preventDefault(); visit(slug, img, it.src); });
+        pics.push(b);
+      });
+    });
+    function point(slug){
+      document.body.classList.toggle('pointing', !!slug);
+      pics.forEach(function(b){ b.classList.toggle('cur', b.slug === slug); });
+      Object.keys(names).forEach(function(k){ names[k].classList.toggle('cur', k === slug); });
+    }
+  }
+
+  // =================== C: strip ===================
+  // one row at one height, run sideways: by a sideways swipe, the wheel (on the home row), the arrows or the keys
+  function railFor(strip, parent, wheel){
+    var foot = el('div', 'c-foot', parent);
+    var prev = el('button', 'c-arrow', foot), rail = el('div', 'c-rail', foot), next = el('button', 'c-arrow', foot);
+    prev.innerHTML = '<svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg>'; prev.setAttribute('aria-label', 'Previous');
+    next.innerHTML = '<svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5"/></svg>'; next.setAttribute('aria-label', 'Next');
+    var bar = el('span', '', rail);
+    function items(){ return Array.prototype.slice.call(strip.children); }
+    function go(dir){
+      var x = strip.scrollLeft, pad = parseFloat(getComputedStyle(strip).paddingLeft), to = null;
+      var list = items().map(function(i){ return i.offsetLeft - pad; });
+      if(dir > 0){ to = list.filter(function(o){ return o > x + 4; })[0]; if(to == null) to = strip.scrollWidth; }
+      else { to = list.filter(function(o){ return o < x - 4; }).pop(); if(to == null) to = 0; }
+      strip.scrollTo({left: to, behavior: 'smooth'});
+    }
+    prev.addEventListener('click', function(){ go(-1); });
+    next.addEventListener('click', function(){ go(1); });
+    function sync(){
+      var max = strip.scrollWidth - strip.clientWidth, w = strip.clientWidth / strip.scrollWidth;
+      bar.style.width = (w * 100) + '%';
+      bar.style.left = (max > 0 ? strip.scrollLeft / max * (1 - w) * 100 : 0) + '%';
+      prev.disabled = strip.scrollLeft < 4; next.disabled = strip.scrollLeft > max - 4;
+      foot.style.visibility = max > 4 ? 'visible' : 'hidden';
+    }
+    strip.addEventListener('scroll', sync, {passive: true});
+    window.addEventListener('resize', sync);
+    strip.querySelectorAll('img').forEach(function(i){ i.addEventListener('load', sync); });
+    if(wheel) strip.addEventListener('wheel', function(e){
+      if(Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+      e.preventDefault(); strip.scrollLeft += e.deltaY;
+    }, {passive: false});
+    document.addEventListener('keydown', function(e){
+      if(document.querySelector('.zoom') || (window.gcMuseum && gcMuseum.isOpen())) return;
+      if(e.key === 'ArrowRight'){ go(1); e.preventDefault(); }
+      if(e.key === 'ArrowLeft'){ go(-1); e.preventDefault(); }
+    });
+    sync();
+  }
+  function buildC(){
+    var home = el('div', 'c-home', main), strip = el('div', 'c-strip', home);
+    SLUGS.forEach(function(slug){
+      var p = P[slug], c = coverOf(slug), f = el('figure', 'c-item', strip), box = el('div', 'c-box', f);
+      if(c){ var img = el('img', '', box); img.alt = p.title; img.src = c.src; }
+      else el('div', 'plate', box, 'In preparation');
+      var cap = el('figcaption', '', f);
+      el('span', 'n', cap, num(slug)); el('b', '', cap, p.title); el('span', 'k', cap, p.kicker || '');
+      f.addEventListener('click', function(){ location.href = '?v=c&p=' + slug; });
+    });
+    railFor(strip, home, true);
+  }
+  function buildProject(slug){
+    var p = P[slug], wrap = el('article', 'cp', main), strip = el('div', 'c-strip', wrap), all = pictures(slug);
+    if(!all.length){ var f0 = el('figure', 'c-item', strip); el('div', 'plate', el('div', 'c-box', f0), 'In preparation'); }
+    all.forEach(function(it){
+      var f = el('figure', 'c-item', strip), img = el('img', '', el('div', 'c-box', f));
+      img.alt = it.caption || p.title; img.src = it.src;
+      f.addEventListener('click', function(){
+        var z = el('div', 'zoom', document.body), zi = el('img', '', z); zi.src = it.src; zi.alt = img.alt;
+        z.addEventListener('click', function(){ z.remove(); });
+      });
+    });
+    railFor(strip, wrap, false);
+    // the words after the pictures: the name, the place and year, the credits (names bold), then his text as it is
+    var text = el('div', 'cp-text', wrap), head = el('div', 'cp-head', text), body = el('div', 'cp-body', text);
+    var h = el('h1', '', head); el('span', 'n', h, num(slug)); el('span', '', h, p.title);
+    el('p', 'k', head, p.kicker || '');
+    (p.credits || []).forEach(function(r){
+      if(r[0] === 'Year') return;
+      var c = el('p', 'cr', head); el('b', '', c, r[0]); c.appendChild(document.createTextNode('  ' + r[1]));
+    });
+    if(p.lede) el('p', 'lede', body, p.lede);
+    (p.text ? (Array.isArray(p.text) ? p.text : [p.text]) : []).forEach(function(t){ el('p', '', body, t); });
+    var i = SLUGS.indexOf(slug), nx = SLUGS[(i + 1) % SLUGS.length];
+    var n = el('a', 'cp-next', main); n.href = '?v=c&p=' + nx;
+    el('span', 'k', n, 'Next project'); el('span', 'n', n, num(nx)); el('b', '', n, P[nx].title);
+    document.title = p.title + ' — Gonzalo Cáceres';
+    document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ var z = document.querySelector('.zoom'); if(z) z.remove(); } });
+  }
+
+  var LAY = (Q.get('l') || '').toLowerCase(), LAYS = {ruler: buildRuler, type: buildType, label: buildLabel};
+  if(V === 'a' && LAYS[LAY]){
+    document.body.classList.add('l-' + LAY, 'lay');
+    var lo = document.querySelector('.opts');
+    lo.innerHTML = 'Layout' + Object.keys(LAYS).map(function(k){ return '<a href="?v=a&l=' + k + '"' + (k === LAY ? ' class="on"' : '') + '>' + k + '</a>'; }).join('');
+    var RP = LAY === 'ruler' && P[Q.get('p')] ? Q.get('p') : null;
+    if(LAY === 'ruler') document.getElementById('home').setAttribute('href', '?v=a&l=ruler');
+    if(RP) lo.innerHTML = 'Project' + ['step', 'scroll'].map(function(k){ return '<a href="?v=a&l=ruler&p=' + RP + '&pv=' + k + '"' + (k === PV ? ' class="on"' : '') + '>' + k + '</a>'; }).join('') + (PV === 'scroll' ? '<span style="margin-left:1.2rem">Appear</span>' + ['rise', 'unveil', 'drift'].map(function(k){ var cur = (Q.get('in') || 'rise').toLowerCase(); return '<a href="?v=a&l=ruler&p=' + RP + '&pv=scroll&in=' + k + '"' + (k === cur ? ' class="on"' : '') + '>' + k + '</a>'; }).join('') : '') + '<span style="margin-left:1.2rem;color:var(--faint)">r12</span>';
+    else if(LAY === 'ruler') lo.innerHTML = '<span style="color:var(--faint)">r12</span>';
+    if(RP){ document.body.classList.add('rp-page'); buildRuledProject(RP); }
+    else LAYS[LAY]();
+  }
+  else if(V === 'a') buildA();
+  else if(V === 'b') buildB();
+  else if(PAGE) buildProject(PAGE);
+  else buildC();
+})();
+</script>
+</body>
+</html>

@@ -319,6 +319,77 @@
   .cp-next .k{color:var(--mute)}
   .cp-next b{font-weight:800;font-size:1.25rem;letter-spacing:-.02em}
   .cp-next:hover .k{color:var(--ink)}
+  /* =================== quiet (&l=quiet): the third round, fewest words ===================
+     the index is a column of short marks, one per project, grouped by space alone (no Built / Unbuilt / Research);
+     only the project shown has its name beside its mark; inside a project its mark opens into one small mark per
+     picture, and the words wait behind a "+" */
+  body.l-quiet{height:100vh;overflow:hidden}
+  body.l-quiet footer > span:first-child{visibility:hidden}
+  .qt{flex:1;display:grid;grid-template-columns:minmax(11rem,16rem) 1fr;gap:clamp(1.5rem,4vw,4rem);padding:clamp(1rem,3vh,2rem) var(--gut) 1rem;min-height:0}
+  .qt-ticks{position:relative;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;min-height:0}
+  .qk{display:flex;align-items:center;gap:.9rem;height:1.25rem;color:var(--ink)}
+  .qk i{flex:none;display:block;width:.9rem;height:1px;background:var(--faint);transition:width .55s cubic-bezier(.2,.7,.2,1),background .3s}
+  .qk i::after{content:"";display:block;height:100%;background:var(--ink);transform:scaleX(var(--p,0));transform-origin:left;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+  .qk:hover i{width:1.6rem;background:var(--ink)}
+  .qk.cur i{width:3rem;height:2px;background:var(--rule)}
+  .qk span{font-weight:800;font-size:clamp(1rem,1.2vw,1.15rem);letter-spacing:-.02em;white-space:nowrap;opacity:0;transform:translateX(-.35rem);transition:opacity .4s ease,transform .4s ease;pointer-events:none}
+  .qk.cur span,.qk:hover span{opacity:1;transform:none}
+  .qt-ticks:hover .qk.cur:not(:hover) span{opacity:0}
+  .qk.gs{margin-top:1.3rem}
+  .qk.qa{margin-top:1.9rem}
+  .qk.qa i{width:auto;height:auto;background:none;font-style:normal;font-family:var(--mono);font-size:.8rem;line-height:1;color:var(--faint)}
+  .qk.qa i::after{display:none}
+  .qk.qa span{font-weight:300;color:var(--mute)}
+  .qk.qa:hover i{color:var(--ink)}
+  .qt-stage{min-height:0}
+  .qt-stage .p-layer{align-items:center;background:var(--paper);transition:opacity 1.1s ease}
+  /* inside a project: under the open mark, one mark per picture; the "+" beside the name holds the words */
+  .qp .qk.cur i{background:var(--ink)}
+  .qp .qk.cur span{pointer-events:auto}
+  .qp-subs{display:flex;flex-direction:column;padding:.45rem 0 .7rem}
+  .qs{display:flex;align-items:center;height:1.05rem;padding-left:1.2rem}
+  .qs i{display:block;width:.6rem;height:1px;background:var(--faint);transition:width .5s cubic-bezier(.2,.7,.2,1),background .3s}
+  .qs:hover i{width:1.1rem;background:var(--ink)}
+  .qs.cur i{width:1.8rem;background:var(--ink)}
+  .qp-plus{font-family:var(--mono);font-size:.95rem;line-height:1;color:var(--mute);padding:.2rem .3rem;margin-left:.25rem;transition:transform .4s ease,color .3s}
+  .qp-plus:hover,.qp.open .qp-plus{color:var(--ink)}
+  .qp.open .qp-plus{transform:rotate(45deg)}
+  .qp .qt-stage{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M4 14h19M17 8l6 6-6 6' fill='none' stroke='%230f1216' stroke-width='1.2'/%3E%3C/svg%3E") 14 14,e-resize}
+  .qp .qt-stage.back{cursor:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Cpath d='M24 14H5M11 8l-6 6 6 6' fill='none' stroke='%230f1216' stroke-width='1.2'/%3E%3C/svg%3E") 14 14,w-resize}
+  .qp .qt-stage img{cursor:inherit}
+  .qp-card{position:absolute;left:0;top:0;bottom:0;width:min(30rem,100%);overflow-y:auto;scrollbar-width:none;background:var(--paper);padding:0 2rem 0 0;opacity:0;transform:translateX(-.8rem);transition:opacity .45s ease,transform .45s ease;pointer-events:none;z-index:3;cursor:auto}
+  .qp-card::-webkit-scrollbar{display:none}
+  .qp.open .qp-card{opacity:1;transform:none;pointer-events:auto}
+  .qp-card .k{display:block;margin-bottom:1.2rem}
+  .qp-card .cr p{margin:0 0 .2rem;font-weight:300;font-size:.86rem}
+  .qp-card .cr b{font-weight:800}
+  .qp-card .tx{margin-top:1.3rem}
+  .qp-card .tx p{margin:0 0 .9rem;font-weight:300;font-size:.92rem;line-height:1.55}
+  .qp-card .tx p.lede{font-weight:400;font-size:1rem;line-height:1.45}
+  @media (max-width:700px){
+    body.l-quiet{height:auto;min-height:100svh;overflow:auto}
+    .qt{grid-template-columns:1fr;grid-template-rows:auto auto;align-content:start;gap:1.6rem;padding-bottom:2rem}
+    .qt-stage{order:-1;height:76vw}
+    .qt-stage .p-layer{align-items:flex-end}
+    .qt-ticks{flex-direction:row;flex-wrap:wrap;align-items:flex-end;justify-content:flex-start;gap:0;padding-bottom:2.4rem}
+    .qk{flex-direction:column-reverse;justify-content:flex-start;height:auto;padding:0 .45rem;gap:0}
+    .qk i,.qk:hover i{width:1px;height:.9rem}
+    .qk.cur i{width:2px;height:2.2rem}
+    .qk i::after{width:100%;height:100%;transform:scaleY(var(--p,0));transform-origin:bottom}
+    .qk span{position:absolute;left:.45rem;top:calc(100% - 1.6rem);transform:none}
+    .qk:hover:not(.cur) span{opacity:0}
+    .qt-ticks:hover .qk.cur:not(:hover) span{opacity:1}
+    .qk.gs{margin:0 0 0 .9rem}
+    .qk.qa{margin:0 0 0 .9rem}
+    .qk.qa i{height:auto;width:auto}
+    .qk.qa span{display:none}
+    .qp-subs{flex-direction:row;align-items:flex-end;padding:0 .3rem}
+    .qs{height:auto;padding:0 .22rem}
+    .qs i,.qs:hover i{width:1px;height:.55rem}
+    .qs.cur i{width:1px;height:1.3rem}
+    .qp .qk.cur span{display:flex;align-items:baseline;gap:.5rem}
+    .qp-card{position:fixed;left:var(--gut);right:var(--gut);top:auto;bottom:1rem;width:auto;max-height:70svh;padding:1.2rem;box-shadow:0 10px 40px rgba(15,18,22,.12)}
+  }
   .zoom{position:fixed;inset:0;z-index:80;background:var(--paper);display:flex;align-items:center;justify-content:center;padding:2rem;cursor:zoom-out}
   .zoom img{max-width:100%;max-height:100%;object-fit:contain}
 
@@ -1183,17 +1254,151 @@
     document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ var z = document.querySelector('.zoom'); if(z) z.remove(); } });
   }
 
-  var LAY = (Q.get('l') || '').toLowerCase(), LAYS = {ruler: buildRuler, type: buildType, label: buildLabel};
+  // =================== quiet (&l=quiet) ===================
+  // home: the marks on the left, one picture on the right; the project's pictures pass one after another, its mark
+  // filling as they go, then the next project. Pointing at a mark shows that project and holds it; the wheel,
+  // the arrow keys or a swipe move from project to project; a click on the picture goes into it
+  function quietMarks(nav, slug, href){
+    var group = null, marks = [];
+    SLUGS.forEach(function(s){
+      var q = P[s], a = el('a', 'qk', nav); a.slug = s; a.href = href(s);
+      if(group !== null && q.group !== group) a.classList.add('gs');
+      group = q.group;
+      el('i', '', a); el('span', '', a, q.title);
+      marks.push(a);
+    });
+    var ab = el('a', 'qk qa', nav); ab.href = 'about.html'; el('i', '', ab, '+'); el('span', '', ab, 'About');
+    return marks;
+  }
+  function quietHref(s, i){ return '?v=a&l=quiet&p=' + s + (i ? '&i=' + i : ''); }
+  function buildQuiet(){
+    var wrap = el('div', 'qt', main), nav = el('nav', 'qt-ticks', wrap), st = el('div', 'p-stage qt-stage', wrap), fade = fader(st);
+    var marks = quietMarks(nav, null, function(s){ return quietHref(s); });
+    var withPics = SLUGS.filter(coverOf), cur = null, list = [], at = 0, hold = false, timer = null, lock = 0;
+    function markOf(s){ return marks.filter(function(m){ return m.slug === s; })[0]; }
+    function paint(instant){
+      var it = list[at], s = cur;
+      fade(function(L){
+        var e = it ? el('img', '', L) : el('div', 'plate', L, 'In preparation');
+        if(it){ e.alt = P[s].title; e.src = it.src; }
+        e.addEventListener('click', function(){ location.href = quietHref(s, at ? at + 1 : 0); });
+      }, instant);
+      var m = markOf(cur); if(m) m.style.setProperty('--p', ((at + 1) / list.length).toFixed(3));
+    }
+    function show(s, instant){
+      if(s === cur) return;
+      cur = s; list = pictures(s); if(!list.length) list = [null]; at = 0;
+      marks.forEach(function(m){ m.classList.toggle('cur', m.slug === s); if(m.slug !== s) m.style.removeProperty('--p'); });
+      paint(instant);
+      clearInterval(timer); timer = setInterval(tick, 3200);
+    }
+    function tick(){
+      if(at + 1 < list.length){ at++; paint(); return; }
+      if(hold){ at = 0; paint(); return; }
+      step(1);
+    }
+    function step(d){ var i = withPics.indexOf(cur); show(withPics[(i + d + withPics.length) % withPics.length]); }
+    marks.forEach(function(m){ m.addEventListener('mouseenter', function(){ show(m.slug); }); });
+    [nav, st].forEach(function(x){
+      x.addEventListener('mouseenter', function(){ hold = true; });
+      x.addEventListener('mouseleave', function(){ hold = false; });
+    });
+    addEventListener('wheel', function(e){
+      var d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      if(Math.abs(d) < 8) return;
+      e.preventDefault();
+      var now = Date.now(); if(now - lock < 800) return; lock = now;
+      step(d > 0 ? 1 : -1);
+    }, {passive: false});
+    addEventListener('keydown', function(e){
+      if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){ step(1); e.preventDefault(); }
+      if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ step(-1); e.preventDefault(); }
+      if(e.key === 'Enter' && cur) location.href = quietHref(cur, at ? at + 1 : 0);
+    });
+    var sx = null;
+    st.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive: true});
+    st.addEventListener('touchend', function(e){ if(sx == null) return; var dx = e.changedTouches[0].clientX - sx; sx = null; if(Math.abs(dx) > 40) step(dx < 0 ? 1 : -1); }, {passive: true});
+    show(withPics[0], true);
+  }
+
+  // a project: the same marks, its own opened into one mark per picture; one picture at a time, as large as fits.
+  // A click on the right half of the picture goes on, the left half back (the pointer shows which); the wheel,
+  // arrow keys and a swipe do the same; past the last picture comes the next project. "+" shows the words.
+  function buildQuietProject(slug){
+    var p = P[slug], all = pictures(slug), n = Math.max(1, all.length);
+    var i0 = SLUGS.indexOf(slug), nx = SLUGS[(i0 + 1) % SLUGS.length], pv = SLUGS[(i0 - 1 + SLUGS.length) % SLUGS.length];
+    document.title = p.title + ' — Gonzalo Cáceres';
+    var wrap = el('div', 'qt qp', main), nav = el('nav', 'qt-ticks', wrap), st = el('div', 'p-stage qt-stage', wrap), fade = fader(st);
+    var marks = quietMarks(nav, slug, function(s){ return quietHref(s); }), me = marks[i0];
+    me.classList.add('cur'); me.removeAttribute('href'); me.style.setProperty('--p', 1);
+    var plus = el('button', 'qp-plus', me.querySelector('span'), '+'); plus.type = 'button'; plus.setAttribute('aria-label', 'About this project');
+    var subs = el('div', 'qp-subs', nav); nav.insertBefore(subs, me.nextSibling);
+    var dots = [];
+    for(var k = 0; k < n; k++){ (function(k){ var b = el('button', 'qs', subs); b.type = 'button'; el('i', '', b); b.setAttribute('aria-label', 'Picture ' + (k + 1)); b.addEventListener('click', function(){ go(k); }); dots.push(b); })(k); }
+    // the words, behind the "+"
+    var card = el('aside', 'qp-card', st);
+    el('span', 'k', card, p.kicker || '');
+    var cr = el('div', 'cr', card);
+    (p.credits || []).forEach(function(r){ if(r[0] === 'Year') return; var c = el('p', '', cr); el('b', '', c, r[0]); c.appendChild(document.createTextNode('  ' + r[1])); });
+    var tx = el('div', 'tx', card);
+    (p.lede ? [p.lede] : []).concat(p.text ? (Array.isArray(p.text) ? p.text : [p.text]) : []).forEach(function(t, i){ el('p', p.lede && i === 0 ? 'lede' : '', tx, t); });
+    function toggle(on){ wrap.classList.toggle('open', on == null ? !wrap.classList.contains('open') : on); }
+    plus.addEventListener('click', function(e){ e.stopPropagation(); toggle(); });
+    card.addEventListener('click', function(e){ e.stopPropagation(); });
+    var at = -1, lock = 0;
+    function go(k){
+      if(k >= n){ location.href = quietHref(nx); return; }
+      if(k < 0){ location.href = quietHref(pv, 'last'); return; }
+      if(k === at) return;
+      var first = at < 0; at = k;
+      fade(function(L){
+        var it = all[k];
+        if(it){ var im = el('img', '', L); im.alt = it.caption || p.title; im.src = it.src; }
+        else el('div', 'plate', L, 'In preparation');
+      }, first);
+      dots.forEach(function(d, j){ d.classList.toggle('cur', j === k); });
+    }
+    st.addEventListener('mousemove', function(e){ var r = st.getBoundingClientRect(); st.classList.toggle('back', e.clientX < r.left + r.width * .35); });
+    st.addEventListener('click', function(e){
+      if(wrap.classList.contains('open')){ toggle(false); return; }
+      var r = st.getBoundingClientRect(); go(at + (e.clientX < r.left + r.width * .35 ? -1 : 1));
+    });
+    addEventListener('wheel', function(e){
+      if(card.contains(e.target)) return;
+      var d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      if(Math.abs(d) < 8) return;
+      e.preventDefault();
+      var now = Date.now(); if(now - lock < 750) return; lock = now;
+      go(at + (d > 0 ? 1 : -1));
+    }, {passive: false});
+    addEventListener('keydown', function(e){
+      if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){ go(at + 1); e.preventDefault(); }
+      if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ go(at - 1); e.preventDefault(); }
+      if(e.key === 'Escape'){ if(wrap.classList.contains('open')) toggle(false); else location.href = '?v=a&l=quiet'; }
+    });
+    var sx = null;
+    st.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive: true});
+    st.addEventListener('touchend', function(e){ if(sx == null) return; var dx = e.changedTouches[0].clientX - sx; sx = null; if(Math.abs(dx) > 40) go(at + (dx < 0 ? 1 : -1)); }, {passive: true});
+    var start = Q.get('i'); go(start === 'last' ? n - 1 : Math.max(0, Math.min(n - 1, (parseInt(start, 10) || 1) - 1)));
+  }
+
+  var LAY = (Q.get('l') || '').toLowerCase(), LAYS = {ruler: buildRuler, type: buildType, label: buildLabel, quiet: buildQuiet};
   if(V === 'a' && LAYS[LAY]){
     document.body.classList.add('l-' + LAY, 'lay');
     var lo = document.querySelector('.opts');
     lo.innerHTML = 'Layout' + Object.keys(LAYS).map(function(k){ return '<a href="?v=a&l=' + k + '"' + (k === LAY ? ' class="on"' : '') + '>' + k + '</a>'; }).join('');
     var RP = LAY === 'ruler' && P[Q.get('p')] ? Q.get('p') : null;
     if(LAY === 'ruler') document.getElementById('home').setAttribute('href', '?v=a&l=ruler');
+    if(LAY === 'quiet'){
+      document.getElementById('home').setAttribute('href', '?v=a&l=quiet');
+      lo.innerHTML = '<a href="draft-ruler.html?v=a&l=ruler">ruler draft</a><span style="margin-left:1.2rem;color:var(--faint)">q1</span>';
+      if(P[Q.get('p')]) buildQuietProject(Q.get('p')); else buildQuiet();
+      RP = null; LAY = '';
+    }
     if(RP) lo.innerHTML = 'Project' + ['step', 'scroll'].map(function(k){ return '<a href="?v=a&l=ruler&p=' + RP + '&pv=' + k + '"' + (k === PV ? ' class="on"' : '') + '>' + k + '</a>'; }).join('') + (PV === 'scroll' ? '<span style="margin-left:1.2rem">Appear</span>' + ['rise', 'unveil', 'drift'].map(function(k){ var cur = (Q.get('in') || 'rise').toLowerCase(); return '<a href="?v=a&l=ruler&p=' + RP + '&pv=scroll&in=' + k + '"' + (k === cur ? ' class="on"' : '') + '>' + k + '</a>'; }).join('') : '') + '<span style="margin-left:1.2rem;color:var(--faint)">r12</span>';
     else if(LAY === 'ruler') lo.innerHTML = '<span style="color:var(--faint)">r12</span>';
     if(RP){ document.body.classList.add('rp-page'); buildRuledProject(RP); }
-    else LAYS[LAY]();
+    else if(LAYS[LAY]) LAYS[LAY]();
   }
   else if(V === 'a') buildA();
   else if(V === 'b') buildB();

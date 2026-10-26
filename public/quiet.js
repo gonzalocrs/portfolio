@@ -479,7 +479,12 @@
     // old addresses of a project on the home page (?show= / ?open=) go to its page
     var old = Q.get('show') || Q.get('open');
     if(old && P[old]){ location.replace(quietHref(old)); return; }
-    if(Q.get('home') === 'roll') (Q.has('flow') ? buildRoll : buildRollOne)();
-    else quietIntro(buildQuiet());
+    // the home (published 2026-10-26): one picture at a time, a scroll fades it and the next opens somewhere else.
+    // The earlier homes stay reachable: ?home=stage (marks + one large picture passing by itself, with the line intro)
+    // and ?home=flow (the pictures down a scrolling page)
+    var H = (Q.get('home') || '').toLowerCase();
+    if(H === 'stage') quietIntro(buildQuiet());
+    else if(H === 'flow' || Q.has('flow')) buildRoll();
+    else buildRollOne();
   }
 })();

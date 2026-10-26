@@ -153,6 +153,8 @@
   .rm-strip .p-layer::-webkit-scrollbar{display:none}
   .rm-strip .p-layer.on{pointer-events:auto}
   .ri-row{padding-right:var(--gut)}
+  .rm-strip .p-layer{bottom:2.4rem}
+  .ru .ri-foot{position:absolute;left:0;right:var(--gut);top:calc(min(100% - 2.4rem, 48vh) + .9rem);padding:0;z-index:2}
   .ri-row{display:flex;gap:clamp(.9rem,1.4vw,1.4rem);height:min(100%,48vh);align-items:flex-start}
   .ri-row img,.ri-row .plate{flex:none;height:100%;width:auto;max-width:none;max-height:none;cursor:pointer}
   .ri-row .plate{aspect-ratio:3/2}
@@ -590,6 +592,30 @@
         if(!L || Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
         e.preventDefault(); L.scrollLeft += e.deltaY;
       }, {passive: false});
+      // under the row: a thin line showing where you are, and an arrow at each end that steps one picture
+      var foot = el('div', 'c-foot ri-foot', st), prev = el('button', 'c-arrow', foot), rail = el('div', 'c-rail', foot), next = el('button', 'c-arrow', foot), bar = el('span', '', rail);
+      prev.innerHTML = '<svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg>'; prev.setAttribute('aria-label', 'Previous');
+      next.innerHTML = '<svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5"/></svg>'; next.setAttribute('aria-label', 'Next');
+      function onL(){ return st.querySelector('.p-layer.on'); }
+      function go(dir){
+        var L = onL(); if(!L) return;
+        var x = L.scrollLeft, list = Array.prototype.map.call(L.firstChild.children, function(c){ return c.offsetLeft; }), to;
+        if(dir > 0){ to = list.filter(function(o){ return o > x + 4; })[0]; if(to == null) to = L.scrollWidth; }
+        else { to = list.filter(function(o){ return o < x - 4; }).pop(); if(to == null) to = 0; }
+        L.scrollTo({left: to, behavior: 'smooth'});
+      }
+      function sync(){
+        var L = onL(); if(!L) return;
+        var max = L.scrollWidth - L.clientWidth, w = Math.min(1, L.clientWidth / L.scrollWidth);
+        bar.style.width = (w * 100) + '%'; bar.style.left = (max > 0 ? L.scrollLeft / max * (1 - w) * 100 : 0) + '%';
+        prev.disabled = L.scrollLeft < 4; next.disabled = L.scrollLeft > max - 4;
+        foot.style.visibility = max > 4 ? 'visible' : 'hidden';
+      }
+      prev.addEventListener('click', function(){ go(-1); });
+      next.addEventListener('click', function(){ go(1); });
+      st.addEventListener('scroll', sync, true);
+      st.addEventListener('load', sync, true);
+      setInterval(sync, 500);
       return;
     }
 
@@ -787,7 +813,7 @@
     document.body.classList.add('l-' + LAY, 'lay');
     var lo = document.querySelector('.opts');
     lo.innerHTML = 'Layout' + Object.keys(LAYS).map(function(k){ return '<a href="?v=a&l=' + k + '"' + (k === LAY ? ' class="on"' : '') + '>' + k + '</a>'; }).join('');
-    if(LAY === 'ruler') lo.innerHTML = 'Pictures' + ['seq', 'strip', 'sheet', 'thumbs', 'cover'].map(function(k){ return '<a href="?v=a&l=ruler&img=' + k + '"' + (k === RIMG ? ' class="on"' : '') + '>' + k + '</a>'; }).join('');
+    if(LAY === 'ruler') lo.innerHTML = 'Pictures' + ['seq', 'strip', 'sheet', 'thumbs', 'cover'].map(function(k){ return '<a href="?v=a&l=ruler&img=' + k + '"' + (k === RIMG ? ' class="on"' : '') + '>' + k + '</a>'; }).join('') + '<span style="margin-left:1.2rem;color:var(--faint)">r6</span>';
     LAYS[LAY]();
   }
   else if(V === 'a') buildA();

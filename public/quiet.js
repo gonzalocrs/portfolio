@@ -4,6 +4,13 @@
   var P = window.PROJECTS || {}, SLUGS = Object.keys(P);
   var Q = new URLSearchParams(location.search);
   var main = document.getElementById('main');
+  // dark theme trial (2026-10-26, preview only): ?theme=dark turns it on for the visit (kept while moving between
+  // pages), ?theme=light turns it off
+  try{
+    if(Q.get('theme') === 'dark') sessionStorage.setItem('gc-theme', 'dark');
+    if(Q.get('theme') === 'light') sessionStorage.removeItem('gc-theme');
+    if(sessionStorage.getItem('gc-theme') === 'dark') document.documentElement.classList.add('dark');
+  }catch(e){ if(Q.get('theme') === 'dark') document.documentElement.classList.add('dark'); }
 
   // ---- the project material: hero, diagram, drawings, models, photos, in that order ----
   function web(src){

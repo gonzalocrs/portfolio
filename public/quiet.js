@@ -124,6 +124,16 @@
   //   &in=unveil  drawn open from its bottom edge (default)
   //   &in=rise    fades up into place
   //   &in=drift   unveiled, then each one moves at its own pace as the page rolls
+  // the home shows only one or two pictures of each project (his note, 2026-10-26): its first picture, and when the
+  // project has three or more, the first one of the other kind (a drawing beside a photo, or a photo beside a drawing)
+  function homePicks(got){
+    if(!got.length) return [];
+    var first = got[0], out = [{it: first.it, r: first.r, k0: 0}];
+    if(got.length >= 3){
+      for(var i = 1; i < got.length; i++) if(got[i].it.drawing !== first.it.drawing){ out.push({it: got[i].it, r: got[i].r, k0: i}); break; }
+    }
+    return out;
+  }
   function buildRoll(){
     var IN = (Q.get('in') || 'unveil').toLowerCase(); if(['unveil', 'rise', 'drift'].indexOf(IN) === -1) IN = 'unveil';
     document.body.classList.add('qh-roll', 'in-' + IN);
@@ -139,13 +149,14 @@
       var f = el('figure', 'qr-fig', row), par = el('div', 'qr-par', f);
       f.style.width = 'min(' + w + '%, calc(' + (o.r * 74).toFixed(1) + 'vh))';
       var im = el('img', '', par); im.alt = o.it.caption || P[s].title; im.src = o.it.src;
-      f.addEventListener('click', function(){ location.href = quietHref(s, k ? k + 1 : 0); });
+      f.addEventListener('click', function(){ location.href = quietHref(s, o.k0 ? o.k0 + 1 : 0); });
       f.slug = s; f.k = k; par.speed = (rnd() - .5) * .22;
       figs.push(f); return f;
     }
     var withPics = SLUGS.filter(coverOf);
     Promise.all(withPics.map(function(s){ return loadAll(pictures(s)); })).then(function(all){
       all.forEach(function(got, j){
+        got = homePicks(got);
         var s = withPics[j], k = 0;
         while(k < got.length){
           var o = got[k], q = got[k + 1], row = el('div', 'qr-row', flow);
@@ -230,7 +241,7 @@
       if(old){ old.classList.remove('in'); old.classList.add('out', d < 0 ? 'down' : 'up'); setTimeout(function(){ old.remove(); }, 1100); }
       var f = el('figure', 'qo-fig' + (d < 0 ? ' from-up' : ''), st); f.o = o;
       var im = el('img', '', f); im.alt = o.it.caption || P[o.slug].title; im.src = o.it.src;
-      f.addEventListener('click', function(){ location.href = quietHref(o.slug, o.k ? o.k + 1 : 0); });
+      f.addEventListener('click', function(){ location.href = quietHref(o.slug, o.k0 ? o.k0 + 1 : 0); });
       place(f, o);
       setTimeout(function(){ f.classList.add('in'); }, old ? 420 : 60);
       curEl = f; at = i;
@@ -241,9 +252,10 @@
     var withPics = SLUGS.filter(coverOf);
     Promise.all(withPics.map(function(s){ return loadAll(pictures(s)); })).then(function(all){
       all.forEach(function(got, j){
+        got = homePicks(got);
         got.forEach(function(o, k){
           var sd = j === 0 && k === 0 ? 'm' : side();
-          seq.push({it: o.it, r: o.r, slug: withPics[j], k: k, n: got.length, side: sd, w: j === 0 && k === 0 ? (o.r >= 1.15 ? 72 : 44) : size(o.r),
+          seq.push({it: o.it, r: o.r, slug: withPics[j], k: k, k0: o.k0, n: got.length, side: sd, w: j === 0 && k === 0 ? (o.r >= 1.15 ? 72 : 44) : size(o.r),
             pw: pick([78, 86, 94]), off: pick([0, .06, .12]), y: sd === 'm' ? .45 : pick([.15, .35, .55, .8])});
         });
       });

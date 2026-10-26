@@ -449,8 +449,9 @@
         var f = el('figure', 'qf', L);
         if(it){
           var im = el('img', '', f); im.alt = it.caption || p.title; im.src = it.src;
-          // photographs, renders and model photos go without a caption (his call, 2026-10-26); drawings keep theirs
-          var cap = it.drawing ? el('figcaption', 'k', f, it.caption || kindOf(it)) : null;
+          // no captions under the pictures (his call, 2026-10-26: first the photos, then the drawings too); the caption text
+          // stays in projects.js as the picture's alt text
+          var cap = null;
           var fit = function(){ if(cap) cap.style.width = im.offsetWidth ? im.offsetWidth + 'px' : ''; };
           im.addEventListener('load', fit); f.fit = fit;
         }

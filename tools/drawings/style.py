@@ -51,7 +51,15 @@ ELEVATION = {
 ELEVATION_ORDER = ['glass', 'frame', 'greyfill', 'grey', 'shadow', 'frameline', 'line', 'outline', 'ground', 'bound']
 
 
-def css(style):
+# Lines keep their screen width wherever a drawing is shown, so the smaller it is shown the closer they crowd and the
+# heavier it reads (2026-10-26: the Sierra elevation looked thick on a smaller screen and fine on a large one). Below a
+# shown width (a share of the sheet's width) every line steps thinner; under one screen pixel a line is drawn fainter
+# rather than narrower, so the drawing keeps the same light tone at any size. The SVG's own media queries measure
+# the size the picture is shown at.
+THIN = [(0.21, 0.8), (0.16, 0.65), (0.12, 0.5), (0.095, 0.4)]
+
+
+def css(style, sheet_w=None):
     rules = ['path{fill:none;stroke:none;stroke-linecap:round;stroke-linejoin:round;fill-rule:evenodd;'
              'vector-effect:non-scaling-stroke}']
     for name, s in style.items():
@@ -63,4 +71,10 @@ def css(style):
         if 'stroke' in s:
             r.append(f"stroke:{s['stroke']};stroke-width:{s['width']}")
         rules.append(f".{name}{{{';'.join(r)}}}")
+    if sheet_w:
+        for share, k in THIN:
+            # the silhouette and ground line stay at least 0.6 so the building keeps its outline
+            inner = [f".{name}{{stroke-width:{round(max(s['width'] * k, .6) if s['width'] >= 1 else s['width'] * k, 3)}}}"
+                     for name, s in style.items() if 'stroke' in s]
+            rules.append(f"@media (max-width:{round(sheet_w * share)}px){{{''.join(inner)}}}")
     return '\n'.join(rules)

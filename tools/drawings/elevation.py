@@ -127,4 +127,4 @@ def build(cfg, sources):
     if sil is not None:
         sheet.lines('bound', [tp(list(sil.exterior.coords))])
     print(f"  elevation: {len(items)} elements, scale {S:.1f} units/m")
-    return sheet.render(style.css(style.ELEVATION), style.ELEVATION_ORDER)
+    return sheet.render(style.css(style.ELEVATION, sheet.w), style.ELEVATION_ORDER)

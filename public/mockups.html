@@ -367,40 +367,23 @@
   .qp-card .tx{margin-top:1.3rem}
   .qp-card .tx p{margin:0 0 .9rem;font-weight:300;font-size:.92rem;line-height:1.55}
   .qp-card .tx p.lede{font-weight:400;font-size:1rem;line-height:1.45}
-  /* where the words open (&d=), once the "+" is pressed:
-     fold    the picture closes into one thin line (the intro played backwards), the line rises to the name, the words
-             hang under it
-     under   the words unfold in the index itself, under the name; the other marks dim
+  /* where the words open (&d=), once the "+" is pressed; either way the pictures keep going while the words are open
+     (wheel, keys, a click on the picture, the small marks), and only the × or Esc closes them:
+     fold    the picture closes quickly into one thin line (the intro played backwards), the line rises to the name, the
+             words hang under it and the picture opens again out of a line beside them
      beside  the picture steps right; the words stand in the space it leaves, starting on the name's line
-     foot    the picture rises; a line draws under it and the words sit below in a band, credits first
      (on a phone the words always come up in the floating card) */
   .qp-card .meta .k{display:block;margin-bottom:1.2rem}
-  .qd-fold .qp-card,.qd-beside .qp-card{top:var(--ny,0px);transform:none;transition:opacity .5s ease}
-  .qd-fold .qp-card{width:min(34rem,100%);padding-top:1.3rem}
+  .qd-fold .qp-card,.qd-beside .qp-card{top:var(--ny,0px);width:21rem;padding:0;transform:none;transition:opacity .4s ease}
+  .qd-fold .qp-card{padding-top:1.2rem}
+  .qd-fold .qp-card .tx p,.qd-beside .qp-card .tx p{font-size:.88rem}
   .qd-fold.open .qp-card{opacity:0;pointer-events:none}
   .qd-fold.open.shown .qp-card{opacity:1;pointer-events:auto}
-  .qd-rule{position:absolute;height:1px;background:var(--ink);opacity:0;z-index:4;pointer-events:none;transition:top .75s cubic-bezier(.65,0,.2,1),left .75s cubic-bezier(.65,0,.2,1),width .75s cubic-bezier(.65,0,.2,1),opacity .35s ease}
-  .qd-fold .qt-stage img{transition:clip-path .8s cubic-bezier(.7,0,.2,1)}
-  .qd-under{transition:grid-template-columns .7s cubic-bezier(.2,.7,.2,1)}
-  .qd-under.open{grid-template-columns:minmax(11rem,27rem) 1fr}
-  .qd-under .qt-ticks{justify-content:safe center;overflow-y:auto;scrollbar-width:none;padding:.5rem 0}
-  .qd-under .qt-ticks::-webkit-scrollbar{display:none}
-  .qd-under .qp-card{position:static;flex:none;width:auto;max-width:27rem;max-height:0;overflow:hidden;padding:0 0 0 3.9rem;transform:none;transition:max-height .7s cubic-bezier(.2,.7,.2,1),opacity .5s ease,padding .7s ease}
-  .qd-under.open .qp-card{max-height:200vh;padding:.9rem 0 1.1rem 3.9rem}
-  .qd-under .qt-ticks > .qk,.qd-under .qp-subs{transition:opacity .5s ease}
-  .qd-under.open .qt-ticks > .qk:not(.cur),.qd-under.open .qp-subs{opacity:.2}
-  .qd-under .qp-card .tx p{font-size:.88rem}
-  .qd-beside .qp-card{width:21rem;padding:0}
-  .qd-beside .qt-stage .p-layer{transition:opacity 1.1s ease,left .85s cubic-bezier(.2,.7,.2,1)}
+  .qd-rule{position:absolute;height:1px;background:var(--ink);opacity:0;z-index:4;pointer-events:none;transition:top .4s cubic-bezier(.65,0,.2,1),left .4s cubic-bezier(.65,0,.2,1),width .4s cubic-bezier(.65,0,.2,1),opacity .3s ease}
+  .qd-fold .qt-stage img{transition:clip-path .4s cubic-bezier(.7,0,.2,1)}
+  .qd-fold.shown .qt-stage .p-layer{left:24rem}
+  .qd-beside .qt-stage .p-layer{transition:opacity 1.1s ease,left .7s cubic-bezier(.2,.7,.2,1)}
   .qd-beside.open .qt-stage .p-layer{left:24rem}
-  .qd-beside .qp-card .tx p{font-size:.88rem}
-  .qd-foot .qt-stage .p-layer{transition:opacity 1.1s ease,bottom .85s cubic-bezier(.2,.7,.2,1)}
-  .qd-foot.open .qt-stage .p-layer{bottom:calc(38% + 1.6rem)}
-  .qd-foot .qp-card{top:auto;bottom:0;height:38%;width:100%;padding:1.3rem 0 0;transform:translateY(.6rem);display:grid;grid-template-columns:minmax(13rem,17rem) 1fr;gap:2.5rem}
-  .qd-foot .qp-card::before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:var(--ink);transform:scaleX(0);transform-origin:left;transition:transform .9s cubic-bezier(.65,0,.2,1)}
-  .qd-foot.open .qp-card::before{transform:scaleX(1)}
-  .qd-foot .qp-card .tx{margin-top:0;column-count:2;column-gap:2.5rem}
-  .qd-foot .qp-card .tx p{font-size:.86rem;break-inside:avoid-column}
   @media (max-width:700px){
     body.l-quiet{height:auto;min-height:100svh;overflow:auto}
     .qt{grid-template-columns:1fr;grid-template-rows:auto auto;align-content:start;gap:1.6rem;padding-bottom:2rem}
@@ -1394,11 +1377,10 @@
     var dots = [];
     for(var k = 0; k < n; k++){ (function(k){ var b = el('button', 'qs', subs); b.type = 'button'; el('i', '', b); b.setAttribute('aria-label', 'Picture ' + (k + 1)); b.addEventListener('click', function(){ go(k); }); dots.push(b); })(k); }
     // the words, behind the "+", opened one of four ways (&d=, see the CSS); on a phone always the floating card
-    var D = (Q.get('d') || 'fold').toLowerCase(); if(['fold', 'under', 'beside', 'foot'].indexOf(D) === -1) D = 'fold';
+    var D = (Q.get('d') || 'fold').toLowerCase(); if(['fold', 'beside'].indexOf(D) === -1) D = 'fold';
     if(innerWidth <= 700) D = 'float';
     wrap.classList.add('qd-' + D);
     var card = el('aside', 'qp-card', st), meta = el('div', 'meta', card);
-    if(D === 'under') nav.insertBefore(card, subs);
     el('span', 'k', meta, p.kicker || '');
     var cr = el('div', 'cr', meta);
     (p.credits || []).forEach(function(r){ if(r[0] === 'Year') return; var c = el('p', '', cr); el('b', '', c, r[0]); c.appendChild(document.createTextNode('  ' + r[1])); });
@@ -1413,26 +1395,26 @@
       if(on === isOpen()) return;
       st.style.setProperty('--ny', nameY() + 'px');
       if(D !== 'fold'){ wrap.classList.toggle('open', on); return; }
-      // fold: the picture closes into its middle line, the line rises to the name, the words come in under it;
-      // closing plays it backwards
+      // fold: the picture closes into its middle line, the line rises to the name, the words come in under it and the
+      // picture opens again beside them, out of a line; closing just lets the words go and the picture slide back
       T.forEach(clearTimeout); T = [];
-      var im = curImg(), sr = st.getBoundingClientRect(), r = im ? im.getBoundingClientRect() : sr;
-      var mid = {top: (r.top - sr.top + r.height / 2) + 'px', left: (r.left - sr.left) + 'px', width: r.width + 'px'};
-      var high = {top: nameY() + 'px', left: '0px', width: Math.min(sr.width, card.offsetWidth || 544) + 'px'};
-      function put(o){ rule.style.top = o.top; rule.style.left = o.left; rule.style.width = o.width; }
-      if(on){
-        wrap.classList.add('open');
-        rule.style.transition = 'none'; put(mid); void rule.offsetWidth; rule.style.transition = '';
-        rule.style.opacity = '1';
-        if(im) im.style.clipPath = 'inset(50% 0 50% 0)';
-        T.push(setTimeout(function(){ put(high); }, 750));
-        T.push(setTimeout(function(){ wrap.classList.add('shown'); }, 1350));
-      } else {
-        wrap.classList.remove('shown');
-        T.push(setTimeout(function(){ put(mid); }, 250));
-        T.push(setTimeout(function(){ if(im) im.style.clipPath = 'inset(0 0 0 0)'; rule.style.opacity = '0'; }, 1000));
-        T.push(setTimeout(function(){ wrap.classList.remove('open'); if(im) im.style.clipPath = ''; }, 1850));
+      if(!on){
+        wrap.classList.remove('shown', 'open'); rule.style.opacity = '0';
+        st.querySelectorAll('.p-layer').forEach(function(L){ L.style.transition = 'opacity 1.1s ease, left .6s cubic-bezier(.2,.7,.2,1)'; });
+        T.push(setTimeout(function(){ st.querySelectorAll('.p-layer').forEach(function(L){ L.style.transition = ''; }); }, 700));
+        return;
       }
+      var im = curImg(), sr = st.getBoundingClientRect(), r = im ? im.getBoundingClientRect() : sr;
+      function put(o){ rule.style.top = o.top; rule.style.left = o.left; rule.style.width = o.width; }
+      wrap.classList.add('open');
+      rule.style.transition = 'none'; put({top: (r.top - sr.top + r.height / 2) + 'px', left: (r.left - sr.left) + 'px', width: r.width + 'px'});
+      void rule.offsetWidth; rule.style.transition = ''; rule.style.opacity = '1';
+      if(im) im.style.clipPath = 'inset(50% 0 50% 0)';
+      T.push(setTimeout(function(){ put({top: nameY() + 'px', left: '0px', width: Math.min(sr.width, card.offsetWidth || 336) + 'px'}); }, 380));
+      T.push(setTimeout(function(){
+        wrap.classList.add('shown');
+        if(im){ void im.offsetWidth; im.style.clipPath = 'inset(0 0 0 0)'; T.push(setTimeout(function(){ im.style.clipPath = ''; }, 450)); }
+      }, 760));
     }
     plus.addEventListener('click', function(e){ e.stopPropagation(); toggle(); });
     card.addEventListener('click', function(e){ e.stopPropagation(); });
@@ -1441,7 +1423,6 @@
       if(k >= n){ location.href = quietHref(nx); return; }
       if(k < 0){ location.href = quietHref(pv, 'last'); return; }
       if(k === at) return;
-      if(D === 'fold' && isOpen()){ toggle(false); return; }
       var first = at < 0; at = k;
       fade(function(L){
         var it = all[k];
@@ -1452,11 +1433,11 @@
     }
     st.addEventListener('mousemove', function(e){ var r = st.getBoundingClientRect(); st.classList.toggle('back', e.clientX < r.left + r.width * .35); });
     st.addEventListener('click', function(e){
-      if(isOpen()){ toggle(false); return; }
+      if(isOpen() && D === 'float'){ toggle(false); return; }
       var r = st.getBoundingClientRect(); go(at + (e.clientX < r.left + r.width * .35 ? -1 : 1));
     });
     addEventListener('wheel', function(e){
-      if(card.contains(e.target) || (D === 'under' && isOpen() && nav.contains(e.target))) return;
+      if(card.contains(e.target) && card.scrollHeight > card.clientHeight) return;
       var d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
       if(Math.abs(d) < 8) return;
       e.preventDefault();
@@ -1539,7 +1520,7 @@
     if(LAY === 'quiet'){
       document.getElementById('home').setAttribute('href', '?v=a&l=quiet');
       var QD = (Q.get('d') || 'fold').toLowerCase();
-      lo.innerHTML = (P[Q.get('p')] ? 'Words' + ['fold', 'under', 'beside', 'foot'].map(function(k){ return '<a href="?v=a&l=quiet&p=' + Q.get('p') + '&d=' + k + '"' + (k === QD ? ' class="on"' : '') + '>' + k + '</a>'; }).join('') + '<span style="margin-right:1.2rem"></span>' : '<a href="?v=a&l=quiet&intro=line">replay intro</a><span style="margin-right:1.2rem"></span>') + '<a href="draft-ruler.html?v=a&l=ruler">ruler draft</a><span style="margin-left:1.2rem;color:var(--faint)">q4</span>';
+      lo.innerHTML = (P[Q.get('p')] ? 'Words' + ['fold', 'beside'].map(function(k){ return '<a href="?v=a&l=quiet&p=' + Q.get('p') + '&d=' + k + '"' + (k === QD ? ' class="on"' : '') + '>' + k + '</a>'; }).join('') + '<span style="margin-right:1.2rem"></span>' : '<a href="?v=a&l=quiet&intro=line">replay intro</a><span style="margin-right:1.2rem"></span>') + '<a href="draft-ruler.html?v=a&l=ruler">ruler draft</a><span style="margin-left:1.2rem;color:var(--faint)">q5</span>';
       if(P[Q.get('p')]) buildQuietProject(Q.get('p')); else quietIntro(buildQuiet());
       RP = null; LAY = '';
     }

@@ -362,6 +362,7 @@
     var p = P[slug], all = pictures(slug), n = Math.max(1, all.length);
     var i0 = SLUGS.indexOf(slug);
     document.title = p.title + ' — Gonzalo Cáceres';
+    document.body.classList.add('qh-proj');
     var wrap = el('div', 'qt qp', main), nav = el('nav', 'qt-ticks', wrap), st = el('div', 'p-stage qt-stage', wrap), fade = fader(st);
     var marks = quietMarks(nav, slug, function(s){ return quietHref(s); }), me = marks[i0];
     me.classList.add('cur'); me.removeAttribute('href'); me.style.setProperty('--p', 1);

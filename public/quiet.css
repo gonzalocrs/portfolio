@@ -162,9 +162,8 @@
     .qi.qi-marks-in .qt-ticks > .qk i{width:1px;height:.9rem}
     .qi.qi-marks-in .qt-ticks > .qk.cur i{width:2px;height:2.2rem}
   }
-  @media (max-width:900px){
-    .gv-mark{width:170px;font-size:10.5px}
-  }
+  /* the name keeps its full size on every screen (his note, 2026-10-26: shrunk on phones it read smaller than the
+     project title); 230px still fits a 320px phone inside the gutters */
 
 /* the picture in the middle of the space right of the marks (home and projects; 2026-10-26, for wide screens) */
 .qt-stage .p-layer{justify-content:center}

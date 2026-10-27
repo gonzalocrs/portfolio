@@ -351,3 +351,12 @@ main.q-away{opacity:0;transition:none}
 .qd-beside.open .qv-hint{left:var(--px,24rem)}
 .qp.qnav-hint .qt-stage .p-layer{padding-bottom:calc(3vh + 2.6rem)}
 @media (max-width:700px){ .qv{display:none} .qv-hint{display:none} }
+
+/* phone project pages stand like the home (his note, 2026-10-26: "in mobile version is inconsistent"): one screen tall,
+   the picture centred in the space above, the marks and the name at the foot in the same place as on the home */
+@media (max-width:700px){
+  body.l-quiet.qh-proj{height:100svh;overflow:hidden}
+  .qh-proj .qp.qt{display:flex;flex-direction:column;padding-bottom:0}
+  .qh-proj .qp .qt-stage{order:-1;height:auto;flex:1;min-height:0}
+  .qh-proj .qp .qt-stage .p-layer{align-items:center}
+}

@@ -4,6 +4,12 @@
   var P = window.PROJECTS || {}, SLUGS = Object.keys(P);
   var Q = new URLSearchParams(location.search);
   var main = document.getElementById('main');
+  // the showroom look (2026-10-28, between this quiet site and MAD's product-like polish): the pictures stand on soft
+  // rounded display surfaces, the name is light and larger with its place and year in small capitals under it, the "+"
+  // is a round button. On by default on this preview; ?look=off shows the site as it was (kept for the visit).
+  var LOOK = Q.get('look');
+  try { if(LOOK) sessionStorage.setItem('gc-look', LOOK); else LOOK = sessionStorage.getItem('gc-look'); } catch(e){}
+  if(LOOK !== 'off') document.body.classList.add('lk');
 
   // ---- the project material: hero, diagram, drawings, models, photos, in that order ----
   function web(src){
@@ -53,7 +59,7 @@
       var q = P[s], a = el('a', 'qk', nav); a.slug = s; a.href = href(s);
       if(group !== null && q.group !== group) a.classList.add('gs');
       group = q.group;
-      el('i', '', a); el('span', '', a, q.title);
+      el('i', '', a); el('span', '', a, q.title).setAttribute('data-k', q.kicker || '');
       marks.push(a);
     });
     var ab = el('a', 'qk qa', nav); ab.href = 'about.html'; el('i', '', ab, '+'); el('span', '', ab, 'About');
@@ -281,7 +287,7 @@
       i = (i + seq.length) % seq.length;
       var o = seq[i], old = curEl;
       if(old){ old.classList.remove('in'); old.classList.add('out', d < 0 ? 'down' : 'up'); setTimeout(function(){ old.remove(); }, 1100); }
-      var f = el('figure', 'qo-fig' + (d < 0 ? ' from-up' : ''), st); f.o = o;
+      var f = el('figure', 'qo-fig' + (d < 0 ? ' from-up' : '') + (o.it.drawing ? ' dr' : ''), st); f.o = o;
       var im = el('img', '', f); im.alt = o.it.caption || P[o.slug].title; im.src = o.it.src;
       f.addEventListener('click', function(){ into(im, o.slug, o.k0); });
       place(f, o);
@@ -455,7 +461,7 @@
         var it = all[k];
         // the picture, smaller than the space and centred, with its caption centred under it (drawings carry their own
         // white margins, so a caption set from the picture's edge would look off)
-        var f = el('figure', 'qf', L);
+        var f = el('figure', 'qf' + (all[k] && all[k].drawing ? ' dr' : ''), L);
         if(it){
           var im = el('img', '', f); im.alt = it.caption || p.title; im.src = it.src;
           // no captions under the pictures (his call, 2026-10-26: first the photos, then the drawings too); the caption text

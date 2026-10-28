@@ -64,6 +64,14 @@
   // the home and glides to its place in the project while the home fades away and the project fades in around it; the
   // address changes to the project's, and Back returns to the home. (The older homes, ?home=stage|flow, still just go.)
   var PAGE = document.body.getAttribute('data-page');
+  // trial ?it=1|2|3 (2026-10-28, his ask: today's home, plus the categories and the project opening as a panel, both
+  // from the MAD round): 1 = the categories as large light words over the home, the panel with the pictures one under
+  // another; 2 = the same, the panel showing one picture at a time with small marks; 3 = the categories smaller at the
+  // right of the bar, panel as in 1. Kept for the visit (sessionStorage gc-it); ?it=off goes back to today's site.
+  var IT = Q.get('it');
+  try{ if(IT === 'off'){ sessionStorage.removeItem('gc-it'); IT = null; } else if(IT) sessionStorage.setItem('gc-it', IT); else IT = sessionStorage.getItem('gc-it'); }catch(e){}
+  if(['1', '2', '3'].indexOf(IT) < 0) IT = null;
+  function panelMode(){ return IT === '2' ? 'one' : 'stack'; }
   function enter(img, href){ location.href = href; }
   function into(img, slug, k){
     if(PAGE !== 'home') return;
@@ -95,7 +103,10 @@
     if(!target || (target.complete && target.naturalWidth)) requestAnimationFrame(go);
     else { target.addEventListener('load', go); target.addEventListener('error', go); }
   }
-  addEventListener('popstate', function(){ location.reload(); });
+  addEventListener('popstate', function(){
+    if(IT && window.gcPanel && PAGE === 'home'){ var s = new URLSearchParams(location.search).get('p'); if(P[s]) gcPanel.open(s, 0, panelMode(), false); else gcPanel.close(false); return; }
+    location.reload();
+  });
   function ratioOf(img){ return img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1.5; }
   function loadAll(list){
     return Promise.all(list.map(function(it){
@@ -283,7 +294,7 @@
       if(old){ old.classList.remove('in'); old.classList.add('out', d < 0 ? 'down' : 'up'); setTimeout(function(){ old.remove(); }, 1100); }
       var f = el('figure', 'qo-fig' + (d < 0 ? ' from-up' : ''), st); f.o = o;
       var im = el('img', '', f); im.alt = o.it.caption || P[o.slug].title; im.src = o.it.src;
-      f.addEventListener('click', function(){ into(im, o.slug, o.k0); });
+      f.addEventListener('click', function(){ if(IT && window.gcPanel) gcPanel.open(o.slug, o.k0, panelMode(), true); else into(im, o.slug, o.k0); });
       place(f, o);
       setTimeout(function(){ f.classList.add('in'); }, old ? 420 : 60);
       curEl = f; at = i;
@@ -309,8 +320,26 @@
             pw: pick([78, 86, 94]), off: pick([0, .06, .12]), y: sd === 'm' ? .45 : pick([.15, .35, .55, .8])});
         });
       });
+      full = seq.slice();
       show(start, 1);
+      if(IT && window.gcPanel && P[Q.get('p')]) gcPanel.open(Q.get('p'), 0, panelMode(), false);
     });
+    // the categories (trial ?it=): All / Built / Unbuilt / Research; picking one keeps only its projects, on the
+    // marks and among the pictures, and starts again from its first picture
+    var full = [];
+    if(IT){
+      var cats = IT === '3' ? el('nav', 'qcat qcat-bar', document.querySelector('.bar')) : el('nav', 'qcat', main);
+      if(IT !== '3') main.insertBefore(cats, wrap);
+      ['All'].concat(SLUGS.map(function(s){ return P[s].group; }).filter(function(g, i, a){ return g && a.indexOf(g) === i; })).forEach(function(g){
+        var b = el('button', g === 'All' ? 'on' : '', cats, g); b.type = 'button';
+        b.addEventListener('click', function(){
+          cats.querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x === b); });
+          seq = full.filter(function(o){ return g === 'All' || P[o.slug].group === g; });
+          marks.forEach(function(m){ var hide = g !== 'All' && P[m.slug].group !== g; m.classList.toggle('hid', hide); });
+          at = -1; lastStep = Date.now(); show(0, 1);
+        });
+      });
+    }
     marks.forEach(function(m){
       m.addEventListener('click', function(e){
         var i = -1; seq.some(function(o, j){ if(o.slug === m.slug){ i = j; return true; } });
@@ -322,7 +351,7 @@
     // short pause in the wheel since the last one, or a clearly new push
     var lastD = 0;
     addEventListener('wheel', function(e){
-      if(PAGE !== 'home') return;
+      if(PAGE !== 'home' || document.body.classList.contains('md-open')) return;
       e.preventDefault();
       var d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX, now = Date.now(), gap = now - lastWheel;
       lastWheel = now;
@@ -332,7 +361,7 @@
       step(d > 0 ? 1 : -1);
     }, {passive: false});
     addEventListener('keydown', function(e){
-      if(PAGE !== 'home') return;
+      if(PAGE !== 'home' || document.body.classList.contains('md-open')) return;
       if(['ArrowDown', 'ArrowRight', 'PageDown', ' '].indexOf(e.key) > -1){ step(1); e.preventDefault(); }
       if(['ArrowUp', 'ArrowLeft', 'PageUp'].indexOf(e.key) > -1){ step(-1); e.preventDefault(); }
       if(e.key === 'Enter' && curEl) curEl.click();
@@ -643,6 +672,9 @@
     var H = (Q.get('home') || '').toLowerCase();
     if(H === 'stage') quietIntro(buildQuiet());
     else if(H === 'flow' || Q.has('flow')) buildRoll();
-    else buildRollOne();
+    else {
+      if(IT){ document.body.classList.add('it-' + IT); var ps = document.createElement('script'); ps.src = 'panel.js'; document.body.appendChild(ps); ps.onload = function(){ if(P[Q.get('p')] && !gcPanel.isOpen()) gcPanel.open(Q.get('p'), 0, panelMode(), false); }; }
+      buildRollOne();
+    }
   }
 })();

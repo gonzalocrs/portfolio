@@ -1,0 +1,82 @@
+/* The project panel (panel.js), as in the MAD round he liked: grey rounded buttons with small mono capitals, a white
+   rounded panel over the dimmed page, the title in Archivo regular, the facts in mono capitals, pictures on the right. */
+:root{--pill:#ececec;--soft:#f2f2f2;--r:12px;--grey:#8f8f8f}
+body.md-open{overflow:hidden}
+.md-btn{display:inline-flex;align-items:center;justify-content:center;gap:.6rem;height:2.4rem;padding:0 1.3rem;border-radius:8px;background:var(--pill);
+  font-family:var(--mono);font-size:.72rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);transition:background .2s,color .2s}
+.md-btn:hover{background:#e2e2e2}
+/* a project: a white rounded panel over the dimmed grid */
+.md-shade{position:fixed;inset:0;z-index:30;background:rgba(120,120,120,.55);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
+  opacity:0;pointer-events:none;transition:opacity .45s ease;display:flex;align-items:center;justify-content:center;padding:6vh 8vw}
+.md-open .md-shade{opacity:1;pointer-events:auto}
+.md-card{position:relative;width:100%;height:100%;max-width:1680px;background:var(--paper);border-radius:16px;padding:14px;
+  display:grid;grid-template-columns:minmax(19rem,30%) 1fr;gap:1.6rem;overflow:hidden;
+  transform:translateY(18px) scale(.985);transition:transform .55s cubic-bezier(.2,.7,.2,1)}
+.md-open .md-card{transform:none}
+.md-left{display:flex;flex-direction:column;min-height:0;padding:0 0 1rem}
+.md-tools{display:flex;gap:.6rem}
+.md-x{width:3.6rem;height:3.6rem;padding:0;border-radius:10px;font-family:var(--font);font-weight:200;font-size:1.7rem;line-height:1}
+.md-tools .md-btn{height:3.6rem;border-radius:10px;padding:0 1.6rem}
+.md-title{margin:3.2rem 0 0;padding:0 0 0 .1rem;font-weight:400;font-size:clamp(2rem,2.6vw,2.8rem);letter-spacing:-.02em;line-height:1.1}
+.md-facts{margin:2.6rem 0 0;padding-left:.1rem}
+.md-facts p{margin:0;font-family:var(--mono);font-size:.82rem;letter-spacing:.04em;text-transform:uppercase;color:var(--grey);line-height:1.75}
+.md-words{margin-top:2.6rem;padding-left:.1rem;max-height:11.2em;overflow:hidden;font-size:1.1rem;line-height:1.4;
+  -webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent)}
+.md-words.open{max-height:none;overflow-y:auto;-webkit-mask-image:none;mask-image:none;flex:1;min-height:0;scrollbar-width:thin}
+.md-words p{margin:0 0 1.2rem}
+.md-words .lede{color:var(--grey)}
+.md-cr{display:grid;grid-template-columns:auto 1fr;gap:.3rem 1.2rem;margin:1.6rem 0 0;font-size:.85rem}
+.md-cr dt{font-family:var(--mono);font-size:.7rem;letter-spacing:.05em;text-transform:uppercase;color:var(--grey);padding-top:.15rem}
+.md-cr dd{margin:0}
+.md-more{align-self:flex-start;margin:1.4rem 0 0 .1rem;font-family:var(--mono);font-size:.74rem;letter-spacing:.05em;text-transform:uppercase;color:var(--grey);display:flex;align-items:center;gap:.6rem}
+.md-more::after{content:"+";font-family:var(--font);font-weight:300;font-size:1.2rem;line-height:1}
+.md-more.less::after{content:"\2212"}
+.md-more:hover{color:var(--ink)}
+.md-right{min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:14px;scrollbar-width:none}
+.md-right::-webkit-scrollbar{display:none}
+.md-fig{margin:0;flex:none}
+.md-fig img{max-width:100%;max-height:calc(100vh - 12vh - 28px);width:auto;height:auto;border-radius:var(--r);opacity:0;transition:opacity .6s ease}
+.md-fig img.in{opacity:1}
+.md-fig.dr{border-radius:var(--r);padding:5%;display:flex;justify-content:center;align-self:stretch}
+.md-fig.dr img{border-radius:0;mix-blend-mode:multiply;max-height:calc(100vh - 12vh - 28px - 10%)}
+.md-none{flex:1;border-radius:var(--r);background:var(--soft);display:flex;align-items:center;justify-content:center;color:var(--grey);font-weight:300;font-size:1.05rem}
+/* Gallery: the same pictures as a sheet, three across */
+.md-card.sheet .md-right{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-content:start}
+.md-card.sheet .md-right .md-fig{aspect-ratio:1;background:var(--soft);border-radius:var(--r);display:flex;align-items:center;justify-content:center;padding:6%}
+.md-card.sheet .md-right .md-fig img{max-height:100%;border-radius:4px}
+
+@media (max-width:1000px){
+  .md-shade{padding:3vh 3vw}
+  .md-card{grid-template-columns:1fr;overflow-y:auto;display:block}
+  .md-right{overflow:visible;margin-top:2rem}
+  .md-fig img{max-height:none;width:100%}
+}
+@media (max-width:700px){
+  .md-shade{padding:0}
+  .md-card{border-radius:0;padding:12px}
+  .md-x,.md-tools .md-btn{height:3rem}
+  .md-x{width:3rem}
+  .md-title{margin-top:2rem}
+  .md-facts,.md-words{margin-top:1.6rem}
+  .md-words{font-size:1rem}
+  .md-card.sheet .md-right{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* one picture at a time (mode 'one'): the pictures stacked in place, the current one shown; marks under it */
+.m-one .md-right{overflow:hidden;display:flex;flex-direction:column;gap:0}
+.md-one{position:relative;flex:1;min-height:0;cursor:e-resize}
+.md-one.back{cursor:w-resize}
+.md-one .md-fig{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .6s ease}
+.md-one .md-fig.on{opacity:1;pointer-events:auto}
+.md-one .md-fig img{max-width:100%;max-height:100%}
+.md-one .md-fig.dr{padding:4%}
+.md-one .md-fig.dr img{max-height:100%}
+.md-marks{display:flex;justify-content:center;gap:2px;padding:14px 0 4px}
+.md-m{width:26px;height:16px;display:flex;align-items:center;justify-content:center}
+.md-m i{display:block;width:18px;height:1px;background:#c9c9c9;transition:background .2s,height .2s}
+.md-m:hover i{background:var(--grey)}
+.md-m.cur i{background:var(--ink);height:2px}
+.m-one.sheet .md-right{overflow-y:auto;gap:14px}
+.m-one.sheet .md-one{display:contents}
+.m-one.sheet .md-one .md-fig{position:static;opacity:1;pointer-events:auto}
+.m-one.sheet .md-marks{display:none}

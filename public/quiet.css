@@ -359,3 +359,22 @@ main.q-away{opacity:0;transition:none}
   .qh-proj .qp .qt-stage{order:-1;height:auto;flex:1;min-height:0}
   .qh-proj .qp .qt-stage .p-layer{align-items:center}
 }
+
+/* trial ?it=1|2|3 (2026-10-28): the categories, as large light words as in the MAD round (1, 2) or smaller at the
+   right of the bar (3); the project opens as a panel (panel.js / panel.css) */
+.qk.hid{display:none}
+.qcat{display:flex;flex-wrap:wrap;gap:0 1.5rem;padding:clamp(.6rem,2vh,1.4rem) var(--gut) 0}
+.qcat button{font-family:var(--font);font-weight:300;font-size:clamp(1.7rem,2.5vw,2.5rem);letter-spacing:-.02em;line-height:1.1;color:var(--faint);transition:color .2s}
+.qcat button:hover,.qcat button.on{color:var(--ink)}
+.qcat-bar{padding:0;gap:0 1.2rem}
+.qcat-bar button{font-size:1.15rem;letter-spacing:-.01em;text-transform:none}
+@media (max-width:700px){
+  .qcat{gap:0 1rem;padding-top:.4rem}
+  .qcat button{font-size:1.45rem}
+  .qcat-bar{gap:0 .7rem}
+  .qcat-bar button{font-size:.95rem}
+}
+@media (max-width:700px){
+  .it-3 .bar{flex-wrap:wrap;row-gap:.9rem}
+  .qcat-bar{width:100%}
+}

@@ -377,3 +377,17 @@ main.q-away{opacity:0;transition:none}
   .qcat{width:100%;gap:0 .7rem}
   .qcat button{font-size:.95rem}
 }
+
+/* test &grid=on (2026-10-28): the MAD-round grid of rounded tiles in the stage, scrolling inside it */
+.qg{position:absolute;inset:0;overflow-y:auto;display:flex;gap:14px;align-items:flex-start;padding-bottom:2rem;scrollbar-width:none;transition:opacity .4s ease}
+.qg::-webkit-scrollbar{display:none}
+.qg.out{opacity:0;pointer-events:none}
+.qg-col{flex:1;min-width:0;display:flex;flex-direction:column;gap:14px}
+.qg-t{position:relative;display:block;border-radius:12px;overflow:hidden;background:#f2f2f2;cursor:pointer;opacity:0;transform:translateY(12px);transition:opacity .7s ease,transform .9s cubic-bezier(.2,.7,.2,1)}
+.qg-t.in{opacity:1;transform:none}
+.qg-t img{display:block;width:100%;height:100%;object-fit:contain;transition:transform 1.2s cubic-bezier(.2,.7,.2,1)}
+.qg-t:hover img{transform:scale(1.015)}
+.qg-t.dr img{padding:7%;mix-blend-mode:multiply}
+.qg-t.none{display:flex;align-items:center;justify-content:center}
+.qg-t.none span{font-weight:300;font-size:1.05rem;color:#8f8f8f}
+.qg-t.none:hover span{color:var(--ink)}

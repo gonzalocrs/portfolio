@@ -349,7 +349,7 @@
         var fit = function(k){
           var y = 0, w0 = W * k, out = [{x: (W - w0) / 2, y: 0, w: w0, h: w0 / items[0].r}]; y = out[0].h + gap * 1.4;
           for(var i = 1; i < n; i += 2){
-            var pr = items.slice(i, i + 2), A = Math.pow((W * k * .82 - gap) / pr.reduce(function(a, o){ return a + Math.sqrt(o.r); }, 0), 2);
+            var pr = items.slice(i, i + 2), A = Math.pow((W * k * .82 - gap) / (pr.reduce(function(a, o){ return a + Math.sqrt(o.r); }, 0) * (pr.length === 1 ? 2 : 1)), 2);
             var ds = pr.map(function(o){ return dims(o, A); }), mh = Math.max.apply(null, ds.map(function(d){ return d.h; }));
             var x = (W - (ds.reduce(function(a, d){ return a + d.w; }, 0) + gap * (ds.length - 1))) / 2;
             ds.forEach(function(d, j){ out.push({x: x, y: y + (j % 2 ? mh - d.h : 0), w: d.w, h: d.h}); x += d.w + gap; });

@@ -79,6 +79,13 @@
   }catch(e){}
   if(IT === 'off') IT = null;
   if(['step', 'salon'].indexOf(LO) < 0) LO = 'anchor';
+  // anchor, refined (his note: "the best one but it's not there yet"): one large picture and two smaller, the group
+  // sized as a whole and centred. &an=: block (default: the two make one column as tall as the large one, or a row
+  // under it as wide), pair (one on its top line, one on its bottom line, further out), floor (both standing on its
+  // bottom line, stepping down in size), cols (the first try, four smaller in two columns)
+  var AN = Q.get('an');
+  try{ if(AN) sessionStorage.setItem('gc-an', AN); else AN = sessionStorage.getItem('gc-an'); }catch(e){}
+  if(['pair', 'floor', 'cols'].indexOf(AN) < 0) AN = 'block';
   function panelMode(){ return 'one'; }
   function enter(img, href){ location.href = href; }
   function into(img, slug, k){
@@ -380,6 +387,44 @@
           var ds = r.map(function(o){ return dims(o, A); }), x = (W - (ds.reduce(function(a, d){ return a + d.w; }, 0) + gap * (r.length - 1))) / 2 + (ri ? gap * 1.5 : -gap * 1.5);
           ds.forEach(function(d){ box.push({x: x, y: ri ? axis + gap / 2 : axis - gap / 2 - d.h, w: d.w}); x += d.w + gap; });
         });
+      } else if(AN !== 'cols'){
+        // the group is sized as a whole to fill most of the space, then stands in its middle
+        var L = items[0], rest = items.slice(1), rL = L.r, maxW = W * .92, maxH = H * .86;
+        if(!rest.length){ var lh = Math.min(maxH, maxW / rL); box.push({x: 0, y: (H - lh) / 2, w: lh * rL}); }
+        else if(AN === 'block'){
+          // block: two smaller ones make one column exactly as tall as the large one (one top line, one bottom line,
+          // one gap); with a wide large one they make a row under it, exactly as wide
+          var a1 = rest[0], a2 = rest[1];
+          if(!a2){ var lh = Math.min(maxH, (maxW - gap) / (rL + a1.r * .6)); box.push({x: 0, y: (H - lh) / 2, w: lh * rL}); var h1 = lh * .6; box.push({x: lh * rL + gap, y: (H - lh) / 2 + lh - h1, w: h1 * a1.r}); }
+          else {
+            var S = 1 / a1.r + 1 / a2.r, R = a1.r + a2.r;
+            var lhC = Math.min(maxH, (maxW - gap + gap / S) / (rL + 1 / S)), wc = (lhC - gap) / S;
+            var lhR = Math.min((maxH - gap + gap / R) / (1 + rL / R), maxW / rL), hr = (lhR * rL - gap) / R;
+            if(wc * wc * S >= hr * hr * R){
+              var y0 = (H - lhC) / 2; box.push({x: 0, y: y0, w: lhC * rL});
+              box.push({x: lhC * rL + gap, y: y0, w: wc}); box.push({x: lhC * rL + gap, y: y0 + wc / a1.r + gap, w: wc});
+            } else {
+              var lw = lhR * rL, y0 = (H - (lhR + gap + hr)) / 2; box.push({x: 0, y: y0, w: lw});
+              box.push({x: 0, y: y0 + lhR + gap, w: hr * a1.r}); box.push({x: hr * a1.r + gap, y: y0 + lhR + gap, w: hr * a2.r});
+            }
+          }
+        } else if(AN === 'pair'){
+          // pair: one smaller one on the large one's top line, the other on its bottom line and further out
+          var f = .46, cw = Math.max.apply(null, rest.map(function(o){ return o.r * f; }));
+          var lh = Math.min(maxH, (maxW - gap * 2.4) / (rL + cw * 1.35)), lw = lh * rL, y0 = (H - lh) / 2, x0 = lw + gap * 2.4;
+          box.push({x: 0, y: y0, w: lw});
+          rest.forEach(function(o, i){ var h = lh * f, w = h * o.r; box.push(i ? {x: x0 + cw * lh * 1.35 - w, y: y0 + lh - h, w: w} : {x: x0, y: y0, w: w}); });
+        } else {
+          // floor: the smaller ones stand beside it on its bottom line, stepping down in size
+          var fs = [.58, .4], sr = rest.reduce(function(a, o, i){ return a + o.r * fs[i]; }, 0);
+          var lh = Math.min(maxH, (maxW - gap * 1.6 * rest.length) / (rL + sr)), lw = lh * rL, y0 = (H - lh) / 2, x = lw + gap * 1.6;
+          box.push({x: 0, y: y0, w: lw});
+          rest.forEach(function(o, i){ var h = lh * fs[i]; box.push({x: x, y: y0 + lh - h, w: h * o.r}); x += h * o.r + gap * 1.6; });
+        }
+        // the whole group stands in the middle of the space, so no hole opens between the large one and the rest
+        var mx = Math.max.apply(null, box.map(function(b){ return b.x + b.w; })), sh = (W - mx) / 2;
+        box.forEach(function(b){ b.x += sh; });
+        if(set.flip) box.forEach(function(b){ b.x = W - b.x - b.w; });
       } else {
         // anchor: the first picture large on one side; the others smaller, two columns beside it, the first ones on
         // its top line, the last ones ending on its bottom line. Sides swap from one category to the next
@@ -417,7 +462,7 @@
         got.forEach(function(o, k){ if(ks.indexOf(k) < 0) ks.push(k); });
         return ks.map(function(k){ return {slug: s, k0: k, it: got[k].it, r: got[k].r}; });
       });
-      var picks = [], cap = LO === 'salon' ? 6 : LO === 'step' ? 4 : 5;
+      var picks = [], cap = LO === 'salon' ? 6 : LO === 'step' ? 4 : AN === 'cols' ? 5 : 3;
       while(picks.length < cap && lists.some(function(l){ return l.length; })) lists.forEach(function(l){ if(l.length && picks.length < cap) picks.push(l.shift()); });
       if(!picks.length) return;
       set = el('div', 'qc-set qc-' + LO, st); set.flip = ++flips % 2 === 0;

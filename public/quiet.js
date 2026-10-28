@@ -66,17 +66,19 @@
   var PAGE = document.body.getAttribute('data-page');
   // trial ?it=on (2026-10-28, his picks from three versions: today's home, plus the categories small at the right of
   // the bar, and a project opening as a panel showing one picture at a time with small marks, both from the MAD round).
-  // Picking Built / Unbuilt / Research shows several of its pictures at once (&cv=row, the default: one quiet line at
-  // one height; &cv=loose: a few at varied sizes, loosely placed); All keeps one picture at a time.
-  // Kept for the visit (sessionStorage gc-it, gc-cv); ?it=off goes back to today's site.
-  var IT = Q.get('it'), CV = Q.get('cv');
+  // Picking Built / Unbuilt / Research shows several of its pictures at once, loosely composed (row dropped, his call);
+  // three ways (&lo=): anchor (default: one large picture, smaller ones beside it on its top and bottom lines),
+  // step (four of equal weight stepping down across the space), salon (six of equal weight hung above and below one
+  // line, as in a gallery). All keeps one picture at a time.
+  // Kept for the visit (sessionStorage gc-it, gc-lo); ?it=off goes back to today's site.
+  var IT = Q.get('it'), LO = Q.get('lo');
   try{
-    if(IT === 'off'){ sessionStorage.removeItem('gc-it'); sessionStorage.removeItem('gc-cv'); IT = null; }
+    if(IT === 'off'){ sessionStorage.removeItem('gc-it'); sessionStorage.removeItem('gc-lo'); IT = null; }
     else if(IT) sessionStorage.setItem('gc-it', IT); else IT = sessionStorage.getItem('gc-it');
-    if(CV) sessionStorage.setItem('gc-cv', CV); else CV = sessionStorage.getItem('gc-cv');
+    if(LO) sessionStorage.setItem('gc-lo', LO); else LO = sessionStorage.getItem('gc-lo');
   }catch(e){}
   if(IT === 'off') IT = null;
-  if(CV !== 'loose') CV = 'row';
+  if(['step', 'salon'].indexOf(LO) < 0) LO = 'anchor';
   function panelMode(){ return 'one'; }
   function enter(img, href){ location.href = href; }
   function into(img, slug, k){
@@ -333,33 +335,77 @@
     // the categories (trial ?it=): All / Built / Unbuilt / Research at the right of the bar. A category keeps only its
     // projects' marks and shows a few of its pictures at once (each project's home picks first, then its others, taking
     // turns between projects); hovering one names its project, a click opens it. All goes back to one at a time.
-    var allGot = {}, set = null;
+    var allGot = {}, set = null, flips = 0;
     function curMark(slug){ marks.forEach(function(m){ m.classList.toggle('cur', m.slug === slug); m.style.removeProperty('--p'); }); }
+    // pictures of equal weight get equal area (a tall drawing and a wide photo then read alike); edges line up on a
+    // few shared lines so the looseness still looks placed
     function layoutSet(){
       if(!set) return;
-      var W = st.clientWidth, H = st.clientHeight, phone = innerWidth <= 700, figs = set.children, n = figs.length, gap = Math.max(14, W * .025);
-      var items = Array.prototype.map.call(figs, function(f){ return f.o; });
-      var put = function(f, x, y, w){ f.style.left = x + 'px'; f.style.top = y + 'px'; f.style.width = w + 'px'; };
-      if(CV === 'loose'){
-        var cols = phone ? 2 : Math.min(3, n), rows = Math.ceil(n / cols), cw = W / cols, ch = H / rows, sd = 7;
-        var r = function(){ sd = (sd * 9301 + 49297) % 233280; return sd / 233280; };
-        items.forEach(function(o, i){
-          var c = i % cols, rw = Math.floor(i / cols), k = [.62, .72, .82][Math.floor(r() * 3)];
-          var w = Math.min((cw - gap) * k, (ch - gap) * k * o.r), h = w / o.r;
-          put(figs[i], c * cw + gap / 2 + (cw - gap - w) * r(), rw * ch + gap / 2 + (ch - gap - h) * r(), w);
+      var W = st.clientWidth, H = st.clientHeight, phone = innerWidth <= 700, figs = set.children, n = figs.length, gap = Math.max(16, W * .03);
+      var items = Array.prototype.map.call(figs, function(f){ return f.o; }), box = [];
+      function dims(o, A){ return {w: Math.sqrt(A * o.r), h: Math.sqrt(A / o.r)}; }
+      if(phone){
+        // the first one across the width, the others two by two under it at equal area, all fitted to the height
+        var fit = function(k){
+          var y = 0, w0 = W * k, out = [{x: (W - w0) / 2, y: 0, w: w0, h: w0 / items[0].r}]; y = out[0].h + gap * 1.4;
+          for(var i = 1; i < n; i += 2){
+            var pr = items.slice(i, i + 2), A = Math.pow((W * k * .82 - gap) / pr.reduce(function(a, o){ return a + Math.sqrt(o.r); }, 0), 2);
+            var ds = pr.map(function(o){ return dims(o, A); }), mh = Math.max.apply(null, ds.map(function(d){ return d.h; }));
+            var x = (W - (ds.reduce(function(a, d){ return a + d.w; }, 0) + gap * (ds.length - 1))) / 2;
+            ds.forEach(function(d, j){ out.push({x: x, y: y + (j % 2 ? mh - d.h : 0), w: d.w, h: d.h}); x += d.w + gap; });
+            y += mh + gap * 1.4;
+          }
+          out.tot = y - gap * 1.4; return out;
+        };
+        var k = 1, out = fit(k); while(out.tot > H * .96 && k > .3){ k -= .04; out = fit(k); }
+        var oy = (H - out.tot) / 2; box = out.map(function(b){ return {x: b.x, y: b.y + oy, w: b.w}; });
+      } else if(LO === 'step'){
+        // equal area, stepping from the top left down to the bottom right across the whole width
+        var sr = items.reduce(function(a, o){ return a + Math.sqrt(o.r); }, 0), A = Math.pow((W * .97 - gap * (n - 1)) / sr, 2);
+        var mh = function(A){ return Math.max.apply(null, items.map(function(o){ return dims(o, A).h; })); };
+        while(mh(A) > H * .52) A *= .94;
+        var ds = items.map(function(o){ return dims(o, A); }), x = (W - (ds.reduce(function(a, d){ return a + d.w; }, 0) + gap * (n - 1))) / 2;
+        ds.forEach(function(d, i){
+          var t = n > 1 ? i / (n - 1) : .5, cy = H * .08 + d.h / 2 + t * (H * .84 - d.h);
+          box.push({x: x, y: cy - d.h / 2, w: d.w}); x += d.w + gap;
         });
-        return;
+      } else if(LO === 'salon'){
+        // equal area, two rows hung on one line: the upper row stands on it, the lower one hangs from it
+        var rows = [items.slice(0, Math.ceil(n / 2)), items.slice(Math.ceil(n / 2))].filter(function(r){ return r.length; });
+        var A = Math.pow((W * .8 - gap * 2) / Math.max.apply(null, rows.map(function(r){ return r.reduce(function(a, o){ return a + Math.sqrt(o.r); }, 0); })), 2);
+        var hOf = function(A){ return rows.reduce(function(a, r){ return a + Math.max.apply(null, r.map(function(o){ return dims(o, A).h; })); }, 0) + gap; };
+        while(hOf(A) > H * .9) A *= .94;
+        var top = Math.max.apply(null, rows[0].map(function(o){ return dims(o, A).h; })), axis = (H - hOf(A)) / 2 + top + gap / 2;
+        rows.forEach(function(r, ri){
+          var ds = r.map(function(o){ return dims(o, A); }), x = (W - (ds.reduce(function(a, d){ return a + d.w; }, 0) + gap * (r.length - 1))) / 2 + (ri ? gap * 1.5 : -gap * 1.5);
+          ds.forEach(function(d){ box.push({x: x, y: ri ? axis + gap / 2 : axis - gap / 2 - d.h, w: d.w}); x += d.w + gap; });
+        });
+      } else {
+        // anchor: the first picture large on one side; the others smaller, two columns beside it, the first ones on
+        // its top line, the last ones ending on its bottom line. Sides swap from one category to the next
+        var L = items[0], lw = Math.min(W * .5, H * .76 * L.r), lh = lw / L.r, rest = items.slice(1);
+        var x0 = lw + gap * 2.4, cw = (W - x0 - gap * 1.6) / 2, A = lw * lh * .3;
+        var fitR = function(A){
+          var cols = [[], []]; rest.forEach(function(o, i){ cols[i % 2].push(dims(o, A)); });
+          cols.forEach(function(c){ c.forEach(function(d){ if(d.w > cw){ d.h *= cw / d.w; d.w = cw; } }); });
+          return cols;
+        };
+        var cols = fitR(A), colH = function(c){ return c.reduce(function(a, d){ return a + d.h; }, 0) + gap * 1.6 * Math.max(0, c.length - 1); };
+        while(Math.max(colH(cols[0]), colH(cols[1])) > H * .84 && A > 1000){ A *= .94; cols = fitR(A); }
+        // one band holds them all: the large one in its middle, the first column from its top, the second to its bottom
+        var band = Math.max(lh, colH(cols[0]), colH(cols[1])), bt = (H - band) * .5;
+        box.push({x: 0, y: bt + (band - lh) / 2, w: lw});
+        var placed = [];
+        cols.forEach(function(c, ci){
+          var y = ci ? bt + band - colH(c) : bt, base = x0 + ci * (cw + gap * 1.6);
+          c.forEach(function(d){ placed.push({ci: ci, b: {x: ci ? base + cw - d.w : base, y: y, w: d.w}}); y += d.h + gap * 1.6; });
+        });
+        // back into the pictures' order: column 0 took the 1st, 3rd...; column 1 the 2nd, 4th...
+        var c0 = placed.filter(function(p){ return !p.ci; }), c1 = placed.filter(function(p){ return p.ci; });
+        rest.forEach(function(o, i){ box.push((i % 2 ? c1 : c0).shift().b); });
+        if(set.flip) box.forEach(function(b){ b.x = W - b.x - b.w; });
       }
-      // row: one line at one height, centred (two to a line on a phone)
-      var per = phone ? 2 : n, lines = [];
-      for(var i = 0; i < n; i += per) lines.push(items.slice(i, i + per));
-      var hs = lines.map(function(L){ var sr = L.reduce(function(a, o){ return a + o.r; }, 0); return Math.min(H * (phone ? .3 : .46), (W - gap * (L.length - 1)) / sr); });
-      var tot = hs.reduce(function(a, h){ return a + h; }, 0) + gap * (lines.length - 1), y = Math.max(0, (H - tot) / 2), j = 0;
-      lines.forEach(function(L, li){
-        var h = hs[li], lw = L.reduce(function(a, o){ return a + o.r * h; }, 0) + gap * (L.length - 1), x = (W - lw) / 2;
-        L.forEach(function(o){ put(figs[j++], x, y, o.r * h); x += o.r * h + gap; });
-        y += h + gap;
-      });
+      box.forEach(function(b, i){ var f = figs[i]; f.style.left = b.x + 'px'; f.style.top = b.y + 'px'; f.style.width = b.w + 'px'; });
     }
     function catView(g){
       marks.forEach(function(m){ m.classList.toggle('hid', g !== 'All' && P[m.slug].group !== g); });
@@ -371,10 +417,10 @@
         got.forEach(function(o, k){ if(ks.indexOf(k) < 0) ks.push(k); });
         return ks.map(function(k){ return {slug: s, k0: k, it: got[k].it, r: got[k].r}; });
       });
-      var picks = [], cap = CV === 'loose' ? 6 : 4;
+      var picks = [], cap = LO === 'salon' ? 6 : LO === 'step' ? 4 : 5;
       while(picks.length < cap && lists.some(function(l){ return l.length; })) lists.forEach(function(l){ if(l.length && picks.length < cap) picks.push(l.shift()); });
       if(!picks.length) return;
-      set = el('div', 'qc-set qc-' + CV, st);
+      set = el('div', 'qc-set qc-' + LO, st); set.flip = ++flips % 2 === 0;
       picks.forEach(function(o, i){
         var f = el('figure', 'qc-fig', set); f.o = o;
         var im = el('img', '', f); im.alt = o.it.caption || P[o.slug].title; im.src = o.it.src;

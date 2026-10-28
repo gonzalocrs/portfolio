@@ -359,35 +359,3 @@ main.q-away{opacity:0;transition:none}
   .qh-proj .qp .qt-stage{order:-1;height:auto;flex:1;min-height:0}
   .qh-proj .qp .qt-stage .p-layer{align-items:center}
 }
-
-/* ---------- the showroom look (body.lk; see quiet.js, 2026-10-28) ----------
-   between the quiet site and MAD's product-like polish ("like shopping for a brand new iPhone or Porsche"): each picture
-   stands on a soft, rounded display surface; drawings sit on it like sheets (multiply takes their white to the surface's
-   grey, the lines keep their colours; nothing is inverted); the name is light and larger, with its place and year in
-   small capitals under it; the "+" is a round button; pictures arrive with a slower, smoother ease */
-.lk{--stage:#f3f3f5}
-.lk .qo-fig{background:var(--stage);border-radius:22px;padding:clamp(14px,2.4%,34px)}
-.lk .qo-fig img{border-radius:10px}
-.lk .qo-fig.dr img{border-radius:0;mix-blend-mode:multiply}
-.lk .qt-stage .p-layer{background:transparent}
-/* in a project the surface hugs the picture, as on the home */
-.lk .qf{height:auto;max-height:100%;background:var(--stage);border-radius:24px;padding:clamp(16px,2.6vw,40px)}
-.lk .qf img{max-height:calc(100vh - 15rem);border-radius:12px}
-.lk .qf.dr img{border-radius:0;mix-blend-mode:multiply}
-.lk .qp .qt-stage .p-layer{transform:scale(.988);transition:opacity 1s cubic-bezier(.4,0,.2,1),transform 1.4s cubic-bezier(.2,.7,.2,1),left .7s cubic-bezier(.2,.7,.2,1)}
-.lk .qp .qt-stage .p-layer.on{transform:none}
-.lk .qk span{font-weight:300;font-size:clamp(1.2rem,1.55vw,1.5rem);letter-spacing:-.02em}
-.lk .qk.qa span{font-weight:300}
-.lk .qk.cur span::after{content:attr(data-k);display:block;margin-top:.45rem;font-family:var(--mono);font-weight:400;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--mute)}
-.lk .qk.cur{height:auto;min-height:1.25rem}
-.lk .qp-plus{display:inline-flex;align-items:center;justify-content:center;width:1.9rem;height:1.9rem;padding:0;margin-left:.75rem;border-radius:50%;background:#e8e8ec;
-  font-family:var(--font);font-weight:300;font-size:1.15rem;line-height:1;color:var(--ink);vertical-align:.1em;transition:transform .45s cubic-bezier(.2,.7,.2,1),background .2s}
-.lk .qp-plus:hover{background:#dcdce1}
-.lk .qd-beside .qp-card{padding-top:1.5rem;padding-bottom:1.5rem}
-@media (max-width:700px){
-  .lk .qk.cur span::after{display:none}
-  .lk .qk span{font-size:1.2rem}
-  .lk .qo-fig{border-radius:16px}
-  .lk .qf{border-radius:16px;padding:12px}
-  .lk .qf img{max-height:calc(100svh - 17rem)}
-}

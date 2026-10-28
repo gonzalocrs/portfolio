@@ -64,14 +64,20 @@
   // the home and glides to its place in the project while the home fades away and the project fades in around it; the
   // address changes to the project's, and Back returns to the home. (The older homes, ?home=stage|flow, still just go.)
   var PAGE = document.body.getAttribute('data-page');
-  // trial ?it=1|2|3 (2026-10-28, his ask: today's home, plus the categories and the project opening as a panel, both
-  // from the MAD round): 1 = the categories as large light words over the home, the panel with the pictures one under
-  // another; 2 = the same, the panel showing one picture at a time with small marks; 3 = the categories smaller at the
-  // right of the bar, panel as in 1. Kept for the visit (sessionStorage gc-it); ?it=off goes back to today's site.
-  var IT = Q.get('it');
-  try{ if(IT === 'off'){ sessionStorage.removeItem('gc-it'); IT = null; } else if(IT) sessionStorage.setItem('gc-it', IT); else IT = sessionStorage.getItem('gc-it'); }catch(e){}
-  if(['1', '2', '3'].indexOf(IT) < 0) IT = null;
-  function panelMode(){ return IT === '2' ? 'one' : 'stack'; }
+  // trial ?it=on (2026-10-28, his picks from three versions: today's home, plus the categories small at the right of
+  // the bar, and a project opening as a panel showing one picture at a time with small marks, both from the MAD round).
+  // Picking Built / Unbuilt / Research shows several of its pictures at once (&cv=row, the default: one quiet line at
+  // one height; &cv=loose: a few at varied sizes, loosely placed); All keeps one picture at a time.
+  // Kept for the visit (sessionStorage gc-it, gc-cv); ?it=off goes back to today's site.
+  var IT = Q.get('it'), CV = Q.get('cv');
+  try{
+    if(IT === 'off'){ sessionStorage.removeItem('gc-it'); sessionStorage.removeItem('gc-cv'); IT = null; }
+    else if(IT) sessionStorage.setItem('gc-it', IT); else IT = sessionStorage.getItem('gc-it');
+    if(CV) sessionStorage.setItem('gc-cv', CV); else CV = sessionStorage.getItem('gc-cv');
+  }catch(e){}
+  if(IT === 'off') IT = null;
+  if(CV !== 'loose') CV = 'row';
+  function panelMode(){ return 'one'; }
   function enter(img, href){ location.href = href; }
   function into(img, slug, k){
     if(PAGE !== 'home') return;
@@ -312,6 +318,7 @@
     Promise.all(withPics.map(function(s){ return loadAll(pictures(s)); })).then(function(all){
       var start = 0;
       all.forEach(function(got, j){
+        allGot[withPics[j]] = got;
         got = homePicks(got, withPics[j]);
         got.forEach(function(o, k){
           var lead = withPics[j] === first && k === 0, sd = lead ? 'm' : side();
@@ -320,28 +327,78 @@
             pw: pick([78, 86, 94]), off: pick([0, .06, .12]), y: sd === 'm' ? .45 : pick([.15, .35, .55, .8])});
         });
       });
-      full = seq.slice();
       show(start, 1);
       if(IT && window.gcPanel && P[Q.get('p')]) gcPanel.open(Q.get('p'), 0, panelMode(), false);
     });
-    // the categories (trial ?it=): All / Built / Unbuilt / Research; picking one keeps only its projects, on the
-    // marks and among the pictures, and starts again from its first picture
-    var full = [];
+    // the categories (trial ?it=): All / Built / Unbuilt / Research at the right of the bar. A category keeps only its
+    // projects' marks and shows a few of its pictures at once (each project's home picks first, then its others, taking
+    // turns between projects); hovering one names its project, a click opens it. All goes back to one at a time.
+    var allGot = {}, set = null;
+    function curMark(slug){ marks.forEach(function(m){ m.classList.toggle('cur', m.slug === slug); m.style.removeProperty('--p'); }); }
+    function layoutSet(){
+      if(!set) return;
+      var W = st.clientWidth, H = st.clientHeight, phone = innerWidth <= 700, figs = set.children, n = figs.length, gap = Math.max(14, W * .025);
+      var items = Array.prototype.map.call(figs, function(f){ return f.o; });
+      var put = function(f, x, y, w){ f.style.left = x + 'px'; f.style.top = y + 'px'; f.style.width = w + 'px'; };
+      if(CV === 'loose'){
+        var cols = phone ? 2 : Math.min(3, n), rows = Math.ceil(n / cols), cw = W / cols, ch = H / rows, sd = 7;
+        var r = function(){ sd = (sd * 9301 + 49297) % 233280; return sd / 233280; };
+        items.forEach(function(o, i){
+          var c = i % cols, rw = Math.floor(i / cols), k = [.62, .72, .82][Math.floor(r() * 3)];
+          var w = Math.min((cw - gap) * k, (ch - gap) * k * o.r), h = w / o.r;
+          put(figs[i], c * cw + gap / 2 + (cw - gap - w) * r(), rw * ch + gap / 2 + (ch - gap - h) * r(), w);
+        });
+        return;
+      }
+      // row: one line at one height, centred (two to a line on a phone)
+      var per = phone ? 2 : n, lines = [];
+      for(var i = 0; i < n; i += per) lines.push(items.slice(i, i + per));
+      var hs = lines.map(function(L){ var sr = L.reduce(function(a, o){ return a + o.r; }, 0); return Math.min(H * (phone ? .3 : .46), (W - gap * (L.length - 1)) / sr); });
+      var tot = hs.reduce(function(a, h){ return a + h; }, 0) + gap * (lines.length - 1), y = Math.max(0, (H - tot) / 2), j = 0;
+      lines.forEach(function(L, li){
+        var h = hs[li], lw = L.reduce(function(a, o){ return a + o.r * h; }, 0) + gap * (L.length - 1), x = (W - lw) / 2;
+        L.forEach(function(o){ put(figs[j++], x, y, o.r * h); x += o.r * h + gap; });
+        y += h + gap;
+      });
+    }
+    function catView(g){
+      marks.forEach(function(m){ m.classList.toggle('hid', g !== 'All' && P[m.slug].group !== g); });
+      if(set){ var s0 = set; s0.classList.add('out'); setTimeout(function(){ s0.remove(); }, 800); set = null; }
+      if(g === 'All'){ lastStep = Date.now(); show(at < 0 ? 0 : at, 1); return; }
+      if(curEl){ var old = curEl; old.classList.remove('in'); old.classList.add('out', 'up'); setTimeout(function(){ old.remove(); }, 1100); curEl = null; }
+      var lists = withPics.filter(function(s){ return P[s].group === g && allGot[s]; }).map(function(s){
+        var got = allGot[s], ks = homePicks(got, s).map(function(o){ return o.k0; });
+        got.forEach(function(o, k){ if(ks.indexOf(k) < 0) ks.push(k); });
+        return ks.map(function(k){ return {slug: s, k0: k, it: got[k].it, r: got[k].r}; });
+      });
+      var picks = [], cap = CV === 'loose' ? 6 : 4;
+      while(picks.length < cap && lists.some(function(l){ return l.length; })) lists.forEach(function(l){ if(l.length && picks.length < cap) picks.push(l.shift()); });
+      if(!picks.length) return;
+      set = el('div', 'qc-set qc-' + CV, st);
+      picks.forEach(function(o, i){
+        var f = el('figure', 'qc-fig', set); f.o = o;
+        var im = el('img', '', f); im.alt = o.it.caption || P[o.slug].title; im.src = o.it.src;
+        f.addEventListener('click', function(){ if(window.gcPanel) gcPanel.open(o.slug, o.k0, panelMode(), true); });
+        f.addEventListener('mouseenter', function(){ curMark(o.slug); });
+        setTimeout(function(){ f.classList.add('in'); }, 380 + i * 130);
+      });
+      layoutSet(); curMark(picks[0].slug);
+    }
     if(IT){
-      var cats = IT === '3' ? el('nav', 'qcat qcat-bar', document.querySelector('.bar')) : el('nav', 'qcat', main);
-      if(IT !== '3') main.insertBefore(cats, wrap);
+      var cats = el('nav', 'qcat qcat-bar', document.querySelector('.bar'));
       ['All'].concat(SLUGS.map(function(s){ return P[s].group; }).filter(function(g, i, a){ return g && a.indexOf(g) === i; })).forEach(function(g){
         var b = el('button', g === 'All' ? 'on' : '', cats, g); b.type = 'button';
         b.addEventListener('click', function(){
+          if(b.classList.contains('on')) return;
           cats.querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x === b); });
-          seq = full.filter(function(o){ return g === 'All' || P[o.slug].group === g; });
-          marks.forEach(function(m){ var hide = g !== 'All' && P[m.slug].group !== g; m.classList.toggle('hid', hide); });
-          at = -1; lastStep = Date.now(); show(0, 1);
+          catView(g);
         });
       });
+      addEventListener('resize', layoutSet);
     }
     marks.forEach(function(m){
       m.addEventListener('click', function(e){
+        if(set){ e.preventDefault(); if(window.gcPanel) gcPanel.open(m.slug, 0, panelMode(), true); return; }
         var i = -1; seq.some(function(o, j){ if(o.slug === m.slug){ i = j; return true; } });
         if(i < 0) return;
         e.preventDefault(); if(i !== at){ lastStep = Date.now(); show(i, i > at ? 1 : -1); }
@@ -353,6 +410,7 @@
     addEventListener('wheel', function(e){
       if(PAGE !== 'home' || document.body.classList.contains('md-open')) return;
       e.preventDefault();
+      if(set) return;
       var d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX, now = Date.now(), gap = now - lastWheel;
       lastWheel = now;
       var fresh = gap > 160 || Math.abs(d) > Math.abs(lastD) * 1.6 + 4;
@@ -361,7 +419,7 @@
       step(d > 0 ? 1 : -1);
     }, {passive: false});
     addEventListener('keydown', function(e){
-      if(PAGE !== 'home' || document.body.classList.contains('md-open')) return;
+      if(PAGE !== 'home' || document.body.classList.contains('md-open') || set) return;
       if(['ArrowDown', 'ArrowRight', 'PageDown', ' '].indexOf(e.key) > -1){ step(1); e.preventDefault(); }
       if(['ArrowUp', 'ArrowLeft', 'PageUp'].indexOf(e.key) > -1){ step(-1); e.preventDefault(); }
       if(e.key === 'Enter' && curEl) curEl.click();
@@ -373,7 +431,7 @@
       if(sy == null) return;
       var dy = e.changedTouches[0].clientY - sy, dx = e.changedTouches[0].clientX - sx; sy = sx = null;
       var d = Math.abs(dy) > Math.abs(dx) ? dy : dx;
-      if(Math.abs(d) > 35) step(d < 0 ? 1 : -1);
+      if(Math.abs(d) > 35 && !set) step(d < 0 ? 1 : -1);
     }, {passive: true});
     addEventListener('resize', function(){ if(PAGE === 'home' && curEl) place(curEl, curEl.o); });
   }
@@ -673,7 +731,7 @@
     if(H === 'stage') quietIntro(buildQuiet());
     else if(H === 'flow' || Q.has('flow')) buildRoll();
     else {
-      if(IT){ document.body.classList.add('it-' + IT); var ps = document.createElement('script'); ps.src = 'panel.js'; document.body.appendChild(ps); ps.onload = function(){ if(P[Q.get('p')] && !gcPanel.isOpen()) gcPanel.open(Q.get('p'), 0, panelMode(), false); }; }
+      if(IT){ document.body.classList.add('it-on'); var ps = document.createElement('script'); ps.src = 'panel.js'; document.body.appendChild(ps); ps.onload = function(){ if(P[Q.get('p')] && !gcPanel.isOpen()) gcPanel.open(Q.get('p'), 0, panelMode(), false); }; }
       buildRollOne();
     }
   }

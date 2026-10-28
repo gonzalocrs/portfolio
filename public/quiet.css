@@ -360,21 +360,20 @@ main.q-away{opacity:0;transition:none}
   .qh-proj .qp .qt-stage .p-layer{align-items:center}
 }
 
-/* trial ?it=1|2|3 (2026-10-28): the categories, as large light words as in the MAD round (1, 2) or smaller at the
-   right of the bar (3); the project opens as a panel (panel.js / panel.css) */
+/* trial ?it=on (2026-10-28): the categories small at the right of the bar; a category shows a few of its pictures at
+   once (.qc-set, laid out by quiet.js: &cv=row or loose); the project opens as a panel (panel.js / panel.css) */
 .qk.hid{display:none}
-.qcat{display:flex;flex-wrap:wrap;gap:0 1.5rem;padding:clamp(.6rem,2vh,1.4rem) var(--gut) 0}
-.qcat button{font-family:var(--font);font-weight:300;font-size:clamp(1.7rem,2.5vw,2.5rem);letter-spacing:-.02em;line-height:1.1;color:var(--faint);transition:color .2s}
+.qcat{display:flex;flex-wrap:wrap;gap:0 1.2rem}
+.qcat button{font-family:var(--font);font-weight:300;font-size:1.15rem;letter-spacing:-.01em;line-height:1.1;text-transform:none;color:var(--faint);transition:color .2s}
 .qcat button:hover,.qcat button.on{color:var(--ink)}
-.qcat-bar{padding:0;gap:0 1.2rem}
-.qcat-bar button{font-size:1.15rem;letter-spacing:-.01em;text-transform:none}
+.qc-set{position:absolute;inset:0;transition:opacity .6s ease}
+.qc-set.out{opacity:0;pointer-events:none}
+.qc-fig{position:absolute;margin:0;cursor:pointer;opacity:0;transform:translateY(3vh);transition:opacity .9s ease,transform 1.3s cubic-bezier(.16,.8,.2,1)}
+.qc-fig.in{opacity:1;transform:none}
+.qc-fig img{display:block;width:100%;height:auto}
+@media (hover:hover){ .qc-set:hover .qc-fig.in:not(:hover){opacity:.35;transition:opacity .4s ease,transform 1.3s cubic-bezier(.16,.8,.2,1)} }
 @media (max-width:700px){
-  .qcat{gap:0 1rem;padding-top:.4rem}
-  .qcat button{font-size:1.45rem}
-  .qcat-bar{gap:0 .7rem}
-  .qcat-bar button{font-size:.95rem}
-}
-@media (max-width:700px){
-  .it-3 .bar{flex-wrap:wrap;row-gap:.9rem}
-  .qcat-bar{width:100%}
+  .it-on .bar{flex-wrap:wrap;row-gap:.9rem}
+  .qcat{width:100%;gap:0 .7rem}
+  .qcat button{font-size:.95rem}
 }

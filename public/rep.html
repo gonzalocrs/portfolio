@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Drawing styles</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#fff;color:#111;font:11px/1.4 "IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase}
+h1{font-size:11px;font-weight:400;margin:24px 4%}
+.row{display:grid;grid-template-columns:repeat(5,1fr);gap:2.5%;padding:0 4% 40px;align-items:end}
+figure{margin:0}
+img{display:block;width:100%;height:auto}
+figcaption{margin-top:10px;color:#777}
+figcaption b{color:#111;font-weight:400}
+@media (max-width:800px){.row{grid-template-columns:1fr 1fr}}
+</style></head><body>
+<h1>Sierra Hotel: drawing styles (preview)</h1>
+<div class="row" id="el"></div>
+<div class="row" id="pl"></div>
+<script>
+const S=[['current','live now'],['tone','flat tones, cast shadows'],['line','line only'],['hatch','hatching'],['material','muted material colour']];
+const v=Date.now();
+for(const [id,f] of [['el','elevation.svg'],['pl','floor-plans.svg']])
+  document.getElementById(id).innerHTML=S.map(([k,d])=>`<figure><img src="img/sierra-hotel/${k=='current'?'':'rep/'+k+'-'}${f}?v=${v}"><figcaption><b>${k}</b> · ${d}</figcaption></figure>`).join('');
+</script>
+</body></html>

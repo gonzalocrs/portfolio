@@ -85,13 +85,6 @@
   // tilt (his pick, "reminds me of a record player": the current tick lies flat and runs out, the ones above it lean
   // up, the ones below lean down), fan (the same, the lean growing with the distance from the current one, like a fan
   // of lines), dot (a dot per project; the current one stretches into the line)
-  // fade (2026-10-29, his ask: "make the bottom or top edge of the images fade with the background according to their
-  // position"): on the home, the picture's edge nearer the top or bottom of the screen melts into the page. The default
-  // since he said "nearer edge is good, not both"; ?fade=off turns it off for the visit, ?fade=on back on
-  var FADE = Q.get('fade');
-  try{ if(FADE) sessionStorage.setItem('gc-fade', FADE); FADE = sessionStorage.getItem('gc-fade') || FADE; }catch(e){}
-  FADE = FADE === 'off' ? 'off' : 'on';
-  if(FADE === 'on') document.body.classList.add('fd');
   var TICK = Q.get('tick');
   try{ if(TICK === 'off') sessionStorage.removeItem('gc-tick'); else if(TICK) sessionStorage.setItem('gc-tick', TICK); TICK = sessionStorage.getItem('gc-tick'); }catch(e){}
   TICK = TICK && TICK !== 'off' ? TICK : 'tilt';
@@ -301,32 +294,6 @@
       var w = Math.min(W * (phone ? o.pw : o.w) / 100, H * (phone ? .8 : .72) * o.r), h = w / o.r;
       var room = Math.max(0, W - w), x = o.side === 'l' ? room * o.off : o.side === 'r' ? room * (1 - o.off) : room / 2 + (o.off - .1) * room * .4;
       f.style.width = w + 'px'; f.style.left = Math.max(0, Math.min(room, x)) + 'px'; f.style.top = (Math.max(0, H - h) * o.y) + 'px';
-      // the top or bottom edge (the one nearer that edge of the screen) melts
-      // into the page, just biting into the edge of what is drawn (his note, 2026-10-29: "not long but rather bite an
-      // edge a little bit", it has to touch the drawing, its white margin is already the page)
-      if(FADE === 'on') bite(f, o, (Math.max(0, H - h) * o.y + h / 2) / H - .5);
-    }
-    // where the drawing really starts and ends on the sheet: the first and last row with ink in it (worked out once)
-    function inked(im, o){
-      if(o.ink) return o.ink;
-      try {
-        var cw = Math.min(600, im.naturalWidth || 600), ch = Math.max(8, Math.round(cw / o.r)), cv = document.createElement('canvas'); cv.width = cw; cv.height = ch;
-        var cx = cv.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, cw, ch); cx.drawImage(im, 0, 0, cw, ch);
-        var px = cx.getImageData(0, 0, cw, ch).data, t = -1, b = -1;
-        for(var y = 0; y < ch; y++) for(var x = 0; x < cw; x++){
-          var k = (y * cw + x) * 4; if(px[k] + px[k + 1] + px[k + 2] < 3 * 248){ if(t < 0) t = y; b = y; break; }
-        }
-        o.ink = t < 0 ? {t: 0, b: 1} : {t: t / ch, b: (b + 1) / ch};
-      } catch(e){ o.ink = {t: 0, b: 1}; }
-      return o.ink;
-    }
-    function bite(f, o, c){
-      var im = f.querySelector('img');
-      if(!im.complete || !im.naturalWidth){ im.addEventListener('load', function(){ bite(f, o, c); }, {once: true}); return; }
-      var ink = inked(im, o), n = (ink.b - ink.t) * .12;
-      f.classList.toggle('fade-top', c < 0); f.classList.toggle('fade-bottom', c >= 0);
-      f.style.setProperty('--ct', (ink.t * 100).toFixed(2) + '%'); f.style.setProperty('--cb', ((1 - ink.b) * 100).toFixed(2) + '%');
-      f.style.setProperty('--bite', (n * 100).toFixed(2) + '%');
     }
     function show(i, d){
       if(!seq.length) return;

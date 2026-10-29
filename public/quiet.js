@@ -101,14 +101,15 @@
   var NAV = Q.get('nav');
   try{ if(NAV) sessionStorage.setItem('gc-nav', NAV); else NAV = sessionStorage.getItem('gc-nav'); }catch(e){}
   if(['list', 'ticks', 'bar'].indexOf(NAV) < 0) NAV = 'groups';
-  // with the grid, the index on the left (his note 2026-10-29: the grid "doesn't go with the thin lines"), &menu=:
-  // names (default: the project names as a plain list, grey, the current one in ink, the category words over each
-  // group in small mono capitals), pills (each name on a grey rounded button like the panel's, the current one dark),
-  // thumbs (a small rounded tile per project with its picture, grey for those still without, its name beside it),
-  // lines (the marks as before)
+  // with the grid, the index (his notes 2026-10-29: the grid "doesn't go with the thin lines"; names, pills and small
+  // tiles were too much: "keep it minimalistic... a horizontal bar... even only numbers"), &menu=:
+  // num (default: a column of small numbers, 01 to 10, the current one's name beside it), hnum (the numbers in one
+  // line over the grid, the category words between their groups, the current name at the end), hnames (the names in
+  // one quiet line under the grid), squares (one small square per project in a line over the grid, filled for the
+  // current one, its name beside), lines (the marks as before)
   var MENU = Q.get('menu');
   try{ if(MENU) sessionStorage.setItem('gc-menu', MENU); else MENU = sessionStorage.getItem('gc-menu'); }catch(e){}
-  if(['pills', 'thumbs', 'lines'].indexOf(MENU) < 0) MENU = 'names';
+  if(['hnum', 'hnames', 'squares', 'lines'].indexOf(MENU) < 0) MENU = 'num';
   function panelMode(){ return 'one'; }
   function enter(img, href){ location.href = href; }
   function into(img, slug, k){
@@ -359,10 +360,6 @@
             pw: pick([78, 86, 94]), off: pick([0, .06, .12]), y: sd === 'm' ? .45 : pick([.15, .35, .55, .8])});
         });
       });
-      if(GRID && MENU === 'thumbs') marks.forEach(function(m){
-        var th = el('b', 'qk-th', null), got = allGot[m.slug]; m.insertBefore(th, m.firstChild);
-        if(got && got.length){ var o = homePicks(got, m.slug)[0], im = el('img', o.it.drawing ? 'dr' : '', th); im.alt = ''; im.src = o.it.drawing ? o.it.src : thumb(o.it.src); if(!o.it.drawing) im.addEventListener('error', function(){ im.src = o.it.src; }, {once: true}); }
-      });
       if(GRID) gridView('All'); else show(start, 1);
       if(IT && window.gcPanel && P[Q.get('p')]) gcPanel.open(Q.get('p'), 0, panelMode(), false);
     });
@@ -370,7 +367,10 @@
     // projects' marks and shows a few of its pictures at once (each project's home picks first, then its others, taking
     // turns between projects); hovering one names its project, a click opens it. All goes back to one at a time.
     var allGot = {}, set = null, flips = 0;
-    function curMark(slug){ marks.forEach(function(m){ m.classList.toggle('cur', m.slug === slug); m.style.removeProperty('--p'); }); }
+    function curMark(slug){
+      marks.forEach(function(m){ m.classList.toggle('cur', m.slug === slug); m.style.removeProperty('--p'); });
+      var now = nav.querySelector('.qnow'); if(now) now.textContent = slug && P[slug] ? P[slug].title : '';
+    }
     // pictures of equal weight get equal area (a tall drawing and a wide photo then read alike); edges line up on a
     // few shared lines so the looseness still looks placed
     function layoutSet(){
@@ -541,7 +541,12 @@
     }
     if(IT){
       document.body.classList.add('nav-' + NAV);
-      if(GRID && MENU !== 'lines') document.body.classList.add('menu', 'menu-' + MENU);
+      if(GRID && MENU !== 'lines'){
+        document.body.classList.add('menu', 'menu-' + MENU);
+        if(MENU !== 'num') document.body.classList.add('menu-h');
+        if(MENU === 'num' || MENU === 'hnum') marks.forEach(function(m, i){ var n = el('em', 'qk-n', null, (i < 9 ? '0' : '') + (i + 1)); m.insertBefore(n, m.firstChild); });
+        if(MENU === 'hnum' || MENU === 'squares') nav.insertBefore(el('span', 'qnow', null), nav.querySelector('.qk.qa'));
+      }
       var GROUPS = ['All'].concat(SLUGS.map(function(s){ return P[s].group; }).filter(function(g, i, a){ return g && a.indexOf(g) === i; }));
       var cats = el('nav', 'qcat qcat-bar', document.querySelector('.bar'));
       function pickGroup(g){

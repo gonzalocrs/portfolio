@@ -315,11 +315,12 @@
     // stops the page goes back to the slow opening for the next step
     var flipping = false, flipT = 0;
     function step(d){
-      var now = Date.now(); if(now - lastStep < 340) return;
+      var now = Date.now(); if(now - lastStep < 340) return false;
       flipping = now - lastStep < 900; lastStep = now;
       document.body.classList.toggle('qo-flip', flipping);
       clearTimeout(flipT); flipT = setTimeout(function(){ flipping = false; document.body.classList.remove('qo-flip'); }, 900);
       show(at + d, d);
+      return true;
     }
     var withPics = SLUGS.filter(coverOf);
     // each visit opens on a different project (his call, 2026-10-26: "i always see sierra"): picked at random, never the
@@ -352,9 +353,11 @@
         e.preventDefault(); if(i !== at){ lastStep = Date.now(); show(i, i > at ? 1 : -1); }
       });
     });
-    // a new push of the wheel steps at once; while the scroll goes on (a trackpad's glide included) every further stretch
-    // of it steps again, so a long scroll keeps passing pictures and a short one moves just one
-    var lastD = 0, run = 0, STRETCH = 440;
+    // a new push of the wheel moves one picture as soon as it really moves; while the fingers keep scrolling, every further
+    // stretch moves one more, so a long scroll keeps passing pictures. The glide a trackpad adds after the fingers lift
+    // (deltas sinking well under the push's strongest) never counts: it used to carry a single swipe two or three projects on (his note,
+    // 2026-10-29: "scrolling makes me skip some projects")
+    var lastD = 0, run = 0, push = 0, peak = 0, moved = false, STRETCH = 440;
     addEventListener('wheel', function(e){
       if(PAGE !== 'home') return;
       e.preventDefault();
@@ -363,10 +366,13 @@
       lastWheel = now;
       var fresh = gap > 220 || (d > 0) !== (lastD > 0);
       lastD = d;
-      if(Math.abs(d) < 2) return;
-      if(fresh){ run = 0; if(Math.abs(d) >= 6) step(d > 0 ? 1 : -1); return; }
+      if(fresh){ run = 0; push = 0; peak = 0; moved = false; }
+      // the glide: once the deltas have sunk well under the strongest of this push, the fingers have let go
+      var gliding = Math.abs(d) < peak * .8; peak = Math.max(peak, Math.abs(d));
+      if(!moved){ push += Math.abs(d); if(push >= 10) moved = step(d > 0 ? 1 : -1); return; }
+      if(gliding) return;
       run += Math.max(-60, Math.min(60, d));
-      if(Math.abs(run) >= STRETCH){ run = 0; step(d > 0 ? 1 : -1); }
+      if(Math.abs(run) >= STRETCH && step(d > 0 ? 1 : -1)) run = 0;
     }, {passive: false});
     addEventListener('keydown', function(e){
       if(PAGE !== 'home') return;

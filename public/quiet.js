@@ -522,7 +522,9 @@
       if(isOpen() && D === 'float'){ toggle(false); return; }
       if(!e.target.closest('img, .plate')) return;
       e.stopPropagation();
-      var r = st.getBoundingClientRect(); go(at + (e.clientX < r.left + r.width * .35 ? -1 : 1));
+      // clicking on past the last picture comes round to the first, and back past the first to the last (his ask,
+      // 2026-10-29); scrolling still stops at the ends
+      var r = st.getBoundingClientRect(); go((at + (e.clientX < r.left + r.width * .35 ? -1 : 1) + n) % n);
     });
     document.addEventListener('click', function(e){
       if(e.defaultPrevented || e.button || e.target.closest('a, button, img, .plate, input, textarea, select, label, .qp-card')) return;

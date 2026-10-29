@@ -404,3 +404,21 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
   .tk-dot .qk:not(.qa) i,.tk-dot .qk:not(.qa):hover i{width:4px;height:4px}
   .tk-dot .qk.cur:not(.qa) i{width:2px;height:2.2rem}
 }
+
+/* trial ?words=label|lede|mono: how the project words behind the "+" are set (his words unchanged) */
+.wd-label .qp-card .cr p{display:grid;grid-template-columns:5.6rem 1fr;align-items:baseline;margin:0 0 .3rem;font-size:.84rem;font-weight:300}
+.wd-label .qp-card .cr b{font-family:var(--mono);font-weight:400;font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mute)}
+.wd-label .qp-card .tx{margin-top:1.5rem;padding-top:1.4rem;border-top:1px solid var(--rule)}
+.wd-label .qp-card .tx p{font-size:.84rem;line-height:1.62;font-weight:300;margin-bottom:1rem}
+.wd-label .qp-card .tx p.lede{font-size:1.02rem;line-height:1.45;font-weight:400}
+.wd-lede .qp-card .cr p{display:inline;margin:0;font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);font-weight:400}
+.wd-lede .qp-card .cr b{display:none}
+.wd-lede .qp-card .cr p + p::before{content:"/";margin:0 .15em 0 .55em;color:var(--faint)}
+.wd-lede .qp-card .meta .k{margin-bottom:.5rem}
+.wd-lede .qp-card .tx{margin-top:2rem}
+.wd-lede .qp-card .tx p{font-size:.8rem;line-height:1.7;font-weight:300}
+.wd-lede .qp-card .tx p:first-child{font-size:1.1rem;line-height:1.38;font-weight:300;letter-spacing:-.012em;margin-bottom:1.6rem}
+.wd-mono .qp-card .cr p{font-family:var(--mono);font-size:.7rem;font-weight:400;margin:0 0 .25rem}
+.wd-mono .qp-card .cr b{font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-right:.3em}
+.wd-mono .qp-card .tx p{font-family:var(--mono);font-size:.74rem;line-height:1.75;font-weight:400;letter-spacing:-.01em}
+.wd-mono .qp-card .tx p.lede{font-weight:500}

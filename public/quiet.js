@@ -101,6 +101,14 @@
   var NAV = Q.get('nav');
   try{ if(NAV) sessionStorage.setItem('gc-nav', NAV); else NAV = sessionStorage.getItem('gc-nav'); }catch(e){}
   if(['list', 'ticks', 'bar'].indexOf(NAV) < 0) NAV = 'groups';
+  // with the grid, the index on the left (his note 2026-10-29: the grid "doesn't go with the thin lines"), &menu=:
+  // names (default: the project names as a plain list, grey, the current one in ink, the category words over each
+  // group in small mono capitals), pills (each name on a grey rounded button like the panel's, the current one dark),
+  // thumbs (a small rounded tile per project with its picture, grey for those still without, its name beside it),
+  // lines (the marks as before)
+  var MENU = Q.get('menu');
+  try{ if(MENU) sessionStorage.setItem('gc-menu', MENU); else MENU = sessionStorage.getItem('gc-menu'); }catch(e){}
+  if(['pills', 'thumbs', 'lines'].indexOf(MENU) < 0) MENU = 'names';
   function panelMode(){ return 'one'; }
   function enter(img, href){ location.href = href; }
   function into(img, slug, k){
@@ -351,6 +359,10 @@
             pw: pick([78, 86, 94]), off: pick([0, .06, .12]), y: sd === 'm' ? .45 : pick([.15, .35, .55, .8])});
         });
       });
+      if(GRID && MENU === 'thumbs') marks.forEach(function(m){
+        var th = el('b', 'qk-th', null), got = allGot[m.slug]; m.insertBefore(th, m.firstChild);
+        if(got && got.length){ var o = homePicks(got, m.slug)[0], im = el('img', o.it.drawing ? 'dr' : '', th); im.alt = ''; im.src = o.it.drawing ? o.it.src : thumb(o.it.src); if(!o.it.drawing) im.addEventListener('error', function(){ im.src = o.it.src; }, {once: true}); }
+      });
       if(GRID) gridView('All'); else show(start, 1);
       if(IT && window.gcPanel && P[Q.get('p')]) gcPanel.open(Q.get('p'), 0, panelMode(), false);
     });
@@ -529,6 +541,7 @@
     }
     if(IT){
       document.body.classList.add('nav-' + NAV);
+      if(GRID && MENU !== 'lines') document.body.classList.add('menu', 'menu-' + MENU);
       var GROUPS = ['All'].concat(SLUGS.map(function(s){ return P[s].group; }).filter(function(g, i, a){ return g && a.indexOf(g) === i; }));
       var cats = el('nav', 'qcat qcat-bar', document.querySelector('.bar'));
       function pickGroup(g){

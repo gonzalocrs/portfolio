@@ -419,3 +419,46 @@ main.q-away{opacity:0;transition:none}
   .qct::before{width:.6rem}
   .qct.on::before{width:1.2rem}
 }
+
+/* &menu= with the grid (2026-10-29): the index as names, pills or small tiles instead of the thin lines; it starts at
+   the grid's top edge */
+.menu .qt-ticks{justify-content:flex-start;overflow-y:auto;scrollbar-width:none;padding-bottom:2rem}
+.menu .qt-ticks::-webkit-scrollbar{display:none}
+.menu .qk{height:auto}
+.menu .qk > i{display:none}
+.menu .qk span,.menu .qt-ticks:hover .qk.cur:not(:hover) span{opacity:1;transform:none;pointer-events:auto}
+.menu .qk.gs{margin-top:0}
+.menu .qcg{height:auto;font-family:var(--mono);font-size:.62rem;font-weight:400;letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+.menu .qcg:hover,.menu .qcg.on{color:var(--ink)}
+.menu .qcg:not(.qcg-all){margin-top:1.6rem}
+.menu .qcg-all{margin-bottom:0}
+.menu .qcg + .qk{margin-top:.55rem}
+.menu .qk.qa{margin-top:2rem}
+.menu .qk.qa > i{display:block}
+/* names */
+.menu-names .qk{padding:.2rem 0}
+.menu-names .qk span{font-weight:400;font-size:.98rem;letter-spacing:-.01em;color:var(--faint);transition:color .2s}
+.menu-names .qk:hover span,.menu-names .qk.cur span{color:var(--ink)}
+/* pills */
+.menu-pills .qk{margin-bottom:6px}
+.menu-pills .qk span{display:inline-flex;align-items:center;height:2.1rem;padding:0 .95rem;border-radius:8px;background:#ececec;font-family:var(--mono);font-size:.64rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);transition:background .2s,color .2s}
+.menu-pills .qk:hover span{background:#e2e2e2}
+.menu-pills .qk.cur span{background:#9b9b9b;color:#fff}
+.menu-pills .qk.qa span{background:none;padding:0;height:auto;color:var(--mute)}
+/* thumbs */
+.menu-thumbs .qk{gap:.8rem;margin-bottom:8px}
+.qk-th{flex:none;display:flex;align-items:center;justify-content:center;width:3.4rem;height:2.4rem;border-radius:6px;background:#f2f2f2;overflow:hidden;opacity:.55;transition:opacity .25s}
+.qk-th img{max-width:100%;max-height:100%}
+.qk-th img.dr{max-width:84%;max-height:84%;mix-blend-mode:multiply}
+.menu-thumbs .qk span{font-weight:400;font-size:.9rem;color:var(--faint);transition:color .2s}
+.menu-thumbs .qk:hover .qk-th,.menu-thumbs .qk.cur .qk-th{opacity:1}
+.menu-thumbs .qk:hover span,.menu-thumbs .qk.cur span{color:var(--ink)}
+@media (max-width:700px){
+  .menu .qt-ticks{flex-direction:row;flex-wrap:nowrap;align-items:center;overflow-x:auto;overflow-y:hidden;padding:0 0 1.2rem;gap:0 .3rem}
+  .menu .qk{flex-direction:row;padding:0 .5rem 0 0;margin:0}
+  .menu .qk span{position:static}
+  .menu .qk.gs,.menu .qk.qa{margin:0 0 0 .6rem}
+  .menu .qcg + .qk{margin-top:0}
+  .menu .qk.qa span{display:inline}
+  .menu-thumbs .qk span{display:none}
+}

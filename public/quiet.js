@@ -85,6 +85,11 @@
   // tilt (his pick, "reminds me of a record player": the current tick lies flat and runs out, the ones above it lean
   // up, the ones below lean down), fan (the same, the lean growing with the distance from the current one, like a fan
   // of lines), dot (a dot per project; the current one stretches into the line)
+  // trial ?fade=on (2026-10-29, his ask: "make the bottom or top edge of the images fade with the background according
+  // to their position"): on the home, kept for the visit, ?fade=off ends it
+  var FADE = Q.get('fade');
+  try{ if(FADE === 'off') sessionStorage.removeItem('gc-fade'); else if(FADE) sessionStorage.setItem('gc-fade', FADE); FADE = sessionStorage.getItem('gc-fade') || FADE; }catch(e){}
+  if(FADE && FADE !== 'off') document.body.classList.add('fd');
   var TICK = Q.get('tick');
   try{ if(TICK === 'off') sessionStorage.removeItem('gc-tick'); else if(TICK) sessionStorage.setItem('gc-tick', TICK); TICK = sessionStorage.getItem('gc-tick'); }catch(e){}
   TICK = TICK && TICK !== 'off' ? TICK : 'tilt';
@@ -294,6 +299,10 @@
       var w = Math.min(W * (phone ? o.pw : o.w) / 100, H * (phone ? .8 : .72) * o.r), h = w / o.r;
       var room = Math.max(0, W - w), x = o.side === 'l' ? room * o.off : o.side === 'r' ? room * (1 - o.off) : room / 2 + (o.off - .1) * room * .4;
       f.style.width = w + 'px'; f.style.left = Math.max(0, Math.min(room, x)) + 'px'; f.style.top = (Math.max(0, H - h) * o.y) + 'px';
+      // trial ?fade=on: the edge nearer the top or bottom of the screen dissolves into the page, more the nearer it is
+      var c = (Math.max(0, H - h) * o.y + h / 2) / H - .5;
+      f.classList.toggle('fade-top', c < 0); f.classList.toggle('fade-bottom', c >= 0);
+      f.style.setProperty('--fade', Math.min(50, 18 + Math.abs(c) * 2 * 45).toFixed(1) + '%');
     }
     function show(i, d){
       if(!seq.length) return;
@@ -315,7 +324,7 @@
     // stops the page goes back to the slow opening for the next step
     var flipping = false, flipT = 0;
     function step(d){
-      var now = Date.now(); if(now - lastStep < 450) return;
+      var now = Date.now(); if(now - lastStep < 340) return;
       flipping = now - lastStep < 900; lastStep = now;
       document.body.classList.toggle('qo-flip', flipping);
       clearTimeout(flipT); flipT = setTimeout(function(){ flipping = false; document.body.classList.remove('qo-flip'); }, 900);
@@ -350,7 +359,7 @@
     });
     // a new push of the wheel steps at once; while the scroll goes on (a trackpad's glide included) every further stretch
     // of it steps again, so a long scroll keeps passing pictures and a short one moves just one
-    var lastD = 0, run = 0, STRETCH = 650;
+    var lastD = 0, run = 0, STRETCH = 440;
     addEventListener('wheel', function(e){
       if(PAGE !== 'home') return;
       e.preventDefault();

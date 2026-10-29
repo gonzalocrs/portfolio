@@ -64,71 +64,6 @@
   // the home and glides to its place in the project while the home fades away and the project fades in around it; the
   // address changes to the project's, and Back returns to the home. (The older homes, ?home=stage|flow, still just go.)
   var PAGE = document.body.getAttribute('data-page');
-  // trial ?it=on (2026-10-28, his picks from three versions: today's home, plus the categories small at the right of
-  // the bar, and a project opening as a panel showing one picture at a time with small marks, both from the MAD round).
-  // Picking Built / Unbuilt / Research shows several of its pictures at once, loosely composed (row dropped, his call);
-  // three ways (&lo=): anchor (default: one large picture, smaller ones beside it on its top and bottom lines),
-  // step (four of equal weight stepping down across the space), salon (six of equal weight hung above and below one
-  // line, as in a gallery). All keeps one picture at a time.
-  // Kept for the visit (sessionStorage gc-it, gc-lo); ?it=off goes back to today's site.
-  var IT = Q.get('it'), LO = Q.get('lo');
-  try{
-    if(IT === 'off'){ sessionStorage.removeItem('gc-it'); sessionStorage.removeItem('gc-lo'); IT = null; }
-    else if(IT) sessionStorage.setItem('gc-it', IT); else IT = sessionStorage.getItem('gc-it');
-    if(LO) sessionStorage.setItem('gc-lo', LO); else LO = sessionStorage.getItem('gc-lo');
-  }catch(e){}
-  if(IT === 'off') IT = null;
-  if(['step', 'salon'].indexOf(LO) < 0) LO = 'anchor';
-  // anchor, refined (his note: "the best one but it's not there yet"): one large picture and two smaller, the group
-  // sized as a whole and centred. &an=: block (default: the two make one column as tall as the large one, or a row
-  // under it as wide), pair (one on its top line, one on its bottom line, further out), floor (both standing on its
-  // bottom line, stepping down in size), cols (the first try, four smaller in two columns)
-  var AN = Q.get('an');
-  try{ if(AN) sessionStorage.setItem('gc-an', AN); else AN = sessionStorage.getItem('gc-an'); }catch(e){}
-  if(['pair', 'floor', 'cols'].indexOf(AN) < 0) AN = 'block';
-  // &grid=on (test, 2026-10-28, his ask: bring back the MAD-round grid "to home page and also when selecting each
-  // project"): the stage becomes a scrolling grid of rounded tiles at the pictures' own proportions (grey tiles with
-  // the name for projects still without pictures). All: one or two per project; a category: all its pictures; a
-  // project's mark: all of that project's pictures. A tile opens the panel. &grid=off ends it.
-  var GRID = Q.get('grid');
-  try{ if(GRID === 'off'){ sessionStorage.removeItem('gc-grid'); GRID = null; } else if(GRID) sessionStorage.setItem('gc-grid', GRID); else GRID = sessionStorage.getItem('gc-grid'); }catch(e){}
-  GRID = !!(IT && GRID && GRID !== 'off');
-  // where the categories stand (his note 2026-10-29: "a disconnect between the minimalistic lines to the left and the
-  // titles to the top"), &nav=: groups (default: each category word heads its own group of marks in the column, All
-  // above them), list (the four words stacked over the marks, same left edge), ticks (still at the top right, but each
-  // word drawn with a short line like a mark, the chosen one long and dark as the current mark), bar (as yesterday).
-  // On a phone the words stay in a row under the name.
-  var NAV = Q.get('nav');
-  try{ if(NAV) sessionStorage.setItem('gc-nav', NAV); else NAV = sessionStorage.getItem('gc-nav'); }catch(e){}
-  if(['list', 'ticks', 'bar'].indexOf(NAV) < 0) NAV = 'groups';
-  // with the grid, the index (his notes 2026-10-29: the grid "doesn't go with the thin lines"; names, pills and small
-  // tiles were too much: "keep it minimalistic... a horizontal bar... even only numbers"), &menu=:
-  // num (a column of small numbers, 01 to 10, the current one's name beside it), hnum (the numbers in one
-  // line over the grid, the category words between their groups, the current name at the end), hnames (the names in
-  // one quiet line under the grid), squares (one small square per project in a line over the grid, filled for the
-  // current one, its name beside; the default, his pick), lines (the marks as before)
-  var MENU = Q.get('menu');
-  try{ if(MENU) sessionStorage.setItem('gc-menu', MENU); else MENU = sessionStorage.getItem('gc-menu'); }catch(e){}
-  // round 2 of the line over the grid (his note 2026-10-29 on squares: "too stiff, not elegant not modern"): no mono
-  // capitals, no grid of boxes, things that move softly. morph (default: one small dot per project; the current one
-  // stretches into a short bar, its name sliding in beside; the category words in light sentence case), type (no
-  // shapes: the category words with one hairline gliding under the chosen one, the projects as light numbers),
-  // float (the dots of morph in a small frosted bar floating at the foot of the screen, over the grid)
-  if(['num', 'hnum', 'hnames', 'lines', 'squares', 'type', 'float'].indexOf(MENU) < 0) MENU = 'morph';
-  // corners (his note 2026-10-29: "the best yet but... too similar to MAD... without the round edges"), &edge=:
-  // round (default again, his call: "neither... keep the original"), sharp (every corner square: tiles, squares, panel, buttons), line (square too, and no grey fills: the
-  // empty tiles, the buttons and the Gallery sheet drawn with hairlines, the dimmed page white instead of grey),
-  // round
-  // &theme=dark (his ask 2026-10-29: "keep the original and do a dark version, don't invert the colors on the
-  // drawings"): near-black ground, light words; photos as they are, and every drawing on its own white, like a
-  // sheet laid on a dark table. Kept for the visit (sessionStorage gc-dark); &theme=light ends it.
-  var DARK = Q.get('theme');
-  try{ if(DARK === 'light') sessionStorage.removeItem('gc-dark'); else if(DARK === 'dark') sessionStorage.setItem('gc-dark', '1'); DARK = sessionStorage.getItem('gc-dark') === '1'; }catch(e){ DARK = DARK === 'dark'; }
-  if(DARK && IT) document.documentElement.classList.add('theme-dark');
-  var EDGE = Q.get('edge');
-  try{ if(EDGE) sessionStorage.setItem('gc-edge', EDGE); else EDGE = sessionStorage.getItem('gc-edge'); }catch(e){}
-  if(['line', 'sharp'].indexOf(EDGE) < 0) EDGE = 'round';
-  function panelMode(){ return 'one'; }
   function enter(img, href){ location.href = href; }
   function into(img, slug, k){
     if(PAGE !== 'home') return;
@@ -160,10 +95,7 @@
     if(!target || (target.complete && target.naturalWidth)) requestAnimationFrame(go);
     else { target.addEventListener('load', go); target.addEventListener('error', go); }
   }
-  addEventListener('popstate', function(){
-    if(IT && window.gcPanel && PAGE === 'home'){ var s = new URLSearchParams(location.search).get('p'); if(P[s]) gcPanel.open(s, 0, panelMode(), false); else gcPanel.close(false); return; }
-    location.reload();
-  });
+  addEventListener('popstate', function(){ location.reload(); });
   function ratioOf(img){ return img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1.5; }
   function loadAll(list){
     return Promise.all(list.map(function(it){
@@ -351,7 +283,7 @@
       if(old){ old.classList.remove('in'); old.classList.add('out', d < 0 ? 'down' : 'up'); setTimeout(function(){ old.remove(); }, 1100); }
       var f = el('figure', 'qo-fig' + (d < 0 ? ' from-up' : ''), st); f.o = o;
       var im = el('img', '', f); im.alt = o.it.caption || P[o.slug].title; im.src = o.it.src;
-      f.addEventListener('click', function(){ if(IT && window.gcPanel) gcPanel.open(o.slug, o.k0, panelMode(), true); else into(im, o.slug, o.k0); });
+      f.addEventListener('click', function(){ into(im, o.slug, o.k0); });
       place(f, o);
       setTimeout(function(){ f.classList.add('in'); }, old ? 420 : 60);
       curEl = f; at = i;
@@ -369,7 +301,6 @@
     Promise.all(withPics.map(function(s){ return loadAll(pictures(s)); })).then(function(all){
       var start = 0;
       all.forEach(function(got, j){
-        allGot[withPics[j]] = got;
         got = homePicks(got, withPics[j]);
         got.forEach(function(o, k){
           var lead = withPics[j] === first && k === 0, sd = lead ? 'm' : side();
@@ -378,241 +309,10 @@
             pw: pick([78, 86, 94]), off: pick([0, .06, .12]), y: sd === 'm' ? .45 : pick([.15, .35, .55, .8])});
         });
       });
-      if(GRID) gridView('All'); else show(start, 1);
-      if(IT && window.gcPanel && P[Q.get('p')]) gcPanel.open(Q.get('p'), 0, panelMode(), false);
+      show(start, 1);
     });
-    // the categories (trial ?it=): All / Built / Unbuilt / Research at the right of the bar. A category keeps only its
-    // projects' marks and shows a few of its pictures at once (each project's home picks first, then its others, taking
-    // turns between projects); hovering one names its project, a click opens it. All goes back to one at a time.
-    var allGot = {}, set = null, flips = 0;
-    function curMark(slug){
-      marks.forEach(function(m){ m.classList.toggle('cur', m.slug === slug); m.style.removeProperty('--p'); });
-      var now = nav.querySelector('.qnow'), t = slug && P[slug] ? P[slug].title : '';
-      if(now && now.textContent !== t){
-        now.textContent = t;
-        if(now.animate) now.animate([{opacity: 0, transform: 'translateY(5px)', filter: 'blur(2px)'}, {opacity: 1, transform: 'none', filter: 'none'}], {duration: 520, easing: 'cubic-bezier(.2,.7,.2,1)'});
-      }
-    }
-    // pictures of equal weight get equal area (a tall drawing and a wide photo then read alike); edges line up on a
-    // few shared lines so the looseness still looks placed
-    function layoutSet(){
-      if(!set) return;
-      var W = st.clientWidth, H = st.clientHeight, phone = innerWidth <= 700, figs = set.children, n = figs.length, gap = Math.max(16, W * .03);
-      var items = Array.prototype.map.call(figs, function(f){ return f.o; }), box = [];
-      function dims(o, A){ return {w: Math.sqrt(A * o.r), h: Math.sqrt(A / o.r)}; }
-      if(phone){
-        // the first one across the width, the others two by two under it at equal area, all fitted to the height
-        var fit = function(k){
-          var y = 0, w0 = W * k, out = [{x: (W - w0) / 2, y: 0, w: w0, h: w0 / items[0].r}]; y = out[0].h + gap * 1.4;
-          for(var i = 1; i < n; i += 2){
-            var pr = items.slice(i, i + 2), A = Math.pow((W * k * .82 - gap) / (pr.reduce(function(a, o){ return a + Math.sqrt(o.r); }, 0) * (pr.length === 1 ? 2 : 1)), 2);
-            var ds = pr.map(function(o){ return dims(o, A); }), mh = Math.max.apply(null, ds.map(function(d){ return d.h; }));
-            var x = (W - (ds.reduce(function(a, d){ return a + d.w; }, 0) + gap * (ds.length - 1))) / 2;
-            ds.forEach(function(d, j){ out.push({x: x, y: y + (j % 2 ? mh - d.h : 0), w: d.w, h: d.h}); x += d.w + gap; });
-            y += mh + gap * 1.4;
-          }
-          out.tot = y - gap * 1.4; return out;
-        };
-        var k = 1, out = fit(k); while(out.tot > H * .96 && k > .3){ k -= .04; out = fit(k); }
-        var oy = (H - out.tot) / 2; box = out.map(function(b){ return {x: b.x, y: b.y + oy, w: b.w}; });
-      } else if(LO === 'step'){
-        // equal area, stepping from the top left down to the bottom right across the whole width
-        var sr = items.reduce(function(a, o){ return a + Math.sqrt(o.r); }, 0), A = Math.pow((W * .97 - gap * (n - 1)) / sr, 2);
-        var mh = function(A){ return Math.max.apply(null, items.map(function(o){ return dims(o, A).h; })); };
-        while(mh(A) > H * .52) A *= .94;
-        var ds = items.map(function(o){ return dims(o, A); }), x = (W - (ds.reduce(function(a, d){ return a + d.w; }, 0) + gap * (n - 1))) / 2;
-        ds.forEach(function(d, i){
-          var t = n > 1 ? i / (n - 1) : .5, cy = H * .08 + d.h / 2 + t * (H * .84 - d.h);
-          box.push({x: x, y: cy - d.h / 2, w: d.w}); x += d.w + gap;
-        });
-      } else if(LO === 'salon'){
-        // equal area, two rows hung on one line: the upper row stands on it, the lower one hangs from it
-        var rows = [items.slice(0, Math.ceil(n / 2)), items.slice(Math.ceil(n / 2))].filter(function(r){ return r.length; });
-        var A = Math.pow((W * .8 - gap * 2) / Math.max.apply(null, rows.map(function(r){ return r.reduce(function(a, o){ return a + Math.sqrt(o.r); }, 0); })), 2);
-        var hOf = function(A){ return rows.reduce(function(a, r){ return a + Math.max.apply(null, r.map(function(o){ return dims(o, A).h; })); }, 0) + gap; };
-        while(hOf(A) > H * .9) A *= .94;
-        var top = Math.max.apply(null, rows[0].map(function(o){ return dims(o, A).h; })), axis = (H - hOf(A)) / 2 + top + gap / 2;
-        rows.forEach(function(r, ri){
-          var ds = r.map(function(o){ return dims(o, A); }), x = (W - (ds.reduce(function(a, d){ return a + d.w; }, 0) + gap * (r.length - 1))) / 2 + (ri ? gap * 1.5 : -gap * 1.5);
-          ds.forEach(function(d){ box.push({x: x, y: ri ? axis + gap / 2 : axis - gap / 2 - d.h, w: d.w}); x += d.w + gap; });
-        });
-      } else if(AN !== 'cols'){
-        // the group is sized as a whole to fill most of the space, then stands in its middle
-        var L = items[0], rest = items.slice(1), rL = L.r, maxW = W * .92, maxH = H * .86;
-        if(!rest.length){ var lh = Math.min(maxH, maxW / rL); box.push({x: 0, y: (H - lh) / 2, w: lh * rL}); }
-        else if(AN === 'block'){
-          // block: two smaller ones make one column exactly as tall as the large one (one top line, one bottom line,
-          // one gap); with a wide large one they make a row under it, exactly as wide
-          var a1 = rest[0], a2 = rest[1];
-          if(!a2){ var lh = Math.min(maxH, (maxW - gap) / (rL + a1.r * .6)); box.push({x: 0, y: (H - lh) / 2, w: lh * rL}); var h1 = lh * .6; box.push({x: lh * rL + gap, y: (H - lh) / 2 + lh - h1, w: h1 * a1.r}); }
-          else {
-            var S = 1 / a1.r + 1 / a2.r, R = a1.r + a2.r;
-            var lhC = Math.min(maxH, (maxW - gap + gap / S) / (rL + 1 / S)), wc = (lhC - gap) / S;
-            var lhR = Math.min((maxH - gap + gap / R) / (1 + rL / R), maxW / rL), hr = (lhR * rL - gap) / R;
-            if(wc * wc * S >= hr * hr * R){
-              var y0 = (H - lhC) / 2; box.push({x: 0, y: y0, w: lhC * rL});
-              box.push({x: lhC * rL + gap, y: y0, w: wc}); box.push({x: lhC * rL + gap, y: y0 + wc / a1.r + gap, w: wc});
-            } else {
-              var lw = lhR * rL, y0 = (H - (lhR + gap + hr)) / 2; box.push({x: 0, y: y0, w: lw});
-              box.push({x: 0, y: y0 + lhR + gap, w: hr * a1.r}); box.push({x: hr * a1.r + gap, y: y0 + lhR + gap, w: hr * a2.r});
-            }
-          }
-        } else if(AN === 'pair'){
-          // pair: one smaller one on the large one's top line, the other on its bottom line and further out
-          var f = .46, cw = Math.max.apply(null, rest.map(function(o){ return o.r * f; }));
-          var lh = Math.min(maxH, (maxW - gap * 2.4) / (rL + cw * 1.35)), lw = lh * rL, y0 = (H - lh) / 2, x0 = lw + gap * 2.4;
-          box.push({x: 0, y: y0, w: lw});
-          rest.forEach(function(o, i){ var h = lh * f, w = h * o.r; box.push(i ? {x: x0 + cw * lh * 1.35 - w, y: y0 + lh - h, w: w} : {x: x0, y: y0, w: w}); });
-        } else {
-          // floor: the smaller ones stand beside it on its bottom line, stepping down in size
-          var fs = [.58, .4], sr = rest.reduce(function(a, o, i){ return a + o.r * fs[i]; }, 0);
-          var lh = Math.min(maxH, (maxW - gap * 1.6 * rest.length) / (rL + sr)), lw = lh * rL, y0 = (H - lh) / 2, x = lw + gap * 1.6;
-          box.push({x: 0, y: y0, w: lw});
-          rest.forEach(function(o, i){ var h = lh * fs[i]; box.push({x: x, y: y0 + lh - h, w: h * o.r}); x += h * o.r + gap * 1.6; });
-        }
-        // the whole group stands in the middle of the space, so no hole opens between the large one and the rest
-        var mx = Math.max.apply(null, box.map(function(b){ return b.x + b.w; })), sh = (W - mx) / 2;
-        box.forEach(function(b){ b.x += sh; });
-        if(set.flip) box.forEach(function(b){ b.x = W - b.x - b.w; });
-      } else {
-        // anchor: the first picture large on one side; the others smaller, two columns beside it, the first ones on
-        // its top line, the last ones ending on its bottom line. Sides swap from one category to the next
-        var L = items[0], lw = Math.min(W * .5, H * .76 * L.r), lh = lw / L.r, rest = items.slice(1);
-        var x0 = lw + gap * 2.4, cw = (W - x0 - gap * 1.6) / 2, A = lw * lh * .3;
-        var fitR = function(A){
-          var cols = [[], []]; rest.forEach(function(o, i){ cols[i % 2].push(dims(o, A)); });
-          cols.forEach(function(c){ c.forEach(function(d){ if(d.w > cw){ d.h *= cw / d.w; d.w = cw; } }); });
-          return cols;
-        };
-        var cols = fitR(A), colH = function(c){ return c.reduce(function(a, d){ return a + d.h; }, 0) + gap * 1.6 * Math.max(0, c.length - 1); };
-        while(Math.max(colH(cols[0]), colH(cols[1])) > H * .84 && A > 1000){ A *= .94; cols = fitR(A); }
-        // one band holds them all: the large one in its middle, the first column from its top, the second to its bottom
-        var band = Math.max(lh, colH(cols[0]), colH(cols[1])), bt = (H - band) * .5;
-        box.push({x: 0, y: bt + (band - lh) / 2, w: lw});
-        var placed = [];
-        cols.forEach(function(c, ci){
-          var y = ci ? bt + band - colH(c) : bt, base = x0 + ci * (cw + gap * 1.6);
-          c.forEach(function(d){ placed.push({ci: ci, b: {x: ci ? base + cw - d.w : base, y: y, w: d.w}}); y += d.h + gap * 1.6; });
-        });
-        // back into the pictures' order: column 0 took the 1st, 3rd...; column 1 the 2nd, 4th...
-        var c0 = placed.filter(function(p){ return !p.ci; }), c1 = placed.filter(function(p){ return p.ci; });
-        rest.forEach(function(o, i){ box.push((i % 2 ? c1 : c0).shift().b); });
-        if(set.flip) box.forEach(function(b){ b.x = W - b.x - b.w; });
-      }
-      box.forEach(function(b, i){ var f = figs[i]; f.style.left = b.x + 'px'; f.style.top = b.y + 'px'; f.style.width = b.w + 'px'; });
-    }
-    // the grid (&grid=on): columns of rounded tiles, each picture going to the shortest column
-    var gridNow = null;
-    function gridView(g, one){
-      if(curEl){ curEl.remove(); curEl = null; }
-      var old = st.querySelector('.qg:not(.out)'); if(old){ old.classList.add('out'); setTimeout(function(){ old.remove(); }, 450); }
-      if(g) marks.forEach(function(m){ m.classList.toggle('hid', g !== 'All' && P[m.slug].group !== g); });
-      var tiles = [];
-      (one ? [one] : SLUGS.filter(function(s){ return g === 'All' || P[s].group === g; })).forEach(function(s){
-        var got = allGot[s] || [];
-        if(!got.length){ tiles.push({slug: s, none: true, r: 1.5}); return; }
-        var list = (!one && g === 'All') ? homePicks(got, s) : got.map(function(o, k){ return {it: o.it, r: o.r, k0: k}; });
-        list.forEach(function(o){ tiles.push({slug: s, k0: o.k0, it: o.it, r: o.r}); });
-      });
-      var box = el('div', 'qg', st); gridNow = {box: box, tiles: tiles};
-      tiles.forEach(function(o, i){
-        var t = el('a', 'qg-t' + (o.none ? ' none' : o.it.drawing ? ' dr' : ''), null); t.href = quietHref(o.slug); t.o = o;
-        t.style.aspectRatio = o.r.toFixed(4);
-        if(o.none) el('span', '', t, P[o.slug].title);
-        else {
-          var im = el('img', '', t); im.alt = o.it.caption || P[o.slug].title; im.decoding = 'async';
-          if(!o.it.drawing){ im.addEventListener('error', function(){ if(im.src.indexOf(o.it.src) < 0) im.src = o.it.src; }, {once: true}); im.src = thumb(o.it.src); }
-          else im.src = o.it.src;
-        }
-        t.addEventListener('click', function(e){ e.preventDefault(); if(window.gcPanel) gcPanel.open(o.slug, o.k0 || 0, panelMode(), true); });
-        t.addEventListener('mouseenter', function(){ curMark(o.slug); });
-        o.el = t; setTimeout(function(){ t.classList.add('in'); }, 120 + Math.min(i, 12) * 70);
-      });
-      layGrid(); curMark(one || (tiles[0] && tiles[0].slug));
-    }
-    function layGrid(){
-      if(!gridNow) return;
-      var box = gridNow.box, W = box.clientWidth || st.clientWidth, n = W >= 860 ? 3 : W >= 480 ? 2 : 1, cs = [], hs = [];
-      Array.prototype.slice.call(box.querySelectorAll('.qg-col')).forEach(function(c){ c.remove(); });
-      for(var i = 0; i < n; i++){ cs.push(el('div', 'qg-col', box)); hs.push(0); }
-      gridNow.tiles.forEach(function(o){ var k = hs.indexOf(Math.min.apply(null, hs)); cs[k].appendChild(o.el); hs[k] += 1 / o.r + .05; });
-    }
-    if(GRID) addEventListener('resize', layGrid);
-    function catView(g){
-      marks.forEach(function(m){ m.classList.toggle('hid', g !== 'All' && P[m.slug].group !== g); });
-      if(set){ var s0 = set; s0.classList.add('out'); setTimeout(function(){ s0.remove(); }, 800); set = null; }
-      if(g === 'All'){ lastStep = Date.now(); show(at < 0 ? 0 : at, 1); return; }
-      if(curEl){ var old = curEl; old.classList.remove('in'); old.classList.add('out', 'up'); setTimeout(function(){ old.remove(); }, 1100); curEl = null; }
-      var lists = withPics.filter(function(s){ return P[s].group === g && allGot[s]; }).map(function(s){
-        var got = allGot[s], ks = homePicks(got, s).map(function(o){ return o.k0; });
-        got.forEach(function(o, k){ if(ks.indexOf(k) < 0) ks.push(k); });
-        return ks.map(function(k){ return {slug: s, k0: k, it: got[k].it, r: got[k].r}; });
-      });
-      var picks = [], cap = LO === 'salon' ? 6 : LO === 'step' ? 4 : AN === 'cols' ? 5 : 3;
-      while(picks.length < cap && lists.some(function(l){ return l.length; })) lists.forEach(function(l){ if(l.length && picks.length < cap) picks.push(l.shift()); });
-      if(!picks.length) return;
-      set = el('div', 'qc-set qc-' + LO, st); set.flip = ++flips % 2 === 0;
-      picks.forEach(function(o, i){
-        var f = el('figure', 'qc-fig', set); f.o = o;
-        var im = el('img', '', f); im.alt = o.it.caption || P[o.slug].title; im.src = o.it.src;
-        f.addEventListener('click', function(){ if(window.gcPanel) gcPanel.open(o.slug, o.k0, panelMode(), true); });
-        f.addEventListener('mouseenter', function(){ curMark(o.slug); });
-        setTimeout(function(){ f.classList.add('in'); }, 380 + i * 130);
-      });
-      layoutSet(); curMark(picks[0].slug);
-    }
-    if(IT){
-      document.body.classList.add('nav-' + NAV);
-      if(EDGE !== 'round') document.body.classList.add('edge-sharp', 'edge-' + EDGE);
-      if(GRID && MENU !== 'lines'){
-        document.body.classList.add('menu', 'menu-' + MENU);
-        if(MENU !== 'num') document.body.classList.add('menu-h');
-        if(MENU === 'float') document.body.classList.add('menu-morph');
-        if(MENU === 'num' || MENU === 'hnum' || MENU === 'type') marks.forEach(function(m, i){ var n = el('em', 'qk-n', null, (i < 9 ? '0' : '') + (i + 1)); m.insertBefore(n, m.firstChild); });
-        if(['hnum', 'squares', 'morph', 'type', 'float'].indexOf(MENU) > -1) nav.insertBefore(el('span', 'qnow', null), nav.querySelector('.qk.qa'));
-      }
-      var GROUPS = ['All'].concat(SLUGS.map(function(s){ return P[s].group; }).filter(function(g, i, a){ return g && a.indexOf(g) === i; }));
-      var cats = el('nav', 'qcat qcat-bar', document.querySelector('.bar'));
-      function pickGroup(g){
-        var bs = document.querySelectorAll('.qcat button, .qcg');
-        if(Array.prototype.some.call(bs, function(x){ return x.dataset.g === g && x.classList.contains('on'); })) return;
-        bs.forEach(function(x){ x.classList.toggle('on', x.dataset.g === g); });
-        document.querySelectorAll('.qcg').forEach(function(x){ x.classList.toggle('hid', g !== 'All' && x.dataset.g !== 'All' && x.dataset.g !== g); });
-        if(GRID) gridView(g); else catView(g);
-        moveInd();
-      }
-      // type: one hairline glides under the chosen category word
-      var ind = (GRID && MENU === 'type') ? el('b', 'qind', nav) : null;
-      function moveInd(){
-        if(!ind) return;
-        var on = nav.querySelector('.qcg.on');
-        if(!on){ ind.style.opacity = 0; return; }
-        ind.style.opacity = 1; ind.style.left = on.offsetLeft + 'px'; ind.style.width = on.offsetWidth + 'px';
-      }
-      addEventListener('resize', moveInd);
-      function catBtn(g, cls, parent, before){
-        var b = el('button', cls + (g === 'All' ? ' on' : ''), null); b.type = 'button'; b.dataset.g = g;
-        if(cls.indexOf('qcg') > -1){ el('i', '', b); el('span', '', b, g); } else b.textContent = g;
-        parent.insertBefore(b, before || null);
-        b.addEventListener('click', function(){ pickGroup(g); });
-        return b;
-      }
-      GROUPS.forEach(function(g){ catBtn(g, NAV === 'ticks' ? 'qct' : '', cats); });
-      if(NAV === 'groups'){
-        // each word heads its group: put before the first mark of that group; All first
-        catBtn('All', 'qcg qcg-all', nav, nav.firstChild);
-        GROUPS.slice(1).forEach(function(g){ var m = marks.filter(function(m){ return P[m.slug].group === g; })[0]; if(m) catBtn(g, 'qcg', nav, m); });
-        requestAnimationFrame(function(){ requestAnimationFrame(moveInd); });
-      } else if(NAV === 'list'){
-        var lst = el('div', 'qcl', null); nav.insertBefore(lst, nav.firstChild);
-        GROUPS.forEach(function(g){ catBtn(g, 'qcg', lst); });
-      }
-      addEventListener('resize', layoutSet);
-    }
     marks.forEach(function(m){
       m.addEventListener('click', function(e){
-        if(GRID){ e.preventDefault(); document.querySelectorAll('.qcat button, .qcg').forEach(function(x){ x.classList.remove('on'); }); gridView(null, m.slug); if(typeof moveInd === 'function') moveInd(); return; }
-        if(set){ e.preventDefault(); if(window.gcPanel) gcPanel.open(m.slug, 0, panelMode(), true); return; }
         var i = -1; seq.some(function(o, j){ if(o.slug === m.slug){ i = j; return true; } });
         if(i < 0) return;
         e.preventDefault(); if(i !== at){ lastStep = Date.now(); show(i, i > at ? 1 : -1); }
@@ -622,9 +322,8 @@
     // short pause in the wheel since the last one, or a clearly new push
     var lastD = 0;
     addEventListener('wheel', function(e){
-      if(PAGE !== 'home' || document.body.classList.contains('md-open') || GRID) return;
+      if(PAGE !== 'home') return;
       e.preventDefault();
-      if(set) return;
       var d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX, now = Date.now(), gap = now - lastWheel;
       lastWheel = now;
       var fresh = gap > 160 || Math.abs(d) > Math.abs(lastD) * 1.6 + 4;
@@ -633,19 +332,19 @@
       step(d > 0 ? 1 : -1);
     }, {passive: false});
     addEventListener('keydown', function(e){
-      if(PAGE !== 'home' || document.body.classList.contains('md-open') || set || GRID) return;
+      if(PAGE !== 'home') return;
       if(['ArrowDown', 'ArrowRight', 'PageDown', ' '].indexOf(e.key) > -1){ step(1); e.preventDefault(); }
       if(['ArrowUp', 'ArrowLeft', 'PageUp'].indexOf(e.key) > -1){ step(-1); e.preventDefault(); }
       if(e.key === 'Enter' && curEl) curEl.click();
     });
     var sy = null, sx = null;
     st.addEventListener('touchstart', function(e){ sy = e.touches[0].clientY; sx = e.touches[0].clientX; }, {passive: true});
-    st.addEventListener('touchmove', function(e){ if(!GRID) e.preventDefault(); }, {passive: false});
+    st.addEventListener('touchmove', function(e){ e.preventDefault(); }, {passive: false});
     st.addEventListener('touchend', function(e){
       if(sy == null) return;
       var dy = e.changedTouches[0].clientY - sy, dx = e.changedTouches[0].clientX - sx; sy = sx = null;
       var d = Math.abs(dy) > Math.abs(dx) ? dy : dx;
-      if(Math.abs(d) > 35 && !set && !GRID) step(d < 0 ? 1 : -1);
+      if(Math.abs(d) > 35) step(d < 0 ? 1 : -1);
     }, {passive: true});
     addEventListener('resize', function(){ if(PAGE === 'home' && curEl) place(curEl, curEl.o); });
   }
@@ -944,9 +643,6 @@
     var H = (Q.get('home') || '').toLowerCase();
     if(H === 'stage') quietIntro(buildQuiet());
     else if(H === 'flow' || Q.has('flow')) buildRoll();
-    else {
-      if(IT){ document.body.classList.add('it-on'); var ps = document.createElement('script'); ps.src = 'panel.js'; document.body.appendChild(ps); ps.onload = function(){ if(P[Q.get('p')] && !gcPanel.isOpen()) gcPanel.open(Q.get('p'), 0, panelMode(), false); }; }
-      buildRollOne();
-    }
+    else buildRollOne();
   }
 })();

@@ -104,9 +104,9 @@ window.PROJECTS = {
     grid: [
       {src: "img/permanent-impermanence/stair.jpg", caption: "Pavilion"},
       {src: "img/permanent-impermanence/elevations.jpg", drawing: true, caption: "Pavilion elevations"},
+      {src: "img/permanent-impermanence/pavilion.jpg", caption: "Perspective"},
       {src: "img/permanent-impermanence/section.jpg", drawing: true, caption: "Section"},
       {src: "img/permanent-impermanence/flyer.jpg", drawing: true, caption: "Flyer"},
-      {src: "img/permanent-impermanence/pavilion.jpg", caption: "Perspective"},
       {src: "img/permanent-impermanence/theater.jpg", caption: "Theater"},
       {src: "img/permanent-impermanence/hallway.jpg", caption: "Hallway"},
       {src: "img/permanent-impermanence/structure.jpg", drawing: true, caption: "Structure"}

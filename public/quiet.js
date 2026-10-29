@@ -79,13 +79,15 @@
   // the home and glides to its place in the project while the home fades away and the project fades in around it; the
   // address changes to the project's, and Back returns to the home. (The older homes, ?home=stage|flow, still just go.)
   var PAGE = document.body.getAttribute('data-page');
-  // trial ?tick= (2026-10-29, his ask: "a new system for the menu ticks"; kept for the visit, ?tick=off ends it):
+  // ticks (2026-10-29, his ask: "a new system for the menu ticks"): tilt is the default since he said "tick tilt was
+  // good"; ?tick= tries another for the visit, ?tick=flat the straight ticks from before, ?tick=off back to tilt:
   // sign (each project's tick has its own length, like a signature or a barcode; the current one runs out long),
   // tilt (his pick, "reminds me of a record player": the current tick lies flat and runs out, the ones above it lean
   // up, the ones below lean down), fan (the same, the lean growing with the distance from the current one, like a fan
   // of lines), dot (a dot per project; the current one stretches into the line)
   var TICK = Q.get('tick');
   try{ if(TICK === 'off') sessionStorage.removeItem('gc-tick'); else if(TICK) sessionStorage.setItem('gc-tick', TICK); TICK = sessionStorage.getItem('gc-tick'); }catch(e){}
+  TICK = TICK && TICK !== 'off' ? TICK : 'tilt';
   if(['sign', 'tilt', 'fan', 'dot'].indexOf(TICK) > -1) document.body.classList.add('tk-' + TICK, TICK === 'fan' ? 'tk-tilt' : 'tk');
   function enter(img, href){ location.href = href; }
   function into(img, slug, k){

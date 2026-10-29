@@ -517,3 +517,42 @@ html.theme-dark{--paper:#0f0f0f;--ink:#ecebe7;--rule:#3a3a3a;--mute:#8d8d8a;--fa
 .theme-dark .md-m i{background:#3a3a3a}
 .theme-dark .md-m:hover i{background:#8d8d8a}
 .theme-dark .md-m.cur i{background:var(--ink)}
+
+/* the line over the grid, round 2 (2026-10-29): light sentence-case words, soft motion, no boxes */
+.menu-morph .qcg,.menu-type .qcg,.menu-float .qcg{font-family:var(--font);text-transform:none;letter-spacing:-.01em;font-size:.92rem;font-weight:300;color:var(--faint);transition:color .35s ease}
+.menu-morph .qcg:hover,.menu-morph .qcg.on,.menu-type .qcg:hover,.menu-type .qcg.on{color:var(--ink)}
+.menu-morph .qnow,.menu-type .qnow{font-size:.92rem;font-weight:400}
+.menu-morph .qk.qa span,.menu-type .qk.qa span{font-size:.92rem}
+/* morph: dots; the current one stretches into a short bar */
+.menu-morph .qk{padding:0 3px}
+.menu-morph .qk > i,.menu-morph .qk:hover > i,.menu-morph .qk.cur > i{display:block;width:6px;height:6px;border-radius:3px;background:#d4d4d2;transition:width .6s cubic-bezier(.2,.7,.2,1),background .35s ease}
+.menu-morph .qk > i::after{display:none}
+.menu-morph .qk:hover > i{background:#8f8f8f}
+.menu-morph .qk.cur > i{width:24px;background:var(--ink)}
+.menu-morph .qk.qa > i{width:auto;height:auto;background:none;border-radius:0}
+.menu-morph .qcg:not(.qcg-all){margin-left:1.6rem}
+/* type: words and light numbers; a hairline glides under the chosen word */
+.menu-type .qt-ticks{position:relative;padding-bottom:.5rem}
+.menu-type .qk{padding:0 .38rem}
+.menu-type .qk-n{font-family:var(--font);font-size:.92rem;font-weight:300;letter-spacing:0;color:var(--faint);transition:color .35s ease}
+.menu-type .qk:hover .qk-n{color:var(--mute)}
+.menu-type .qk.cur .qk-n{color:var(--ink);font-weight:400}
+.qind{position:absolute;bottom:.15rem;height:1px;background:var(--ink);transition:left .6s cubic-bezier(.2,.7,.2,1),width .6s cubic-bezier(.2,.7,.2,1),opacity .3s}
+/* float: the dots in a small frosted bar at the foot of the screen, over the grid */
+.menu-float .qt-ticks{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:20;width:auto;max-width:calc(100vw - 32px);
+  padding:.7rem 1.3rem;border-radius:999px;background:rgba(255,255,255,.72);-webkit-backdrop-filter:blur(18px) saturate(1.5);backdrop-filter:blur(18px) saturate(1.5);
+  box-shadow:0 0 0 1px rgba(0,0,0,.04),0 10px 34px rgba(0,0,0,.09)}
+.menu-float .qcg{font-size:.86rem}
+.menu-float .qcg:hover,.menu-float .qcg.on{color:var(--ink)}
+.menu-float .qnow{font-size:.86rem;font-weight:400;min-width:9.5rem}
+.menu-float .qk.qa{padding-left:1.2rem}
+.menu-float .qk.qa span{font-size:.86rem}
+.menu-float .qt{grid-template-rows:minmax(0,1fr)}
+.menu-float .qg{padding-bottom:7rem}
+.theme-dark .menu-morph .qk > i,.theme-dark.menu-morph .qk > i{background:#3a3a38}
+.theme-dark .menu-float .qt-ticks{background:rgba(24,24,24,.7);box-shadow:0 0 0 1px rgba(255,255,255,.06),0 10px 34px rgba(0,0,0,.4)}
+@media (max-width:700px){
+  .menu-float .qt-ticks{bottom:14px;padding:.6rem 1rem;overflow-x:auto}
+  .menu-float .qnow{min-width:0}
+  .menu-type .qind{display:none}
+}

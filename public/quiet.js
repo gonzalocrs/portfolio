@@ -109,7 +109,12 @@
   // current one, its name beside; the default, his pick), lines (the marks as before)
   var MENU = Q.get('menu');
   try{ if(MENU) sessionStorage.setItem('gc-menu', MENU); else MENU = sessionStorage.getItem('gc-menu'); }catch(e){}
-  if(['num', 'hnum', 'hnames', 'lines'].indexOf(MENU) < 0) MENU = 'squares';
+  // round 2 of the line over the grid (his note 2026-10-29 on squares: "too stiff, not elegant not modern"): no mono
+  // capitals, no grid of boxes, things that move softly. morph (default: one small dot per project; the current one
+  // stretches into a short bar, its name sliding in beside; the category words in light sentence case), type (no
+  // shapes: the category words with one hairline gliding under the chosen one, the projects as light numbers),
+  // float (the dots of morph in a small frosted bar floating at the foot of the screen, over the grid)
+  if(['num', 'hnum', 'hnames', 'lines', 'squares', 'type', 'float'].indexOf(MENU) < 0) MENU = 'morph';
   // corners (his note 2026-10-29: "the best yet but... too similar to MAD... without the round edges"), &edge=:
   // round (default again, his call: "neither... keep the original"), sharp (every corner square: tiles, squares, panel, buttons), line (square too, and no grey fills: the
   // empty tiles, the buttons and the Gallery sheet drawn with hairlines, the dimmed page white instead of grey),
@@ -382,7 +387,11 @@
     var allGot = {}, set = null, flips = 0;
     function curMark(slug){
       marks.forEach(function(m){ m.classList.toggle('cur', m.slug === slug); m.style.removeProperty('--p'); });
-      var now = nav.querySelector('.qnow'); if(now) now.textContent = slug && P[slug] ? P[slug].title : '';
+      var now = nav.querySelector('.qnow'), t = slug && P[slug] ? P[slug].title : '';
+      if(now && now.textContent !== t){
+        now.textContent = t;
+        if(now.animate) now.animate([{opacity: 0, transform: 'translateY(5px)', filter: 'blur(2px)'}, {opacity: 1, transform: 'none', filter: 'none'}], {duration: 520, easing: 'cubic-bezier(.2,.7,.2,1)'});
+      }
     }
     // pictures of equal weight get equal area (a tall drawing and a wide photo then read alike); edges line up on a
     // few shared lines so the looseness still looks placed
@@ -558,8 +567,9 @@
       if(GRID && MENU !== 'lines'){
         document.body.classList.add('menu', 'menu-' + MENU);
         if(MENU !== 'num') document.body.classList.add('menu-h');
-        if(MENU === 'num' || MENU === 'hnum') marks.forEach(function(m, i){ var n = el('em', 'qk-n', null, (i < 9 ? '0' : '') + (i + 1)); m.insertBefore(n, m.firstChild); });
-        if(MENU === 'hnum' || MENU === 'squares') nav.insertBefore(el('span', 'qnow', null), nav.querySelector('.qk.qa'));
+        if(MENU === 'float') document.body.classList.add('menu-morph');
+        if(MENU === 'num' || MENU === 'hnum' || MENU === 'type') marks.forEach(function(m, i){ var n = el('em', 'qk-n', null, (i < 9 ? '0' : '') + (i + 1)); m.insertBefore(n, m.firstChild); });
+        if(['hnum', 'squares', 'morph', 'type', 'float'].indexOf(MENU) > -1) nav.insertBefore(el('span', 'qnow', null), nav.querySelector('.qk.qa'));
       }
       var GROUPS = ['All'].concat(SLUGS.map(function(s){ return P[s].group; }).filter(function(g, i, a){ return g && a.indexOf(g) === i; }));
       var cats = el('nav', 'qcat qcat-bar', document.querySelector('.bar'));
@@ -569,7 +579,17 @@
         bs.forEach(function(x){ x.classList.toggle('on', x.dataset.g === g); });
         document.querySelectorAll('.qcg').forEach(function(x){ x.classList.toggle('hid', g !== 'All' && x.dataset.g !== 'All' && x.dataset.g !== g); });
         if(GRID) gridView(g); else catView(g);
+        moveInd();
       }
+      // type: one hairline glides under the chosen category word
+      var ind = (GRID && MENU === 'type') ? el('b', 'qind', nav) : null;
+      function moveInd(){
+        if(!ind) return;
+        var on = nav.querySelector('.qcg.on');
+        if(!on){ ind.style.opacity = 0; return; }
+        ind.style.opacity = 1; ind.style.left = on.offsetLeft + 'px'; ind.style.width = on.offsetWidth + 'px';
+      }
+      addEventListener('resize', moveInd);
       function catBtn(g, cls, parent, before){
         var b = el('button', cls + (g === 'All' ? ' on' : ''), null); b.type = 'button'; b.dataset.g = g;
         if(cls.indexOf('qcg') > -1){ el('i', '', b); el('span', '', b, g); } else b.textContent = g;
@@ -582,6 +602,7 @@
         // each word heads its group: put before the first mark of that group; All first
         catBtn('All', 'qcg qcg-all', nav, nav.firstChild);
         GROUPS.slice(1).forEach(function(g){ var m = marks.filter(function(m){ return P[m.slug].group === g; })[0]; if(m) catBtn(g, 'qcg', nav, m); });
+        requestAnimationFrame(function(){ requestAnimationFrame(moveInd); });
       } else if(NAV === 'list'){
         var lst = el('div', 'qcl', null); nav.insertBefore(lst, nav.firstChild);
         GROUPS.forEach(function(g){ catBtn(g, 'qcg', lst); });
@@ -590,7 +611,7 @@
     }
     marks.forEach(function(m){
       m.addEventListener('click', function(e){
-        if(GRID){ e.preventDefault(); document.querySelectorAll('.qcat button, .qcg').forEach(function(x){ x.classList.remove('on'); }); gridView(null, m.slug); return; }
+        if(GRID){ e.preventDefault(); document.querySelectorAll('.qcat button, .qcg').forEach(function(x){ x.classList.remove('on'); }); gridView(null, m.slug); if(typeof moveInd === 'function') moveInd(); return; }
         if(set){ e.preventDefault(); if(window.gcPanel) gcPanel.open(m.slug, 0, panelMode(), true); return; }
         var i = -1; seq.some(function(o, j){ if(o.slug === m.slug){ i = j; return true; } });
         if(i < 0) return;

@@ -321,7 +321,7 @@
     function bite(f, o, c){
       var im = f.querySelector('img');
       if(!im.complete || !im.naturalWidth){ im.addEventListener('load', function(){ bite(f, o, c); }, {once: true}); return; }
-      var ink = inked(im, o), n = (ink.b - ink.t) * .07;
+      var ink = inked(im, o), n = (ink.b - ink.t) * .12;
       f.classList.toggle('fade-top', FADE === 'both' || c < 0); f.classList.toggle('fade-bottom', FADE === 'both' || c >= 0);
       f.style.setProperty('--ct', (ink.t * 100).toFixed(2) + '%'); f.style.setProperty('--cb', ((1 - ink.b) * 100).toFixed(2) + '%');
       f.style.setProperty('--bite', (n * 100).toFixed(2) + '%');

@@ -119,7 +119,7 @@ window.PROJECTS = {
     credits: [["Type", "Structural Form-Finding, Material Research"], ["Practice", "Robert Marino Architects"], ["Year", "2026"], ["Design", "Gonzalo Cáceres Valcárcel"]],
     diagram: {src: "img/anticlastic-roof-structure/hand-drawing.jpg", caption: "Spherical vs. hyperbolic curvature study"},
     hero: "img/anticlastic-roof-structure/hero.jpg",
-    home: ["img/anticlastic-roof-structure/section.png", "img/anticlastic-roof-structure/hero.jpg"],
+    home: ["img/anticlastic-roof-structure/hero.jpg", "img/anticlastic-roof-structure/section.png"],
     heroPosition: "center",
     physicalNote: "Physical Form-Finding · Plywood · 1:12 Scale",
     // all the pictures in one grid after the text (see project.js: grid)

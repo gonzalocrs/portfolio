@@ -20,6 +20,8 @@
     var photos = grid.filter(function(it){ return !isDrawing(it) && !/\/physical\//.test(it.src); });
     if(!grid.length){ drawings = g.drawings || []; physical = g.physical || []; photos = g.photos || []; }
     if(!physical.length && g.physical) physical = g.physical;
+    // inOrder: the grid's own order after the hero, drawings and renders mixed (Joint, his order, 2026-10-29)
+    if(p.inOrder && grid.length){ drawings = grid; physical = []; photos = []; }
     [p.hero ? [{src: p.hero}] : [], p.diagram && p.diagram.src ? [{src: p.diagram.src, caption: p.diagram.caption, drawing: true}] : [], drawings, physical, photos].forEach(function(list){
       list.forEach(function(it){
         var s = it.src && web(it.src);

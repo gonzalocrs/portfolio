@@ -14,6 +14,7 @@
               home shows one picture per project, so only the first one listed counts; without it the home uses the first
     lede      one or two sentences under the title
     text      a short second paragraph
+    inOrder   optional: true keeps the grid's own order after the hero (otherwise drawings, then models, then photos)
     grid      optional: [{src, size, drawing, fill, caption}, ...] shows every picture in one hand-arranged grid after
               the text instead of the galleries. size: small (default) / xl / tower / half / wide / full / big / tall;
               drawing: shown whole instead of cropped; fill: a drawing that may be cropped to fill its tile.
@@ -98,17 +99,17 @@ window.PROJECTS = {
     kicker: "New York, 2025",
     hero: "img/permanent-impermanence/perspective.jpg",
     credits: [["School", "Columbia GSAPP"], ["Year", "2025"], ["Design", "Gonzalo Cáceres Valcárcel"]],
-    // after the hero: the drawings in this order, then the renders
+    // after the hero, in this order (his order, 2026-10-29), drawings and renders mixed
+    inOrder: true,
     grid: [
-      {src: "img/permanent-impermanence/section.jpg", drawing: true, caption: "Section"},
+      {src: "img/permanent-impermanence/stair.jpg", caption: "Pavilion"},
       {src: "img/permanent-impermanence/elevations.jpg", drawing: true, caption: "Pavilion elevations"},
-      {src: "img/permanent-impermanence/structure.jpg", drawing: true, caption: "Structure"},
+      {src: "img/permanent-impermanence/section.jpg", drawing: true, caption: "Section"},
       {src: "img/permanent-impermanence/flyer.jpg", drawing: true, caption: "Flyer"},
       {src: "img/permanent-impermanence/pavilion.jpg", caption: "Perspective"},
-      {src: "img/permanent-impermanence/hallway.jpg", caption: "Hallway"},
       {src: "img/permanent-impermanence/theater.jpg", caption: "Theater"},
-      {src: "img/permanent-impermanence/stair.jpg", caption: "Pavilion"},
-      {src: "img/permanent-impermanence/room.jpg", caption: "Room"}
+      {src: "img/permanent-impermanence/hallway.jpg", caption: "Hallway"},
+      {src: "img/permanent-impermanence/structure.jpg", drawing: true, caption: "Structure"}
     ]
   },
   "intra-urban-forestation": {

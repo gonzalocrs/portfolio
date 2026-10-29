@@ -93,6 +93,14 @@
   var GRID = Q.get('grid');
   try{ if(GRID === 'off'){ sessionStorage.removeItem('gc-grid'); GRID = null; } else if(GRID) sessionStorage.setItem('gc-grid', GRID); else GRID = sessionStorage.getItem('gc-grid'); }catch(e){}
   GRID = !!(IT && GRID && GRID !== 'off');
+  // where the categories stand (his note 2026-10-29: "a disconnect between the minimalistic lines to the left and the
+  // titles to the top"), &nav=: groups (default: each category word heads its own group of marks in the column, All
+  // above them), list (the four words stacked over the marks, same left edge), ticks (still at the top right, but each
+  // word drawn with a short line like a mark, the chosen one long and dark as the current mark), bar (as yesterday).
+  // On a phone the words stay in a row under the name.
+  var NAV = Q.get('nav');
+  try{ if(NAV) sessionStorage.setItem('gc-nav', NAV); else NAV = sessionStorage.getItem('gc-nav'); }catch(e){}
+  if(['list', 'ticks', 'bar'].indexOf(NAV) < 0) NAV = 'groups';
   function panelMode(){ return 'one'; }
   function enter(img, href){ location.href = href; }
   function into(img, slug, k){
@@ -520,20 +528,37 @@
       layoutSet(); curMark(picks[0].slug);
     }
     if(IT){
+      document.body.classList.add('nav-' + NAV);
+      var GROUPS = ['All'].concat(SLUGS.map(function(s){ return P[s].group; }).filter(function(g, i, a){ return g && a.indexOf(g) === i; }));
       var cats = el('nav', 'qcat qcat-bar', document.querySelector('.bar'));
-      ['All'].concat(SLUGS.map(function(s){ return P[s].group; }).filter(function(g, i, a){ return g && a.indexOf(g) === i; })).forEach(function(g){
-        var b = el('button', g === 'All' ? 'on' : '', cats, g); b.type = 'button';
-        b.addEventListener('click', function(){
-          if(b.classList.contains('on')) return;
-          cats.querySelectorAll('button').forEach(function(x){ x.classList.toggle('on', x === b); });
-          if(GRID) gridView(g); else catView(g);
-        });
-      });
+      function pickGroup(g){
+        var bs = document.querySelectorAll('.qcat button, .qcg');
+        if(Array.prototype.some.call(bs, function(x){ return x.dataset.g === g && x.classList.contains('on'); })) return;
+        bs.forEach(function(x){ x.classList.toggle('on', x.dataset.g === g); });
+        document.querySelectorAll('.qcg').forEach(function(x){ x.classList.toggle('hid', g !== 'All' && x.dataset.g !== 'All' && x.dataset.g !== g); });
+        if(GRID) gridView(g); else catView(g);
+      }
+      function catBtn(g, cls, parent, before){
+        var b = el('button', cls + (g === 'All' ? ' on' : ''), null); b.type = 'button'; b.dataset.g = g;
+        if(cls.indexOf('qcg') > -1){ el('i', '', b); el('span', '', b, g); } else b.textContent = g;
+        parent.insertBefore(b, before || null);
+        b.addEventListener('click', function(){ pickGroup(g); });
+        return b;
+      }
+      GROUPS.forEach(function(g){ catBtn(g, NAV === 'ticks' ? 'qct' : '', cats); });
+      if(NAV === 'groups'){
+        // each word heads its group: put before the first mark of that group; All first
+        catBtn('All', 'qcg qcg-all', nav, nav.firstChild);
+        GROUPS.slice(1).forEach(function(g){ var m = marks.filter(function(m){ return P[m.slug].group === g; })[0]; if(m) catBtn(g, 'qcg', nav, m); });
+      } else if(NAV === 'list'){
+        var lst = el('div', 'qcl', null); nav.insertBefore(lst, nav.firstChild);
+        GROUPS.forEach(function(g){ catBtn(g, 'qcg', lst); });
+      }
       addEventListener('resize', layoutSet);
     }
     marks.forEach(function(m){
       m.addEventListener('click', function(e){
-        if(GRID){ e.preventDefault(); document.querySelectorAll('.qcat button').forEach(function(x){ x.classList.remove('on'); }); gridView(null, m.slug); return; }
+        if(GRID){ e.preventDefault(); document.querySelectorAll('.qcat button, .qcg').forEach(function(x){ x.classList.remove('on'); }); gridView(null, m.slug); return; }
         if(set){ e.preventDefault(); if(window.gcPanel) gcPanel.open(m.slug, 0, panelMode(), true); return; }
         var i = -1; seq.some(function(o, j){ if(o.slug === m.slug){ i = j; return true; } });
         if(i < 0) return;

@@ -391,3 +391,31 @@ main.q-away{opacity:0;transition:none}
 .qg-t.none{display:flex;align-items:center;justify-content:center}
 .qg-t.none span{font-weight:300;font-size:1.05rem;color:#8f8f8f}
 .qg-t.none:hover span{color:var(--ink)}
+
+/* &nav= (2026-10-29): the categories joined to the marks. groups: each word heads its group in the column; list: the
+   four words stacked over the marks; ticks: at the top right, each word with a short line like a mark */
+.nav-groups .qcat-bar,.nav-list .qcat-bar{display:none}
+.qcg{display:flex;align-items:center;gap:.9rem;height:1.25rem;font-family:var(--font);font-weight:300;font-size:.95rem;letter-spacing:-.01em;color:var(--faint);transition:color .2s}
+.qcg i{display:none}
+.qcg span{white-space:nowrap}
+.qcg:hover,.qcg.on{color:var(--ink)}
+.qcg.hid{display:none}
+/* groups: the word sits where the space between groups was, the marks under it */
+.nav-groups .qk.gs{margin-top:.25rem}
+.nav-groups .qcg:not(.qcg-all){margin-top:1.1rem}
+.nav-groups .qcg-all{margin-bottom:.2rem}
+.nav-groups .qcg + .qk{margin-top:.25rem}
+/* list: the words stacked, then a space, then the marks */
+.qcl{display:flex;flex-direction:column;margin-bottom:2rem}
+/* ticks: a short faint line before each word, long and dark on the chosen one, as with the current mark */
+.qct{display:inline-flex;align-items:center;gap:.6rem}
+.qct::before{content:"";display:block;width:.9rem;height:1px;background:var(--faint);transition:width .55s cubic-bezier(.2,.7,.2,1),background .3s,height .3s}
+.qct:hover::before{width:1.3rem;background:var(--ink)}
+.qct.on::before{width:2.2rem;height:2px;background:var(--ink)}
+.nav-ticks .qcat{gap:0 1.4rem}
+@media (max-width:700px){
+  .nav-groups .qcat-bar,.nav-list .qcat-bar{display:flex}
+  .qcg,.qcl{display:none}
+  .qct::before{width:.6rem}
+  .qct.on::before{width:1.2rem}
+}

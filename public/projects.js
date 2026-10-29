@@ -108,8 +108,7 @@ window.PROJECTS = {
       {src: "img/permanent-impermanence/section.jpg", drawing: true, caption: "Section"},
       {src: "img/permanent-impermanence/flyer.jpg", drawing: true, caption: "Flyer"},
       {src: "img/permanent-impermanence/theater.jpg", caption: "Theater"},
-      {src: "img/permanent-impermanence/hallway.jpg", caption: "Hallway"},
-      {src: "img/permanent-impermanence/structure.jpg", drawing: true, caption: "Structure"}
+      {src: "img/permanent-impermanence/hallway.jpg", caption: "Hallway"}
     ]
   },
   "intra-urban-forestation": {

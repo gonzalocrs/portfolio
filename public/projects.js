@@ -7,9 +7,11 @@
     ready     true once the page has its real content. Until then the page shows
               the full layout as a roadmap, with marked placeholders.
     hero      path to the main image, e.g. "img/sierra-hotel/hero.jpg"
+    dark      optional: true turns the whole page dark while this project's picture is up on the home and on its
+              page (trial, 2026-10-29); drawings keep their own white
     heroPositionPhone  optional: where a phone-shaped crop of the hero looks on the home page, e.g. "78% center"
-    home      optional: the one or two pictures the home page shows for this project, in order, e.g.
-              ["img/sierra-hotel/elevation.svg", "img/sierra-hotel/floor-plans.svg"]; without it the home picks them
+    home      optional: the picture the home page shows for this project, e.g. ["img/sierra-hotel/elevation.svg"]; the
+              home shows one picture per project, so only the first one listed counts; without it the home uses the first
     lede      one or two sentences under the title
     text      a short second paragraph
     grid      optional: [{src, size, drawing, fill, caption}, ...] shows every picture in one hand-arranged grid after
@@ -92,8 +94,9 @@ window.PROJECTS = {
     diagram: {src: "img/social-sanctuary/hand-drawing.jpg"}
   },
   "permanent-impermanence": {
-    title: "Joint", group: "Unbuilt", hue: 330,
+    title: "Joint", group: "Unbuilt", hue: 330, dark: true,
     kicker: "New York, 2025",
+    hero: "img/permanent-impermanence/perspective.jpg",
     credits: [["School", "Columbia GSAPP"], ["Year", "2025"], ["Design", "Gonzalo Cáceres Valcárcel"]],
     diagram: {}
   },
@@ -116,7 +119,7 @@ window.PROJECTS = {
     credits: [["Type", "Structural Form-Finding, Material Research"], ["Practice", "Robert Marino Architects"], ["Year", "2026"], ["Design", "Gonzalo Cáceres Valcárcel"]],
     diagram: {src: "img/anticlastic-roof-structure/hand-drawing.jpg", caption: "Spherical vs. hyperbolic curvature study"},
     hero: "img/anticlastic-roof-structure/hero.jpg",
-    home: ["img/anticlastic-roof-structure/section.png", "img/anticlastic-roof-structure/hero.jpg"],
+    home: ["img/anticlastic-roof-structure/hero.jpg", "img/anticlastic-roof-structure/section.png"],
     heroPosition: "center",
     physicalNote: "Physical Form-Finding · Plywood · 1:12 Scale",
     // all the pictures in one grid after the text (see project.js: grid)

@@ -54,16 +54,41 @@
       if(group !== null && q.group !== group) a.classList.add('gs');
       group = q.group;
       el('i', '', a); el('span', '', a, q.title);
+      // a length of its own for each project, the same on every visit (used by the signature ticks)
+      a.style.setProperty('--len', (.35 + ((marks.length + 1) * .618034 % 1) * 1.45).toFixed(2) + 'rem');
       marks.push(a);
     });
     var ab = el('a', 'qk qa', nav); ab.href = 'about.html'; el('i', '', ab, '+'); el('span', '', ab, 'About');
+    // fan ticks: each one knows how far it is from the current project, so the lean can grow with the distance
+    if(TICK === 'fan'){
+      var spread = function(){
+        var c = -1; marks.forEach(function(m, i){ if(m.classList.contains('cur')) c = i; });
+        marks.forEach(function(m, i){ m.style.setProperty('--d', c < 0 ? 0 : i - c); });
+      };
+      new MutationObserver(spread).observe(nav, {subtree: true, attributes: true, attributeFilter: ['class']});
+      spread();
+    }
     return marks;
   }
+  // a dark project (projects.js "dark: true", trial 2026-10-29 with Joint's night render): while its picture is up, and
+  // on its page, the whole page slowly goes dark (the ground near-black, the words and marks light). Drawings are never
+  // inverted: they keep their own white
+  function night(on){ document.body.classList.toggle('q-night', !!on); }
   function quietHref(s, i){ return 'project.html?p=' + s + (i ? '&i=' + i : ''); }
   // going into a project from a picture on the home (test, 2026-10-26): the page doesn't reload. The picture lifts off
   // the home and glides to its place in the project while the home fades away and the project fades in around it; the
   // address changes to the project's, and Back returns to the home. (The older homes, ?home=stage|flow, still just go.)
   var PAGE = document.body.getAttribute('data-page');
+  // ticks (2026-10-29, his ask: "a new system for the menu ticks"): tilt is the default since he said "tick tilt was
+  // good"; ?tick= tries another for the visit, ?tick=flat the straight ticks from before, ?tick=off back to tilt:
+  // sign (each project's tick has its own length, like a signature or a barcode; the current one runs out long),
+  // tilt (his pick, "reminds me of a record player": the current tick lies flat and runs out, the ones above it lean
+  // up, the ones below lean down), fan (the same, the lean growing with the distance from the current one, like a fan
+  // of lines), dot (a dot per project; the current one stretches into the line)
+  var TICK = Q.get('tick');
+  try{ if(TICK === 'off') sessionStorage.removeItem('gc-tick'); else if(TICK) sessionStorage.setItem('gc-tick', TICK); TICK = sessionStorage.getItem('gc-tick'); }catch(e){}
+  TICK = TICK && TICK !== 'off' ? TICK : 'tilt';
+  if(['sign', 'tilt', 'fan', 'dot'].indexOf(TICK) > -1) document.body.classList.add('tk-' + TICK, TICK === 'fan' ? 'tk-tilt' : 'tk');
   function enter(img, href){ location.href = href; }
   function into(img, slug, k){
     if(PAGE !== 'home') return;
@@ -160,21 +185,15 @@
   //   &in=unveil  drawn open from its bottom edge (default)
   //   &in=rise    fades up into place
   //   &in=drift   unveiled, then each one moves at its own pace as the page rolls
-  // the home shows only one or two pictures of each project (his note, 2026-10-26): the ones he chose, otherwise its
-  // first picture and, when the project has three or more, the first one of the other kind (a drawing beside a photo, or a photo beside a drawing)
+  // the home shows one picture of each project (his note, 2026-10-29; it was one or two since 2026-10-26): his pick
+  // (projects.js: home, the first one when it lists several), otherwise the project's first picture
   function homePicks(got, slug){
     if(!got.length) return [];
-    // his own pick (projects.js: home), when the project has one
     var mine = (P[slug].home || []).map(function(src){
       var i = -1; got.some(function(o, j){ if(o.it.src === web(src)){ i = j; return true; } });
       return i < 0 ? null : {it: got[i].it, r: got[i].r, k0: i};
     }).filter(Boolean);
-    if(mine.length) return mine;
-    var first = got[0], out = [{it: first.it, r: first.r, k0: 0}];
-    if(got.length >= 3){
-      for(var i = 1; i < got.length; i++) if(got[i].it.drawing !== first.it.drawing){ out.push({it: got[i].it, r: got[i].r, k0: i}); break; }
-    }
-    return out;
+    return mine.length ? mine.slice(0, 1) : [{it: got[0].it, r: got[0].r, k0: 0}];
   }
   function buildRoll(){
     var IN = (Q.get('in') || 'unveil').toLowerCase(); if(['unveil', 'rise', 'drift'].indexOf(IN) === -1) IN = 'unveil';
@@ -285,18 +304,33 @@
       var im = el('img', '', f); im.alt = o.it.caption || P[o.slug].title; im.src = o.it.src;
       f.addEventListener('click', function(){ into(im, o.slug, o.k0); });
       place(f, o);
-      setTimeout(function(){ f.classList.add('in'); }, old ? 420 : 60);
+      setTimeout(function(){ f.classList.add('in'); }, old && !flipping ? 420 : 30);
       curEl = f; at = i;
+      night(P[o.slug].dark);
       marks.forEach(function(m){ m.classList.toggle('cur', m.slug === o.slug); if(m.slug !== o.slug) m.style.removeProperty('--p'); });
       var m = markOf(o.slug); if(m) m.style.setProperty('--p', ((o.k + 1) / o.n).toFixed(3));
     }
-    function step(d){ var now = Date.now(); if(now - lastStep < 900) return; lastStep = now; show(at + d, d); }
+    // flipping (his note, 2026-10-29: "if i keep scrolling i will keep passing them, like records"): there is no wait
+    // between steps; when steps follow each other closely the pictures pass quickly (short fades), and once the scroll
+    // stops the page goes back to the slow opening for the next step
+    var flipping = false, flipT = 0;
+    function step(d){
+      var now = Date.now(); if(now - lastStep < 340) return;
+      flipping = now - lastStep < 900; lastStep = now;
+      document.body.classList.toggle('qo-flip', flipping);
+      clearTimeout(flipT); flipT = setTimeout(function(){ flipping = false; document.body.classList.remove('qo-flip'); }, 900);
+      show(at + d, d);
+    }
     var withPics = SLUGS.filter(coverOf);
     // each visit opens on a different project (his call, 2026-10-26: "i always see sierra"): picked at random, never the
     // one the last visit opened on; scrolling then goes on through the others in the usual order and comes round again
     var last = null; try { last = localStorage.getItem('gc-first'); } catch(e){}
     var firsts = withPics.filter(function(s){ return s !== last; }); if(!firsts.length) firsts = withPics;
     var first = firsts[Math.floor(Math.random() * firsts.length)];
+    // coming back from a project (a click outside its pictures, or Esc): /?at=<slug> opens on that project, so the visit
+    // carries on scrolling from there (his note, 2026-10-29); the address is then cleaned
+    var back = Q.get('at');
+    if(back && withPics.indexOf(back) > -1){ first = back; try { history.replaceState(null, '', location.pathname); } catch(e){} }
     try { localStorage.setItem('gc-first', first); } catch(e){}
     Promise.all(withPics.map(function(s){ return loadAll(pictures(s)); })).then(function(all){
       var start = 0;
@@ -318,18 +352,21 @@
         e.preventDefault(); if(i !== at){ lastStep = Date.now(); show(i, i > at ? 1 : -1); }
       });
     });
-    // one step per scroll: a trackpad keeps sending wheel events for a while after the fingers lift, so a step needs a
-    // short pause in the wheel since the last one, or a clearly new push
-    var lastD = 0;
+    // a new push of the wheel steps at once; while the scroll goes on (a trackpad's glide included) every further stretch
+    // of it steps again, so a long scroll keeps passing pictures and a short one moves just one
+    var lastD = 0, run = 0, STRETCH = 440;
     addEventListener('wheel', function(e){
       if(PAGE !== 'home') return;
       e.preventDefault();
       var d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX, now = Date.now(), gap = now - lastWheel;
+      if(e.deltaMode === 1) d *= 40;
       lastWheel = now;
-      var fresh = gap > 160 || Math.abs(d) > Math.abs(lastD) * 1.6 + 4;
+      var fresh = gap > 220 || (d > 0) !== (lastD > 0);
       lastD = d;
-      if(Math.abs(d) < 6 || !fresh) return;
-      step(d > 0 ? 1 : -1);
+      if(Math.abs(d) < 2) return;
+      if(fresh){ run = 0; if(Math.abs(d) >= 6) step(d > 0 ? 1 : -1); return; }
+      run += Math.max(-60, Math.min(60, d));
+      if(Math.abs(run) >= STRETCH){ run = 0; step(d > 0 ? 1 : -1); }
     }, {passive: false});
     addEventListener('keydown', function(e){
       if(PAGE !== 'home') return;
@@ -363,6 +400,7 @@
     var i0 = SLUGS.indexOf(slug);
     document.title = p.title + ' — Gonzalo Cáceres';
     document.body.classList.add('qh-proj');
+    night(p.dark);
     var wrap = el('div', 'qt qp', main), nav = el('nav', 'qt-ticks', wrap), st = el('div', 'p-stage qt-stage', wrap), fade = fader(st);
     var marks = quietMarks(nav, slug, function(s){ return quietHref(s); }), me = marks[i0];
     me.classList.add('cur'); me.removeAttribute('href'); me.style.setProperty('--p', 1);
@@ -470,9 +508,19 @@
       if(up){ up.classList.toggle('off', k === 0); dn.classList.toggle('off', k === n - 1); }
       if(hint && !first) hint.classList.add('off');
     }
+    // a click on the picture goes on (or back, on its left part); a click anywhere outside the pictures, the marks and the
+    // words goes back to the home (his note, 2026-10-29)
     st.addEventListener('click', function(e){
       if(isOpen() && D === 'float'){ toggle(false); return; }
+      if(!e.target.closest('img, .plate')) return;
+      e.stopPropagation();
       var r = st.getBoundingClientRect(); go(at + (e.clientX < r.left + r.width * .35 ? -1 : 1));
+    });
+    document.addEventListener('click', function(e){
+      if(e.defaultPrevented || e.button || e.target.closest('a, button, img, .plate, input, textarea, select, label, .qp-card')) return;
+      if(isOpen() && D === 'float') return;
+      if(String(getSelection())) return;
+      location.href = '/?at=' + encodeURIComponent(slug);
     });
     addEventListener('wheel', function(e){
       if(card.contains(e.target) && card.scrollHeight > card.clientHeight) return;
@@ -485,7 +533,7 @@
     addEventListener('keydown', function(e){
       if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){ go(at + 1); e.preventDefault(); }
       if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ go(at - 1); e.preventDefault(); }
-      if(e.key === 'Escape'){ if(isOpen()) toggle(false); else location.href = '/'; }
+      if(e.key === 'Escape'){ if(isOpen()) toggle(false); else location.href = '/?at=' + encodeURIComponent(slug); }
     });
     var sx = null;
     st.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive: true});

@@ -85,11 +85,13 @@
   // tilt (his pick, "reminds me of a record player": the current tick lies flat and runs out, the ones above it lean
   // up, the ones below lean down), fan (the same, the lean growing with the distance from the current one, like a fan
   // of lines), dot (a dot per project; the current one stretches into the line)
-  // trial ?fade=on|both (2026-10-29, his ask: "make the bottom or top edge of the images fade with the background
-  // according to their position"; both: top and bottom): on the home, kept for the visit, ?fade=off ends it
+  // fade (2026-10-29, his ask: "make the bottom or top edge of the images fade with the background according to their
+  // position"): on the home, the picture's edge nearer the top or bottom of the screen melts into the page. The default
+  // since he said "nearer edge is good, not both"; ?fade=off turns it off for the visit, ?fade=on back on
   var FADE = Q.get('fade');
-  try{ if(FADE === 'off') sessionStorage.removeItem('gc-fade'); else if(FADE) sessionStorage.setItem('gc-fade', FADE); FADE = sessionStorage.getItem('gc-fade') || FADE; }catch(e){}
-  if(FADE && FADE !== 'off') document.body.classList.add('fd');
+  try{ if(FADE) sessionStorage.setItem('gc-fade', FADE); FADE = sessionStorage.getItem('gc-fade') || FADE; }catch(e){}
+  FADE = FADE === 'off' ? 'off' : 'on';
+  if(FADE === 'on') document.body.classList.add('fd');
   var TICK = Q.get('tick');
   try{ if(TICK === 'off') sessionStorage.removeItem('gc-tick'); else if(TICK) sessionStorage.setItem('gc-tick', TICK); TICK = sessionStorage.getItem('gc-tick'); }catch(e){}
   TICK = TICK && TICK !== 'off' ? TICK : 'tilt';
@@ -299,10 +301,10 @@
       var w = Math.min(W * (phone ? o.pw : o.w) / 100, H * (phone ? .8 : .72) * o.r), h = w / o.r;
       var room = Math.max(0, W - w), x = o.side === 'l' ? room * o.off : o.side === 'r' ? room * (1 - o.off) : room / 2 + (o.off - .1) * room * .4;
       f.style.width = w + 'px'; f.style.left = Math.max(0, Math.min(room, x)) + 'px'; f.style.top = (Math.max(0, H - h) * o.y) + 'px';
-      // trial ?fade=on|both: the top or bottom edge (the one nearer that edge of the screen; both with &fade=both) melts
+      // the top or bottom edge (the one nearer that edge of the screen) melts
       // into the page, just biting into the edge of what is drawn (his note, 2026-10-29: "not long but rather bite an
       // edge a little bit", it has to touch the drawing, its white margin is already the page)
-      if(FADE === 'on' || FADE === 'both') bite(f, o, (Math.max(0, H - h) * o.y + h / 2) / H - .5);
+      if(FADE === 'on') bite(f, o, (Math.max(0, H - h) * o.y + h / 2) / H - .5);
     }
     // where the drawing really starts and ends on the sheet: the first and last row with ink in it (worked out once)
     function inked(im, o){
@@ -322,7 +324,7 @@
       var im = f.querySelector('img');
       if(!im.complete || !im.naturalWidth){ im.addEventListener('load', function(){ bite(f, o, c); }, {once: true}); return; }
       var ink = inked(im, o), n = (ink.b - ink.t) * .12;
-      f.classList.toggle('fade-top', FADE === 'both' || c < 0); f.classList.toggle('fade-bottom', FADE === 'both' || c >= 0);
+      f.classList.toggle('fade-top', c < 0); f.classList.toggle('fade-bottom', c >= 0);
       f.style.setProperty('--ct', (ink.t * 100).toFixed(2) + '%'); f.style.setProperty('--cb', ((1 - ink.b) * 100).toFixed(2) + '%');
       f.style.setProperty('--bite', (n * 100).toFixed(2) + '%');
     }
@@ -535,9 +537,19 @@
       if(up){ up.classList.toggle('off', k === 0); dn.classList.toggle('off', k === n - 1); }
       if(hint && !first) hint.classList.add('off');
     }
+    // a click on the picture goes on (or back, on its left part); a click anywhere outside the pictures, the marks and the
+    // words goes back to the home (his note, 2026-10-29)
     st.addEventListener('click', function(e){
       if(isOpen() && D === 'float'){ toggle(false); return; }
+      if(!e.target.closest('img, .plate')) return;
+      e.stopPropagation();
       var r = st.getBoundingClientRect(); go(at + (e.clientX < r.left + r.width * .35 ? -1 : 1));
+    });
+    document.addEventListener('click', function(e){
+      if(e.defaultPrevented || e.button || e.target.closest('a, button, img, .plate, input, textarea, select, label, .qp-card')) return;
+      if(isOpen() && D === 'float') return;
+      if(String(getSelection())) return;
+      location.href = '/';
     });
     addEventListener('wheel', function(e){
       if(card.contains(e.target) && card.scrollHeight > card.clientHeight) return;

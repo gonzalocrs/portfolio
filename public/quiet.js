@@ -315,7 +315,7 @@
     // stops the page goes back to the slow opening for the next step
     var flipping = false, flipT = 0;
     function step(d){
-      var now = Date.now(); if(now - lastStep < 200) return;
+      var now = Date.now(); if(now - lastStep < 450) return;
       flipping = now - lastStep < 900; lastStep = now;
       document.body.classList.toggle('qo-flip', flipping);
       clearTimeout(flipT); flipT = setTimeout(function(){ flipping = false; document.body.classList.remove('qo-flip'); }, 900);
@@ -350,18 +350,18 @@
     });
     // a new push of the wheel steps at once; while the scroll goes on (a trackpad's glide included) every further stretch
     // of it steps again, so a long scroll keeps passing pictures and a short one moves just one
-    var lastD = 0, run = 0, STRETCH = 220;
+    var lastD = 0, run = 0, STRETCH = 650;
     addEventListener('wheel', function(e){
       if(PAGE !== 'home') return;
       e.preventDefault();
       var d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX, now = Date.now(), gap = now - lastWheel;
       if(e.deltaMode === 1) d *= 40;
       lastWheel = now;
-      var fresh = gap > 160 || Math.abs(d) > Math.abs(lastD) * 1.6 + 4 || (d > 0) !== (lastD > 0);
+      var fresh = gap > 220 || (d > 0) !== (lastD > 0);
       lastD = d;
       if(Math.abs(d) < 2) return;
       if(fresh){ run = 0; if(Math.abs(d) >= 6) step(d > 0 ? 1 : -1); return; }
-      run += Math.max(-120, Math.min(120, d));
+      run += Math.max(-60, Math.min(60, d));
       if(Math.abs(run) >= STRETCH){ run = 0; step(d > 0 ? 1 : -1); }
     }, {passive: false});
     addEventListener('keydown', function(e){

@@ -96,7 +96,7 @@ window.PROJECTS = {
   "permanent-impermanence": {
     title: "Joint", group: "Unbuilt", hue: 330, dark: true,
     kicker: "New York, 2025",
-    hero: "img/permanent-impermanence/hero.jpg",
+    hero: "img/permanent-impermanence/perspective.jpg",
     credits: [["School", "Columbia GSAPP"], ["Year", "2025"], ["Design", "Gonzalo Cáceres Valcárcel"]],
     diagram: {}
   },

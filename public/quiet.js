@@ -85,6 +85,13 @@
   // tilt (his pick, "reminds me of a record player": the current tick lies flat and runs out, the ones above it lean
   // up, the ones below lean down), fan (the same, the lean growing with the distance from the current one, like a fan
   // of lines), dot (a dot per project; the current one stretches into the line)
+  // trial ?words= (2026-10-29, his note on the project words behind the "+": "i don't like how it is"); the words stay
+  // his, only how they are set changes: label (credits as a quiet two-column label, a hairline, the text lighter and
+  // more open), lede (credits on one small line, the first paragraph set large, the rest small), mono (all in the mono
+  // face, like a data sheet); kept for the visit, ?words=off back to the live setting
+  var WORDS = Q.get('words');
+  try{ if(WORDS === 'off') sessionStorage.removeItem('gc-words'); else if(WORDS) sessionStorage.setItem('gc-words', WORDS); WORDS = sessionStorage.getItem('gc-words'); }catch(e){}
+  if(['label', 'lede', 'mono'].indexOf(WORDS) > -1) document.body.classList.add('wd-' + WORDS);
   var TICK = Q.get('tick');
   try{ if(TICK === 'off') sessionStorage.removeItem('gc-tick'); else if(TICK) sessionStorage.setItem('gc-tick', TICK); TICK = sessionStorage.getItem('gc-tick'); }catch(e){}
   TICK = TICK && TICK !== 'off' ? TICK : 'tilt';

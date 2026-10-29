@@ -183,21 +183,15 @@
   //   &in=unveil  drawn open from its bottom edge (default)
   //   &in=rise    fades up into place
   //   &in=drift   unveiled, then each one moves at its own pace as the page rolls
-  // the home shows only one or two pictures of each project (his note, 2026-10-26): the ones he chose, otherwise its
-  // first picture and, when the project has three or more, the first one of the other kind (a drawing beside a photo, or a photo beside a drawing)
+  // the home shows one picture of each project (his note, 2026-10-29; it was one or two since 2026-10-26): his pick
+  // (projects.js: home, the first one when it lists several), otherwise the project's first picture
   function homePicks(got, slug){
     if(!got.length) return [];
-    // his own pick (projects.js: home), when the project has one
     var mine = (P[slug].home || []).map(function(src){
       var i = -1; got.some(function(o, j){ if(o.it.src === web(src)){ i = j; return true; } });
       return i < 0 ? null : {it: got[i].it, r: got[i].r, k0: i};
     }).filter(Boolean);
-    if(mine.length) return mine;
-    var first = got[0], out = [{it: first.it, r: first.r, k0: 0}];
-    if(got.length >= 3){
-      for(var i = 1; i < got.length; i++) if(got[i].it.drawing !== first.it.drawing){ out.push({it: got[i].it, r: got[i].r, k0: i}); break; }
-    }
-    return out;
+    return mine.length ? mine.slice(0, 1) : [{it: got[0].it, r: got[0].r, k0: 0}];
   }
   function buildRoll(){
     var IN = (Q.get('in') || 'unveil').toLowerCase(); if(['unveil', 'rise', 'drift'].indexOf(IN) === -1) IN = 'unveil';

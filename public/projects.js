@@ -10,8 +10,8 @@
     dark      optional: true turns the whole page dark while this project's picture is up on the home and on its
               page (trial, 2026-10-29); drawings keep their own white
     heroPositionPhone  optional: where a phone-shaped crop of the hero looks on the home page, e.g. "78% center"
-    home      optional: the one or two pictures the home page shows for this project, in order, e.g.
-              ["img/sierra-hotel/elevation.svg", "img/sierra-hotel/floor-plans.svg"]; without it the home picks them
+    home      optional: the picture the home page shows for this project, e.g. ["img/sierra-hotel/elevation.svg"]; the
+              home shows one picture per project, so only the first one listed counts; without it the home uses the first
     lede      one or two sentences under the title
     text      a short second paragraph
     grid      optional: [{src, size, drawing, fill, caption}, ...] shows every picture in one hand-arranged grid after

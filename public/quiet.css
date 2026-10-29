@@ -372,9 +372,16 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 .tk-sign .qk:not(.qa) i{width:var(--len)}
 .tk-sign .qk:not(.qa):hover i{width:calc(var(--len) + .5rem)}
 .tk-sign .qk.cur:not(.qa) i{width:calc(var(--len) + 2.2rem);height:1px;background:var(--rule)}
-.tk-tilt .qk:not(.qa) i{transform:rotate(-38deg);transform-origin:left center;transition:width .55s cubic-bezier(.2,.7,.2,1),transform .55s cubic-bezier(.2,.7,.2,1),background .3s}
+/* tilt, like the arm of a record player: above the current tick they lean up, below it they lean down, it lies flat */
+.tk-tilt .qk:not(.qa) i{transform:rotate(-34deg);transform-origin:left center;transition:width .55s cubic-bezier(.2,.7,.2,1),transform .8s cubic-bezier(.2,.7,.2,1),background .3s}
+.tk-tilt .qk.cur ~ .qk:not(.qa) i{transform:rotate(34deg)}
 .tk-tilt .qk:not(.qa):hover i{transform:rotate(-14deg)}
+.tk-tilt .qk.cur ~ .qk:not(.qa):hover i{transform:rotate(14deg)}
 .tk-tilt .qk.cur:not(.qa) i{transform:none}
+/* fan: the lean grows with the distance from the current tick (--d, set by quiet.js) */
+.tk-fan .qk:not(.qa) i,.tk-fan .qk.cur ~ .qk:not(.qa) i{transform:rotate(calc(var(--d,0) * 11deg))}
+.tk-fan .qk:not(.qa):hover i,.tk-fan .qk.cur ~ .qk:not(.qa):hover i{transform:rotate(calc(var(--d,0) * 5deg))}
+.tk-fan .qk.cur:not(.qa) i{transform:none}
 .tk-dot .qk:not(.qa) i{width:4px;height:4px;border-radius:2px;transition:width .6s cubic-bezier(.2,.7,.2,1),height .3s,background .3s,border-radius .3s}
 .tk-dot .qk:not(.qa):hover i{width:4px;background:var(--ink)}
 .tk-dot .qk.cur:not(.qa) i{width:3rem;height:2px;border-radius:1px}
@@ -382,8 +389,11 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 @media (max-width:700px){
   .tk-sign .qk:not(.qa) i,.tk-sign .qk:not(.qa):hover i{width:1px;height:var(--len)}
   .tk-sign .qk.cur:not(.qa) i{width:1px;height:calc(var(--len) + 1.3rem)}
-  .tk-tilt .qk:not(.qa) i{transform:rotate(32deg);transform-origin:bottom center}
-  .tk-tilt .qk:not(.qa):hover i{transform:rotate(14deg)}
+  .tk-tilt .qk:not(.qa) i{transform:rotate(-30deg);transform-origin:bottom center}
+  .tk-tilt .qk.cur ~ .qk:not(.qa) i{transform:rotate(30deg)}
+  .tk-tilt .qk:not(.qa):hover i{transform:rotate(-12deg)}
+  .tk-tilt .qk.cur ~ .qk:not(.qa):hover i{transform:rotate(12deg)}
+  .tk-fan .qk:not(.qa) i,.tk-fan .qk.cur ~ .qk:not(.qa) i{transform:rotate(calc(var(--d,0) * 9deg))}
   .tk-dot .qk:not(.qa) i,.tk-dot .qk:not(.qa):hover i{width:4px;height:4px}
   .tk-dot .qk.cur:not(.qa) i{width:2px;height:2.2rem}
 }

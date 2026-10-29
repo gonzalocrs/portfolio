@@ -59,6 +59,15 @@
       marks.push(a);
     });
     var ab = el('a', 'qk qa', nav); ab.href = 'about.html'; el('i', '', ab, '+'); el('span', '', ab, 'About');
+    // fan ticks: each one knows how far it is from the current project, so the lean can grow with the distance
+    if(TICK === 'fan'){
+      var spread = function(){
+        var c = -1; marks.forEach(function(m, i){ if(m.classList.contains('cur')) c = i; });
+        marks.forEach(function(m, i){ m.style.setProperty('--d', c < 0 ? 0 : i - c); });
+      };
+      new MutationObserver(spread).observe(nav, {subtree: true, attributes: true, attributeFilter: ['class']});
+      spread();
+    }
     return marks;
   }
   // a dark project (projects.js "dark: true", trial 2026-10-29 with Joint's night render): while its picture is up, and
@@ -72,11 +81,12 @@
   var PAGE = document.body.getAttribute('data-page');
   // trial ?tick= (2026-10-29, his ask: "a new system for the menu ticks"; kept for the visit, ?tick=off ends it):
   // sign (each project's tick has its own length, like a signature or a barcode; the current one runs out long),
-  // tilt (the ticks lean on a diagonal; the current one straightens and runs out), dot (a dot per project; the current
-  // one stretches into the line)
+  // tilt (his pick, "reminds me of a record player": the current tick lies flat and runs out, the ones above it lean
+  // up, the ones below lean down), fan (the same, the lean growing with the distance from the current one, like a fan
+  // of lines), dot (a dot per project; the current one stretches into the line)
   var TICK = Q.get('tick');
   try{ if(TICK === 'off') sessionStorage.removeItem('gc-tick'); else if(TICK) sessionStorage.setItem('gc-tick', TICK); TICK = sessionStorage.getItem('gc-tick'); }catch(e){}
-  if(['sign', 'tilt', 'dot'].indexOf(TICK) > -1) document.body.classList.add('tk-' + TICK);
+  if(['sign', 'tilt', 'fan', 'dot'].indexOf(TICK) > -1) document.body.classList.add('tk-' + TICK, TICK === 'fan' ? 'tk-tilt' : 'tk');
   function enter(img, href){ location.href = href; }
   function into(img, slug, k){
     if(PAGE !== 'home') return;

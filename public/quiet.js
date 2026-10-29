@@ -103,13 +103,13 @@
   if(['list', 'ticks', 'bar'].indexOf(NAV) < 0) NAV = 'groups';
   // with the grid, the index (his notes 2026-10-29: the grid "doesn't go with the thin lines"; names, pills and small
   // tiles were too much: "keep it minimalistic... a horizontal bar... even only numbers"), &menu=:
-  // num (default: a column of small numbers, 01 to 10, the current one's name beside it), hnum (the numbers in one
+  // num (a column of small numbers, 01 to 10, the current one's name beside it), hnum (the numbers in one
   // line over the grid, the category words between their groups, the current name at the end), hnames (the names in
   // one quiet line under the grid), squares (one small square per project in a line over the grid, filled for the
-  // current one, its name beside), lines (the marks as before)
+  // current one, its name beside; the default, his pick), lines (the marks as before)
   var MENU = Q.get('menu');
   try{ if(MENU) sessionStorage.setItem('gc-menu', MENU); else MENU = sessionStorage.getItem('gc-menu'); }catch(e){}
-  if(['hnum', 'hnames', 'squares', 'lines'].indexOf(MENU) < 0) MENU = 'num';
+  if(['num', 'hnum', 'hnames', 'lines'].indexOf(MENU) < 0) MENU = 'squares';
   function panelMode(){ return 'one'; }
   function enter(img, href){ location.href = href; }
   function into(img, slug, k){

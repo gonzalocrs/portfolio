@@ -479,3 +479,18 @@ main.q-away{opacity:0;transition:none}
   .menu-h .qt{display:flex;flex-direction:column}
   .menu-hnum .qnow{display:none}
 }
+
+/* &edge= (2026-10-29): square corners everywhere (sharp); line also drops the grey fills for hairlines */
+.edge-sharp .qg-t,.edge-sharp .md-card,.edge-sharp .md-btn,.edge-sharp .md-x,.edge-sharp .md-tools .md-btn,.edge-sharp .md-fig img,
+.edge-sharp .md-fig.dr,.edge-sharp .md-none,.edge-sharp .md-card.sheet .md-right .md-fig,.edge-sharp .md-card.sheet .md-right .md-fig img{border-radius:0}
+.edge-sharp .menu-squares .qk > i,.edge-sharp.menu-squares .qk > i{border-radius:0}
+.edge-line .qg-t.none{background:#fff;box-shadow:inset 0 0 0 1px #e4e4e4}
+.edge-line .md-shade{background:rgba(255,255,255,.82)}
+.edge-line .md-card{box-shadow:0 0 0 1px #e4e4e4}
+.edge-line .md-btn,.edge-line .md-x{background:none;box-shadow:inset 0 0 0 1px #d6d6d6;transition:box-shadow .2s}
+.edge-line .md-btn:hover,.edge-line .md-x:hover{background:none;box-shadow:inset 0 0 0 1px var(--ink)}
+.edge-line .md-none{background:#fff;box-shadow:inset 0 0 0 1px #e4e4e4}
+.edge-line .md-card.sheet .md-right .md-fig{background:#fff;box-shadow:inset 0 0 0 1px #ececec}
+.edge-line.menu-squares .qk > i{background:#fff;box-shadow:inset 0 0 0 1px #c9c9c9}
+.edge-line.menu-squares .qk:hover > i{box-shadow:inset 0 0 0 1px var(--ink)}
+.edge-line.menu-squares .qk.cur > i{background:var(--ink);box-shadow:none}

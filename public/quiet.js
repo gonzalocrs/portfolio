@@ -110,6 +110,13 @@
   var MENU = Q.get('menu');
   try{ if(MENU) sessionStorage.setItem('gc-menu', MENU); else MENU = sessionStorage.getItem('gc-menu'); }catch(e){}
   if(['num', 'hnum', 'hnames', 'lines'].indexOf(MENU) < 0) MENU = 'squares';
+  // corners (his note 2026-10-29: "the best yet but... too similar to MAD... without the round edges"), &edge=:
+  // sharp (default: every corner square: tiles, squares, panel, buttons), line (square too, and no grey fills: the
+  // empty tiles, the buttons and the Gallery sheet drawn with hairlines, the dimmed page white instead of grey),
+  // round (as before)
+  var EDGE = Q.get('edge');
+  try{ if(EDGE) sessionStorage.setItem('gc-edge', EDGE); else EDGE = sessionStorage.getItem('gc-edge'); }catch(e){}
+  if(['line', 'round'].indexOf(EDGE) < 0) EDGE = 'sharp';
   function panelMode(){ return 'one'; }
   function enter(img, href){ location.href = href; }
   function into(img, slug, k){
@@ -541,6 +548,7 @@
     }
     if(IT){
       document.body.classList.add('nav-' + NAV);
+      if(EDGE !== 'round') document.body.classList.add('edge-sharp', 'edge-' + EDGE);
       if(GRID && MENU !== 'lines'){
         document.body.classList.add('menu', 'menu-' + MENU);
         if(MENU !== 'num') document.body.classList.add('menu-h');

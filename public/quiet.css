@@ -237,8 +237,9 @@ body.l-quiet.qh-roll{height:auto;overflow:visible}
 .qo-flip.l-quiet{transition-duration:.35s}
 .qo-flip.tk-tilt .qk:not(.qa) i{transition-duration:.35s,.4s,.2s}
 /* trial ?fade=on: the picture's top or bottom edge dissolves into the page, by where it stands */
-.fd .qo-fig.fade-top img{-webkit-mask-image:linear-gradient(to bottom,transparent,#000 var(--fade,20%));mask-image:linear-gradient(to bottom,transparent,#000 var(--fade,20%))}
-.fd .qo-fig.fade-bottom img{-webkit-mask-image:linear-gradient(to top,transparent,#000 var(--fade,20%));mask-image:linear-gradient(to top,transparent,#000 var(--fade,20%))}
+.fd .qo-fig::after{content:"";position:absolute;inset:-1px;pointer-events:none}
+.fd .qo-fig.fade-top::after{background:linear-gradient(to bottom,var(--paper),var(--paper) 3%,transparent var(--fade,30%))}
+.fd .qo-fig.fade-bottom::after{background:linear-gradient(to top,var(--paper),var(--paper) 3%,transparent var(--fade,30%))}
 .qp .qt-stage.none,.qp .qt-stage.none img{cursor:default}
 /* beside: the words stand centred top to bottom in the space, wherever the name is (his note, 2026-10-26); when they
    are longer than the space they start at the top and scroll */

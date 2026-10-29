@@ -302,7 +302,7 @@
       // trial ?fade=on: the edge nearer the top or bottom of the screen dissolves into the page, more the nearer it is
       var c = (Math.max(0, H - h) * o.y + h / 2) / H - .5;
       f.classList.toggle('fade-top', c < 0); f.classList.toggle('fade-bottom', c >= 0);
-      f.style.setProperty('--fade', Math.min(50, 18 + Math.abs(c) * 2 * 45).toFixed(1) + '%');
+      f.style.setProperty('--fade', Math.min(65, 30 + Math.abs(c) * 2 * 40).toFixed(1) + '%');
     }
     function show(i, d){
       if(!seq.length) return;

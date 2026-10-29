@@ -477,4 +477,5 @@ main.q-away{opacity:0;transition:none}
   .menu .qk.qa span{display:inline}
   .menu-num .qk span{display:none}
   .menu-h .qt{display:flex;flex-direction:column}
+  .menu-hnum .qnow{display:none}
 }

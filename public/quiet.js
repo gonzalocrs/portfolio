@@ -111,12 +111,18 @@
   try{ if(MENU) sessionStorage.setItem('gc-menu', MENU); else MENU = sessionStorage.getItem('gc-menu'); }catch(e){}
   if(['num', 'hnum', 'hnames', 'lines'].indexOf(MENU) < 0) MENU = 'squares';
   // corners (his note 2026-10-29: "the best yet but... too similar to MAD... without the round edges"), &edge=:
-  // sharp (default: every corner square: tiles, squares, panel, buttons), line (square too, and no grey fills: the
+  // round (default again, his call: "neither... keep the original"), sharp (every corner square: tiles, squares, panel, buttons), line (square too, and no grey fills: the
   // empty tiles, the buttons and the Gallery sheet drawn with hairlines, the dimmed page white instead of grey),
-  // round (as before)
+  // round
+  // &theme=dark (his ask 2026-10-29: "keep the original and do a dark version, don't invert the colors on the
+  // drawings"): near-black ground, light words; photos as they are, and every drawing on its own white, like a
+  // sheet laid on a dark table. Kept for the visit (sessionStorage gc-dark); &theme=light ends it.
+  var DARK = Q.get('theme');
+  try{ if(DARK === 'light') sessionStorage.removeItem('gc-dark'); else if(DARK === 'dark') sessionStorage.setItem('gc-dark', '1'); DARK = sessionStorage.getItem('gc-dark') === '1'; }catch(e){ DARK = DARK === 'dark'; }
+  if(DARK && IT) document.documentElement.classList.add('theme-dark');
   var EDGE = Q.get('edge');
   try{ if(EDGE) sessionStorage.setItem('gc-edge', EDGE); else EDGE = sessionStorage.getItem('gc-edge'); }catch(e){}
-  if(['line', 'round'].indexOf(EDGE) < 0) EDGE = 'sharp';
+  if(['line', 'sharp'].indexOf(EDGE) < 0) EDGE = 'round';
   function panelMode(){ return 'one'; }
   function enter(img, href){ location.href = href; }
   function into(img, slug, k){

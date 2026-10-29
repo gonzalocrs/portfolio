@@ -98,7 +98,18 @@ window.PROJECTS = {
     kicker: "New York, 2025",
     hero: "img/permanent-impermanence/perspective.jpg",
     credits: [["School", "Columbia GSAPP"], ["Year", "2025"], ["Design", "Gonzalo Cáceres Valcárcel"]],
-    diagram: {}
+    // after the hero: the drawings in this order, then the renders
+    grid: [
+      {src: "img/permanent-impermanence/section.jpg", drawing: true, caption: "Section"},
+      {src: "img/permanent-impermanence/elevations.jpg", drawing: true, caption: "Pavilion elevations"},
+      {src: "img/permanent-impermanence/structure.jpg", drawing: true, caption: "Structure"},
+      {src: "img/permanent-impermanence/flyer.jpg", drawing: true, caption: "Flyer"},
+      {src: "img/permanent-impermanence/pavilion.jpg", caption: "Perspective"},
+      {src: "img/permanent-impermanence/hallway.jpg", caption: "Hallway"},
+      {src: "img/permanent-impermanence/theater.jpg", caption: "Theater"},
+      {src: "img/permanent-impermanence/stair.jpg", caption: "Pavilion"},
+      {src: "img/permanent-impermanence/room.jpg", caption: "Room"}
+    ]
   },
   "intra-urban-forestation": {
     title: "Aftergrowth", group: "Unbuilt", hue: 150,

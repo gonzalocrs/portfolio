@@ -304,13 +304,23 @@
       var im = el('img', '', f); im.alt = o.it.caption || P[o.slug].title; im.src = o.it.src;
       f.addEventListener('click', function(){ into(im, o.slug, o.k0); });
       place(f, o);
-      setTimeout(function(){ f.classList.add('in'); }, old ? 420 : 60);
+      setTimeout(function(){ f.classList.add('in'); }, old && !flipping ? 420 : 30);
       curEl = f; at = i;
       night(P[o.slug].dark);
       marks.forEach(function(m){ m.classList.toggle('cur', m.slug === o.slug); if(m.slug !== o.slug) m.style.removeProperty('--p'); });
       var m = markOf(o.slug); if(m) m.style.setProperty('--p', ((o.k + 1) / o.n).toFixed(3));
     }
-    function step(d){ var now = Date.now(); if(now - lastStep < 900) return; lastStep = now; show(at + d, d); }
+    // flipping (his note, 2026-10-29: "if i keep scrolling i will keep passing them, like records"): there is no wait
+    // between steps; when steps follow each other closely the pictures pass quickly (short fades), and once the scroll
+    // stops the page goes back to the slow opening for the next step
+    var flipping = false, flipT = 0;
+    function step(d){
+      var now = Date.now(); if(now - lastStep < 200) return;
+      flipping = now - lastStep < 900; lastStep = now;
+      document.body.classList.toggle('qo-flip', flipping);
+      clearTimeout(flipT); flipT = setTimeout(function(){ flipping = false; document.body.classList.remove('qo-flip'); }, 900);
+      show(at + d, d);
+    }
     var withPics = SLUGS.filter(coverOf);
     // each visit opens on a different project (his call, 2026-10-26: "i always see sierra"): picked at random, never the
     // one the last visit opened on; scrolling then goes on through the others in the usual order and comes round again
@@ -338,18 +348,21 @@
         e.preventDefault(); if(i !== at){ lastStep = Date.now(); show(i, i > at ? 1 : -1); }
       });
     });
-    // one step per scroll: a trackpad keeps sending wheel events for a while after the fingers lift, so a step needs a
-    // short pause in the wheel since the last one, or a clearly new push
-    var lastD = 0;
+    // a new push of the wheel steps at once; while the scroll goes on (a trackpad's glide included) every further stretch
+    // of it steps again, so a long scroll keeps passing pictures and a short one moves just one
+    var lastD = 0, run = 0, STRETCH = 220;
     addEventListener('wheel', function(e){
       if(PAGE !== 'home') return;
       e.preventDefault();
       var d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX, now = Date.now(), gap = now - lastWheel;
+      if(e.deltaMode === 1) d *= 40;
       lastWheel = now;
-      var fresh = gap > 160 || Math.abs(d) > Math.abs(lastD) * 1.6 + 4;
+      var fresh = gap > 160 || Math.abs(d) > Math.abs(lastD) * 1.6 + 4 || (d > 0) !== (lastD > 0);
       lastD = d;
-      if(Math.abs(d) < 6 || !fresh) return;
-      step(d > 0 ? 1 : -1);
+      if(Math.abs(d) < 2) return;
+      if(fresh){ run = 0; if(Math.abs(d) >= 6) step(d > 0 ? 1 : -1); return; }
+      run += Math.max(-120, Math.min(120, d));
+      if(Math.abs(run) >= STRETCH){ run = 0; step(d > 0 ? 1 : -1); }
     }, {passive: false});
     addEventListener('keydown', function(e){
       if(PAGE !== 'home') return;

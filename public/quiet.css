@@ -229,6 +229,13 @@ body.l-quiet.qh-roll{height:auto;overflow:visible}
   .qh-one .qo-stage{touch-action:none}
 }
 .in-unveil .qo-fig.out img{clip-path:inset(0 0 0 0)}
+/* flipping through (a long scroll): the pictures pass quickly, like records */
+.qo-flip .qo-fig{transition-duration:.45s}
+.qo-flip.in-unveil .qo-fig img{transition-duration:.35s}
+.qo-flip.in-rise .qo-fig{transition-duration:.3s,.45s}
+.qo-flip .qo-fig.out{transition-duration:.2s,.3s}
+.qo-flip.l-quiet{transition-duration:.35s}
+.qo-flip.tk-tilt .qk:not(.qa) i{transition-duration:.35s,.4s,.2s}
 .qp .qt-stage.none,.qp .qt-stage.none img{cursor:default}
 /* beside: the words stand centred top to bottom in the space, wherever the name is (his note, 2026-10-26); when they
    are longer than the space they start at the top and scroll */

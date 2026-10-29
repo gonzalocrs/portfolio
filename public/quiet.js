@@ -59,6 +59,10 @@
     var ab = el('a', 'qk qa', nav); ab.href = 'about.html'; el('i', '', ab, '+'); el('span', '', ab, 'About');
     return marks;
   }
+  // a dark project (projects.js "dark: true", trial 2026-10-29 with Joint's night render): while its picture is up, and
+  // on its page, the whole page slowly goes dark (the ground near-black, the words and marks light). Drawings are never
+  // inverted: they keep their own white
+  function night(on){ document.body.classList.toggle('q-night', !!on); }
   function quietHref(s, i){ return 'project.html?p=' + s + (i ? '&i=' + i : ''); }
   // going into a project from a picture on the home (test, 2026-10-26): the page doesn't reload. The picture lifts off
   // the home and glides to its place in the project while the home fades away and the project fades in around it; the
@@ -287,6 +291,7 @@
       place(f, o);
       setTimeout(function(){ f.classList.add('in'); }, old ? 420 : 60);
       curEl = f; at = i;
+      night(P[o.slug].dark);
       marks.forEach(function(m){ m.classList.toggle('cur', m.slug === o.slug); if(m.slug !== o.slug) m.style.removeProperty('--p'); });
       var m = markOf(o.slug); if(m) m.style.setProperty('--p', ((o.k + 1) / o.n).toFixed(3));
     }
@@ -363,6 +368,7 @@
     var i0 = SLUGS.indexOf(slug);
     document.title = p.title + ' — Gonzalo Cáceres';
     document.body.classList.add('qh-proj');
+    night(p.dark);
     var wrap = el('div', 'qt qp', main), nav = el('nav', 'qt-ticks', wrap), st = el('div', 'p-stage qt-stage', wrap), fade = fader(st);
     var marks = quietMarks(nav, slug, function(s){ return quietHref(s); }), me = marks[i0];
     me.classList.add('cur'); me.removeAttribute('href'); me.style.setProperty('--p', 1);

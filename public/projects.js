@@ -7,6 +7,8 @@
     ready     true once the page has its real content. Until then the page shows
               the full layout as a roadmap, with marked placeholders.
     hero      path to the main image, e.g. "img/sierra-hotel/hero.jpg"
+    dark      optional: true turns the whole page dark while this project's picture is up on the home and on its
+              page (trial, 2026-10-29); drawings keep their own white
     heroPositionPhone  optional: where a phone-shaped crop of the hero looks on the home page, e.g. "78% center"
     home      optional: the one or two pictures the home page shows for this project, in order, e.g.
               ["img/sierra-hotel/elevation.svg", "img/sierra-hotel/floor-plans.svg"]; without it the home picks them
@@ -92,8 +94,9 @@ window.PROJECTS = {
     diagram: {src: "img/social-sanctuary/hand-drawing.jpg"}
   },
   "permanent-impermanence": {
-    title: "Joint", group: "Unbuilt", hue: 330,
+    title: "Joint", group: "Unbuilt", hue: 330, dark: true,
     kicker: "New York, 2025",
+    hero: "img/permanent-impermanence/hero.jpg",
     credits: [["School", "Columbia GSAPP"], ["Year", "2025"], ["Design", "Gonzalo Cáceres Valcárcel"]],
     diagram: {}
   },

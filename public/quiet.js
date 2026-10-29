@@ -360,6 +360,10 @@
     var last = null; try { last = localStorage.getItem('gc-first'); } catch(e){}
     var firsts = withPics.filter(function(s){ return s !== last; }); if(!firsts.length) firsts = withPics;
     var first = firsts[Math.floor(Math.random() * firsts.length)];
+    // coming back from a project (a click outside its pictures, or Esc): /?at=<slug> opens on that project, so the visit
+    // carries on scrolling from there (his note, 2026-10-29); the address is then cleaned
+    var back = Q.get('at');
+    if(back && withPics.indexOf(back) > -1){ first = back; try { history.replaceState(null, '', location.pathname); } catch(e){} }
     try { localStorage.setItem('gc-first', first); } catch(e){}
     Promise.all(withPics.map(function(s){ return loadAll(pictures(s)); })).then(function(all){
       var start = 0;
@@ -549,7 +553,7 @@
       if(e.defaultPrevented || e.button || e.target.closest('a, button, img, .plate, input, textarea, select, label, .qp-card')) return;
       if(isOpen() && D === 'float') return;
       if(String(getSelection())) return;
-      location.href = '/';
+      location.href = '/?at=' + encodeURIComponent(slug);
     });
     addEventListener('wheel', function(e){
       if(card.contains(e.target) && card.scrollHeight > card.clientHeight) return;
@@ -562,7 +566,7 @@
     addEventListener('keydown', function(e){
       if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){ go(at + 1); e.preventDefault(); }
       if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ go(at - 1); e.preventDefault(); }
-      if(e.key === 'Escape'){ if(isOpen()) toggle(false); else location.href = '/'; }
+      if(e.key === 'Escape'){ if(isOpen()) toggle(false); else location.href = '/?at=' + encodeURIComponent(slug); }
     });
     var sx = null;
     st.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive: true});

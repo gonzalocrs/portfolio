@@ -366,3 +366,24 @@ body.l-quiet{transition:background-color 1.1s ease,color 1.1s ease}
 body.q-night{--paper:#0c0c0e;--ink:#ecebe7;--rule:#3b3b3e;--mute:#8e8e8c;--faint:#4c4c4f;--plate:#1a1a1c;--live:#ecebe7}
 body.q-night ::selection{background:rgba(236,235,231,.18)}
 body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body.q-night .p-layer img[src$=".svg"],body.q-night .p-layer img[src$=".png"]{background:#fff}
+
+/* trial ?tick= (2026-10-29): other systems for the ticks. sign: a length of its own per project; tilt: leaning on a
+   diagonal, the current one straight; dot: dots, the current one stretched into the line */
+.tk-sign .qk:not(.qa) i{width:var(--len)}
+.tk-sign .qk:not(.qa):hover i{width:calc(var(--len) + .5rem)}
+.tk-sign .qk.cur:not(.qa) i{width:calc(var(--len) + 2.2rem);height:1px;background:var(--rule)}
+.tk-tilt .qk:not(.qa) i{transform:rotate(-38deg);transform-origin:left center;transition:width .55s cubic-bezier(.2,.7,.2,1),transform .55s cubic-bezier(.2,.7,.2,1),background .3s}
+.tk-tilt .qk:not(.qa):hover i{transform:rotate(-14deg)}
+.tk-tilt .qk.cur:not(.qa) i{transform:none}
+.tk-dot .qk:not(.qa) i{width:4px;height:4px;border-radius:2px;transition:width .6s cubic-bezier(.2,.7,.2,1),height .3s,background .3s,border-radius .3s}
+.tk-dot .qk:not(.qa):hover i{width:4px;background:var(--ink)}
+.tk-dot .qk.cur:not(.qa) i{width:3rem;height:2px;border-radius:1px}
+.tk-dot .qk:not(.qa) i::after{border-radius:inherit}
+@media (max-width:700px){
+  .tk-sign .qk:not(.qa) i,.tk-sign .qk:not(.qa):hover i{width:1px;height:var(--len)}
+  .tk-sign .qk.cur:not(.qa) i{width:1px;height:calc(var(--len) + 1.3rem)}
+  .tk-tilt .qk:not(.qa) i{transform:rotate(32deg);transform-origin:bottom center}
+  .tk-tilt .qk:not(.qa):hover i{transform:rotate(14deg)}
+  .tk-dot .qk:not(.qa) i,.tk-dot .qk:not(.qa):hover i{width:4px;height:4px}
+  .tk-dot .qk.cur:not(.qa) i{width:2px;height:2.2rem}
+}

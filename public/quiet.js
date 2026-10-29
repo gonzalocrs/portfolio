@@ -54,6 +54,8 @@
       if(group !== null && q.group !== group) a.classList.add('gs');
       group = q.group;
       el('i', '', a); el('span', '', a, q.title);
+      // a length of its own for each project, the same on every visit (used by the signature ticks)
+      a.style.setProperty('--len', (.35 + ((marks.length + 1) * .618034 % 1) * 1.45).toFixed(2) + 'rem');
       marks.push(a);
     });
     var ab = el('a', 'qk qa', nav); ab.href = 'about.html'; el('i', '', ab, '+'); el('span', '', ab, 'About');
@@ -68,6 +70,13 @@
   // the home and glides to its place in the project while the home fades away and the project fades in around it; the
   // address changes to the project's, and Back returns to the home. (The older homes, ?home=stage|flow, still just go.)
   var PAGE = document.body.getAttribute('data-page');
+  // trial ?tick= (2026-10-29, his ask: "a new system for the menu ticks"; kept for the visit, ?tick=off ends it):
+  // sign (each project's tick has its own length, like a signature or a barcode; the current one runs out long),
+  // tilt (the ticks lean on a diagonal; the current one straightens and runs out), dot (a dot per project; the current
+  // one stretches into the line)
+  var TICK = Q.get('tick');
+  try{ if(TICK === 'off') sessionStorage.removeItem('gc-tick'); else if(TICK) sessionStorage.setItem('gc-tick', TICK); TICK = sessionStorage.getItem('gc-tick'); }catch(e){}
+  if(['sign', 'tilt', 'dot'].indexOf(TICK) > -1) document.body.classList.add('tk-' + TICK);
   function enter(img, href){ location.href = href; }
   function into(img, slug, k){
     if(PAGE !== 'home') return;

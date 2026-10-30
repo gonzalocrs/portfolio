@@ -392,11 +392,14 @@
       });
       show(start, 1);
     });
+    // a project's name in the index goes straight into the project (his note, 2026-10-29; it used to only show its
+    // picture here): from its picture when that is the one up, otherwise with the same soft change as between projects
     marks.forEach(function(m){
       m.addEventListener('click', function(e){
-        var i = -1; seq.some(function(o, j){ if(o.slug === m.slug){ i = j; return true; } });
-        if(i < 0) return;
-        e.preventDefault(); if(i !== at){ lastStep = Date.now(); show(i, i > at ? 1 : -1); }
+        if(e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+        e.preventDefault();
+        if(curEl && curEl.o.slug === m.slug) into(curEl.querySelector('img'), m.slug, curEl.o.k0);
+        else goProject(m.slug);
       });
     });
     // a new push of the wheel moves one picture as soon as it really moves; while the fingers keep scrolling, every further

@@ -90,10 +90,12 @@
   // trial ?words= (2026-10-29, his note on the project words behind the "+": "i don't like how it is"); the words stay
   // his, only how they are set changes: label (credits as a quiet two-column label, a hairline, the text lighter and
   // more open), lede (credits on one small line, the first paragraph set large, the rest small), mono (all in the mono
-  // face, like a data sheet); kept for the visit, ?words=off back to the live setting
+  // face, like a data sheet), plain (no credits, only the place and year over his paragraphs, set a little larger),
+  // first (the first sentence of each paragraph in full ink, the rest lighter); kept for the visit, ?words=off back to
+  // the live setting
   var WORDS = Q.get('words');
   try{ if(WORDS === 'off') sessionStorage.removeItem('gc-words'); else if(WORDS) sessionStorage.setItem('gc-words', WORDS); WORDS = sessionStorage.getItem('gc-words'); }catch(e){}
-  if(['label', 'lede', 'mono'].indexOf(WORDS) > -1) document.body.classList.add('wd-' + WORDS);
+  if(['label', 'lede', 'mono', 'plain', 'first'].indexOf(WORDS) > -1) document.body.classList.add('wd-' + WORDS);
   var TICK = Q.get('tick');
   try{ if(TICK === 'off') sessionStorage.removeItem('gc-tick'); else if(TICK) sessionStorage.setItem('gc-tick', TICK); TICK = sessionStorage.getItem('gc-tick'); }catch(e){}
   TICK = TICK && TICK !== 'off' ? TICK : 'tilt';
@@ -432,7 +434,11 @@
     var cr = el('div', 'cr', meta);
     (p.credits || []).forEach(function(r){ if(r[0] === 'Year') return; var c = el('p', '', cr); el('b', '', c, r[0]); c.appendChild(document.createTextNode('  ' + r[1])); });
     var tx = el('div', 'tx', card);
-    (p.lede ? [p.lede] : []).concat(p.text ? (Array.isArray(p.text) ? p.text : [p.text]) : []).forEach(function(t, i){ el('p', p.lede && i === 0 ? 'lede' : '', tx, t); });
+    (p.lede ? [p.lede] : []).concat(p.text ? (Array.isArray(p.text) ? p.text : [p.text]) : []).forEach(function(t, i){
+      // the first sentence in its own span (for ?words=first); the words themselves unchanged
+      var e = el('p', p.lede && i === 0 ? 'lede' : '', tx), m = /^(.+?[.!?])(\s.*)?$/.exec(t);
+      if(m && m[2]){ el('span', 's1', e, m[1]); e.appendChild(document.createTextNode(m[2])); } else e.textContent = t;
+    });
     var nameEl = me.querySelector('span'), rule = D === 'fold' ? el('div', 'qd-rule', st) : null, T = [];
     function nameY(){ var a = nameEl.getBoundingClientRect(), b = st.getBoundingClientRect(); return Math.max(0, Math.round(a.top + a.height / 2 - b.top)); }
     function curImg(){ return st.querySelector('.p-layer.on img, .p-layer.on .plate'); }

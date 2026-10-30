@@ -422,3 +422,8 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 .wd-mono .qp-card .cr b{font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-right:.3em}
 .wd-mono .qp-card .tx p{font-family:var(--mono);font-size:.74rem;line-height:1.75;font-weight:400;letter-spacing:-.01em}
 .wd-mono .qp-card .tx p.lede{font-weight:500}
+.wd-plain .qp-card .cr{display:none}
+.wd-plain .qp-card .tx{margin-top:1.4rem}
+.wd-plain .qp-card .tx p{font-size:.92rem;line-height:1.6;font-weight:300;margin-bottom:1.1rem}
+.wd-first .qp-card .tx p{font-size:.84rem;line-height:1.62;font-weight:300;color:var(--mute)}
+.wd-first .qp-card .tx p .s1{color:var(--ink);font-weight:400}

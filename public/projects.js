@@ -175,7 +175,7 @@ window.PROJECTS = {
     title: "Lean Shells", group: "Research", hue: 260,
     kicker: "New York, 2026",
     lede: "A physical study of vaulted plywood shell structures, investigating efficient, structurally sound and expressive roof systems that can accommodate insulation.",
-    credits: [["Studio", "Robert Marino Architects"], ["Program", "Form through material"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2026"]],
+    credits: [["Studio", "Robert Marino Architects"], ["Type", "Structural Form-Finding"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2026"]],
     // reserves the full-bleed diagram slot (see anticlastic-roof-structure)
     // before the real drawing exists; shows a roadmap placeholder until then
     diagram: {}
@@ -184,7 +184,7 @@ window.PROJECTS = {
     title: "Open Assembly", group: "Research", hue: 120,
     kicker: "New York, 2025",
     lede: "A modular system for sphere-like structures, built from the fewest possible parts that assemble with one another, like an organic system.",
-    credits: [["Program", "Ecosystem of exploration"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2025"]],
+    credits: [["Type", "Modular Systems"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2025"]],
     diagram: {}
   }
 };

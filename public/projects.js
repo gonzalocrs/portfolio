@@ -189,7 +189,6 @@ window.PROJECTS = {
       {src: "img/vaulted-shell-structure/model-9937.jpg", caption: "Physical model, underside"},
       {src: "img/vaulted-shell-structure/model-9925.jpg", caption: "Physical model, joints"},
       {src: "img/vaulted-shell-structure/model-9928.jpg", caption: "Physical model, joints"},
-      {src: "img/vaulted-shell-structure/model-9933.jpg", caption: "Physical model, crown"},
       {src: "img/vaulted-shell-structure/site-plan.png", drawing: true, caption: "Plan with the existing house"},
       {src: "img/vaulted-shell-structure/site-elevation.png", drawing: true, caption: "Elevation with the existing house"},
       {src: "img/vaulted-shell-structure/house-elevation.png", drawing: true, caption: "End elevation with the existing house"}

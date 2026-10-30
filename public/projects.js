@@ -130,7 +130,7 @@ window.PROJECTS = {
       "Developing Curvature investigates the architectural potential of flat plywood: how the geometry of individual pieces can generate a surface of double curvature. The shell develops through the orientation, edges, and connections of planar elements, bringing material constraints directly into the production of form. Physical models serve as the primary design tool, allowing the surface to be assessed through its assembly, thickness, and spatial presence. The resulting geometry holds together two scales of expression: the precise articulation of individual panels and the continuity of the larger shell.",
       "The study explores how changes in panel orientation generate structural depth, linking the shell’s geometric character to its potential stiffness. This investigation opens a further direction: integrating insulation with the plywood skin so that thermal and structural functions might operate within one material system. Through making, the project pursues an economy of means in which construction, performance, and architectural expression develop together."
     ],
-    credits: [["Studio", "Robert Marino Architects"], ["Program", "Developing curvature"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2026"]],
+    credits: [["Studio", "Robert Marino Architects"], ["Type", "Structural Form-Finding, Material Research"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2026"]],
     diagram: {src: "img/anticlastic-roof-structure/hand-drawing.jpg", caption: "Spherical vs. hyperbolic curvature study"},
     hero: "img/anticlastic-roof-structure/hero.jpg",
     home: ["img/anticlastic-roof-structure/hero.jpg", "img/anticlastic-roof-structure/section.png"],

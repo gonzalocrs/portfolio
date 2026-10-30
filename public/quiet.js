@@ -474,6 +474,9 @@
     var D = (Q.get('d') || 'under').toLowerCase(); if(['fold', 'beside', 'under'].indexOf(D) === -1) D = 'under';   // fold: by address only
     if(innerWidth <= 700) D = 'float';
     wrap.classList.add('qd-' + D);
+    // under, while the words are open, another project's name on hover (his note, 2026-10-29, try both): &hov=top (the
+    // name over the words, on the page's own ground; default) or &hov=none (no names while the words are open)
+    var HOV = (Q.get('hov') || 'top').toLowerCase(); wrap.classList.add('hv-' + (HOV === 'none' ? 'none' : 'top'));
     var card = el('aside', 'qp-card', st), meta = el('div', 'meta', card);
     el('span', 'k', meta, p.kicker || '');
     var cr = el('div', 'cr', meta);

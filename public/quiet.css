@@ -458,4 +458,7 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
     transition:opacity .35s ease,transform .45s ease}
   .qd-under.open .qp-card{transform:none;transition:opacity 1s cubic-bezier(.4,0,.2,1) .3s,transform 1.3s cubic-bezier(.16,1,.3,1) .3s}
   .qd-under .qp-card .tx p{font-size:.84rem}
+  .qd-under.open.hv-top .qt-ticks{z-index:5}
+  .qd-under.open.hv-top .qk:not(.cur) span{background:var(--paper);padding:.15rem .6rem .15rem 0;margin-right:-.6rem;box-shadow:.9rem 0 1rem -.2rem var(--paper)}
+  .qd-under.open.hv-none .qk:not(.cur):not(.qa) span{display:none}
 }

@@ -20,6 +20,8 @@
     var photos = grid.filter(function(it){ return !isDrawing(it) && !/\/physical\//.test(it.src); });
     if(!grid.length){ drawings = g.drawings || []; physical = g.physical || []; photos = g.photos || []; }
     if(!physical.length && g.physical) physical = g.physical;
+    // inOrder: the grid's own order after the hero, drawings and renders mixed (Joint, his order, 2026-10-29)
+    if(p.inOrder && grid.length){ drawings = grid; physical = []; photos = []; }
     [p.hero ? [{src: p.hero}] : [], p.diagram && p.diagram.src ? [{src: p.diagram.src, caption: p.diagram.caption, drawing: true}] : [], drawings, physical, photos].forEach(function(list){
       list.forEach(function(it){
         var s = it.src && web(it.src);
@@ -88,10 +90,14 @@
   // trial ?words= (2026-10-29, his note on the project words behind the "+": "i don't like how it is"); the words stay
   // his, only how they are set changes: label (credits as a quiet two-column label, a hairline, the text lighter and
   // more open), lede (credits on one small line, the first paragraph set large, the rest small), mono (all in the mono
-  // face, like a data sheet); kept for the visit, ?words=off back to the live setting
+  // face, like a data sheet), plain (no credits, only the place and year over his paragraphs, set a little larger),
+  // first (the first sentence of each paragraph in full ink, the rest lighter), bare / line / tail (the
+  // credits kept minimal, see the CSS), mix (his pick, 2026-10-29: label's credits with first's text; the default on
+  // this preview); kept for the visit, ?words=off shows the live setting
   var WORDS = Q.get('words');
-  try{ if(WORDS === 'off') sessionStorage.removeItem('gc-words'); else if(WORDS) sessionStorage.setItem('gc-words', WORDS); WORDS = sessionStorage.getItem('gc-words'); }catch(e){}
-  if(['label', 'lede', 'mono'].indexOf(WORDS) > -1) document.body.classList.add('wd-' + WORDS);
+  try{ if(WORDS) sessionStorage.setItem('gc-words', WORDS); WORDS = sessionStorage.getItem('gc-words'); }catch(e){}
+  WORDS = WORDS || 'mix';
+  if(['label', 'lede', 'mono', 'plain', 'first', 'bare', 'line', 'tail', 'mix'].indexOf(WORDS) > -1) document.body.classList.add('wd-' + WORDS);
   var TICK = Q.get('tick');
   try{ if(TICK === 'off') sessionStorage.removeItem('gc-tick'); else if(TICK) sessionStorage.setItem('gc-tick', TICK); TICK = sessionStorage.getItem('gc-tick'); }catch(e){}
   TICK = TICK && TICK !== 'off' ? TICK : 'tilt';
@@ -111,6 +117,7 @@
     document.body.classList.remove('qh-one', 'in-unveil', 'in-rise');
     document.body.setAttribute('data-page', 'project');
     main.classList.add('q-away');
+    offAll();
     buildQuietProject(slug, k);
     var target = document.querySelector('.p-layer.on img');
     function go(){
@@ -127,7 +134,38 @@
     if(!target || (target.complete && target.naturalWidth)) requestAnimationFrame(go);
     else { target.addEventListener('load', go); target.addEventListener('error', go); }
   }
-  addEventListener('popstate', function(){ location.reload(); });
+  // leaving a page without a reload (his note, 2026-10-29: "when i click to get out of the project the whole page
+  // reloads, it should smoothly go back"; and from one project straight into another): the page's own listeners are
+  // kept here so they can be let go, the page fades out on a layer of its own and the next is built in its place and
+  // fades in, the address following. Back and Forward do the same
+  var OFF = [], CUR = null, HOME_TITLE = PAGE === 'home' ? document.title : 'Gonzalo Cáceres — Architecture';
+  function on(t, ty, fn, o){ t.addEventListener(ty, fn, o); OFF.push(function(){ t.removeEventListener(ty, fn, o); }); }
+  function offAll(){ OFF.splice(0).forEach(function(f){ f(); }); }
+  function swap(url, page, build){
+    if(url) history.pushState({q: page}, '', url);
+    var cur = main.firstElementChild;
+    if(cur){
+      var r = cur.getBoundingClientRect(), old = el('div', 'q-old', document.body);
+      old.style.left = r.left + 'px'; old.style.top = r.top + 'px'; old.style.width = r.width + 'px'; old.style.height = r.height + 'px';
+      // seamless (his note, 2026-10-29: "i don't like the reloading feature"): the marks change in place at once, only
+      // the old picture (and words) fade out over the new page, which is there from the start underneath
+      var t = cur.querySelector('.qt-ticks'); if(t) t.style.visibility = 'hidden';
+      old.appendChild(cur); old.classList.add('soft'); void old.offsetWidth; old.classList.add('out');
+      setTimeout(function(){ old.remove(); }, 650);
+    }
+    offAll(); main.innerHTML = '';
+    document.body.classList.remove('qh-one', 'qh-proj', 'in-unveil', 'in-rise', 'qo-flip');
+    document.body.setAttribute('data-page', page); PAGE = page;
+    build();
+  }
+  function goHome(slug){ swap('/', 'home', function(){ document.title = HOME_TITLE; buildRollOne(slug); }); }
+  function goProject(s){ swap(quietHref(s), 'project', function(){ buildQuietProject(s, 0); }); }
+  addEventListener('popstate', function(){
+    var u = new URLSearchParams(location.search), s = u.get('p');
+    if(PAGE === 'about' || (Q.get('home') || Q.has('flow'))){ location.reload(); return; }
+    if(/project\.html$/.test(location.pathname) && P[s]){ var i = u.get('i'); swap(null, 'project', function(){ buildQuietProject(s, i === 'last' ? 1e3 : i ? (parseInt(i, 10) || 1) - 1 : 0); }); }
+    else { var was = CUR; swap(null, 'home', function(){ document.title = HOME_TITLE; buildRollOne(was); }); }
+  });
   function ratioOf(img){ return img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1.5; }
   function loadAll(list){
     return Promise.all(list.map(function(it){
@@ -284,7 +322,7 @@
   // appears, don't make two appear at the same time"): the same placing (left, right or near the middle, its own size and
   // height), but there is only ever one picture: a scroll fades it out as it rises away and the next one opens up out of
   // its bottom edge somewhere else. The page itself doesn't move. Back with a scroll up. &flow keeps the scrolling page.
-  function buildRollOne(){
+  function buildRollOne(backTo){
     var IN = (Q.get('in') || 'unveil').toLowerCase(); if(['unveil', 'rise'].indexOf(IN) === -1) IN = 'unveil';
     document.body.classList.add('qh-one', 'in-' + IN);
     var wrap = el('div', 'qt', main), nav = el('nav', 'qt-ticks', wrap), st = el('div', 'qo-stage', wrap);
@@ -337,10 +375,11 @@
     var first = firsts[Math.floor(Math.random() * firsts.length)];
     // coming back from a project (a click outside its pictures, or Esc): /?at=<slug> opens on that project, so the visit
     // carries on scrolling from there (his note, 2026-10-29); the address is then cleaned
-    var back = Q.get('at');
-    if(back && withPics.indexOf(back) > -1){ first = back; try { history.replaceState(null, '', location.pathname); } catch(e){} }
+    var back = backTo || Q.get('at');
+    if(back && withPics.indexOf(back) > -1){ first = back; if(!backTo) try { history.replaceState(null, '', location.pathname); } catch(e){} }
     try { localStorage.setItem('gc-first', first); } catch(e){}
     Promise.all(withPics.map(function(s){ return loadAll(pictures(s)); })).then(function(all){
+      if(!st.isConnected || PAGE !== 'home') return;   // left before the pictures came
       var start = 0;
       all.forEach(function(got, j){
         got = homePicks(got, withPics[j]);
@@ -365,7 +404,7 @@
     // (deltas sinking well under the push's strongest) never counts: it used to carry a single swipe two or three projects on (his note,
     // 2026-10-29: "scrolling makes me skip some projects")
     var lastD = 0, run = 0, push = 0, peak = 0, moved = false, STRETCH = 440;
-    addEventListener('wheel', function(e){
+    on(window, 'wheel', function(e){
       if(PAGE !== 'home') return;
       e.preventDefault();
       var d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX, now = Date.now(), gap = now - lastWheel;
@@ -381,7 +420,7 @@
       run += Math.max(-60, Math.min(60, d));
       if(Math.abs(run) >= STRETCH && step(d > 0 ? 1 : -1)) run = 0;
     }, {passive: false});
-    addEventListener('keydown', function(e){
+    on(window, 'keydown', function(e){
       if(PAGE !== 'home') return;
       if(['ArrowDown', 'ArrowRight', 'PageDown', ' '].indexOf(e.key) > -1){ step(1); e.preventDefault(); }
       if(['ArrowUp', 'ArrowLeft', 'PageUp'].indexOf(e.key) > -1){ step(-1); e.preventDefault(); }
@@ -396,7 +435,7 @@
       var d = Math.abs(dy) > Math.abs(dx) ? dy : dx;
       if(Math.abs(d) > 35) step(d < 0 ? 1 : -1);
     }, {passive: true});
-    addEventListener('resize', function(){ if(PAGE === 'home' && curEl) place(curEl, curEl.o); });
+    on(window, 'resize', function(){ if(PAGE === 'home' && curEl) place(curEl, curEl.o); });
   }
 
   // a project: the same marks, its own opened into one mark per picture; one picture at a time, as large as fits.
@@ -410,13 +449,17 @@
   addEventListener('resize', function(){ Array.prototype.forEach.call(document.querySelectorAll('.qf'), function(f){ if(f.fit) f.fit(); }); });
   function buildQuietProject(slug, startAt){
     var p = P[slug], all = pictures(slug), n = Math.max(1, all.length);
-    var i0 = SLUGS.indexOf(slug);
+    var i0 = SLUGS.indexOf(slug); CUR = slug;
     document.title = p.title + ' — Gonzalo Cáceres';
     document.body.classList.add('qh-proj');
     night(p.dark);
     var wrap = el('div', 'qt qp', main), nav = el('nav', 'qt-ticks', wrap), st = el('div', 'p-stage qt-stage', wrap), fade = fader(st);
     var marks = quietMarks(nav, slug, function(s){ return quietHref(s); }), me = marks[i0];
     me.classList.add('cur'); me.removeAttribute('href'); me.style.setProperty('--p', 1);
+    marks.forEach(function(m){
+      if(m === me) return;
+      m.addEventListener('click', function(e){ if(e.metaKey || e.ctrlKey || e.shiftKey || e.button) return; e.preventDefault(); goProject(m.slug); });
+    });
     var plus = el('button', 'qp-plus', me.querySelector('span'), '+'); plus.type = 'button'; plus.setAttribute('aria-label', 'About this project');
     var subs = el('div', 'qp-subs', nav); nav.insertBefore(subs, me.nextSibling);
     var dots = [];
@@ -428,9 +471,14 @@
     var card = el('aside', 'qp-card', st), meta = el('div', 'meta', card);
     el('span', 'k', meta, p.kicker || '');
     var cr = el('div', 'cr', meta);
-    (p.credits || []).forEach(function(r){ if(r[0] === 'Year') return; var c = el('p', '', cr); el('b', '', c, r[0]); c.appendChild(document.createTextNode('  ' + r[1])); });
+    (p.credits || []).forEach(function(r){ if(r[0] === 'Year' || !r[1]) return; var c = el('p', '', cr); el('b', '', c, r[0]); c.appendChild(document.createTextNode('  ' + r[1])); });
     var tx = el('div', 'tx', card);
-    (p.lede ? [p.lede] : []).concat(p.text ? (Array.isArray(p.text) ? p.text : [p.text]) : []).forEach(function(t, i){ el('p', p.lede && i === 0 ? 'lede' : '', tx, t); });
+    (p.lede ? [p.lede] : []).concat(p.text ? (Array.isArray(p.text) ? p.text : [p.text]) : []).forEach(function(t, i){
+      // the first sentence in its own span (for ?words=first); the words themselves unchanged
+      var e = el('p', p.lede && i === 0 ? 'lede' : '', tx), m = /^(.+?[.!?])(\s.*)?$/.exec(t);
+      if(m && m[2]){ el('span', 's1', e, m[1]); e.appendChild(document.createTextNode(m[2])); } else e.textContent = t;
+    });
+    if(WORDS === 'tail') card.appendChild(cr);   // ?words=tail: the credits after his paragraphs
     var nameEl = me.querySelector('span'), rule = D === 'fold' ? el('div', 'qd-rule', st) : null, T = [];
     function nameY(){ var a = nameEl.getBoundingClientRect(), b = st.getBoundingClientRect(); return Math.max(0, Math.round(a.top + a.height / 2 - b.top)); }
     function curImg(){ return st.querySelector('.p-layer.on img, .p-layer.on .plate'); }
@@ -445,7 +493,7 @@
       st.style.setProperty('--px', Math.round(x - sr.left + w + 3 * rem) + 'px');
       st.style.setProperty('--ny', (nameY() - 8) + 'px');
     }
-    addEventListener('resize', function(){ if(D === 'beside' && isOpen()) placeBeside(); });
+    on(window, 'resize', function(){ if(D === 'beside' && isOpen()) placeBeside(); });
     function toggle(on){
       on = on == null ? !isOpen() : on;
       if(on === isOpen()) return;
@@ -527,15 +575,17 @@
       if(isOpen() && D === 'float'){ toggle(false); return; }
       if(!e.target.closest('img, .plate')) return;
       e.stopPropagation();
-      var r = st.getBoundingClientRect(); go(at + (e.clientX < r.left + r.width * .35 ? -1 : 1));
+      // clicking on past the last picture comes round to the first, and back past the first to the last (his ask,
+      // 2026-10-29); scrolling still stops at the ends
+      var r = st.getBoundingClientRect(); go((at + (e.clientX < r.left + r.width * .35 ? -1 : 1) + n) % n);
     });
-    document.addEventListener('click', function(e){
+    on(document, 'click', function(e){
       if(e.defaultPrevented || e.button || e.target.closest('a, button, img, .plate, input, textarea, select, label, .qp-card')) return;
       if(isOpen() && D === 'float') return;
       if(String(getSelection())) return;
-      location.href = '/?at=' + encodeURIComponent(slug);
+      goHome(slug);
     });
-    addEventListener('wheel', function(e){
+    on(window, 'wheel', function(e){
       if(card.contains(e.target) && card.scrollHeight > card.clientHeight) return;
       var d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
       if(Math.abs(d) < 8) return;
@@ -543,10 +593,10 @@
       var now = Date.now(); if(now - lock < 750) return; lock = now;
       go(at + (d > 0 ? 1 : -1));
     }, {passive: false});
-    addEventListener('keydown', function(e){
+    on(window, 'keydown', function(e){
       if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){ go(at + 1); e.preventDefault(); }
       if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ go(at - 1); e.preventDefault(); }
-      if(e.key === 'Escape'){ if(isOpen()) toggle(false); else location.href = '/?at=' + encodeURIComponent(slug); }
+      if(e.key === 'Escape'){ if(isOpen()) toggle(false); else goHome(slug); }
     });
     var sx = null;
     st.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive: true});

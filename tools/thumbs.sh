@@ -8,6 +8,6 @@ grep -oE "img/[^'\"]+\.(jpe?g|JPE?G)" public/projects.js | sort -u | while read 
   dir="$(dirname "$src")/thumbs"; out="$dir/$(basename "${f%.*}").jpg"
   [ -f "$out" ] && [ "$out" -nt "$src" ] && continue
   mkdir -p "$dir"
-  ffmpeg -loglevel error -y -i "$src" -vf "scale='min(1000,iw)':-2:flags=lanczos" -q:v 4 "$out"
+  ffmpeg -nostdin -loglevel error -y -i "$src" -vf "scale='min(1000,iw)':-2:flags=lanczos" -q:v 4 "$out"
   echo "$out"
 done

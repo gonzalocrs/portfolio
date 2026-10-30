@@ -332,6 +332,7 @@ body.l-quiet.qh-roll{height:auto;overflow:visible}
 .q-fly.go{transition:transform 1.1s cubic-bezier(.7,0,.2,1)}
 .q-old{position:fixed;z-index:50;pointer-events:none;transition:opacity .55s ease}
 .q-old.out{opacity:0}
+.q-old.soft{transition:opacity .6s ease}
 .q-old > .qt{height:100%}
 main{transition:opacity .7s ease .35s}
 main.q-away{opacity:0;transition:none}
@@ -422,3 +423,26 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 .wd-mono .qp-card .cr b{font-weight:500;text-transform:uppercase;letter-spacing:.05em;margin-right:.3em}
 .wd-mono .qp-card .tx p{font-family:var(--mono);font-size:.74rem;line-height:1.75;font-weight:400;letter-spacing:-.01em}
 .wd-mono .qp-card .tx p.lede{font-weight:500}
+.wd-plain .qp-card .cr{display:none}
+.wd-plain .qp-card .tx{margin-top:1.4rem}
+.wd-plain .qp-card .tx p{font-size:.92rem;line-height:1.6;font-weight:300;margin-bottom:1.1rem}
+.wd-first .qp-card .tx p{font-size:.84rem;line-height:1.62;font-weight:300;color:var(--mute)}
+.wd-first .qp-card .tx p .s1{color:var(--ink);font-weight:400}
+/* minimal credits (his note, 2026-10-29: "something more minimalist" than his reference): bare (only the values, small
+   and grey, no names), line (the values on one small grey line), tail (the credits after his paragraphs, small and grey) */
+.wd-bare .qp-card .cr b,.wd-line .qp-card .cr b{display:none}
+.wd-bare .qp-card .cr p{margin:0 0 .15rem;font-size:.8rem;font-weight:300;color:var(--mute)}
+.wd-line .qp-card .cr p{display:inline;margin:0;font-size:.8rem;font-weight:300;color:var(--mute)}
+.wd-line .qp-card .cr p + p::before{content:"\00B7";margin:0 .5em;color:var(--faint)}
+.wd-bare .qp-card .tx,.wd-line .qp-card .tx{margin-top:1.6rem}
+.wd-tail .qp-card .cr{margin-top:.6rem}
+.wd-tail .qp-card .cr p{margin:0 0 .15rem;font-size:.76rem;font-weight:300;color:var(--mute)}
+.wd-tail .qp-card .cr b{font-weight:300;color:var(--faint);margin-right:.5em}
+.wd-bare .qp-card .tx p,.wd-line .qp-card .tx p,.wd-tail .qp-card .tx p{font-size:.84rem;line-height:1.62;font-weight:300}
+/* mix (his pick): label's credits (names in small grey mono capitals, values beside them) over first's text (the first
+   sentence of each paragraph in full ink, the rest grey) */
+.wd-mix .qp-card .cr p{display:grid;grid-template-columns:5.6rem 1fr;align-items:baseline;margin:0 0 .3rem;font-size:.84rem;font-weight:300}
+.wd-mix .qp-card .cr b{font-family:var(--mono);font-weight:400;font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mute)}
+.wd-mix .qp-card .tx{margin-top:1.6rem}
+.wd-mix .qp-card .tx p{font-size:.84rem;line-height:1.62;font-weight:300;color:var(--mute)}
+.wd-mix .qp-card .tx p .s1{color:var(--ink);font-weight:400}

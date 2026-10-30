@@ -447,11 +447,10 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 .wd-mix .qp-card .tx p{font-size:.84rem;line-height:1.62;font-weight:300;color:var(--mute)}
 .wd-mix .qp-card .tx p .s1{color:var(--ink);font-weight:400}
 
-/* under (mockup, 2026-10-29): + lifts the whole column of lines (as far as it can with every line still in view), and
-   the words open softly under the name, right of the lines. The picture stays exactly as it is */
+/* under (mockup, 2026-10-29): + turns the column of lines round until the project is at the top (the ones above go
+   round to the bottom), and the words open softly under the name, right of the lines. The picture stays exactly as it is */
 @media (min-width:701px){
-  .qd-under .qt-ticks > *{transition:transform .9s cubic-bezier(.22,.8,.24,1),opacity .45s ease}
-  .qd-under.open .qt-ticks > *{transform:translateY(var(--up,0px))}
+  .qu-ghost{position:absolute;margin:0;pointer-events:none}
   .qd-under .qp-card{left:var(--cx,0px);width:var(--cw,18rem);top:var(--ny,0px);bottom:0;padding:0 0 2rem;transform:translateY(.9rem);
     transition:opacity .35s ease,transform .45s ease}
   .qd-under.open .qp-card{transform:none;transition:opacity 1s cubic-bezier(.4,0,.2,1) .3s,transform 1.3s cubic-bezier(.16,1,.3,1) .3s}

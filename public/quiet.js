@@ -499,20 +499,47 @@
       st.style.setProperty('--px', Math.round(x - sr.left + w + 3 * rem) + 'px');
       st.style.setProperty('--ny', (nameY() - 8) + 'px');
     }
-    // under: the whole column of lines slides up, as far as it can while every line stays in view (the other
-    // projects' and this project's pictures' too, his note), and the words open under the name, right of the lines.
-    // They are as wide as the room left of the widest a picture can be, so no picture moves or shrinks
+    // under: like picking a record from a rack (his note, 2026-10-29: "if you choose this record then the ones on top
+    // go to the bottom, like a circular thing"): the column turns round until this project is at the top, the projects
+    // above it going round to the bottom, under the last; every line stays (the other projects' and this one's
+    // pictures'). The words open under the name, right of the lines, as wide as the room left of the widest a picture
+    // can be, so no picture moves or shrinks. Closing turns the column back
+    var ORDER = Array.prototype.slice.call(nav.children), ABOVE = ORDER.slice(0, ORDER.indexOf(me));
+    function regroup(){
+      var g = null, i = 0;
+      Array.prototype.forEach.call(nav.children, function(c){
+        if(!c.classList.contains('qk') || c.classList.contains('qa')) return;
+        var q = P[c.slug]; c.classList.toggle('gs', i++ > 0 && q.group !== g); g = q.group;
+      });
+    }
+    function turn(on){
+      var kids = Array.prototype.slice.call(nav.children), vr = nav.getBoundingClientRect(), was = new Map();
+      kids.forEach(function(k){ var r = k.getBoundingClientRect(); was.set(k, {top: r.top, left: r.left}); });
+      if(on){ var ab = nav.querySelector('.qk.qa'); ABOVE.forEach(function(k){ nav.insertBefore(k, ab); }); }
+      else ORDER.forEach(function(k){ nav.appendChild(k); });
+      regroup();
+      if(on) placeUnder();   // measured at the new places, before anything moves
+      var ease = 'cubic-bezier(.22,.8,.24,1)';
+      kids.forEach(function(k){
+        var o = was.get(k), d = o.top - k.getBoundingClientRect().top;
+        if(!d) return;
+        if(ABOVE.indexOf(k) > -1){
+          // the ones going round: a copy leaves from where it was, and it comes in at its new place
+          var g = k.cloneNode(true); g.classList.add('qu-ghost'); g.style.top = (o.top - vr.top) + 'px'; g.style.left = (o.left - vr.left) + 'px';
+          nav.appendChild(g);
+          g.animate([{opacity: 1, transform: 'none'}, {opacity: 0, transform: 'translateY(' + (on ? -14 : 14) + 'px)'}], {duration: 450, easing: 'ease-in'}).onfinish = function(){ g.remove(); };
+          k.animate([{opacity: 0, transform: 'translateY(' + (on ? 14 : -14) + 'px)'}, {opacity: 1, transform: 'none'}], {duration: 650, delay: 300, easing: ease, fill: 'backwards'});
+        }
+        else k.animate([{transform: 'translateY(' + d + 'px)'}, {transform: 'none'}], {duration: 850, easing: ease});
+      });
+    }
     function placeUnder(){
       var rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
-      wrap.style.setProperty('--up', '0px');
-      var nr = nameEl.getBoundingClientRect(), vr = nav.getBoundingClientRect(), sr = st.getBoundingClientRect();
-      var top = nav.firstElementChild.getBoundingClientRect().top;
-      var up = Math.max(0, Math.round(Math.min(nr.top - vr.top - .4 * rem, top - vr.top)));
-      wrap.style.setProperty('--up', -up + 'px');
+      var nr = nameEl.getBoundingClientRect(), sr = st.getBoundingClientRect();
       var right = sr.left + sr.width * .04 - 1.6 * rem, x = nr.left, w = Math.max(11 * rem, right - x);
       st.style.setProperty('--cx', Math.round(x - sr.left) + 'px');
       st.style.setProperty('--cw', Math.round(Math.min(26 * rem, w)) + 'px');
-      st.style.setProperty('--ny', Math.round(nr.bottom - up - sr.top + 1.3 * rem) + 'px');
+      st.style.setProperty('--ny', Math.round(nr.bottom - sr.top + 1.3 * rem) + 'px');
     }
     on(window, 'resize', function(){ if(D === 'beside' && isOpen()) placeBeside(); if(D === 'under' && isOpen()) placeUnder(); });
     function toggle(on){
@@ -520,7 +547,7 @@
       if(on === isOpen()) return;
       st.style.setProperty('--ny', nameY() + 'px');
       if(D === 'beside') placeBeside();
-      if(D === 'under'){ if(on) placeUnder(); else wrap.style.setProperty('--up', '0px'); }
+      if(D === 'under' && innerWidth > 700) turn(on);
       if(D !== 'fold'){ wrap.classList.toggle('open', on); return; }
       // fold: the picture closes into its middle line, the line rises to the name, the words come in under it and the
       // picture opens again beside them, out of a line; closing just lets the words go and the picture slide back

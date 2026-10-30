@@ -117,6 +117,7 @@
     document.body.classList.remove('qh-one', 'in-unveil', 'in-rise');
     document.body.setAttribute('data-page', 'project');
     main.classList.add('q-away');
+    offAll();
     buildQuietProject(slug, k);
     var target = document.querySelector('.p-layer.on img');
     function go(){
@@ -133,7 +134,37 @@
     if(!target || (target.complete && target.naturalWidth)) requestAnimationFrame(go);
     else { target.addEventListener('load', go); target.addEventListener('error', go); }
   }
-  addEventListener('popstate', function(){ location.reload(); });
+  // leaving a page without a reload (his note, 2026-10-29: "when i click to get out of the project the whole page
+  // reloads, it should smoothly go back"; and from one project straight into another): the page's own listeners are
+  // kept here so they can be let go, the page fades out on a layer of its own and the next is built in its place and
+  // fades in, the address following. Back and Forward do the same
+  var OFF = [], CUR = null, HOME_TITLE = PAGE === 'home' ? document.title : 'Gonzalo Cáceres — Architecture';
+  function on(t, ty, fn, o){ t.addEventListener(ty, fn, o); OFF.push(function(){ t.removeEventListener(ty, fn, o); }); }
+  function offAll(){ OFF.splice(0).forEach(function(f){ f(); }); }
+  function swap(url, page, build){
+    if(url) history.pushState({q: page}, '', url);
+    var cur = main.firstElementChild;
+    if(cur){
+      var r = cur.getBoundingClientRect(), old = el('div', 'q-old', document.body);
+      old.style.left = r.left + 'px'; old.style.top = r.top + 'px'; old.style.width = r.width + 'px'; old.style.height = r.height + 'px';
+      old.appendChild(cur); void old.offsetWidth; old.classList.add('out');
+      setTimeout(function(){ old.remove(); }, 700);
+    }
+    offAll(); main.innerHTML = '';
+    document.body.classList.remove('qh-one', 'qh-proj', 'in-unveil', 'in-rise', 'qo-flip');
+    document.body.setAttribute('data-page', page); PAGE = page;
+    main.classList.add('q-away');
+    build();
+    void main.offsetWidth; main.classList.remove('q-away');
+  }
+  function goHome(slug){ swap('/', 'home', function(){ document.title = HOME_TITLE; buildRollOne(slug); }); }
+  function goProject(s){ swap(quietHref(s), 'project', function(){ buildQuietProject(s, 0); }); }
+  addEventListener('popstate', function(){
+    var u = new URLSearchParams(location.search), s = u.get('p');
+    if(PAGE === 'about' || (Q.get('home') || Q.has('flow'))){ location.reload(); return; }
+    if(/project\.html$/.test(location.pathname) && P[s]){ var i = u.get('i'); swap(null, 'project', function(){ buildQuietProject(s, i === 'last' ? 1e3 : i ? (parseInt(i, 10) || 1) - 1 : 0); }); }
+    else { var was = CUR; swap(null, 'home', function(){ document.title = HOME_TITLE; buildRollOne(was); }); }
+  });
   function ratioOf(img){ return img.naturalWidth && img.naturalHeight ? img.naturalWidth / img.naturalHeight : 1.5; }
   function loadAll(list){
     return Promise.all(list.map(function(it){
@@ -290,7 +321,7 @@
   // appears, don't make two appear at the same time"): the same placing (left, right or near the middle, its own size and
   // height), but there is only ever one picture: a scroll fades it out as it rises away and the next one opens up out of
   // its bottom edge somewhere else. The page itself doesn't move. Back with a scroll up. &flow keeps the scrolling page.
-  function buildRollOne(){
+  function buildRollOne(backTo){
     var IN = (Q.get('in') || 'unveil').toLowerCase(); if(['unveil', 'rise'].indexOf(IN) === -1) IN = 'unveil';
     document.body.classList.add('qh-one', 'in-' + IN);
     var wrap = el('div', 'qt', main), nav = el('nav', 'qt-ticks', wrap), st = el('div', 'qo-stage', wrap);
@@ -343,10 +374,11 @@
     var first = firsts[Math.floor(Math.random() * firsts.length)];
     // coming back from a project (a click outside its pictures, or Esc): /?at=<slug> opens on that project, so the visit
     // carries on scrolling from there (his note, 2026-10-29); the address is then cleaned
-    var back = Q.get('at');
-    if(back && withPics.indexOf(back) > -1){ first = back; try { history.replaceState(null, '', location.pathname); } catch(e){} }
+    var back = backTo || Q.get('at');
+    if(back && withPics.indexOf(back) > -1){ first = back; if(!backTo) try { history.replaceState(null, '', location.pathname); } catch(e){} }
     try { localStorage.setItem('gc-first', first); } catch(e){}
     Promise.all(withPics.map(function(s){ return loadAll(pictures(s)); })).then(function(all){
+      if(!st.isConnected || PAGE !== 'home') return;   // left before the pictures came
       var start = 0;
       all.forEach(function(got, j){
         got = homePicks(got, withPics[j]);
@@ -371,7 +403,7 @@
     // (deltas sinking well under the push's strongest) never counts: it used to carry a single swipe two or three projects on (his note,
     // 2026-10-29: "scrolling makes me skip some projects")
     var lastD = 0, run = 0, push = 0, peak = 0, moved = false, STRETCH = 440;
-    addEventListener('wheel', function(e){
+    on(window, 'wheel', function(e){
       if(PAGE !== 'home') return;
       e.preventDefault();
       var d = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX, now = Date.now(), gap = now - lastWheel;
@@ -387,7 +419,7 @@
       run += Math.max(-60, Math.min(60, d));
       if(Math.abs(run) >= STRETCH && step(d > 0 ? 1 : -1)) run = 0;
     }, {passive: false});
-    addEventListener('keydown', function(e){
+    on(window, 'keydown', function(e){
       if(PAGE !== 'home') return;
       if(['ArrowDown', 'ArrowRight', 'PageDown', ' '].indexOf(e.key) > -1){ step(1); e.preventDefault(); }
       if(['ArrowUp', 'ArrowLeft', 'PageUp'].indexOf(e.key) > -1){ step(-1); e.preventDefault(); }
@@ -402,7 +434,7 @@
       var d = Math.abs(dy) > Math.abs(dx) ? dy : dx;
       if(Math.abs(d) > 35) step(d < 0 ? 1 : -1);
     }, {passive: true});
-    addEventListener('resize', function(){ if(PAGE === 'home' && curEl) place(curEl, curEl.o); });
+    on(window, 'resize', function(){ if(PAGE === 'home' && curEl) place(curEl, curEl.o); });
   }
 
   // a project: the same marks, its own opened into one mark per picture; one picture at a time, as large as fits.
@@ -416,13 +448,17 @@
   addEventListener('resize', function(){ Array.prototype.forEach.call(document.querySelectorAll('.qf'), function(f){ if(f.fit) f.fit(); }); });
   function buildQuietProject(slug, startAt){
     var p = P[slug], all = pictures(slug), n = Math.max(1, all.length);
-    var i0 = SLUGS.indexOf(slug);
+    var i0 = SLUGS.indexOf(slug); CUR = slug;
     document.title = p.title + ' — Gonzalo Cáceres';
     document.body.classList.add('qh-proj');
     night(p.dark);
     var wrap = el('div', 'qt qp', main), nav = el('nav', 'qt-ticks', wrap), st = el('div', 'p-stage qt-stage', wrap), fade = fader(st);
     var marks = quietMarks(nav, slug, function(s){ return quietHref(s); }), me = marks[i0];
     me.classList.add('cur'); me.removeAttribute('href'); me.style.setProperty('--p', 1);
+    marks.forEach(function(m){
+      if(m === me) return;
+      m.addEventListener('click', function(e){ if(e.metaKey || e.ctrlKey || e.shiftKey || e.button) return; e.preventDefault(); goProject(m.slug); });
+    });
     var plus = el('button', 'qp-plus', me.querySelector('span'), '+'); plus.type = 'button'; plus.setAttribute('aria-label', 'About this project');
     var subs = el('div', 'qp-subs', nav); nav.insertBefore(subs, me.nextSibling);
     var dots = [];
@@ -456,7 +492,7 @@
       st.style.setProperty('--px', Math.round(x - sr.left + w + 3 * rem) + 'px');
       st.style.setProperty('--ny', (nameY() - 8) + 'px');
     }
-    addEventListener('resize', function(){ if(D === 'beside' && isOpen()) placeBeside(); });
+    on(window, 'resize', function(){ if(D === 'beside' && isOpen()) placeBeside(); });
     function toggle(on){
       on = on == null ? !isOpen() : on;
       if(on === isOpen()) return;
@@ -542,13 +578,13 @@
       // 2026-10-29); scrolling still stops at the ends
       var r = st.getBoundingClientRect(); go((at + (e.clientX < r.left + r.width * .35 ? -1 : 1) + n) % n);
     });
-    document.addEventListener('click', function(e){
+    on(document, 'click', function(e){
       if(e.defaultPrevented || e.button || e.target.closest('a, button, img, .plate, input, textarea, select, label, .qp-card')) return;
       if(isOpen() && D === 'float') return;
       if(String(getSelection())) return;
-      location.href = '/?at=' + encodeURIComponent(slug);
+      goHome(slug);
     });
-    addEventListener('wheel', function(e){
+    on(window, 'wheel', function(e){
       if(card.contains(e.target) && card.scrollHeight > card.clientHeight) return;
       var d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
       if(Math.abs(d) < 8) return;
@@ -556,10 +592,10 @@
       var now = Date.now(); if(now - lock < 750) return; lock = now;
       go(at + (d > 0 ? 1 : -1));
     }, {passive: false});
-    addEventListener('keydown', function(e){
+    on(window, 'keydown', function(e){
       if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){ go(at + 1); e.preventDefault(); }
       if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ go(at - 1); e.preventDefault(); }
-      if(e.key === 'Escape'){ if(isOpen()) toggle(false); else location.href = '/?at=' + encodeURIComponent(slug); }
+      if(e.key === 'Escape'){ if(isOpen()) toggle(false); else goHome(slug); }
     });
     var sx = null;
     st.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive: true});

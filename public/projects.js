@@ -102,7 +102,8 @@ window.PROJECTS = {
       "Joint imagines a Manhattan where music, art, and independent culture can continue to claim space. Conceived above the working DSNY Garage on 12th Avenue, the project builds on public infrastructure to create venues for gathering, experimentation, and performance. For artists without institutional backing or a lasting place in the city, it offers room to create, be heard, and build a community.",
       "Its name carries two meanings: the structural joint that connects individual parts, and the cultural space that brings people together. Inspired by Konrad Wachsmann’s systems of assembly, a modular framework allows spaces to evolve with the artists who inhabit them. Structure becomes a means of supporting creative freedom, allowing different practices, voices, and audiences to meet. Joint seeks to give something lasting to an inherently changing culture: a place to belong, and the freedom to become something new."
     ],
-    credits: [["School", "Columbia GSAPP"], ["Year", "2025"], ["Design", "Gonzalo Cáceres Valcárcel"]],
+    // Site still to come from him (an empty value isn't shown)
+    credits: [["Site", ""], ["Studio", "Core II, Columbia GSAPP"], ["Term", "Fall 2025"], ["Critic", "Christoph Kumpusch"]],
     // after the hero, in this order (his order, 2026-10-29), drawings and renders mixed
     inOrder: true,
     grid: [

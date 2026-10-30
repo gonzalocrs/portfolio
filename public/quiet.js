@@ -392,11 +392,14 @@
       });
       show(start, 1);
     });
+    // a project's name in the index goes straight into the project (his note, 2026-10-29; it used to only show its
+    // picture here): from its picture when that is the one up, otherwise with the same soft change as between projects
     marks.forEach(function(m){
       m.addEventListener('click', function(e){
-        var i = -1; seq.some(function(o, j){ if(o.slug === m.slug){ i = j; return true; } });
-        if(i < 0) return;
-        e.preventDefault(); if(i !== at){ lastStep = Date.now(); show(i, i > at ? 1 : -1); }
+        if(e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+        e.preventDefault();
+        if(curEl && curEl.o.slug === m.slug) into(curEl.querySelector('img'), m.slug, curEl.o.k0);
+        else goProject(m.slug);
       });
     });
     // a new push of the wheel moves one picture as soon as it really moves; while the fingers keep scrolling, every further
@@ -465,9 +468,15 @@
     var dots = [];
     for(var k = 0; k < n; k++){ (function(k){ var b = el('button', 'qs', subs); b.type = 'button'; el('i', '', b); b.setAttribute('aria-label', 'Picture ' + (k + 1)); b.addEventListener('click', function(){ go(k); }); dots.push(b); })(k); }
     // the words, behind the "+", opened one of four ways (&d=, see the CSS); on a phone always the floating card
-    var D = (Q.get('d') || 'beside').toLowerCase(); if(['fold', 'beside'].indexOf(D) === -1) D = 'beside';   // fold: by address only
+    // under (mockup, 2026-10-29, his idea: "when i hit the + the title goes up, the lines also shift up like selecting a
+    // record ... and the description appears below", so the picture is never moved or resized): the default on this
+    // preview; ?d=beside for the live way
+    var D = (Q.get('d') || 'under').toLowerCase(); if(['fold', 'beside', 'under'].indexOf(D) === -1) D = 'under';   // fold: by address only
     if(innerWidth <= 700) D = 'float';
     wrap.classList.add('qd-' + D);
+    // under, while the words are open, another project's name on hover (his note, 2026-10-29, try both): &hov=top (the
+    // name over the words, on the page's own ground; default) or &hov=none (no names while the words are open)
+    var HOV = (Q.get('hov') || 'top').toLowerCase(); wrap.classList.add('hv-' + (HOV === 'none' ? 'none' : 'top'));
     var card = el('aside', 'qp-card', st), meta = el('div', 'meta', card);
     el('span', 'k', meta, p.kicker || '');
     var cr = el('div', 'cr', meta);
@@ -493,12 +502,83 @@
       st.style.setProperty('--px', Math.round(x - sr.left + w + 3 * rem) + 'px');
       st.style.setProperty('--ny', (nameY() - 8) + 'px');
     }
-    on(window, 'resize', function(){ if(D === 'beside' && isOpen()) placeBeside(); });
+    // under: like picking a record from a rack (his note, 2026-10-29: "if you choose this record then the ones on top
+    // go to the bottom, like a circular thing"): the column turns round until this project is at the top, the projects
+    // above it going round to the bottom, under the last; every line stays (the other projects' and this one's
+    // pictures'). The words open under the name, right of the lines, as wide as the room left of the widest a picture
+    // can be, so no picture moves or shrinks. Closing turns the column back
+    var ORDER = Array.prototype.slice.call(nav.children), ABOVE = ORDER.slice(0, ORDER.indexOf(me));
+    function regroup(){
+      var g = null, i = 0;
+      Array.prototype.forEach.call(nav.children, function(c){
+        if(!c.classList.contains('qk') || c.classList.contains('qa')) return;
+        var q = P[c.slug]; c.classList.toggle('gs', i++ > 0 && q.group !== g); g = q.group;
+      });
+    }
+    // the turn moves every line by the same distance at the same pace, like records sliding in a rack: the ones
+    // going round leave over the top as they arrive from below (and the other way when it turns back)
+    // it turns only when the title has to rise (his notes, 2026-10-29): with short words the records stay on top
+    var WRAP = [];
+    function turn(on){
+      var kids = Array.prototype.slice.call(nav.children), vr = nav.getBoundingClientRect(), was = new Map();
+      kids.forEach(function(k){ var r = k.getBoundingClientRect(); was.set(k, {top: r.top, left: r.left}); });
+      var rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      if(on){
+        // where the title goes: level with the top of the picture showing, or lower so that title and words sit
+        // centred on its height when they are shorter than it (never above the picture)
+        var im = curImg(), ir = im ? im.getBoundingClientRect() : st.getBoundingClientRect();
+        placeUnder();
+        var nb = nameEl.getBoundingClientRect(), h = nb.height + 1.3 * rem + (tx.getBoundingClientRect().bottom - meta.getBoundingClientRect().top);
+        // his rule (2026-10-29): when the words are long enough to push the title up, all the lines above roll round
+        // to the bottom; when they are not, they all stay where they are
+        var T = ir.top + Math.max(0, (ir.height - h) / 2);
+        // and the projects of its own group above it stay on top, over the title (his note, 2026-10-30: the second of
+        // Research keeps the first of Research above it; only the other groups go round)
+        WRAP = T < nb.top - .8 * rem ? ABOVE.filter(function(k){ return !k.slug || P[k.slug].group !== P[slug].group; }) : [];
+        var ab = nav.querySelector('.qk.qa'); WRAP.forEach(function(k){ nav.insertBefore(k, ab); });
+        nav.classList.add('qu-top'); nav.style.paddingTop = '';
+        regroup();
+        var dy = T - nameEl.getBoundingClientRect().top; if(dy > 0) nav.style.paddingTop = Math.round(dy) + 'px';
+        placeUnder();   // measured at the new places, before anything moves
+      } else {
+        ORDER.forEach(function(k){ nav.appendChild(k); });
+        nav.classList.remove('qu-top'); nav.style.paddingTop = '';
+        regroup();
+      }
+      var S = was.get(me).top - me.getBoundingClientRect().top, opt = {duration: 1000, easing: 'cubic-bezier(.45,.05,.2,1)'};
+      kids.forEach(function(k){
+        var o = was.get(k), d = o.top - k.getBoundingClientRect().top;
+        if(!d) return;
+        if(WRAP.indexOf(k) > -1){
+          var g = k.cloneNode(true); g.classList.add('qu-ghost'); g.style.top = (o.top - vr.top) + 'px'; g.style.left = (o.left - vr.left) + 'px';
+          nav.appendChild(g);
+          g.animate([{opacity: 1, transform: 'none'}, {opacity: 0, transform: 'translateY(' + (-S) + 'px)'}], opt).onfinish = function(){ g.remove(); };
+          k.animate([{opacity: 0, transform: 'translateY(' + S + 'px)'}, {opacity: 1, transform: 'none'}], opt);
+        }
+        else k.animate([{transform: 'translateY(' + d + 'px)'}, {transform: 'none'}], opt);
+      });
+    }
+    // the words: under the name, which is now level with the top of the picture; as wide as the room
+    // left of the widest a picture can be plus the stage's own margin, the pictures sliding right by that margin (never
+    // smaller, never past the stage's edge)
+    function placeUnder(){
+      var rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      var nr = nameEl.getBoundingClientRect(), sr = st.getBoundingClientRect(), pad = sr.width * .04;
+      var x = nr.left, base = Math.max(11 * rem, sr.left + pad - 1.6 * rem - x), most = base + pad;
+      st.style.setProperty('--cx', Math.round(x - sr.left) + 'px');
+      st.style.setProperty('--ny', Math.round(nr.bottom - sr.top + 1.3 * rem) + 'px');
+      // as wide as it can be (his note: "very narrow"): the full stage margin, the pictures sliding right by as much
+      var w = Math.min(26 * rem, most);
+      st.style.setProperty('--cw', Math.round(w) + 'px');
+      st.style.setProperty('--sh', Math.round(Math.max(0, w - base)) + 'px');
+    }
+    on(window, 'resize', function(){ if(D === 'beside' && isOpen()) placeBeside(); if(D === 'under' && isOpen()) placeUnder(); });
     function toggle(on){
       on = on == null ? !isOpen() : on;
       if(on === isOpen()) return;
       st.style.setProperty('--ny', nameY() + 'px');
       if(D === 'beside') placeBeside();
+      if(D === 'under' && innerWidth > 700) turn(on);
       if(D !== 'fold'){ wrap.classList.toggle('open', on); return; }
       // fold: the picture closes into its middle line, the line rises to the name, the words come in under it and the
       // picture opens again beside them, out of a line; closing just lets the words go and the picture slide back

@@ -86,13 +86,14 @@ window.PROJECTS = {
   "the-outermost-dock": {
     title: "Outer Dock", group: "Unbuilt", hue: 200,
     kicker: "New York, 2026",
-    credits: [["Studio", "Columbia GSAPP"], ["Program", "Architecture as reciprocal infrastructure"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2026"]],
+    credits: [["Site", ""], ["Studio", "Columbia GSAPP"], ["Program", "Architecture as reciprocal infrastructure"], ["Critic", ""], ["Year", "2026"]],
     diagram: {}
   },
   "social-sanctuary": {
     title: "East 5th", group: "Unbuilt", hue: 42,
     kicker: "New York, 2025",
-    credits: [["Studio", "Columbia GSAPP"], ["Program", "Housing as social infrastructure"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2025"]],
+    // Term: Fall 2025 (not shown; Program replaced Term)
+    credits: [["Site", ""], ["Studio", "Core III, Columbia GSAPP"], ["Program", "Housing as social infrastructure"], ["Critic", "Lindy Roy"], ["Year", "2025"]],
     diagram: {src: "img/social-sanctuary/hand-drawing.jpg"}
   },
   "permanent-impermanence": {
@@ -103,7 +104,7 @@ window.PROJECTS = {
       "Joint imagines a Manhattan where music, art, and independent culture can continue to claim space. Conceived above the working DSNY Garage on 12th Avenue, the project builds on public infrastructure to create venues for gathering, experimentation, and performance. For artists without institutional backing or a lasting place in the city, it offers room to create, be heard, and build a community.",
       "Its name carries two meanings: the structural joint that connects individual parts, and the cultural space that brings people together. Inspired by Konrad Wachsmann’s systems of assembly, a modular framework allows spaces to evolve with the artists who inhabit them. Structure becomes a means of supporting creative freedom, allowing different practices, voices, and audiences to meet. Joint seeks to give something lasting to an inherently changing culture: a place to belong, and the freedom to become something new."
     ],
-    // Site still to come from him (an empty value isn't shown); Program replaces Term (his note, 2026-10-29)
+    // Site still to come from him (an empty value isn't shown); Program replaces Term (his note, 2026-10-29). Term: Spring 2025
     credits: [["Site", ""], ["Studio", "Core II, Columbia GSAPP"], ["Program", "An architecture of instability"], ["Critic", "Christoph Kumpusch"], ["Year", "2025"]],
     // after the hero, in this order (his order, 2026-10-29), drawings and renders mixed
     inOrder: true,
@@ -117,13 +118,6 @@ window.PROJECTS = {
       {src: "img/permanent-impermanence/hallway.jpg", caption: "Hallway"}
     ]
   },
-  "intra-urban-forestation": {
-    title: "Aftergrowth", group: "Unbuilt", hue: 150,
-    kicker: "New York, 2024",
-    credits: [["Studio", "Columbia GSAPP"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2024"]],
-    diagram: {}
-  },
-
   "anticlastic-roof-structure": {
     title: "Anticlastic Surfaces", group: "Research", hue: 8,
     kicker: "New York, 2026",
@@ -175,11 +169,30 @@ window.PROJECTS = {
   "vaulted-shell-structure": {
     title: "Lean Shells", group: "Research", hue: 260,
     kicker: "New York, 2026",
-    lede: "A physical study of vaulted plywood shell structures, investigating efficient, structurally sound and expressive roof systems that can accommodate insulation.",
-    credits: [["Studio", "Robert Marino Architects"], ["Type", "Structural Form-Finding"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2026"]],
-    // reserves the full-bleed diagram slot (see anticlastic-roof-structure)
-    // before the real drawing exists; shows a roadmap placeholder until then
-    diagram: {}
+    text: [
+      "Lean Shells investigates how a roof can do more with less material. Thin plywood panels form hollow units whose angled connections generate a vault, combining structural depth with space for insulation. The study seeks an efficient enclosure through the careful arrangement of lightweight parts.",
+      "Physical model making connects the detail of each joint to the geometry of the whole. Exposed plywood edges and repeating facets give the assembly its architectural character. Material economy becomes a design ambition: creating strength, shelter, and spatial presence through a restrained system of parts."
+    ],
+    credits: [["Studio", "Robert Marino Architects"], ["Type", "Structural Systems, Material Research"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2026"]],
+    hero: "img/vaulted-shell-structure/model-9751.jpg",
+    home: ["img/vaulted-shell-structure/model-9751.jpg", "img/vaulted-shell-structure/section.png"],
+    // his order (2026-10-29): each drawing followed by the photo of the same view, the drawings with the house last
+    inOrder: true,
+    grid: [
+      {src: "img/vaulted-shell-structure/section.png", drawing: true, caption: "Section"},
+      {src: "img/vaulted-shell-structure/model-9931.jpg", caption: "Physical model"},
+      {src: "img/vaulted-shell-structure/elevation.png", drawing: true, caption: "Elevation"},
+      {src: "img/vaulted-shell-structure/model-9746.jpg", caption: "Physical model"},
+      {src: "img/vaulted-shell-structure/roof-plan.png", drawing: true, caption: "Roof plan"},
+      {src: "img/vaulted-shell-structure/model-9795.jpg", caption: "Physical model"},
+      {src: "img/vaulted-shell-structure/hand-drawing.jpg", drawing: true, caption: "Vaulted shell study"},
+      {src: "img/vaulted-shell-structure/model-9937.jpg", caption: "Physical model, underside"},
+      // model-9925 (front close-up of the joints) left out for now to try the page without it (his ask, 2026-10-29)
+      {src: "img/vaulted-shell-structure/model-9928.jpg", caption: "Physical model, joints"},
+      {src: "img/vaulted-shell-structure/site-plan.png", drawing: true, caption: "Plan with the existing house"},
+      {src: "img/vaulted-shell-structure/site-elevation.png", drawing: true, caption: "Elevation with the existing house"},
+      {src: "img/vaulted-shell-structure/house-elevation.png", drawing: true, caption: "End elevation with the existing house"}
+    ]
   },
   "modular-living-architecture": {
     title: "Open Assembly", group: "Research", hue: 120,

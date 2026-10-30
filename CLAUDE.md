@@ -19,7 +19,7 @@ https://portfolio.gonzalo-crs.workers.dev. GitHub: `gonzalocrs/portfolio`, branc
 - `wrangler.toml`: Worker config. `.wrangler/` is local cache and is not committed.
 
 Project slugs: sierra-hotel, edificio-murano, urba-branding, the-outermost-dock, social-sanctuary,
-permanent-impermanence, intra-urban-forestation, anticlastic-roof-structure, vaulted-shell-structure,
+permanent-impermanence, anticlastic-roof-structure, vaulted-shell-structure,
 modular-living-architecture. The doc comment at the top of `public/projects.js` explains every field.
 
 ## How a project page works

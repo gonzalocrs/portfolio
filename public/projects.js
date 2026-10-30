@@ -47,13 +47,14 @@ window.PROJECTS = {
     heroPositionPhone: "78% center",   // where a phone-shaped crop of the hero looks (the building is on the right)
     // all the pictures in one grid after the text, (see project.js: grid)
     grid: [
-      {src: "img/sierra-hotel/photo-4-crop.jpg", size: "full"},
       {src: "img/sierra-hotel/render-facade.jpg", size: "xl"},
       {src: "img/sierra-hotel/exploded-diagram.jpg", size: "tower", drawing: true, fill: true, caption: "Exploded axonometric"},
       {src: "img/sierra-hotel/elevation.svg", size: "half", drawing: true, caption: "Front elevation"},
       {src: "img/sierra-hotel/floor-plans.svg", size: "wide", drawing: true, caption: "Floor plans"},
       {src: "img/sierra-hotel/photo-1.jpg", size: "half"},
-      {src: "img/sierra-hotel/photo-3.jpg", size: "half"}
+      {src: "img/sierra-hotel/photo-3.jpg", size: "half"},
+      // his note, 2026-10-29: this one last
+      {src: "img/sierra-hotel/photo-4-crop.jpg", size: "full"}
     ],
     gallery: {
       photosLayout: "grid",

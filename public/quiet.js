@@ -532,7 +532,9 @@
         // his rule (2026-10-29): when the words are long enough to push the title up, all the lines above roll round
         // to the bottom; when they are not, they all stay where they are
         var T = ir.top + Math.max(0, (ir.height - h) / 2);
-        WRAP = T < nb.top - .8 * rem ? ABOVE.slice() : [];
+        // and the projects of its own group above it stay on top, over the title (his note, 2026-10-30: the second of
+        // Research keeps the first of Research above it; only the other groups go round)
+        WRAP = T < nb.top - .8 * rem ? ABOVE.filter(function(k){ return !k.slug || P[k.slug].group !== P[slug].group; }) : [];
         var ab = nav.querySelector('.qk.qa'); WRAP.forEach(function(k){ nav.insertBefore(k, ab); });
         nav.classList.add('qu-top'); nav.style.paddingTop = '';
         regroup();

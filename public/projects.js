@@ -118,13 +118,6 @@ window.PROJECTS = {
       {src: "img/permanent-impermanence/hallway.jpg", caption: "Hallway"}
     ]
   },
-  "intra-urban-forestation": {
-    title: "Aftergrowth", group: "Unbuilt", hue: 150,
-    kicker: "New York, 2024",
-    credits: [["Site", ""], ["Studio", "Columbia GSAPP"], ["Program", ""], ["Critic", ""], ["Year", "2024"]],
-    diagram: {}
-  },
-
   "anticlastic-roof-structure": {
     title: "Anticlastic Surfaces", group: "Research", hue: 8,
     kicker: "New York, 2026",

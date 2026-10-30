@@ -438,3 +438,10 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 .wd-tail .qp-card .cr p{margin:0 0 .15rem;font-size:.76rem;font-weight:300;color:var(--mute)}
 .wd-tail .qp-card .cr b{font-weight:300;color:var(--faint);margin-right:.5em}
 .wd-bare .qp-card .tx p,.wd-line .qp-card .tx p,.wd-tail .qp-card .tx p{font-size:.84rem;line-height:1.62;font-weight:300}
+/* mix (his pick): label's credits (names in small grey mono capitals, values beside them) over first's text (the first
+   sentence of each paragraph in full ink, the rest grey) */
+.wd-mix .qp-card .cr p{display:grid;grid-template-columns:5.6rem 1fr;align-items:baseline;margin:0 0 .3rem;font-size:.84rem;font-weight:300}
+.wd-mix .qp-card .cr b{font-family:var(--mono);font-weight:400;font-size:.6rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mute)}
+.wd-mix .qp-card .tx{margin-top:1.6rem}
+.wd-mix .qp-card .tx p{font-size:.84rem;line-height:1.62;font-weight:300;color:var(--mute)}
+.wd-mix .qp-card .tx p .s1{color:var(--ink);font-weight:400}

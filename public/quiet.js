@@ -92,11 +92,12 @@
   // more open), lede (credits on one small line, the first paragraph set large, the rest small), mono (all in the mono
   // face, like a data sheet), plain (no credits, only the place and year over his paragraphs, set a little larger),
   // first (the first sentence of each paragraph in full ink, the rest lighter), bare / line / tail (the
-  // credits kept minimal, see the CSS); kept for the visit, ?words=off back to
-  // the live setting
+  // credits kept minimal, see the CSS), mix (his pick, 2026-10-29: label's credits with first's text; the default on
+  // this preview); kept for the visit, ?words=off shows the live setting
   var WORDS = Q.get('words');
-  try{ if(WORDS === 'off') sessionStorage.removeItem('gc-words'); else if(WORDS) sessionStorage.setItem('gc-words', WORDS); WORDS = sessionStorage.getItem('gc-words'); }catch(e){}
-  if(['label', 'lede', 'mono', 'plain', 'first', 'bare', 'line', 'tail'].indexOf(WORDS) > -1) document.body.classList.add('wd-' + WORDS);
+  try{ if(WORDS) sessionStorage.setItem('gc-words', WORDS); WORDS = sessionStorage.getItem('gc-words'); }catch(e){}
+  WORDS = WORDS || 'mix';
+  if(['label', 'lede', 'mono', 'plain', 'first', 'bare', 'line', 'tail', 'mix'].indexOf(WORDS) > -1) document.body.classList.add('wd-' + WORDS);
   var TICK = Q.get('tick');
   try{ if(TICK === 'off') sessionStorage.removeItem('gc-tick'); else if(TICK) sessionStorage.setItem('gc-tick', TICK); TICK = sessionStorage.getItem('gc-tick'); }catch(e){}
   TICK = TICK && TICK !== 'off' ? TICK : 'tilt';

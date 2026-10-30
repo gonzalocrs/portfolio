@@ -427,9 +427,14 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 .wd-plain .qp-card .tx p{font-size:.92rem;line-height:1.6;font-weight:300;margin-bottom:1.1rem}
 .wd-first .qp-card .tx p{font-size:.84rem;line-height:1.62;font-weight:300;color:var(--mute)}
 .wd-first .qp-card .tx p .s1{color:var(--ink);font-weight:400}
-.wd-sheet .qp-card .cr{display:grid;grid-template-columns:1fr 1fr;gap:1.1rem 1.6rem}
-.wd-sheet .qp-card .cr p{display:flex;flex-direction:column;margin:0;font-size:.9rem;font-weight:400;line-height:1.35}
-.wd-sheet .qp-card .cr b{font-weight:300;color:var(--mute);margin-bottom:.15rem}
-.wd-sheet .qp-card .cr b::after{content:"\21B4";display:inline-block;margin-left:.3em;font-size:.85em}
-.wd-sheet .qp-card .tx{margin-top:1.8rem}
-.wd-sheet .qp-card .tx p{font-size:.84rem;line-height:1.62;font-weight:300}
+/* minimal credits (his note, 2026-10-29: "something more minimalist" than his reference): bare (only the values, small
+   and grey, no names), line (the values on one small grey line), tail (the credits after his paragraphs, small and grey) */
+.wd-bare .qp-card .cr b,.wd-line .qp-card .cr b{display:none}
+.wd-bare .qp-card .cr p{margin:0 0 .15rem;font-size:.8rem;font-weight:300;color:var(--mute)}
+.wd-line .qp-card .cr p{display:inline;margin:0;font-size:.8rem;font-weight:300;color:var(--mute)}
+.wd-line .qp-card .cr p + p::before{content:"\00B7";margin:0 .5em;color:var(--faint)}
+.wd-bare .qp-card .tx,.wd-line .qp-card .tx{margin-top:1.6rem}
+.wd-tail .qp-card .cr{margin-top:.6rem}
+.wd-tail .qp-card .cr p{margin:0 0 .15rem;font-size:.76rem;font-weight:300;color:var(--mute)}
+.wd-tail .qp-card .cr b{font-weight:300;color:var(--faint);margin-right:.5em}
+.wd-bare .qp-card .tx p,.wd-line .qp-card .tx p,.wd-tail .qp-card .tx p{font-size:.84rem;line-height:1.62;font-weight:300}

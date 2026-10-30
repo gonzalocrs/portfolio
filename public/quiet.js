@@ -91,12 +91,12 @@
   // his, only how they are set changes: label (credits as a quiet two-column label, a hairline, the text lighter and
   // more open), lede (credits on one small line, the first paragraph set large, the rest small), mono (all in the mono
   // face, like a data sheet), plain (no credits, only the place and year over his paragraphs, set a little larger),
-  // first (the first sentence of each paragraph in full ink, the rest lighter), sheet (his reference, 2026-10-29: the
-  // credits in two columns, each a grey name with a small down-turning arrow over its value); kept for the visit, ?words=off back to
+  // first (the first sentence of each paragraph in full ink, the rest lighter), bare / line / tail (the
+  // credits kept minimal, see the CSS); kept for the visit, ?words=off back to
   // the live setting
   var WORDS = Q.get('words');
   try{ if(WORDS === 'off') sessionStorage.removeItem('gc-words'); else if(WORDS) sessionStorage.setItem('gc-words', WORDS); WORDS = sessionStorage.getItem('gc-words'); }catch(e){}
-  if(['label', 'lede', 'mono', 'plain', 'first', 'sheet'].indexOf(WORDS) > -1) document.body.classList.add('wd-' + WORDS);
+  if(['label', 'lede', 'mono', 'plain', 'first', 'bare', 'line', 'tail'].indexOf(WORDS) > -1) document.body.classList.add('wd-' + WORDS);
   var TICK = Q.get('tick');
   try{ if(TICK === 'off') sessionStorage.removeItem('gc-tick'); else if(TICK) sessionStorage.setItem('gc-tick', TICK); TICK = sessionStorage.getItem('gc-tick'); }catch(e){}
   TICK = TICK && TICK !== 'off' ? TICK : 'tilt';
@@ -440,6 +440,7 @@
       var e = el('p', p.lede && i === 0 ? 'lede' : '', tx), m = /^(.+?[.!?])(\s.*)?$/.exec(t);
       if(m && m[2]){ el('span', 's1', e, m[1]); e.appendChild(document.createTextNode(m[2])); } else e.textContent = t;
     });
+    if(WORDS === 'tail') card.appendChild(cr);   // ?words=tail: the credits after his paragraphs
     var nameEl = me.querySelector('span'), rule = D === 'fold' ? el('div', 'qd-rule', st) : null, T = [];
     function nameY(){ var a = nameEl.getBoundingClientRect(), b = st.getBoundingClientRect(); return Math.max(0, Math.round(a.top + a.height / 2 - b.top)); }
     function curImg(){ return st.querySelector('.p-layer.on img, .p-layer.on .plate'); }

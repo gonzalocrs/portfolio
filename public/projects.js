@@ -12,6 +12,7 @@
     heroPositionPhone  optional: where a phone-shaped crop of the hero looks on the home page, e.g. "78% center"
     home      optional: the picture the home page shows for this project, e.g. ["img/sierra-hotel/elevation.svg"]; the
               home shows one picture per project, so only the first one listed counts; without it the home uses the first
+    subtitle  his one-line subtitle, as in his print portfolio's contents (not shown on the site yet)
     lede      one or two sentences under the title
     text      a short second paragraph
     inOrder   optional: true keeps the grid's own order after the hero (otherwise drawings, then models, then photos)
@@ -33,6 +34,7 @@
 window.PROJECTS = {
   "sierra-hotel": {
     title: "Sierra Hotel", group: "Built", hue: 18,
+    subtitle: "Hospitality in Peru",
     kicker: "Cusco, 2023",
     ready: true,
     text: [
@@ -71,12 +73,14 @@ window.PROJECTS = {
   },
   "edificio-murano": {
     title: "Edificio Murano", group: "Built", hue: 210,
+    subtitle: "Housing in Peru",
     kicker: "Cusco, 2021",
     credits: [["Studio", "Urba Inmobiliaria"], ["Program", "Residential"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2021"]],
     diagram: {}
   },
   "urba-branding": {
     title: "Urba Inmobiliaria", group: "Built", hue: 96,
+    subtitle: "Brand identity",
     kicker: "Lima, 2020",
     credits: [["Studio", "Cirkel"], ["Focus", "Graphic / Branding"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2020"]],
     diagram: {}
@@ -84,18 +88,21 @@ window.PROJECTS = {
 
   "the-outermost-dock": {
     title: "Outer Dock", group: "Unbuilt", hue: 200,
+    subtitle: "Architecture as reciprocal infrastructure",
     kicker: "New York, 2026",
     credits: [["Studio", "Columbia GSAPP"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2026"]],
     diagram: {}
   },
   "social-sanctuary": {
     title: "East 5th", group: "Unbuilt", hue: 42,
+    subtitle: "Housing as social infrastructure",
     kicker: "New York, 2025",
     credits: [["Studio", "Columbia GSAPP"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2025"]],
     diagram: {src: "img/social-sanctuary/hand-drawing.jpg"}
   },
   "permanent-impermanence": {
     title: "Joint", group: "Unbuilt", hue: 330, dark: true,
+    subtitle: "An architecture of instability",
     kicker: "New York, 2025",
     hero: "img/permanent-impermanence/perspective.jpg",
     text: [
@@ -125,6 +132,7 @@ window.PROJECTS = {
 
   "anticlastic-roof-structure": {
     title: "Anticlastic Surfaces", group: "Research", hue: 8,
+    subtitle: "Developing curvature",
     kicker: "New York, 2026",
     lede: "How can a double-curved surface emerge from a system of flat, developable elements?",
     text: [
@@ -175,6 +183,7 @@ window.PROJECTS = {
   },
   "vaulted-shell-structure": {
     title: "Lean Shells", group: "Research", hue: 260,
+    subtitle: "Form through material",
     kicker: "New York, 2026",
     lede: "A physical study of vaulted plywood shell structures, investigating efficient, structurally sound and expressive roof systems that can accommodate insulation.",
     credits: [["Studio", "Robert Marino Architects"], ["Focus", "Structural Form-Finding"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2026"]],
@@ -184,6 +193,7 @@ window.PROJECTS = {
   },
   "modular-living-architecture": {
     title: "Open Assembly", group: "Research", hue: 120,
+    subtitle: "Ecosystem of exploration",
     kicker: "New York, 2025",
     lede: "A modular system for sphere-like structures, built from the fewest possible parts that assemble with one another, like an organic system.",
     credits: [["Focus", "Modular Systems"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2025"]],

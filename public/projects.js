@@ -171,9 +171,25 @@ window.PROJECTS = {
     kicker: "New York, 2026",
     lede: "A physical study of vaulted plywood shell structures, investigating efficient, structurally sound and expressive roof systems that can accommodate insulation.",
     credits: [["Studio", "Robert Marino Architects"], ["Type", "Structural Form-Finding"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2026"]],
-    // reserves the full-bleed diagram slot (see anticlastic-roof-structure)
-    // before the real drawing exists; shows a roadmap placeholder until then
-    diagram: {}
+    diagram: {src: "img/vaulted-shell-structure/hand-drawing.jpg", caption: "Vaulted shell study"},
+    hero: "img/vaulted-shell-structure/model-9751.jpg",
+    home: ["img/vaulted-shell-structure/model-9751.jpg", "img/vaulted-shell-structure/section.png"],
+    // drawings first (the shell, then the shell on the existing house), then the model photos
+    grid: [
+      {src: "img/vaulted-shell-structure/section.png", drawing: true, caption: "Section"},
+      {src: "img/vaulted-shell-structure/elevation.png", drawing: true, caption: "Elevation"},
+      {src: "img/vaulted-shell-structure/roof-plan.png", drawing: true, caption: "Roof plan"},
+      {src: "img/vaulted-shell-structure/site-plan.png", drawing: true, caption: "Plan with the existing house"},
+      {src: "img/vaulted-shell-structure/site-elevation.png", drawing: true, caption: "Elevation with the existing house"},
+      {src: "img/vaulted-shell-structure/house-elevation.png", drawing: true, caption: "End elevation with the existing house"},
+      {src: "img/vaulted-shell-structure/model-9795.jpg", caption: "Physical model"},
+      {src: "img/vaulted-shell-structure/model-9931.jpg", caption: "Physical model"},
+      {src: "img/vaulted-shell-structure/model-9746.jpg", caption: "Physical model"},
+      {src: "img/vaulted-shell-structure/model-9937.jpg", caption: "Physical model, underside"},
+      {src: "img/vaulted-shell-structure/model-9925.jpg", caption: "Physical model, joints"},
+      {src: "img/vaulted-shell-structure/model-9928.jpg", caption: "Physical model, joints"},
+      {src: "img/vaulted-shell-structure/model-9933.jpg", caption: "Physical model, crown"}
+    ]
   },
   "modular-living-architecture": {
     title: "Open Assembly", group: "Research", hue: 120,

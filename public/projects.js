@@ -39,7 +39,7 @@ window.PROJECTS = {
       "This project transformed an existing structural shell into a hotel, requiring a complete redesign of the interior layout and façade. As my first non-residential project, it gave me the opportunity to explore how architecture could shape a guest’s experience while working within the constraints of an existing structure.",
       "Materiality became a central focus of the design, connecting the hotel to Cusco’s architectural character. The façade is organized into three elements: base, body, and crown. The base draws on the city’s rustic textures, while the body reinterprets the same warm palette through a contemporary, restrained composition. At the rooftop, natural materials and floor-to-ceiling glazing frame the surrounding mountains, making the landscape part of the guest experience."
     ],
-    credits: [["Type", "Hospitality"], ["Location", "Cusco, Peru"], ["Year", "2023"], ["Studio", "Urba"], ["Design", "Gonzalo Cáceres Valcárcel"]],
+    credits: [["Studio", "Urba Inmobiliaria"], ["Type", "Hospitality"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2023"]],
     diagram: {src: "img/sierra-hotel/exploded-diagram.jpg", caption: "Exploded axonometric"},
     hero: "img/sierra-hotel/hero.jpg",
     home: ["img/sierra-hotel/elevation.svg", "img/sierra-hotel/floor-plans.svg"],
@@ -72,26 +72,26 @@ window.PROJECTS = {
   "edificio-murano": {
     title: "Edificio Murano", group: "Built", hue: 210,
     kicker: "Cusco, 2021",
-    credits: [["Type", "Residential"], ["Location", "Cusco, Peru"], ["Year", "2021"], ["Studio", "Urba"], ["Design", "Gonzalo Cáceres Valcárcel"]],
+    credits: [["Studio", "Urba Inmobiliaria"], ["Type", "Residential"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2021"]],
     diagram: {}
   },
   "urba-branding": {
     title: "Urba Inmobiliaria", group: "Built", hue: 96,
     kicker: "Lima, 2020",
-    credits: [["Type", "Graphic / Branding"], ["Location", "Lima, Peru"], ["Year", "2020"], ["Studio", "Cirkel"], ["Design", "Gonzalo Cáceres Valcárcel"]],
+    credits: [["Studio", "Cirkel"], ["Type", "Graphic / Branding"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2020"]],
     diagram: {}
   },
 
   "the-outermost-dock": {
     title: "Outer Dock", group: "Unbuilt", hue: 200,
     kicker: "New York, 2026",
-    credits: [["School", "Columbia GSAPP"], ["Year", "2026"], ["Design", "Gonzalo Cáceres Valcárcel"]],
+    credits: [["Studio", "Columbia GSAPP"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2026"]],
     diagram: {}
   },
   "social-sanctuary": {
     title: "East 5th", group: "Unbuilt", hue: 42,
     kicker: "New York, 2025",
-    credits: [["School", "Columbia GSAPP"], ["Year", "2025"], ["Design", "Gonzalo Cáceres Valcárcel"]],
+    credits: [["Studio", "Columbia GSAPP"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2025"]],
     diagram: {src: "img/social-sanctuary/hand-drawing.jpg"}
   },
   "permanent-impermanence": {
@@ -102,8 +102,8 @@ window.PROJECTS = {
       "Joint imagines a Manhattan where music, art, and independent culture can continue to claim space. Conceived above the working DSNY Garage on 12th Avenue, the project builds on public infrastructure to create venues for gathering, experimentation, and performance. For artists without institutional backing or a lasting place in the city, it offers room to create, be heard, and build a community.",
       "Its name carries two meanings: the structural joint that connects individual parts, and the cultural space that brings people together. Inspired by Konrad Wachsmann’s systems of assembly, a modular framework allows spaces to evolve with the artists who inhabit them. Structure becomes a means of supporting creative freedom, allowing different practices, voices, and audiences to meet. Joint seeks to give something lasting to an inherently changing culture: a place to belong, and the freedom to become something new."
     ],
-    // Site still to come from him (an empty value isn't shown)
-    credits: [["Site", ""], ["Studio", "Core II, Columbia GSAPP"], ["Term", "Fall 2025"], ["Critic", "Christoph Kumpusch"]],
+    // Site and Program still to come from him (an empty value isn't shown); Program replaces Term (his note, 2026-10-29)
+    credits: [["Site", ""], ["Studio", "Core II, Columbia GSAPP"], ["Program", ""], ["Critic", "Christoph Kumpusch"], ["Year", "2025"]],
     // after the hero, in this order (his order, 2026-10-29), drawings and renders mixed
     inOrder: true,
     grid: [
@@ -119,7 +119,7 @@ window.PROJECTS = {
   "intra-urban-forestation": {
     title: "Aftergrowth", group: "Unbuilt", hue: 150,
     kicker: "New York, 2024",
-    credits: [["School", "Columbia GSAPP"], ["Year", "2024"], ["Design", "Gonzalo Cáceres Valcárcel"]],
+    credits: [["Studio", "Columbia GSAPP"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2024"]],
     diagram: {}
   },
 
@@ -132,7 +132,7 @@ window.PROJECTS = {
       "Physical models became a way to investigate the relationship between geometry, material, and structural behavior. As the panels accumulate, their changes in direction produce depth across the surface, allowing the shell to gain stiffness while maintaining the economy and fabrication logic of flat sheet material. The resulting geometry is therefore not only a formal approximation of a curved surface, but an exploration of how curvature itself can become a structural mechanism.",
       "The study also raises a question beyond the plywood shell: if structural depth is generated by the geometry of the surface, could the layers normally added to that depth participate in the structural system itself? Rather than treating insulation as a separate layer applied to a finished structure, future iterations could explore whether it might work together with the plywood skin to reinforce the shell, potentially reducing material while increasing its thickness and performance."
     ],
-    credits: [["Type", "Structural Form-Finding, Material Research"], ["Practice", "Robert Marino Architects"], ["Year", "2026"], ["Design", "Gonzalo Cáceres Valcárcel"]],
+    credits: [["Studio", "Robert Marino Architects"], ["Type", "Structural Form-Finding, Material Research"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2026"]],
     diagram: {src: "img/anticlastic-roof-structure/hand-drawing.jpg", caption: "Spherical vs. hyperbolic curvature study"},
     hero: "img/anticlastic-roof-structure/hero.jpg",
     home: ["img/anticlastic-roof-structure/hero.jpg", "img/anticlastic-roof-structure/section.png"],
@@ -177,7 +177,7 @@ window.PROJECTS = {
     title: "Lean Shells", group: "Research", hue: 260,
     kicker: "New York, 2026",
     lede: "A physical study of vaulted plywood shell structures, investigating efficient, structurally sound and expressive roof systems that can accommodate insulation.",
-    credits: [["Type", "Structural Form-Finding"], ["Practice", "Robert Marino Architects"], ["Year", "2026"], ["Design", "Gonzalo Cáceres Valcárcel"]],
+    credits: [["Studio", "Robert Marino Architects"], ["Type", "Structural Form-Finding"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2026"]],
     // reserves the full-bleed diagram slot (see anticlastic-roof-structure)
     // before the real drawing exists; shows a roadmap placeholder until then
     diagram: {}
@@ -186,7 +186,7 @@ window.PROJECTS = {
     title: "Open Assembly", group: "Research", hue: 120,
     kicker: "New York, 2025",
     lede: "A modular system for sphere-like structures, built from the fewest possible parts that assemble with one another, like an organic system.",
-    credits: [["Type", "Modular Systems"], ["Year", "2025"], ["Design", "Gonzalo Cáceres Valcárcel"]],
+    credits: [["Type", "Modular Systems"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2025"]],
     diagram: {}
   }
 };

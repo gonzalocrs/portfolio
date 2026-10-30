@@ -525,9 +525,18 @@
       nav.classList.toggle('qu-top', on);
       nav.style.paddingTop = '';
       regroup();
-      // the title rises only as far as the top of the picture showing (his note, 2026-10-29), never above it
-      if(on){ var im = curImg(); if(im){ var dy = im.getBoundingClientRect().top - nameEl.getBoundingClientRect().top; if(dy > 0) nav.style.paddingTop = Math.round(dy) + 'px'; } }
-      if(on) placeUnder();   // measured at the new places, before anything moves
+      // the title rises only as far as the top of the picture showing (his note, 2026-10-29), never above it; when the
+      // words are short, the title and words together sit centred on the picture's height (his next note)
+      if(on){
+        var im = curImg(), ir = im ? im.getBoundingClientRect() : st.getBoundingClientRect();
+        var lift = function(dy){ if(dy) nav.style.paddingTop = Math.max(0, Math.round((parseFloat(nav.style.paddingTop) || 0) + dy)) + 'px'; };
+        lift(ir.top - nameEl.getBoundingClientRect().top);
+        placeUnder();
+        var rem = parseFloat(getComputedStyle(document.documentElement).fontSize), nb = nameEl.getBoundingClientRect();
+        var h = nb.height + 1.3 * rem + (tx.getBoundingClientRect().bottom - meta.getBoundingClientRect().top);
+        lift(Math.max(0, (ir.height - h) / 2));
+        placeUnder();   // measured at the new places, before anything moves
+      }
       var S = was.get(me).top - me.getBoundingClientRect().top, opt = {duration: 1000, easing: 'cubic-bezier(.45,.05,.2,1)'};
       kids.forEach(function(k){
         var o = was.get(k), d = o.top - k.getBoundingClientRect().top;

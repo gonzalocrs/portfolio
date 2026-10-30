@@ -468,7 +468,10 @@
     var dots = [];
     for(var k = 0; k < n; k++){ (function(k){ var b = el('button', 'qs', subs); b.type = 'button'; el('i', '', b); b.setAttribute('aria-label', 'Picture ' + (k + 1)); b.addEventListener('click', function(){ go(k); }); dots.push(b); })(k); }
     // the words, behind the "+", opened one of four ways (&d=, see the CSS); on a phone always the floating card
-    var D = (Q.get('d') || 'beside').toLowerCase(); if(['fold', 'beside'].indexOf(D) === -1) D = 'beside';   // fold: by address only
+    // under (mockup, 2026-10-29, his idea: "when i hit the + the title goes up, the lines also shift up like selecting a
+    // record ... and the description appears below", so the picture is never moved or resized): the default on this
+    // preview; ?d=beside for the live way
+    var D = (Q.get('d') || 'under').toLowerCase(); if(['fold', 'beside', 'under'].indexOf(D) === -1) D = 'under';   // fold: by address only
     if(innerWidth <= 700) D = 'float';
     wrap.classList.add('qd-' + D);
     var card = el('aside', 'qp-card', st), meta = el('div', 'meta', card);
@@ -496,12 +499,34 @@
       st.style.setProperty('--px', Math.round(x - sr.left + w + 3 * rem) + 'px');
       st.style.setProperty('--ny', (nameY() - 8) + 'px');
     }
-    on(window, 'resize', function(){ if(D === 'beside' && isOpen()) placeBeside(); });
+    // under: the column of marks slides up until the name is at its top, the marks after it step aside, and the words
+    // open under the name, as wide as the room left of the widest a picture can be (so no picture moves or shrinks)
+    function placeUnder(){
+      var rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      wrap.style.setProperty('--up', '0px');
+      var nr = nameEl.getBoundingClientRect(), vr = nav.getBoundingClientRect(), sr = st.getBoundingClientRect();
+      var up = Math.max(0, Math.round(nr.top - vr.top - .4 * rem));
+      wrap.style.setProperty('--up', -up + 'px');
+      var after = false;
+      Array.prototype.forEach.call(nav.children, function(c){
+        if(c === me){ after = true; return; }
+        var r = c.getBoundingClientRect();
+        c.classList.toggle('qu-after', after);
+        c.classList.toggle('qu-gone', !after && r.top - up < vr.top - 2);
+      });
+      var right = sr.left + sr.width * .04 - 1.6 * rem, x = nr.left, w = right - x;
+      if(w < 13 * rem){ x = vr.left; w = right - x; }
+      st.style.setProperty('--cx', Math.round(x - sr.left) + 'px');
+      st.style.setProperty('--cw', Math.round(Math.min(26 * rem, w)) + 'px');
+      st.style.setProperty('--ny', Math.round(nr.bottom - up - sr.top + 1.3 * rem) + 'px');
+    }
+    on(window, 'resize', function(){ if(D === 'beside' && isOpen()) placeBeside(); if(D === 'under' && isOpen()) placeUnder(); });
     function toggle(on){
       on = on == null ? !isOpen() : on;
       if(on === isOpen()) return;
       st.style.setProperty('--ny', nameY() + 'px');
       if(D === 'beside') placeBeside();
+      if(D === 'under'){ if(on) placeUnder(); else wrap.style.setProperty('--up', '0px'); }
       if(D !== 'fold'){ wrap.classList.toggle('open', on); return; }
       // fold: the picture closes into its middle line, the line rises to the name, the words come in under it and the
       // picture opens again beside them, out of a line; closing just lets the words go and the picture slide back

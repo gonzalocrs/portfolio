@@ -446,3 +446,15 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 .wd-mix .qp-card .tx{margin-top:1.6rem}
 .wd-mix .qp-card .tx p{font-size:.84rem;line-height:1.62;font-weight:300;color:var(--mute)}
 .wd-mix .qp-card .tx p .s1{color:var(--ink);font-weight:400}
+
+/* under (mockup, 2026-10-29): + lifts the column of marks until the name is at its top, like drawing a record out of a
+   stack; the marks after it step aside and the words open under the name. The picture stays exactly as it is */
+@media (min-width:701px){
+  .qd-under .qt-ticks > *{transition:transform .7s cubic-bezier(.2,.7,.2,1),opacity .45s ease}
+  .qd-under.open .qt-ticks > *{transform:translateY(var(--up,0px))}
+  .qd-under.open .qt-ticks > .qu-gone{opacity:0;pointer-events:none}
+  .qd-under.open .qt-ticks > .qu-after{opacity:0;pointer-events:none;transform:translateY(calc(var(--up,0px) + 1.2rem))}
+  .qd-under .qp-card{left:var(--cx,0px);width:var(--cw,18rem);top:var(--ny,0px);bottom:0;padding:0 0 2rem;transform:translateY(.6rem);transition:opacity .45s ease .2s,transform .6s cubic-bezier(.2,.7,.2,1) .15s}
+  .qd-under.open .qp-card{transform:none}
+  .qd-under .qp-card .tx p{font-size:.84rem}
+}

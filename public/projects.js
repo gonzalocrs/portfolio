@@ -173,7 +173,7 @@ window.PROJECTS = {
       "Vaulted Shell explores how a lightweight roof can achieve strength, accommodate insulation, and use less material. Thin plywood panels form hollow units whose angled connections generate the vault, bringing curvature, structural depth, and space for insulation into one assembly.",
       "Physical model making drives the investigation, connecting the detail of a joint to the shape of the whole. Exposed plywood edges and repeating facets make the construction visible, giving a restrained system of parts a distinct spatial presence. The ambition is to create generous space through the precise placement of material."
     ],
-    credits: [["Studio", "Robert Marino Architects"], ["Type", "Structural Form-Finding"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2026"]],
+    credits: [["Studio", "Robert Marino Architects"], ["Type", "Structural Systems, Material Research"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2026"]],
     hero: "img/vaulted-shell-structure/model-9751.jpg",
     home: ["img/vaulted-shell-structure/model-9751.jpg", "img/vaulted-shell-structure/section.png"],
     // his order (2026-10-29): each drawing followed by the photo of the same view, the drawings with the house last

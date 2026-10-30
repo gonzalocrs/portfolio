@@ -499,23 +499,17 @@
       st.style.setProperty('--px', Math.round(x - sr.left + w + 3 * rem) + 'px');
       st.style.setProperty('--ny', (nameY() - 8) + 'px');
     }
-    // under: the column of marks slides up until the name is at its top, the marks after it step aside, and the words
-    // open under the name, as wide as the room left of the widest a picture can be (so no picture moves or shrinks)
+    // under: the whole column of lines slides up, as far as it can while every line stays in view (the other
+    // projects' and this project's pictures' too, his note), and the words open under the name, right of the lines.
+    // They are as wide as the room left of the widest a picture can be, so no picture moves or shrinks
     function placeUnder(){
       var rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
       wrap.style.setProperty('--up', '0px');
       var nr = nameEl.getBoundingClientRect(), vr = nav.getBoundingClientRect(), sr = st.getBoundingClientRect();
-      var up = Math.max(0, Math.round(nr.top - vr.top - .4 * rem));
+      var top = nav.firstElementChild.getBoundingClientRect().top;
+      var up = Math.max(0, Math.round(Math.min(nr.top - vr.top - .4 * rem, top - vr.top)));
       wrap.style.setProperty('--up', -up + 'px');
-      var after = false;
-      Array.prototype.forEach.call(nav.children, function(c){
-        if(c === me){ after = true; return; }
-        var r = c.getBoundingClientRect();
-        c.classList.toggle('qu-after', after);
-        c.classList.toggle('qu-gone', !after && r.top - up < vr.top - 2);
-      });
-      var right = sr.left + sr.width * .04 - 1.6 * rem, x = nr.left, w = right - x;
-      if(w < 13 * rem){ x = vr.left; w = right - x; }
+      var right = sr.left + sr.width * .04 - 1.6 * rem, x = nr.left, w = Math.max(11 * rem, right - x);
       st.style.setProperty('--cx', Math.round(x - sr.left) + 'px');
       st.style.setProperty('--cw', Math.round(Math.min(26 * rem, w)) + 'px');
       st.style.setProperty('--ny', Math.round(nr.bottom - up - sr.top + 1.3 * rem) + 'px');

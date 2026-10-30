@@ -517,8 +517,7 @@
     }
     // the turn moves every line by the same distance at the same pace, like records sliding in a rack: the ones
     // going round leave over the top as they arrive from below (and the other way when it turns back)
-    // it turns only as far as it needs to (his note, 2026-10-29: with short words there is room above, "keep the
-    // records on top"): the projects above that still fit over the title stay there, the others go round
+    // it turns only when the title has to rise (his notes, 2026-10-29): with short words the records stay on top
     var WRAP = [];
     function turn(on){
       var kids = Array.prototype.slice.call(nav.children), vr = nav.getBoundingClientRect(), was = new Map();
@@ -530,8 +529,10 @@
         var im = curImg(), ir = im ? im.getBoundingClientRect() : st.getBoundingClientRect();
         placeUnder();
         var nb = nameEl.getBoundingClientRect(), h = nb.height + 1.3 * rem + (tx.getBoundingClientRect().bottom - meta.getBoundingClientRect().top);
-        var T = ir.top + Math.max(0, (ir.height - h) / 2), room = T - (nb.top - was.get(me).top) - vr.top;
-        WRAP = ABOVE.filter(function(k){ return was.get(me).top - was.get(k).top > room; });
+        // his rule (2026-10-29): when the words are long enough to push the title up, all the lines above roll round
+        // to the bottom; when they are not, they all stay where they are
+        var T = ir.top + Math.max(0, (ir.height - h) / 2);
+        WRAP = T < nb.top - .8 * rem ? ABOVE.slice() : [];
         var ab = nav.querySelector('.qk.qa'); WRAP.forEach(function(k){ nav.insertBefore(k, ab); });
         nav.classList.add('qu-top'); nav.style.paddingTop = '';
         regroup();

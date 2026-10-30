@@ -147,15 +147,16 @@
     if(cur){
       var r = cur.getBoundingClientRect(), old = el('div', 'q-old', document.body);
       old.style.left = r.left + 'px'; old.style.top = r.top + 'px'; old.style.width = r.width + 'px'; old.style.height = r.height + 'px';
-      old.appendChild(cur); void old.offsetWidth; old.classList.add('out');
-      setTimeout(function(){ old.remove(); }, 700);
+      // seamless (his note, 2026-10-29: "i don't like the reloading feature"): the marks change in place at once, only
+      // the old picture (and words) fade out over the new page, which is there from the start underneath
+      var t = cur.querySelector('.qt-ticks'); if(t) t.style.visibility = 'hidden';
+      old.appendChild(cur); old.classList.add('soft'); void old.offsetWidth; old.classList.add('out');
+      setTimeout(function(){ old.remove(); }, 650);
     }
     offAll(); main.innerHTML = '';
     document.body.classList.remove('qh-one', 'qh-proj', 'in-unveil', 'in-rise', 'qo-flip');
     document.body.setAttribute('data-page', page); PAGE = page;
-    main.classList.add('q-away');
     build();
-    void main.offsetWidth; main.classList.remove('q-away');
   }
   function goHome(slug){ swap('/', 'home', function(){ document.title = HOME_TITLE; buildRollOne(slug); }); }
   function goProject(s){ swap(quietHref(s), 'project', function(){ buildQuietProject(s, 0); }); }

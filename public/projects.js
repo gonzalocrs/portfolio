@@ -170,8 +170,8 @@ window.PROJECTS = {
     title: "Lean Shells", group: "Research", hue: 260,
     kicker: "New York, 2026",
     text: [
-      "Vaulted Shell explores how a lightweight roof can achieve strength, accommodate insulation, and use less material. Thin plywood panels form hollow units whose angled connections generate the vault, bringing curvature, structural depth, and space for insulation into one assembly.",
-      "Physical model making drives the investigation, connecting the detail of a joint to the shape of the whole. Exposed plywood edges and repeating facets make the construction visible, giving a restrained system of parts a distinct spatial presence. The ambition is to create generous space through the precise placement of material."
+      "Lean Shells investigates how a roof can do more with less material. Thin plywood panels form hollow units whose angled connections generate a vault, combining structural depth with space for insulation. The study seeks an efficient enclosure through the careful arrangement of lightweight parts.",
+      "Physical model making connects the detail of each joint to the geometry of the whole. Exposed plywood edges and repeating facets give the assembly its architectural character. Material economy becomes a design ambition: creating strength, shelter, and spatial presence through a restrained system of parts."
     ],
     credits: [["Studio", "Robert Marino Architects"], ["Type", "Structural Systems, Material Research"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2026"]],
     hero: "img/vaulted-shell-structure/model-9751.jpg",

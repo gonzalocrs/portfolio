@@ -517,31 +517,36 @@
     }
     // the turn moves every line by the same distance at the same pace, like records sliding in a rack: the ones
     // going round leave over the top as they arrive from below (and the other way when it turns back)
+    // it turns only as far as it needs to (his note, 2026-10-29: with short words there is room above, "keep the
+    // records on top"): the projects above that still fit over the title stay there, the others go round
+    var WRAP = [];
     function turn(on){
       var kids = Array.prototype.slice.call(nav.children), vr = nav.getBoundingClientRect(), was = new Map();
       kids.forEach(function(k){ var r = k.getBoundingClientRect(); was.set(k, {top: r.top, left: r.left}); });
-      if(on){ var ab = nav.querySelector('.qk.qa'); ABOVE.forEach(function(k){ nav.insertBefore(k, ab); }); }
-      else ORDER.forEach(function(k){ nav.appendChild(k); });
-      nav.classList.toggle('qu-top', on);
-      nav.style.paddingTop = '';
-      regroup();
-      // the title rises only as far as the top of the picture showing (his note, 2026-10-29), never above it; when the
-      // words are short, the title and words together sit centred on the picture's height (his next note)
+      var rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
       if(on){
+        // where the title goes: level with the top of the picture showing, or lower so that title and words sit
+        // centred on its height when they are shorter than it (never above the picture)
         var im = curImg(), ir = im ? im.getBoundingClientRect() : st.getBoundingClientRect();
-        var lift = function(dy){ if(dy) nav.style.paddingTop = Math.max(0, Math.round((parseFloat(nav.style.paddingTop) || 0) + dy)) + 'px'; };
-        lift(ir.top - nameEl.getBoundingClientRect().top);
         placeUnder();
-        var rem = parseFloat(getComputedStyle(document.documentElement).fontSize), nb = nameEl.getBoundingClientRect();
-        var h = nb.height + 1.3 * rem + (tx.getBoundingClientRect().bottom - meta.getBoundingClientRect().top);
-        lift(Math.max(0, (ir.height - h) / 2));
+        var nb = nameEl.getBoundingClientRect(), h = nb.height + 1.3 * rem + (tx.getBoundingClientRect().bottom - meta.getBoundingClientRect().top);
+        var T = ir.top + Math.max(0, (ir.height - h) / 2), room = T - (nb.top - was.get(me).top) - vr.top;
+        WRAP = ABOVE.filter(function(k){ return was.get(me).top - was.get(k).top > room; });
+        var ab = nav.querySelector('.qk.qa'); WRAP.forEach(function(k){ nav.insertBefore(k, ab); });
+        nav.classList.add('qu-top'); nav.style.paddingTop = '';
+        regroup();
+        var dy = T - nameEl.getBoundingClientRect().top; if(dy > 0) nav.style.paddingTop = Math.round(dy) + 'px';
         placeUnder();   // measured at the new places, before anything moves
+      } else {
+        ORDER.forEach(function(k){ nav.appendChild(k); });
+        nav.classList.remove('qu-top'); nav.style.paddingTop = '';
+        regroup();
       }
       var S = was.get(me).top - me.getBoundingClientRect().top, opt = {duration: 1000, easing: 'cubic-bezier(.45,.05,.2,1)'};
       kids.forEach(function(k){
         var o = was.get(k), d = o.top - k.getBoundingClientRect().top;
         if(!d) return;
-        if(ABOVE.indexOf(k) > -1){
+        if(WRAP.indexOf(k) > -1){
           var g = k.cloneNode(true); g.classList.add('qu-ghost'); g.style.top = (o.top - vr.top) + 'px'; g.style.left = (o.left - vr.left) + 'px';
           nav.appendChild(g);
           g.animate([{opacity: 1, transform: 'none'}, {opacity: 0, transform: 'translateY(' + (-S) + 'px)'}], opt).onfinish = function(){ g.remove(); };

@@ -520,7 +520,10 @@
       if(on){ var ab = nav.querySelector('.qk.qa'); ABOVE.forEach(function(k){ nav.insertBefore(k, ab); }); }
       else ORDER.forEach(function(k){ nav.appendChild(k); });
       nav.classList.toggle('qu-top', on);
+      nav.style.paddingTop = '';
       regroup();
+      // the title rises only as far as the top of the picture showing (his note, 2026-10-29), never above it
+      if(on){ var im = curImg(); if(im){ var dy = im.getBoundingClientRect().top - nameEl.getBoundingClientRect().top; if(dy > 0) nav.style.paddingTop = Math.round(dy) + 'px'; } }
       if(on) placeUnder();   // measured at the new places, before anything moves
       var S = was.get(me).top - me.getBoundingClientRect().top, opt = {duration: 1000, easing: 'cubic-bezier(.45,.05,.2,1)'};
       kids.forEach(function(k){
@@ -535,7 +538,7 @@
         else k.animate([{transform: 'translateY(' + d + 'px)'}, {transform: 'none'}], opt);
       });
     }
-    // the words: under the name, which is now at the top, so they have the column's whole height; as wide as the room
+    // the words: under the name, which is now level with the top of the picture; as wide as the room
     // left of the widest a picture can be plus the stage's own margin, the pictures sliding right by that margin (never
     // smaller, never past the stage's edge)
     function placeUnder(){

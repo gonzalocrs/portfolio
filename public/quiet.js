@@ -512,34 +512,42 @@
         var q = P[c.slug]; c.classList.toggle('gs', i++ > 0 && q.group !== g); g = q.group;
       });
     }
+    // the turn moves every line by the same distance at the same pace, like records sliding in a rack: the ones
+    // going round leave over the top as they arrive from below (and the other way when it turns back)
     function turn(on){
       var kids = Array.prototype.slice.call(nav.children), vr = nav.getBoundingClientRect(), was = new Map();
       kids.forEach(function(k){ var r = k.getBoundingClientRect(); was.set(k, {top: r.top, left: r.left}); });
       if(on){ var ab = nav.querySelector('.qk.qa'); ABOVE.forEach(function(k){ nav.insertBefore(k, ab); }); }
       else ORDER.forEach(function(k){ nav.appendChild(k); });
+      nav.classList.toggle('qu-top', on);
       regroup();
       if(on) placeUnder();   // measured at the new places, before anything moves
-      var ease = 'cubic-bezier(.22,.8,.24,1)';
+      var S = was.get(me).top - me.getBoundingClientRect().top, opt = {duration: 1000, easing: 'cubic-bezier(.45,.05,.2,1)'};
       kids.forEach(function(k){
         var o = was.get(k), d = o.top - k.getBoundingClientRect().top;
         if(!d) return;
         if(ABOVE.indexOf(k) > -1){
-          // the ones going round: a copy leaves from where it was, and it comes in at its new place
           var g = k.cloneNode(true); g.classList.add('qu-ghost'); g.style.top = (o.top - vr.top) + 'px'; g.style.left = (o.left - vr.left) + 'px';
           nav.appendChild(g);
-          g.animate([{opacity: 1, transform: 'none'}, {opacity: 0, transform: 'translateY(' + (on ? -14 : 14) + 'px)'}], {duration: 450, easing: 'ease-in'}).onfinish = function(){ g.remove(); };
-          k.animate([{opacity: 0, transform: 'translateY(' + (on ? 14 : -14) + 'px)'}, {opacity: 1, transform: 'none'}], {duration: 650, delay: 300, easing: ease, fill: 'backwards'});
+          g.animate([{opacity: 1, transform: 'none'}, {opacity: 0, transform: 'translateY(' + (-S) + 'px)'}], opt).onfinish = function(){ g.remove(); };
+          k.animate([{opacity: 0, transform: 'translateY(' + S + 'px)'}, {opacity: 1, transform: 'none'}], opt);
         }
-        else k.animate([{transform: 'translateY(' + d + 'px)'}, {transform: 'none'}], {duration: 850, easing: ease});
+        else k.animate([{transform: 'translateY(' + d + 'px)'}, {transform: 'none'}], opt);
       });
     }
+    // the words: under the name, which is now at the top, so they have the column's whole height; as wide as the room
+    // left of the widest a picture can be plus the stage's own margin, the pictures sliding right by that margin (never
+    // smaller, never past the stage's edge)
     function placeUnder(){
       var rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
-      var nr = nameEl.getBoundingClientRect(), sr = st.getBoundingClientRect();
-      var right = sr.left + sr.width * .04 - 1.6 * rem, x = nr.left, w = Math.max(11 * rem, right - x);
+      var nr = nameEl.getBoundingClientRect(), sr = st.getBoundingClientRect(), pad = sr.width * .04;
+      var x = nr.left, base = Math.max(11 * rem, sr.left + pad - 1.6 * rem - x), most = base + pad;
       st.style.setProperty('--cx', Math.round(x - sr.left) + 'px');
-      st.style.setProperty('--cw', Math.round(Math.min(26 * rem, w)) + 'px');
       st.style.setProperty('--ny', Math.round(nr.bottom - sr.top + 1.3 * rem) + 'px');
+      // as wide as it can be (his note: "very narrow"): the full stage margin, the pictures sliding right by as much
+      var w = Math.min(26 * rem, most);
+      st.style.setProperty('--cw', Math.round(w) + 'px');
+      st.style.setProperty('--sh', Math.round(Math.max(0, w - base)) + 'px');
     }
     on(window, 'resize', function(){ if(D === 'beside' && isOpen()) placeBeside(); if(D === 'under' && isOpen()) placeUnder(); });
     function toggle(on){

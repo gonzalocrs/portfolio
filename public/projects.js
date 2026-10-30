@@ -187,7 +187,7 @@ window.PROJECTS = {
       {src: "img/vaulted-shell-structure/model-9795.jpg", caption: "Physical model"},
       {src: "img/vaulted-shell-structure/hand-drawing.jpg", drawing: true, caption: "Vaulted shell study"},
       {src: "img/vaulted-shell-structure/model-9937.jpg", caption: "Physical model, underside"},
-      {src: "img/vaulted-shell-structure/model-9925.jpg", caption: "Physical model, joints"},
+      // model-9925 (front close-up of the joints) left out for now to try the page without it (his ask, 2026-10-29)
       {src: "img/vaulted-shell-structure/model-9928.jpg", caption: "Physical model, joints"},
       {src: "img/vaulted-shell-structure/site-plan.png", drawing: true, caption: "Plan with the existing house"},
       {src: "img/vaulted-shell-structure/site-elevation.png", drawing: true, caption: "Elevation with the existing house"},

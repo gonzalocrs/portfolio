@@ -551,3 +551,5 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 .qf .qn-cap{font-size:.78rem;line-height:1.55;text-align:center;max-width:min(30rem,100%);margin-top:1.3rem;padding:0;color:var(--mute)}
 .qf:has(.qn-cap) img{max-height:calc(100% - 7rem)}
 .qp .qt-ticks{z-index:3}
+.qt.open .qt-stage .p-layer{translate:none!important}
+.qc-move .qt-stage .p-layer{transition:opacity 1.1s ease,left .7s cubic-bezier(.2,.7,.2,1),translate .7s cubic-bezier(.2,.7,.2,1)}

@@ -522,20 +522,18 @@
     function nameY(){ var a = nameEl.getBoundingClientRect(), b = st.getBoundingClientRect(); return Math.max(0, Math.round(a.top + a.height / 2 - b.top)); }
     function curImg(){ return st.querySelector('.p-layer.on img, .p-layer.on .plate'); }
     function isOpen(){ return wrap.classList.contains('open'); }
-    // balance (his note, 2026-11-01: the picture "looks shifted"): the room between the index and the picture matches the
-    // room right of the picture, measured from the "+" after the name, so the picture sits centred in the space it reads in
-    function balance(){
-      st.style.marginLeft = '';
-      if(innerWidth <= 700) return;
-      var sr = st.getBoundingClientRect(), pr = plus.getBoundingClientRect(), r = sr.right, l = sr.left;
-      for(var t = 0; t < 3; t++){
-        var pad = (r - l) * .04, m = innerWidth - r + pad, A = pr.right + m;
-        l = (A - .04 * r) / .96;
-      }
-      st.style.marginLeft = Math.min(0, Math.round(l - sr.left)) + 'px';
+    // centred (his notes, 2026-11-01: the picture "looks shifted"; then: keep the size it had, just centred): the picture
+    // keeps its size and slides sideways until the room between the "+" after the name and the picture matches the room
+    // right of it. Each picture on its own (narrow ones need more); not while the words are open (they place it)
+    function centre(L, im){
+      if(!L || !im) return;
+      if(innerWidth <= 700){ L.style.translate = ''; return; }
+      var cur = parseFloat(L.style.translate) || 0, r = im.getBoundingClientRect(); if(!r.width) return;
+      var a = r.left - cur, b = r.right - cur, P = plus.getBoundingClientRect().right;
+      var sh = Math.round((innerWidth - b - a + P) / 2);
+      L.style.translate = Math.min(0, sh) + 'px 0';
     }
-    balance(); on(window, 'resize', balance);
-    if(document.fonts && document.fonts.ready) document.fonts.ready.then(balance);
+    on(window, 'resize', function(){ var L = st.querySelector('.p-layer.on'); centre(L, L && L.querySelector('.qf img, .qf .plate')); });
     // beside: the words start a short, fixed step after the "+" (whatever the width of the window), the kicker on the
     // name's line; the picture follows a little after the words
     function placeBeside(){
@@ -624,6 +622,8 @@
       st.style.setProperty('--ny', nameY() + 'px');
       if(D === 'beside') placeBeside();
       if(D === 'under' && innerWidth > 700) turn(on);
+      // the picture's centring slide eases along with the words coming or going
+      wrap.classList.add('qc-move'); clearTimeout(wrap.qcT); wrap.qcT = setTimeout(function(){ wrap.classList.remove('qc-move'); }, 900);
       if(D !== 'fold'){ wrap.classList.toggle('open', on); return; }
       // fold: the picture closes into its middle line, the line rises to the name, the words come in under it and the
       // picture opens again beside them, out of a line; closing just lets the words go and the picture slide back
@@ -712,6 +712,7 @@
             };
             if(window.ResizeObserver) new ResizeObserver(function(){ fit(); }).observe(L);
           }
+          var fit0 = fit; fit = function(){ centre(L, im); fit0(); };
           im.addEventListener('load', fit); f.fit = fit; if(im.complete) requestAnimationFrame(fit);
         }
         else el('div', 'plate', f, 'In preparation');

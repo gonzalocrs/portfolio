@@ -614,7 +614,7 @@
       var nr = nameEl.getBoundingClientRect(), sr = st.getBoundingClientRect(), pad = sr.width * .04;
       var x = nr.left, base = Math.max(11 * rem, sr.left + pad - 1.6 * rem - x), most = base + pad;
       st.style.setProperty('--cx', Math.round(x - sr.left) + 'px');
-      st.style.setProperty('--ny', Math.round(nr.bottom - sr.top + 1.3 * rem) + 'px');
+      st.style.setProperty('--ny', Math.round(nr.bottom - sr.top + (wrap.classList.contains('hd-sub') ? .3 : 1.3) * rem) + 'px');
       // as wide as it can be (his note: "very narrow"): the full stage margin, the pictures sliding right by as much
       var w = Math.min(26 * rem, most);
       st.style.setProperty('--cw', Math.round(w) + 'px');

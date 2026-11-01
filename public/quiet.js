@@ -676,6 +676,7 @@
       //   grid    nine tiny dots, all the pictures at once
       //   tilt    one more line, leaning like the project lines in the index
       //   cross   one more line crossed by a short upright one
+      //   logo    his GCV mark, small (his ask, 2026-11-01: "do one with my logo as well")
       var BM = (Q.get('bmark') || 'sleeve').toLowerCase();
       var SVG = {
         square: '<svg viewBox="0 0 10 10" width="10" height="10"><rect class="o" x=".5" y=".5" width="9" height="9" rx="2.2"/><circle class="h" cx="5" cy="5" r="1"/></svg>',
@@ -687,6 +688,7 @@
         stack: '<svg viewBox="0 0 14 8" width="14" height="8"><path d="M0 1h10M2 4h10M4 7h10"/></svg>',
         grid: '<svg viewBox="0 0 10 10" width="10" height="10"><g class="d"><circle cx="1.5" cy="1.5" r=".9"/><circle cx="5" cy="1.5" r=".9"/><circle cx="8.5" cy="1.5" r=".9"/><circle cx="1.5" cy="5" r=".9"/><circle cx="5" cy="5" r=".9"/><circle cx="8.5" cy="5" r=".9"/><circle cx="1.5" cy="8.5" r=".9"/><circle cx="5" cy="8.5" r=".9"/><circle cx="8.5" cy="8.5" r=".9"/></g></svg>',
         tilt: '<svg viewBox="0 0 12 8" width="12" height="8"><path d="M.5 7.5L11.5.5"/></svg>',
+        logo: '<svg viewBox="26 26 148 148" width="13" height="13"><circle cx="100" cy="100" r="70" stroke-width="9"/><g stroke-width="15" class="lg"><path d="M120.09 60.74L132.29 48.54M143.75 100H161M120.09 139.26L132.29 151.46M67.71 151.46L79.91 139.26M42.13 108.55A58.5 58.5 0 0 1 42.13 91.45M67.71 48.54L79.91 60.74"/></g></svg>',
         cross: '<svg viewBox="0 0 12 9" width="12" height="9"><path d="M0 4.5h12M6 0v9"/></svg>'
       };
       if(!SVG[BM]) BM = 'sleeve';

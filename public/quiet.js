@@ -690,7 +690,10 @@
               if(!r.width) return;
               // the column may reach left past the stage, but stays clear of the project's name in the index
               var w = 11 * rem, g = 1.8 * rem, room = r.left - Math.max(me.getBoundingClientRect().right + 2 * rem, 0);
-              if(room >= w + g){ nt.classList.remove('qn-low'); nt.style.width = w + 'px'; nt.style.left = (r.left - lr.left - w - g) + 'px'; nt.style.top = (r.bottom - lr.top - nt.offsetHeight) + 'px'; }
+              // wide pictures take the note under them, from their left edge; upright and square ones beside (his rule,
+              // 2026-11-01: "if the image is wide do under, if it's vertical or square do side")
+              var wide = im.naturalWidth && im.naturalWidth / im.naturalHeight > 1.15;
+              if(!wide && room >= w + g){ nt.classList.remove('qn-low'); nt.style.width = w + 'px'; nt.style.left = (r.left - lr.left - w - g) + 'px'; nt.style.top = (r.bottom - lr.top - nt.offsetHeight) + 'px'; }
               else { nt.classList.add('qn-low'); nt.style.width = Math.min(r.width, 26 * rem) + 'px'; nt.style.left = (r.left - lr.left) + 'px'; nt.style.top = (r.bottom - lr.top + .7 * rem) + 'px'; }
             };
             if(window.ResizeObserver) new ResizeObserver(function(){ fit(); }).observe(L);

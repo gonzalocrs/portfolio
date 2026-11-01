@@ -712,7 +712,15 @@
               var low = wide || room < w + g;
               if(f.classList.contains('qf-low') !== low){ f.classList.toggle('qf-low', low); r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
               if(!low){ nt.classList.remove('qn-low'); nt.style.width = w + 'px'; nt.style.left = (r.left - lr.left - w - g) + 'px'; nt.style.top = (r.bottom - lr.top - nt.offsetHeight) + 'px'; }
-              else { nt.classList.add('qn-low'); nt.style.width = Math.min(r.width, 26 * rem) + 'px'; nt.style.left = (r.left - lr.left) + 'px'; nt.style.top = (r.bottom - lr.top + .7 * rem) + 'px'; }
+              else {
+                // the picture and its note centred together as one block (as the caption under it was), so the picture
+                // doesn't sit low: the picture keeps a margin under it as tall as the note
+                nt.classList.add('qn-low'); nt.style.width = Math.min(r.width, 26 * rem) + 'px';
+                var mb = Math.round(nt.offsetHeight + .7 * rem) + 'px';
+                if(im.style.marginBottom !== mb){ im.style.marginBottom = mb; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
+                nt.style.left = (r.left - lr.left) + 'px'; nt.style.top = (r.bottom - lr.top + .7 * rem) + 'px';
+              }
+              if(!low) im.style.marginBottom = '';
             };
             if(window.ResizeObserver) new ResizeObserver(function(){ fit(); }).observe(L);
           }

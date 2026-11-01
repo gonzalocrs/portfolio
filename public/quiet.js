@@ -106,15 +106,13 @@
   //   crate   the pictures stand in a row like records in a crate, leaning; pointing at one pulls it upright
   //   strip   every picture in one line at the same height, the wheel sliding it along
   // kept for the visit, ?back=off for the live page without a side B
-  // trial ?walk= (his note, 2026-11-01: some of the work is conceptual, so the viewer still needs walking through it,
-  // very minimally): a short note with each picture, from the project's notes in projects.js
-  //   side     the note in a narrow column beside the picture, standing on its bottom edge (default)
-  //   under    the note under the picture, from its left edge
-  //   chapter  the project opens on its first paragraph, alone where the picture stands; then the pictures with notes beside
-  //   off      no notes
+  // walk-through notes (his note, 2026-11-01: some of the work is conceptual, so the viewer still needs walking through it,
+  // very minimally): a short note with each picture, from the project's notes in projects.js, beside the picture (under the
+  // widest ones). He tried under (a caption) and chapter (opening on the first paragraph) and kept this one only.
+  // ?walk=off hides the notes for the session
   var WALK = Q.get('walk');
   try{ if(WALK) sessionStorage.setItem('gc-walk', WALK); WALK = sessionStorage.getItem('gc-walk') || WALK; }catch(e){}
-  WALK = ['side', 'under', 'chapter', 'off'].indexOf(WALK) > -1 ? WALK : 'side';
+  WALK = WALK === 'off' ? 'off' : 'side';
   var BACK = Q.get('back');
   try{ if(BACK) sessionStorage.setItem('gc-back', BACK); BACK = sessionStorage.getItem('gc-back') || BACK; }catch(e){}
   BACK = ['sheet', 'sleeve', 'crate', 'strip', 'off'].indexOf(BACK) > -1 ? BACK : 'sheet';
@@ -474,12 +472,6 @@
     var p = P[slug], all = pictures(slug);
     if(WALK !== 'off'){
       (p.notes || []).forEach(function(t, i){ if(all[i] && t) all[i].note = t; });
-      var open = Array.isArray(p.text) ? p.text[0] : p.text;
-      if(WALK === 'chapter' && open){
-        // the opening paragraph is read first; a note it already says is not said again under a picture
-        all.forEach(function(it){ if(it.note && open.indexOf(it.note) > -1) it.note = ''; });
-        all.unshift({text: open});
-      }
     }
     var n = Math.max(1, all.length);
     var i0 = SLUGS.indexOf(slug); CUR = slug;
@@ -680,22 +672,13 @@
         // the picture, smaller than the space and centred, with its caption centred under it (drawings carry their own
         // white margins, so a caption set from the picture's edge would look off)
         var f = el('figure', 'qf', L);
-        if(it && it.text){ f.classList.add('qf-text'); el('p', 'qtx', f, it.text); }
-        else if(it){
+        if(it){
           var im = el('img', '', f); im.alt = it.caption || p.title; im.src = it.src;
           // no captions under the pictures (his call, 2026-10-26: first the photos, then the drawings too); the caption text
           // stays in projects.js as the picture's alt text
           var cap = null;
           var fit = function(){ if(cap) cap.style.width = im.offsetWidth ? im.offsetWidth + 'px' : ''; };
-          if(it.note && WALK === 'under'){
-            // under: from the picture's left edge, the lines no longer than a short column
-            // a caption (his note, 2026-11-01, after a Peichl plate: "keep it like a caption"): centred under the picture in
-            // small type, the note alone
-            // (no picture name and the site's own type, his note: "don't use that font and drop the title")
-            cap = el('figcaption', 'qn qn-cap', f, it.note);
-            fit = function(){};
-          }
-          else if(it.note){
+          if(it.note){
             // beside: a narrow column left of the picture, its last line on the picture's bottom edge; under the picture
             // when there isn't room beside it
             var nt = el('p', 'qn qn-side', L, it.note);
@@ -802,7 +785,7 @@
     function buildB(){
       sideB = el('div', 'qb qb-' + BACK, st);
       var box = el('div', 'qb-box', sideB);
-      loadAll(all.filter(function(it){ return it.src; })).then(function(got){
+      loadAll(all).then(function(got){
         got.forEach(function(o, k){
           var f = el('figure', 'qb-f', box); f.r = o.r; f.k = k;
           var im = el('img', '', f); im.alt = o.it.caption || p.title; im.src = o.it.src; im.loading = 'lazy';
@@ -920,7 +903,7 @@
     // a safe margin round the picture (his note, 2026-11-01: with narrow pictures a click just beside one went back to the
     // home): a click within it counts as a click on the picture; the note beside a picture is safe ground too
     function picRect(){
-      var L = st.querySelector('.p-layer.on'), t = L && L.querySelector('.qf img, .qf .plate, .qf .qtx');
+      var L = st.querySelector('.p-layer.on'), t = L && L.querySelector('.qf img, .qf .plate');
       return t ? t.getBoundingClientRect() : null;
     }
     function nearPic(e){

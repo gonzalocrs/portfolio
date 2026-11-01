@@ -542,8 +542,7 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 @media (max-width:700px){ .qn{font-size:.75rem} }
 /* trial &head=sub|quiet|pair: the program as an unlabelled subtitle under the project's name */
 .qp-card .sub{margin:0 0 1.1rem;color:var(--ink)}
-.hd-sub .qp-card .sub{font-size:.84rem;line-height:1.4;font-weight:300;margin-bottom:1rem}
-.hd-sub.qd-under .qp-card{transform:none}
+.hd-sub .qp-card .sub{font-size:1.25rem;line-height:1.3;font-weight:300}
 .hd-quiet .qp-card .sub{font-size:.95rem;line-height:1.4;font-weight:400;color:var(--mute)}
 .hd-quiet .qp-card .meta .k{margin:1rem 0 0}
 .hd-pair .qp-card .sub{font-size:1.1rem;line-height:1.35;font-weight:400;margin-bottom:.25rem}

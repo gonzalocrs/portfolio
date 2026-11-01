@@ -5,6 +5,17 @@
   var Q = new URLSearchParams(location.search);
   var main = document.getElementById('main');
 
+  // the tab icon (his ask, 2026-11-01: "an icon here ... one with my logo, one with the letter G and so on"), trial:
+  // ?fav=logo|logo-tile|g|g-bold|g-tile|n|ring, kept for the visit; files in fav/
+  (function(){
+    var F = Q.get('fav');
+    try{ if(F) sessionStorage.setItem('gc-fav', F); F = sessionStorage.getItem('gc-fav') || F; }catch(e){}
+    if(['logo', 'logo-tile', 'g', 'g-bold', 'g-tile', 'n', 'ring'].indexOf(F) < 0) return;
+    var l = document.getElementById('fav');
+    if(!l){ l = document.createElement('link'); l.id = 'fav'; l.rel = 'icon'; l.type = 'image/svg+xml'; document.head.appendChild(l); }
+    l.href = 'fav/' + F + '.svg';
+  })();
+
   // ---- the project material: hero, diagram, drawings, models, photos, in that order ----
   function web(src){
     if(src === 'img/anticlastic-roof-structure/hero.jpg') return 'img/anticlastic-roof-structure/hero-web.jpg';

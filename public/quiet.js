@@ -5,20 +5,6 @@
   var Q = new URLSearchParams(location.search);
   var main = document.getElementById('main');
 
-  // the tab icon (2026-11-01): his logo, ink on a light tab bar and white on a dark one (the SVGs follow the browser's
-  // colour scheme; he dropped the dark tiles). ?fav=logo|g|stitches pins one for the visit (?fav=auto goes back).
-  // ?v= changes whenever the drawings do, since browsers keep tab icons long after a page reloads.
-  var FAV = Q.get('fav');
-  try{ if(FAV) sessionStorage.setItem('gc-fav', FAV); FAV = sessionStorage.getItem('gc-fav') || FAV; }catch(e){}
-  if(['logo', 'g', 'stitches'].indexOf(FAV) < 0) FAV = '';
-  function favicon(name){
-    var l = document.getElementById('fav');
-    if(!l){ l = document.createElement('link'); l.id = 'fav'; l.rel = 'icon'; l.type = 'image/svg+xml'; document.head.appendChild(l); }
-    var h = 'fav/' + (FAV || name) + '.svg?v=3';
-    if(l.getAttribute('href') !== h) l.setAttribute('href', h);
-  }
-  favicon('logo');
-
   // ---- the project material: hero, diagram, drawings, models, photos, in that order ----
   function web(src){
     if(src === 'img/anticlastic-roof-structure/hero.jpg') return 'img/anticlastic-roof-structure/hero-web.jpg';

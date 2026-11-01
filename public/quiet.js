@@ -677,10 +677,10 @@
       //   tilt    one more line, leaning like the project lines in the index
       //   cross   one more line crossed by a short upright one
       //   logo    his GCV mark, small (his ask, 2026-11-01: "do one with my logo as well")
-      var BM = (Q.get('bmark') || 'line').toLowerCase();
+      var BM = (Q.get('bmark') || 'ring').toLowerCase();
       var SVG = {
         square: '<svg viewBox="0 0 10 10" width="10" height="10"><rect class="o" x=".5" y=".5" width="9" height="9" rx="2.2"/><circle class="h" cx="5" cy="5" r="1"/></svg>',
-        ring: '<svg viewBox="0 0 10 10" width="10" height="10"><circle class="o" cx="5" cy="5" r="4.2"/><circle class="h" cx="5" cy="5" r="1"/></svg>',
+        ring: '<svg viewBox="0 0 10 10" width="10" height="10"><circle class="o" cx="5" cy="5" r="4.2"/></svg>',  // his pick 2026-11-01: the circle, without the point in the middle
         groove: '<svg viewBox="0 0 12 6" width="12" height="6"><path d="M0 1.5h12M0 4.5h12"/></svg>',
         corner: '<svg viewBox="0 0 12 8" width="12" height="8"><path d="M0 1h9.5l2 2.5V7.5"/></svg>',
         sleeve: '<svg viewBox="0 0 15 10" width="15" height="10"><path class="r" d="M9 1.2a3.8 3.8 0 0 1 0 7.6"/><rect class="o" x=".5" y=".5" width="9" height="9"/></svg>',
@@ -719,7 +719,7 @@
       //   line   the ticks fade and close up; the line keeps its length and rises under the name
       //   grow   the ticks fade; the line grows up through the place where they stood
       SVG.line = SVG.grow = '<i></i>';
-      if(!SVG[BM]) BM = 'line';
+      if(!SVG[BM]) BM = 'ring';
       subs.classList.add('bm-' + BM);
       bBtn = el('button', 'qs-x qs-' + BM, subs); bBtn.type = 'button'; bBtn.setAttribute('aria-label', 'All the pictures');
       bBtn.innerHTML = SVG[BM];

@@ -82,9 +82,9 @@
   function tabIcon(dark){
     if(!SAFARI) return;
     var ico = document.querySelector('link[rel="icon"][href^="favicon.ico"]'); if(ico) ico.remove();
-    var l = document.querySelector('link[rel="icon"][type="image/svg+xml"]'); if(!l) return;
-    var h = 'fav/logo-' + (dark ? 'white' : 'ink') + '.svg?v=4';
-    if(l.getAttribute('href') !== h){ var n = l.cloneNode(); n.setAttribute('href', h); l.replaceWith(n); }
+    var l = document.querySelector('link[rel="icon"][href^="fav/"]'); if(!l) return;
+    var h = 'fav/logo-' + (dark ? 'white' : 'ink') + '.png?v=5';   // PNG, which every Safari takes
+    if(l.getAttribute('href') !== h){ var n = l.cloneNode(); n.setAttribute('type', 'image/png'); n.setAttribute('href', h); l.replaceWith(n); }
   }
   tabIcon(false);
   function night(on){ document.body.classList.toggle('q-night', !!on); tabIcon(!!on); }

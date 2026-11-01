@@ -675,8 +675,12 @@
           var fit = function(){ if(cap) cap.style.width = im.offsetWidth ? im.offsetWidth + 'px' : ''; };
           if(it.note && WALK === 'under'){
             // under: from the picture's left edge, the lines no longer than a short column
-            cap = el('figcaption', 'qn', f, it.note);
-            fit = function(){ var w = im.offsetWidth; if(!w) return; cap.style.width = w + 'px'; cap.style.paddingRight = Math.max(0, w - 26 * 16) + 'px'; };
+            // a caption (his note, 2026-11-01, after a Peichl plate: "keep it like a caption"): centred under the picture in
+            // the small mono, the picture's name on its own line, then the note
+            cap = el('figcaption', 'qn qn-cap', f);
+            if(it.caption) el('span', 'qn-t', cap, it.caption);
+            el('span', '', cap, it.note);
+            fit = function(){};
           }
           else if(it.note){
             // beside: a narrow column left of the picture, its last line on the picture's bottom edge; under the picture

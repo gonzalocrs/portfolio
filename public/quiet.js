@@ -7,10 +7,10 @@
 
   // the tab icon (his ask, 2026-11-01: "an icon here ... one with my logo, one with the letter G and so on"), trial:
   // his pick to test (2026-11-01): the logo (A) on light projects, the logo on a dark tile (B) on dark ones, following
-  // night() below. ?fav=logo|logo-tile|g|g-bold|g-tile|n|ring pins one for the visit (?fav=auto goes back); files in fav/
+  // night() below. ?fav=logo|logo-tile|g|g-tile|g-ring|stitches pins one for the visit (?fav=auto goes back); files in fav/
   var FAV = Q.get('fav');
   try{ if(FAV) sessionStorage.setItem('gc-fav', FAV); FAV = sessionStorage.getItem('gc-fav') || FAV; }catch(e){}
-  if(['logo', 'logo-tile', 'g', 'g-bold', 'g-tile', 'n', 'ring'].indexOf(FAV) < 0) FAV = '';
+  if(['logo', 'logo-tile', 'g', 'g-tile', 'g-ring', 'stitches'].indexOf(FAV) < 0) FAV = '';
   function favicon(name){
     var l = document.getElementById('fav');
     if(!l){ l = document.createElement('link'); l.id = 'fav'; l.rel = 'icon'; l.type = 'image/svg+xml'; document.head.appendChild(l); }

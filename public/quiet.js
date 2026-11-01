@@ -6,15 +6,18 @@
   var main = document.getElementById('main');
 
   // the tab icon (his ask, 2026-11-01: "an icon here ... one with my logo, one with the letter G and so on"), trial:
-  // ?fav=logo|logo-tile|g|g-bold|g-tile|n|ring, kept for the visit; files in fav/
-  (function(){
-    var F = Q.get('fav');
-    try{ if(F) sessionStorage.setItem('gc-fav', F); F = sessionStorage.getItem('gc-fav') || F; }catch(e){}
-    if(['logo', 'logo-tile', 'g', 'g-bold', 'g-tile', 'n', 'ring'].indexOf(F) < 0) return;
+  // his pick to test (2026-11-01): the logo (A) on light projects, the logo on a dark tile (B) on dark ones, following
+  // night() below. ?fav=logo|logo-tile|g|g-bold|g-tile|n|ring pins one for the visit (?fav=auto goes back); files in fav/
+  var FAV = Q.get('fav');
+  try{ if(FAV) sessionStorage.setItem('gc-fav', FAV); FAV = sessionStorage.getItem('gc-fav') || FAV; }catch(e){}
+  if(['logo', 'logo-tile', 'g', 'g-bold', 'g-tile', 'n', 'ring'].indexOf(FAV) < 0) FAV = '';
+  function favicon(name){
     var l = document.getElementById('fav');
     if(!l){ l = document.createElement('link'); l.id = 'fav'; l.rel = 'icon'; l.type = 'image/svg+xml'; document.head.appendChild(l); }
-    l.href = 'fav/' + F + '.svg';
-  })();
+    var h = 'fav/' + (FAV || name) + '.svg';
+    if(l.getAttribute('href') !== h) l.setAttribute('href', h);
+  }
+  favicon('logo');
 
   // ---- the project material: hero, diagram, drawings, models, photos, in that order ----
   function web(src){
@@ -86,7 +89,7 @@
   // a dark project (projects.js "dark: true", trial 2026-10-29 with Joint's night render): while its picture is up, and
   // on its page, the whole page slowly goes dark (the ground near-black, the words and marks light). Drawings are never
   // inverted: they keep their own white
-  function night(on){ document.body.classList.toggle('q-night', !!on); }
+  function night(on){ document.body.classList.toggle('q-night', !!on); favicon(on ? 'logo-tile' : 'logo'); }
   function quietHref(s, i){ return 'project.html?p=' + s + (i ? '&i=' + i : ''); }
   // going into a project from a picture on the home (test, 2026-10-26): the page doesn't reload. The picture lifts off
   // the home and glides to its place in the project while the home fades away and the project fades in around it; the

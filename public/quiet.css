@@ -464,11 +464,16 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 }
 
 /* trial ?back=sheet|sleeve|crate|strip: a project's side B, all its pictures at once; the record turns over to it */
-.qp-flip{cursor:pointer}
-.qp-all{margin-left:.55rem;padding:.2rem;line-height:0;align-self:center}
-.qp-all svg{fill:none;stroke:var(--mute);stroke-width:1;transition:stroke .3s,fill .3s}
-.qp-all:hover svg{stroke:var(--ink)}
-.qb-show .qp-all svg{stroke:var(--ink);fill:var(--ink)}
+.qs-x{display:flex;align-items:center;height:1.05rem;margin-top:.35rem;padding:0 0 0 1.2rem;line-height:0}
+.qs-x svg{display:block;fill:none;stroke:var(--faint);stroke-width:1;transition:stroke .3s,fill .3s}
+.qs-x .h{fill:var(--faint);stroke:none;transition:fill .3s}
+.qs-x:hover svg{stroke:var(--ink)}
+.qs-x:hover .h{fill:var(--ink)}
+.qb-show .qs-x svg{stroke:var(--ink)}
+.qb-show .qs-ring .o{fill:var(--ink)}
+.qb-show .qs-ring .h{fill:var(--paper)}
+.qb-show .qp-subs .qs i{background:var(--faint);width:.6rem}
+@media (max-width:700px){ .qs-x{margin:0 0 0 .35rem;padding:0;height:auto;align-self:flex-end} }
 .qp .qt-stage{perspective:2200px}
 .qt-stage .p-layer{transition:opacity 1.1s ease,transform .5s cubic-bezier(.5,0,.75,0)}
 .qb-show .qt-stage .p-layer.on{opacity:0;transform:rotateY(90deg);pointer-events:none}

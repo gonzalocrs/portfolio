@@ -664,18 +664,20 @@
     // side B (trial ?back=): all the pictures at once
     var sideB = null, bOn = false, bBtn = null, bTurn = 0, nameEl0 = me.querySelector('span');
     if(BACK !== 'off' && all.length > 1){
-      // no letters (his note, 2026-11-01: the "A / B" switch was "really bad"): the project's own title turns the record
-      // over and back, like picking the record up; scrolling on past the last picture does the same
-      // &bway=mark instead: a small mark of four squares after the "+" (all the pictures), the title left alone
-      if((Q.get('bway') || '') === 'mark'){
-        bBtn = el('button', 'qp-all', nameEl0); bBtn.type = 'button'; bBtn.setAttribute('aria-label', 'All the pictures');
-        bBtn.innerHTML = '<svg viewBox="0 0 11 11" width="11" height="11"><rect x=".5" y=".5" width="4" height="4"/><rect x="6.5" y=".5" width="4" height="4"/><rect x=".5" y="6.5" width="4" height="4"/><rect x="6.5" y="6.5" width="4" height="4"/></svg>';
-        bBtn.addEventListener('click', function(e){ e.stopPropagation(); e.preventDefault(); flip(!bOn); });
-      } else {
-        bBtn = nameEl0;
-        bBtn.classList.add('qp-flip'); bBtn.setAttribute('role', 'button'); bBtn.setAttribute('aria-label', 'All the pictures');
-        bBtn.addEventListener('click', function(e){ if(e.target.closest('.qp-plus')) return; e.stopPropagation(); e.preventDefault(); flip(!bOn); });
-      }
+      // the way in sits under the project's lines, where its pictures' marks end (his note, 2026-11-01: "the B at the
+      // bottom was really cool but it needs to be more subtle than a letter"): a small mark, &bmark=
+      //   ring    a tiny record, a circle with its centre hole; solid while side B shows (default)
+      //   groove  two short lines close together, like the run-out groove at the end of a side
+      //   corner  a short line whose end turns down, like a corner about to be turned over
+      var BM = (Q.get('bmark') || 'ring').toLowerCase(); if(['ring', 'groove', 'corner'].indexOf(BM) === -1) BM = 'ring';
+      var SVG = {
+        ring: '<svg viewBox="0 0 10 10" width="10" height="10"><circle class="o" cx="5" cy="5" r="4.2"/><circle class="h" cx="5" cy="5" r="1"/></svg>',
+        groove: '<svg viewBox="0 0 12 6" width="12" height="6"><path d="M0 1.5h12M0 4.5h12"/></svg>',
+        corner: '<svg viewBox="0 0 12 8" width="12" height="8"><path d="M0 1h9.5l2 2.5V7.5"/></svg>'
+      };
+      bBtn = el('button', 'qs-x qs-' + BM, subs); bBtn.type = 'button'; bBtn.setAttribute('aria-label', 'All the pictures');
+      bBtn.innerHTML = SVG[BM];
+      bBtn.addEventListener('click', function(e){ e.stopPropagation(); flip(!bOn); });
     }
     function buildB(){
       sideB = el('div', 'qb qb-' + BACK, st);

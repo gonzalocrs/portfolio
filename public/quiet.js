@@ -98,6 +98,17 @@
   try{ if(WORDS) sessionStorage.setItem('gc-words', WORDS); WORDS = sessionStorage.getItem('gc-words'); }catch(e){}
   WORDS = WORDS || 'mix';
   if(['label', 'lede', 'mono', 'plain', 'first', 'bare', 'line', 'tail', 'mix'].indexOf(WORDS) > -1) document.body.classList.add('wd-' + WORDS);
+  // trial ?back= (2026-11-01, his ask: "a way to show all the images at once, like the gallery before or like the back
+  // side of the record"): a project's side B, all its pictures at once, reached by a small "B" under its lines or by
+  // scrolling on past the last picture; a click on one turns the record back to that picture. Four ways:
+  //   sheet   the picture turns over and its back is a contact sheet: every picture uncropped, in even rows (default)
+  //   sleeve  the back of a record sleeve: a strict grid, each picture in its own square with its track number (A1, A2...)
+  //   crate   the pictures stand in a row like records in a crate, leaning; pointing at one pulls it upright
+  //   strip   every picture in one line at the same height, the wheel sliding it along
+  // kept for the visit, ?back=off for the live page without a side B
+  var BACK = Q.get('back');
+  try{ if(BACK) sessionStorage.setItem('gc-back', BACK); BACK = sessionStorage.getItem('gc-back') || BACK; }catch(e){}
+  BACK = ['sheet', 'sleeve', 'crate', 'strip', 'off'].indexOf(BACK) > -1 ? BACK : 'sheet';
   var TICK = Q.get('tick');
   try{ if(TICK === 'off') sessionStorage.removeItem('gc-tick'); else if(TICK) sessionStorage.setItem('gc-tick', TICK); TICK = sessionStorage.getItem('gc-tick'); }catch(e){}
   TICK = TICK && TICK !== 'off' ? TICK : 'tilt';
@@ -649,6 +660,90 @@
       if(up){ up.classList.toggle('off', k === 0); dn.classList.toggle('off', k === n - 1); }
       if(hint && !first) hint.classList.add('off');
     }
+    // side B (trial ?back=): all the pictures at once
+    var sideB = null, bOn = false, bBtn = null, bTurn = 0;
+    if(BACK !== 'off' && all.length > 1){
+      bBtn = el('button', 'qs-b', subs, 'B'); bBtn.type = 'button'; bBtn.setAttribute('aria-label', 'All the pictures');
+      bBtn.addEventListener('click', function(e){ e.stopPropagation(); flip(!bOn); });
+    }
+    function buildB(){
+      sideB = el('div', 'qb qb-' + BACK, st);
+      var box = el('div', 'qb-box', sideB);
+      loadAll(all).then(function(got){
+        got.forEach(function(o, k){
+          var f = el('figure', 'qb-f', box); f.r = o.r; f.k = k;
+          var im = el('img', '', f); im.alt = o.it.caption || p.title; im.src = o.it.src; im.loading = 'lazy';
+          if(/\.(svg|png)$/i.test(o.it.src)) f.classList.add('dr');
+          if(BACK === 'sleeve') el('span', 'k', f, 'A' + (k + 1));
+          f.addEventListener('click', function(e){ e.stopPropagation(); go(k); flip(false); });
+        });
+        layB();
+      });
+    }
+    // the pictures laid out to fit the stage: sheet in even rows (one height per row, every row the full width, the
+    // height chosen so that all the rows fit), sleeve in the largest squares that fit, crate and strip in one line
+    function layB(){
+      if(!sideB) return;
+      var box = sideB.firstChild, F = Array.prototype.slice.call(box.children), W = sideB.clientWidth, H = sideB.clientHeight, g = Math.max(10, W * .012);
+      if(!F.length) return;
+      if(BACK === 'sheet'){
+        var rows = function(h){
+          var out = [], row = [], w = 0;
+          F.forEach(function(f){ var fw = f.r * h; if(row.length && w + fw + g * row.length > W){ out.push(row); row = []; w = 0; } row.push(f); w += fw; });
+          if(row.length) out.push(row);
+          return out;
+        };
+        var lo = 20, hi = H, best = null;
+        for(var t = 0; t < 24; t++){
+          var h = (lo + hi) / 2, R = rows(h), tot = 0;
+          R.forEach(function(row, i){ var sw = row.reduce(function(a, f){ return a + f.r; }, 0), rh = i < R.length - 1 ? (W - g * (row.length - 1)) / sw : h; tot += Math.min(rh, h * 1.25); });
+          tot += g * (R.length - 1);
+          if(tot <= H * .92){ best = {h: h, R: R}; lo = h; } else hi = h;
+        }
+        if(!best) best = {h: lo, R: rows(lo)};
+        var y = 0, hs = best.R.map(function(row, i){ var sw = row.reduce(function(a, f){ return a + f.r; }, 0); return i < best.R.length - 1 ? Math.min((W - g * (row.length - 1)) / sw, best.h * 1.25) : best.h; });
+        var total = hs.reduce(function(a, b){ return a + b; }, 0) + g * (hs.length - 1), y0 = Math.max(0, (H - total) / 2);
+        y = y0;
+        best.R.forEach(function(row, i){
+          var rh = hs[i], rw = row.reduce(function(a, f){ return a + f.r * rh; }, 0) + g * (row.length - 1), x = (W - rw) / 2;
+          row.forEach(function(f){ f.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + (f.r * rh) + 'px;height:' + rh + 'px'; x += f.r * rh + g; });
+          y += rh + g;
+        });
+      } else if(BACK === 'sleeve'){
+        var n2 = F.length, bestS = 0, bc = 1, lab = 22; W -= 2;
+        for(var c = 1; c <= n2; c++){ var r2 = Math.ceil(n2 / c), sz = Math.min((W - g * (c - 1)) / c, (H * .94 - (g + lab) * r2) / r2); if(sz > bestS){ bestS = sz; bc = c; } }
+        var rr = Math.ceil(n2 / bc), gw = bc * bestS + g * (bc - 1), gh = rr * (bestS + lab) + g * (rr - 1), x0 = (W - gw) / 2, y1 = (H - gh) / 2;
+        F.forEach(function(f, i){ var cx = i % bc, cy = Math.floor(i / bc); f.style.cssText = 'left:' + (x0 + cx * (bestS + g)) + 'px;top:' + (y1 + cy * (bestS + lab + g)) + 'px;width:' + bestS + 'px;height:' + bestS + 'px'; });
+      } else {
+        // crate and strip: one line, centred while it fits, otherwise starting at the left and sliding with the wheel.
+        // In the crate the pictures stand close, each leaning back from its left edge so only a slice of it shows,
+        // spaced so that the whole crate fits when it can
+        var hh = BACK === 'crate' ? H * .56 : H * .4, xx = 0, ws = F.map(function(f){ return f.r * hh; });
+        var step = BACK === 'crate' ? Math.max(W * .045, Math.min(Math.min.apply(null, ws) * .55, (W * .96 - ws[ws.length - 1]) / Math.max(1, F.length - 1))) : 0;
+        F.forEach(function(f, i){ f.style.cssText = 'left:' + xx + 'px;top:' + ((H - hh) / 2) + 'px;width:' + ws[i] + 'px;height:' + hh + 'px;z-index:' + (BACK === 'crate' ? F.length - i : 1); xx += BACK === 'crate' ? step : ws[i] + g * 1.6; });
+        var last = F[F.length - 1], endX = parseFloat(last.style.left) + parseFloat(last.style.width);
+        box.dataset.w = endX; box.style.width = endX + 'px';
+        slide(0);
+      }
+    }
+    var bx = 0;
+    function slide(d){
+      var box = sideB.firstChild, w = parseFloat(box.dataset.w || 0), W = sideB.clientWidth;
+      if(w <= W){ bx = (W - w) / 2; } else { bx = Math.min(0, Math.max(W - w, bx - d)); }
+      box.style.transform = 'translateX(' + bx + 'px)';
+      return w > W;
+    }
+    on(window, 'resize', function(){ if(bOn) layB(); });
+    function flip(to){
+      if(to === bOn) return;
+      if(to && isOpen()) toggle(false);
+      if(!sideB){ buildB(); }
+      bOn = to; bTurn = Date.now();
+      wrap.classList.toggle('qb-show', to);
+      if(!to){ wrap.classList.add('qb-ret'); setTimeout(function(){ wrap.classList.remove('qb-ret'); }, 1300); }
+      if(bBtn) bBtn.textContent = to ? 'A' : 'B';
+      if(to) requestAnimationFrame(layB);
+    }
     // a click on the picture goes on (or back, on its left part); a click anywhere outside the pictures, the marks and the
     // words goes back to the home (his note, 2026-10-29)
     st.addEventListener('click', function(e){
@@ -670,17 +765,27 @@
       var d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
       if(Math.abs(d) < 8) return;
       e.preventDefault();
+      if(bOn){
+        // on side B: the line slides with the wheel (crate, strip); scrolling back up (or left) turns the record over
+        if((BACK === 'crate' || BACK === 'strip') && slide(d * 1.2) && !(d < 0 && bx >= -1)) return;
+        var nb = Date.now(); if(nb - bTurn < 900) return;
+        if(d < 0){ lock = nb; flip(false); }
+        return;
+      }
       var now = Date.now(); if(now - lock < 750) return; lock = now;
+      // on past the last picture, the record turns over to side B
+      if(d > 0 && at === n - 1 && bBtn){ flip(true); return; }
       go(at + (d > 0 ? 1 : -1));
     }, {passive: false});
     on(window, 'keydown', function(e){
+      if(bOn && /^Arrow/.test(e.key)){ if(e.key === 'ArrowUp') flip(false); e.preventDefault(); return; }
       if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){ go(at + 1); e.preventDefault(); }
       if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ go(at - 1); e.preventDefault(); }
-      if(e.key === 'Escape'){ if(isOpen()) toggle(false); else goHome(slug); }
+      if(e.key === 'Escape'){ if(bOn) flip(false); else if(isOpen()) toggle(false); else goHome(slug); }
     });
     var sx = null;
     st.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive: true});
-    st.addEventListener('touchend', function(e){ if(sx == null) return; var dx = e.changedTouches[0].clientX - sx; sx = null; if(Math.abs(dx) > 40) go(at + (dx < 0 ? 1 : -1)); }, {passive: true});
+    st.addEventListener('touchend', function(e){ if(sx == null) return; var dx = e.changedTouches[0].clientX - sx; sx = null; if(bOn){ if(BACK === 'crate' || BACK === 'strip') slide(-dx * 2); return; } if(Math.abs(dx) > 40) go(at + (dx < 0 ? 1 : -1)); }, {passive: true});
     var start = Q.get('i'); go(startAt != null ? Math.min(n - 1, startAt) : start === 'last' ? n - 1 : Math.max(0, Math.min(n - 1, (parseInt(start, 10) || 1) - 1)));
   }
 

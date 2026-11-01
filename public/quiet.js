@@ -75,7 +75,19 @@
   // a dark project (projects.js "dark: true", trial 2026-10-29 with Joint's night render): while its picture is up, and
   // on its page, the whole page slowly goes dark (the ground near-black, the words and marks light). Drawings are never
   // inverted: they keep their own white
-  function night(on){ document.body.classList.toggle('q-night', !!on); }
+  // the tab icon: fav/logo.svg follows the system's light/dark, which is what Chrome and Firefox colour their tab bars
+  // by; Safari colours its tab bar like the page instead (his note, 2026-11-01: on Joint the icon sat on a light patch),
+  // so there it follows the page: ink on light pages, white on dark ones
+  var SAFARI = /^((?!chrome|chromium|crios|fxios|edg|opr|android).)*safari/i.test(navigator.userAgent);
+  function tabIcon(dark){
+    if(!SAFARI) return;
+    var ico = document.querySelector('link[rel="icon"][href^="favicon.ico"]'); if(ico) ico.remove();
+    var l = document.querySelector('link[rel="icon"][type="image/svg+xml"]'); if(!l) return;
+    var h = 'fav/logo-' + (dark ? 'white' : 'ink') + '.svg?v=3';
+    if(l.getAttribute('href') !== h){ var n = l.cloneNode(); n.setAttribute('href', h); l.replaceWith(n); }
+  }
+  tabIcon(false);
+  function night(on){ document.body.classList.toggle('q-night', !!on); tabIcon(!!on); }
   function quietHref(s, i){ return 'project.html?p=' + s + (i ? '&i=' + i : ''); }
   // going into a project from a picture on the home (test, 2026-10-26): the page doesn't reload. The picture lifts off
   // the home and glides to its place in the project while the home fades away and the project fades in around it; the

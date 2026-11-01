@@ -471,6 +471,12 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 .qs-x:hover .h{fill:var(--ink)}
 .qb-show .qs-x svg{stroke:var(--ink)}
 .qb-show .qs-ring .o,.qb-show .qs-square .o{fill:var(--ink)}
+.qs-x .d{fill:var(--faint);stroke:none;transition:fill .3s}
+.qs-x:hover .d,.qb-show .qs-x .d{fill:var(--ink)}
+.qs-sleeve .o{fill:var(--paper)}
+.qs-sleeve .r{transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.qs-sleeve:hover .r,.qb-show .qs-sleeve .r{transform:translateX(2px)}
+.qb-show .qs-half .o{fill:var(--ink)}
 .qb-show .qs-ring .h,.qb-show .qs-square .h{fill:var(--paper)}
 .qb-show .qp-subs .qs i{background:var(--faint);width:.6rem}
 @media (max-width:700px){ .qs-x{margin:0 0 0 .35rem;padding:0;height:auto;align-self:flex-end} }

@@ -666,18 +666,30 @@
     if(BACK !== 'off' && all.length > 1){
       // the way in sits under the project's lines, where its pictures' marks end (his note, 2026-11-01: "the B at the
       // bottom was really cool but it needs to be more subtle than a letter"): a small mark, &bmark=
-      //   square  a small square with round corners and a centre hole, like a sleeve; solid while side B shows (his pick,
-      //           2026-11-01: "make it a square with round edge, same effect"; default)
+      //   square  a small square with round corners and a centre hole; solid while side B shows (tried 2026-11-01)
       //   ring    a tiny record, a circle with its centre hole; solid while side B shows
       //   groove  two short lines close together, like the run-out groove at the end of a side
       //   corner  a short line whose end turns down, like a corner about to be turned over
-      var BM = (Q.get('bmark') || 'square').toLowerCase(); if(['square', 'ring', 'groove', 'corner'].indexOf(BM) === -1) BM = 'square';
+      //   sleeve  a square sleeve with the record peeking out of its side
+      //   half    half a record, as if sliding out of view
+      //   stack   three short lines stepped like a stack of sheets
+      //   grid    nine tiny dots, all the pictures at once
+      //   tilt    one more line, leaning like the project lines in the index
+      //   cross   one more line crossed by a short upright one
+      var BM = (Q.get('bmark') || 'sleeve').toLowerCase();
       var SVG = {
         square: '<svg viewBox="0 0 10 10" width="10" height="10"><rect class="o" x=".5" y=".5" width="9" height="9" rx="2.2"/><circle class="h" cx="5" cy="5" r="1"/></svg>',
         ring: '<svg viewBox="0 0 10 10" width="10" height="10"><circle class="o" cx="5" cy="5" r="4.2"/><circle class="h" cx="5" cy="5" r="1"/></svg>',
         groove: '<svg viewBox="0 0 12 6" width="12" height="6"><path d="M0 1.5h12M0 4.5h12"/></svg>',
-        corner: '<svg viewBox="0 0 12 8" width="12" height="8"><path d="M0 1h9.5l2 2.5V7.5"/></svg>'
+        corner: '<svg viewBox="0 0 12 8" width="12" height="8"><path d="M0 1h9.5l2 2.5V7.5"/></svg>',
+        sleeve: '<svg viewBox="0 0 15 10" width="15" height="10"><path class="r" d="M9 1.2a3.8 3.8 0 0 1 0 7.6"/><rect class="o" x=".5" y=".5" width="9" height="9"/></svg>',
+        half: '<svg viewBox="0 0 7 10" width="7" height="10"><path class="o" d="M1.5 .6a4.4 4.4 0 0 1 0 8.8z"/></svg>',
+        stack: '<svg viewBox="0 0 14 8" width="14" height="8"><path d="M0 1h10M2 4h10M4 7h10"/></svg>',
+        grid: '<svg viewBox="0 0 10 10" width="10" height="10"><g class="d"><circle cx="1.5" cy="1.5" r=".9"/><circle cx="5" cy="1.5" r=".9"/><circle cx="8.5" cy="1.5" r=".9"/><circle cx="1.5" cy="5" r=".9"/><circle cx="5" cy="5" r=".9"/><circle cx="8.5" cy="5" r=".9"/><circle cx="1.5" cy="8.5" r=".9"/><circle cx="5" cy="8.5" r=".9"/><circle cx="8.5" cy="8.5" r=".9"/></g></svg>',
+        tilt: '<svg viewBox="0 0 12 8" width="12" height="8"><path d="M.5 7.5L11.5.5"/></svg>',
+        cross: '<svg viewBox="0 0 12 9" width="12" height="9"><path d="M0 4.5h12M6 0v9"/></svg>'
       };
+      if(!SVG[BM]) BM = 'sleeve';
       bBtn = el('button', 'qs-x qs-' + BM, subs); bBtn.type = 'button'; bBtn.setAttribute('aria-label', 'All the pictures');
       bBtn.innerHTML = SVG[BM];
       bBtn.addEventListener('click', function(e){ e.stopPropagation(); flip(!bOn); });

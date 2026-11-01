@@ -706,11 +706,14 @@
               var w = 11 * rem, g = 1.8 * rem, room = r.left - Math.max(me.getBoundingClientRect().right + 2 * rem, 0);
               // wide pictures take the note under them, from their left edge; upright and square ones beside (his rule,
               // 2026-11-01: "if the image is wide do under, if it's vertical or square do side")
-              var wide = im.naturalWidth && im.naturalWidth / im.naturalHeight > 1.15;
+              // then (2026-11-01, on the Joint perspective): moderately wide ones go beside too when there's room; only the
+              // widest go under. Every wide picture keeps the size it has with a note under it ("don't resize anything")
+              var ratio = im.naturalWidth ? im.naturalWidth / im.naturalHeight : 1, wide = ratio > 1.15;
               // a note under the picture gets its own room under it, the picture a little smaller for it (as in the
               // version he liked, 2026-11-01), so the note never runs off the bottom
-              var low = wide || room < w + g;
-              if(f.classList.contains('qf-low') !== low){ f.classList.toggle('qf-low', low); r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
+              var low = ratio > 1.65 || room < w + g, sized = wide || low;
+              if(f.classList.contains('qf-low') !== sized){ f.classList.toggle('qf-low', sized); r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
+              if(!low && im.style.marginBottom){ im.style.marginBottom = ''; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
               if(!low){ nt.classList.remove('qn-low'); nt.style.width = w + 'px'; nt.style.left = (r.left - lr.left - w - g) + 'px'; nt.style.top = (r.bottom - lr.top - nt.offsetHeight) + 'px'; }
               else {
                 // the picture and its note centred together as one block (as the caption under it was), so the picture
@@ -720,7 +723,6 @@
                 if(im.style.marginBottom !== mb){ im.style.marginBottom = mb; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
                 nt.style.left = (r.left - lr.left) + 'px'; nt.style.top = (r.bottom - lr.top + .7 * rem) + 'px';
               }
-              if(!low) im.style.marginBottom = '';
             };
             if(window.ResizeObserver) new ResizeObserver(function(){ fit(); }).observe(L);
           }

@@ -513,3 +513,17 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 .qb-sleeve .qb-f .k{position:absolute;left:0;top:100%;margin-top:.45rem;line-height:1}
 .qb-crate .qb-f{transform-origin:left center;transform:perspective(2400px) rotateY(58deg);box-shadow:0 0 0 1px var(--paper)}
 .qb-crate .qb-f:hover{transform:perspective(2400px) rotateY(0deg) translateY(-3%);z-index:99!important}
+
+/* one vertical line (&bmark=line|grow, default line): the ticks go, all the pictures come */
+.qs-line i,.qs-grow i{display:block;width:1px;height:.8rem;background:var(--faint);transform-origin:50% 100%;transition:background .3s,transform .6s cubic-bezier(.2,.7,.2,1)}
+.qs-line:hover i,.qs-grow:hover i,.qb-show .qs-line i,.qb-show .qs-grow i{background:var(--ink)}
+.bm-line .qs,.bm-grow .qs{transition:opacity .35s ease,height .55s cubic-bezier(.2,.7,.2,1)}
+.qb-show .bm-line .qs,.qb-show .bm-grow .qs{opacity:0;pointer-events:none}
+.qb-show .bm-line .qs-line i{transform:translateY(var(--u,0))}
+.qb-show .bm-grow .qs-grow i{transform:scaleY(var(--g,1))}
+.qb-ret .bm-line .qs,.qb-ret .bm-grow .qs{transition-delay:.15s}
+@media (max-width:700px){
+  .qs-line i,.qs-grow i{height:.55rem}
+  .qb-show .bm-line .qs-line i{transform:none}
+  .qb-show .bm-grow .qs-grow i{transform:scaleY(2.4)}
+}

@@ -677,7 +677,7 @@
       //   tilt    one more line, leaning like the project lines in the index
       //   cross   one more line crossed by a short upright one
       //   logo    his GCV mark, small (his ask, 2026-11-01: "do one with my logo as well")
-      var BM = (Q.get('bmark') || 'stack').toLowerCase();
+      var BM = (Q.get('bmark') || 'line').toLowerCase();
       var SVG = {
         square: '<svg viewBox="0 0 10 10" width="10" height="10"><rect class="o" x=".5" y=".5" width="9" height="9" rx="2.2"/><circle class="h" cx="5" cy="5" r="1"/></svg>',
         ring: '<svg viewBox="0 0 10 10" width="10" height="10"><circle class="o" cx="5" cy="5" r="4.2"/><circle class="h" cx="5" cy="5" r="1"/></svg>',
@@ -714,7 +714,13 @@
       SVG.rack = sv(.5 + (NB - 1) * 2.5 + .5, 10, ups(2.5, [9, 7, 8.5, 6, 9, 7.5, 8, 6.5, 9]));
       SVG.lean = sv(.5 + (NB - 1) * 2.5 + 3, 10, ups(2.5));
       SVG.spread = sv(.5 + (NB - 1) * 2 + .5, 10, ups(2));
-      if(!SVG[BM]) BM = 'stack';
+      // one vertical line (his ask, 2026-11-01: "just one vertical line, when you click it makes all the other [ticks]
+      // disappear (idk if it should increase on length or not) and then i'll have all the images"):
+      //   line   the ticks fade and close up; the line keeps its length and rises under the name
+      //   grow   the ticks fade; the line grows up through the place where they stood
+      SVG.line = SVG.grow = '<i></i>';
+      if(!SVG[BM]) BM = 'line';
+      subs.classList.add('bm-' + BM);
       bBtn = el('button', 'qs-x qs-' + BM, subs); bBtn.type = 'button'; bBtn.setAttribute('aria-label', 'All the pictures');
       bBtn.innerHTML = SVG[BM];
       bBtn.addEventListener('click', function(e){ e.stopPropagation(); flip(!bOn); });
@@ -792,6 +798,15 @@
       if(to && isOpen()) toggle(false);
       if(!sideB){ buildB(); }
       bOn = to; bTurn = Date.now();
+      if(to && bBtn && (BM === 'grow' || BM === 'line')){
+        // grow: how far the line grows, from the first tick down to its own foot; line: how far it rises to stand
+        // where the first tick was (the column itself never moves, so the name stays put)
+        var li = bBtn.querySelector('i'), lr = li.getBoundingClientRect(), t0 = dots[0].getBoundingClientRect();
+        if(lr.height){
+          bBtn.style.setProperty('--g', ((lr.bottom - t0.top - t0.height / 2 + 1) / lr.height).toFixed(3));
+          bBtn.style.setProperty('--u', (t0.top + t0.height / 2 - 1 - lr.top).toFixed(1) + 'px');
+        }
+      }
       wrap.classList.toggle('qb-show', to);
       if(!to){ wrap.classList.add('qb-ret'); setTimeout(function(){ wrap.classList.remove('qb-ret'); }, 1300); }
       if(to) requestAnimationFrame(layB);

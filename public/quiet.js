@@ -882,17 +882,32 @@
     }
     // a click on the picture goes on (or back, on its left part); a click anywhere outside the pictures, the marks and the
     // words goes back to the home (his note, 2026-10-29)
+    // a safe margin round the picture (his note, 2026-11-01: with narrow pictures a click just beside one went back to the
+    // home): a click within it counts as a click on the picture; the note beside a picture is safe ground too
+    function picRect(){
+      var L = st.querySelector('.p-layer.on'), t = L && L.querySelector('.qf img, .qf .plate, .qf .qtx');
+      return t ? t.getBoundingClientRect() : null;
+    }
+    function nearPic(e){
+      var r = picRect(); if(!r || !r.width) return false;
+      var mx = Math.max(110, innerWidth * .08), my = Math.max(50, innerHeight * .06);
+      if(e.clientX > r.left - mx && e.clientX < r.right + mx && e.clientY > r.top - my && e.clientY < r.bottom + my) return true;
+      var nt = st.querySelector('.p-layer.on .qn'), q = nt && nt.getBoundingClientRect();
+      return !!(q && q.width && e.clientX > q.left - 20 && e.clientX < q.right + 20 && e.clientY > q.top - 20 && e.clientY < q.bottom + 20);
+    }
     st.addEventListener('click', function(e){
       if(isOpen() && D === 'float'){ toggle(false); return; }
-      if(!e.target.closest('img, .plate')) return;
+      if(bOn) return;
+      if(!e.target.closest('img, .plate') && !nearPic(e)) return;
       e.stopPropagation();
       // clicking on past the last picture comes round to the first, and back past the first to the last (his ask,
-      // 2026-10-29); scrolling still stops at the ends
-      var r = st.getBoundingClientRect(); go((at + (e.clientX < r.left + r.width * .35 ? -1 : 1) + n) % n);
+      // 2026-10-29); scrolling still stops at the ends. Back on the picture's left part (or left of it), on elsewhere
+      var r = picRect() || st.getBoundingClientRect(); go((at + (e.clientX < r.left + r.width * .35 ? -1 : 1) + n) % n);
     });
     on(document, 'click', function(e){
       if(e.defaultPrevented || e.button || e.target.closest('a, button, img, .plate, input, textarea, select, label, .qp-card')) return;
       if(isOpen() && D === 'float') return;
+      if(!bOn && nearPic(e)) return;
       if(String(getSelection())) return;
       goHome(slug);
     });

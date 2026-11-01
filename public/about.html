@@ -9,6 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@200;300;400;500;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="icon" href="favicon.ico?v=6" sizes="32x32">
 <link rel="icon" type="image/svg+xml" href="fav/logo.svg?v=6">
+<!-- Safari tints its tab bar like the page and won't redraw a tab icon after load, so it gets one grey that reads on both -->
+<script>if(/^((?!chrome|chromium|crios|fxios|edg|opr|android).)*safari/i.test(navigator.userAgent)){document.querySelectorAll('link[rel="icon"]').forEach(function(l){l.remove();});var fi=document.createElement('link');fi.rel='icon';fi.type='image/png';fi.href='fav/logo-grey.png?v=7';document.head.appendChild(fi);}</script>
 <link rel="stylesheet" href="quiet.css">
 </head>
 <body class="l-quiet" data-page="about">

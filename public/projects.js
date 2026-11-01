@@ -107,6 +107,18 @@ window.PROJECTS = {
     // Site still to come from him (an empty value isn't shown); Program replaces Term (his note, 2026-10-29). Term: Spring 2025
     credits: [["Site", ""], ["Studio", "Core II, Columbia GSAPP"], ["Program", "An architecture of instability"], ["Critic", "Christoph Kumpusch"], ["Year", "2025"]],
     // after the hero, in this order (his order, 2026-10-29), drawings and renders mixed
+        // walk-through notes, one per picture in order (hero first), for the ?walk= trial (2026-11-01): his own sentences
+    // from the text above, word for word, set beside the picture each one speaks to; "" = no note (he can write his own)
+    notes: [
+      "Joint imagines a Manhattan where music, art, and independent culture can continue to claim space.",
+      "Its name carries two meanings: the structural joint that connects individual parts, and the cultural space that brings people together.",
+      "Inspired by Konrad Wachsmann’s systems of assembly, a modular framework allows spaces to evolve with the artists who inhabit them.",
+      "Conceived above the working DSNY Garage on 12th Avenue, the project builds on public infrastructure to create venues for gathering, experimentation, and performance.",
+      "Structure becomes a means of supporting creative freedom, allowing different practices, voices, and audiences to meet.",
+      "For artists without institutional backing or a lasting place in the city, it offers room to create, be heard, and build a community.",
+      "",
+      "Joint seeks to give something lasting to an inherently changing culture: a place to belong, and the freedom to become something new."
+    ],
     inOrder: true,
     grid: [
       {src: "img/permanent-impermanence/stair.jpg", caption: "Pavilion"},

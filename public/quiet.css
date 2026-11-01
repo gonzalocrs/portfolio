@@ -536,3 +536,15 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
   .qb-show .bm-line .qs-line i{transform:none}
   .qb-show .bm-grow .qs-grow i{transform:scaleY(2.4)}
 }
+
+/* trial ?walk=side|under|chapter: a short note with each picture, quiet grey, small; gone while the words or side B show */
+.qn{margin:0;font-size:.8rem;line-height:1.5;color:var(--mute);font-weight:400;text-align:left;opacity:0;animation:qn-in .8s ease .5s forwards}
+@keyframes qn-in{to{opacity:1}}
+.qf .qn{margin-top:.8rem;align-self:center;max-width:100%;box-sizing:border-box;text-align:left}
+.qn-side{position:absolute;left:0;top:0;pointer-events:none}
+.qf:has(.qn) img{max-height:calc(100% - 5.2rem)}
+.qt.open .qn,.qb-show .qn{opacity:0!important;animation:none;transition:opacity .3s}
+.qf-text{justify-content:center;align-items:flex-start;width:min(31rem,100%)}
+.qtx{margin:0;font-size:1.3rem;line-height:1.5;font-weight:300;max-width:31rem;color:var(--ink)}
+.qp .qt-stage .p-layer:has(.qf-text){justify-content:center}
+@media (max-width:700px){ .qtx{font-size:1.05rem} .qn{font-size:.75rem} }

@@ -666,9 +666,16 @@
     if(BACK !== 'off' && all.length > 1){
       // no letters (his note, 2026-11-01: the "A / B" switch was "really bad"): the project's own title turns the record
       // over and back, like picking the record up; scrolling on past the last picture does the same
-      bBtn = nameEl0;
-      bBtn.classList.add('qp-flip'); bBtn.setAttribute('role', 'button'); bBtn.setAttribute('aria-label', 'All the pictures');
-      bBtn.addEventListener('click', function(e){ if(e.target.closest('.qp-plus')) return; e.stopPropagation(); e.preventDefault(); flip(!bOn); });
+      // &bway=mark instead: a small mark of four squares after the "+" (all the pictures), the title left alone
+      if((Q.get('bway') || '') === 'mark'){
+        bBtn = el('button', 'qp-all', nameEl0); bBtn.type = 'button'; bBtn.setAttribute('aria-label', 'All the pictures');
+        bBtn.innerHTML = '<svg viewBox="0 0 11 11" width="11" height="11"><rect x=".5" y=".5" width="4" height="4"/><rect x="6.5" y=".5" width="4" height="4"/><rect x=".5" y="6.5" width="4" height="4"/><rect x="6.5" y="6.5" width="4" height="4"/></svg>';
+        bBtn.addEventListener('click', function(e){ e.stopPropagation(); e.preventDefault(); flip(!bOn); });
+      } else {
+        bBtn = nameEl0;
+        bBtn.classList.add('qp-flip'); bBtn.setAttribute('role', 'button'); bBtn.setAttribute('aria-label', 'All the pictures');
+        bBtn.addEventListener('click', function(e){ if(e.target.closest('.qp-plus')) return; e.stopPropagation(); e.preventDefault(); flip(!bOn); });
+      }
     }
     function buildB(){
       sideB = el('div', 'qb qb-' + BACK, st);

@@ -550,3 +550,4 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 @media (max-width:700px){ .qtx{font-size:1.05rem} .qn{font-size:.75rem} }
 .qf .qn-cap{font-size:.78rem;line-height:1.55;text-align:center;max-width:min(30rem,100%);margin-top:1.3rem;padding:0;color:var(--mute)}
 .qf:has(.qn-cap) img{max-height:calc(100% - 7rem)}
+.qp .qt-ticks{z-index:3}

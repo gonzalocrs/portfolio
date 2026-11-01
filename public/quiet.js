@@ -522,6 +522,20 @@
     function nameY(){ var a = nameEl.getBoundingClientRect(), b = st.getBoundingClientRect(); return Math.max(0, Math.round(a.top + a.height / 2 - b.top)); }
     function curImg(){ return st.querySelector('.p-layer.on img, .p-layer.on .plate'); }
     function isOpen(){ return wrap.classList.contains('open'); }
+    // balance (his note, 2026-11-01: the picture "looks shifted"): the room between the index and the picture matches the
+    // room right of the picture, measured from the "+" after the name, so the picture sits centred in the space it reads in
+    function balance(){
+      st.style.marginLeft = '';
+      if(innerWidth <= 700) return;
+      var sr = st.getBoundingClientRect(), pr = plus.getBoundingClientRect(), r = sr.right, l = sr.left;
+      for(var t = 0; t < 3; t++){
+        var pad = (r - l) * .04, m = innerWidth - r + pad, A = pr.right + m;
+        l = (A - .04 * r) / .96;
+      }
+      st.style.marginLeft = Math.min(0, Math.round(l - sr.left)) + 'px';
+    }
+    balance(); on(window, 'resize', balance);
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(balance);
     // beside: the words start a short, fixed step after the "+" (whatever the width of the window), the kicker on the
     // name's line; the picture follows a little after the words
     function placeBeside(){

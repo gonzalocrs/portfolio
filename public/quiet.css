@@ -548,7 +548,5 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 .qtx{margin:0;font-size:1.3rem;line-height:1.5;font-weight:300;max-width:31rem;color:var(--ink)}
 .qp .qt-stage .p-layer:has(.qf-text){justify-content:center}
 @media (max-width:700px){ .qtx{font-size:1.05rem} .qn{font-size:.75rem} }
-.qf .qn-cap{font-family:var(--mono);font-size:.7rem;line-height:1.6;letter-spacing:.02em;text-align:center;max-width:min(34rem,100%);margin-top:1.4rem;padding:0;color:var(--mute)}
-.qn-cap span{display:block}
-.qn-cap .qn-t{color:var(--ink)}
+.qf .qn-cap{font-size:.78rem;line-height:1.55;text-align:center;max-width:min(30rem,100%);margin-top:1.3rem;padding:0;color:var(--mute)}
 .qf:has(.qn-cap) img{max-height:calc(100% - 7rem)}

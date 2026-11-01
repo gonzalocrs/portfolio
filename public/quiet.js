@@ -676,10 +676,9 @@
           if(it.note && WALK === 'under'){
             // under: from the picture's left edge, the lines no longer than a short column
             // a caption (his note, 2026-11-01, after a Peichl plate: "keep it like a caption"): centred under the picture in
-            // the small mono, the picture's name on its own line, then the note
-            cap = el('figcaption', 'qn qn-cap', f);
-            if(it.caption) el('span', 'qn-t', cap, it.caption);
-            el('span', '', cap, it.note);
+            // small type, the note alone
+            // (no picture name and the site's own type, his note: "don't use that font and drop the title")
+            cap = el('figcaption', 'qn qn-cap', f, it.note);
             fit = function(){};
           }
           else if(it.note){

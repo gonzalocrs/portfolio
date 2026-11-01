@@ -743,7 +743,7 @@
       var BM = (Q.get('bmark') || 'ring').toLowerCase();
       var SVG = {
         square: '<svg viewBox="0 0 10 10" width="10" height="10"><rect class="o" x=".5" y=".5" width="9" height="9" rx="2.2"/><circle class="h" cx="5" cy="5" r="1"/></svg>',
-        ring: '<svg viewBox="0 0 10 10" width="10" height="10"><circle class="o" cx="5" cy="5" r="4.2"/></svg>',  // his pick 2026-11-01: the circle, without the point in the middle
+        ring: '<svg viewBox="0 0 10 10" width="10" height="10"><circle class="o" cx="5" cy="5" r="4.2"/><circle class="h" cx="5" cy="5" r="1"/></svg>',  // his pick 2026-11-01: the circle with its point (he dropped the point, then asked for it back)
         groove: '<svg viewBox="0 0 12 6" width="12" height="6"><path d="M0 1.5h12M0 4.5h12"/></svg>',
         corner: '<svg viewBox="0 0 12 8" width="12" height="8"><path d="M0 1h9.5l2 2.5V7.5"/></svg>',
         sleeve: '<svg viewBox="0 0 15 10" width="15" height="10"><path class="r" d="M9 1.2a3.8 3.8 0 0 1 0 7.6"/><rect class="o" x=".5" y=".5" width="9" height="9"/></svg>',
@@ -791,7 +791,7 @@
     function buildB(){
       sideB = el('div', 'qb qb-' + BACK, st);
       var box = el('div', 'qb-box', sideB);
-      loadAll(all).then(function(got){
+      sideB.ready = loadAll(all).then(function(got){
         got.forEach(function(o, k){
           var f = el('figure', 'qb-f', box); f.r = o.r; f.k = k;
           var im = el('img', '', f); im.alt = o.it.caption || p.title; im.src = o.it.src; im.loading = 'lazy';
@@ -856,34 +856,60 @@
       return w > W;
     }
     on(window, 'resize', function(){ if(bOn) layB(); });
+    // the way over to side B and back (his note, 2026-11-01: the turn "is like a wall turning, should be smoother"):
+    // nothing turns. The picture on show glides from its place to its own place on the sheet while the rest of the sheet
+    // fades in round it; coming back, it glides from the sheet to its place again while the sheet fades out
+    function tileAt(k){ return sideB ? Array.prototype.filter.call(sideB.querySelectorAll('.qb-f'), function(f){ return f.k === k; })[0] : null; }
+    function rectIn(f){
+      var src = f.querySelector('img'), fr = src.getBoundingClientRect(), cs = getComputedStyle(src);
+      var pl = parseFloat(cs.paddingLeft) || 0, pt = parseFloat(cs.paddingTop) || 0;
+      var cw = fr.width - 2 * pl, ch = fr.height - 2 * pt, w0 = Math.min(cw, ch * f.r), h0 = w0 / f.r;
+      return {left: fr.left + pl + (cw - w0) / 2, top: fr.top + pt + (ch - h0) / 2, width: w0, height: h0};
+    }
+    function glide(src, dr, from, to, done){
+      var fly = el('img', 'qb-fly' + (dr ? ' dr' : ''), document.body); fly.src = src; fly.alt = '';
+      fly.style.cssText = 'left:' + to.left + 'px;top:' + to.top + 'px;width:' + to.width + 'px;height:' + to.height + 'px;transform:translate(' + (from.left - to.left) + 'px,' + (from.top - to.top) + 'px) scale(' + (from.width / to.width) + ',' + (from.height / to.height) + ')';
+      void fly.offsetWidth; fly.style.transform = 'none';
+      setTimeout(function(){ done(); fly.remove(); }, 780);
+    }
     function flip(to){
       if(to === bOn) return;
       if(to && isOpen()) toggle(false);
-      // built on the first turn: its resting (turned-away) style has to exist before it turns in, or it just appears
-      if(!sideB){ buildB(); void sideB.offsetWidth; }
-      bOn = to; bTurn = Date.now();
-      if(to && bBtn && (BM === 'grow' || BM === 'line')){
+      if(!to){
+        var t0 = tileAt(at);
+        if(t0){ pick(at, t0); return; }
+        bOn = false; bTurn = Date.now(); wrap.classList.remove('qb-show'); return;
+      }
+      if(!sideB) buildB();
+      bOn = true; bTurn = Date.now();
+      if(bBtn && (BM === 'grow' || BM === 'line')){
         // grow: how far the line grows, from the first tick down to its own foot; line: how far it rises to stand
         // where the first tick was (the column itself never moves, so the name stays put)
-        var li = bBtn.querySelector('i'), lr = li.getBoundingClientRect(), t0 = dots[0].getBoundingClientRect();
+        var li = bBtn.querySelector('i'), lr = li.getBoundingClientRect(), d0 = dots[0].getBoundingClientRect();
         if(lr.height){
-          bBtn.style.setProperty('--g', ((lr.bottom - t0.top - t0.height / 2 + 1) / lr.height).toFixed(3));
-          bBtn.style.setProperty('--u', (t0.top + t0.height / 2 - 1 - lr.top).toFixed(1) + 'px');
+          bBtn.style.setProperty('--g', ((lr.bottom - d0.top - d0.height / 2 + 1) / lr.height).toFixed(3));
+          bBtn.style.setProperty('--u', (d0.top + d0.height / 2 - 1 - lr.top).toFixed(1) + 'px');
         }
       }
-      wrap.classList.toggle('qb-show', to);
-      if(!to){ wrap.classList.add('qb-ret'); setTimeout(function(){ wrap.classList.remove('qb-ret'); }, 1300); }
-      if(to) requestAnimationFrame(layB);
+      wrap.classList.add('qb-going');
+      sideB.ready.then(function(){
+        if(!bOn) return;
+        layB();
+        var L = st.querySelector('.p-layer.on'), im = L && L.querySelector('img'), t = tileAt(at);
+        if(im && t && im.getBoundingClientRect().width){
+          var rA = im.getBoundingClientRect(), rB = rectIn(t);
+          t.style.visibility = 'hidden'; im.style.visibility = 'hidden';
+          glide(t.querySelector('img').src, t.classList.contains('dr'), rA, rB, function(){ t.style.visibility = ''; im.style.visibility = ''; });
+        }
+        wrap.classList.remove('qb-going'); wrap.classList.add('qb-show');
+      });
     }
     // a picture clicked on side B (his note, 2026-11-01: "if i click an image i don't need the whole gallery to turn, it
     // should be a smooth transition of just that one image"): that picture glides from its place on the sheet to its
     // place on side A; the others fade where they are; nothing turns
     function pick(k, f){
       if(!bOn) return;
-      var src = f.querySelector('img'), fr = src.getBoundingClientRect(), cs = getComputedStyle(src);
-      var pl = parseFloat(cs.paddingLeft) || 0, pt = parseFloat(cs.paddingTop) || 0;
-      var cw = fr.width - 2 * pl, ch = fr.height - 2 * pt, w0 = Math.min(cw, ch * f.r), h0 = w0 / f.r;
-      var r0 = {left: fr.left + pl + (cw - w0) / 2, top: fr.top + pt + (ch - h0) / 2, width: w0, height: h0};
+      var r0 = rectIn(f), src = f.querySelector('img').src;
       wrap.classList.add('qb-pick');
       if(k !== at) go(k);
       bOn = false; bTurn = Date.now();
@@ -892,14 +918,10 @@
       if(!im){ wrap.classList.remove('qb-pick'); return; }
       im.style.visibility = 'hidden'; f.style.visibility = 'hidden';
       var land = function(){
-        var r1 = im.getBoundingClientRect();
-        var fly = el('img', 'qb-fly' + (f.classList.contains('dr') ? ' dr' : ''), document.body); fly.src = src.src; fly.alt = '';
-        fly.style.cssText = 'left:' + r1.left + 'px;top:' + r1.top + 'px;width:' + r1.width + 'px;height:' + r1.height + 'px;transform:translate(' + (r0.left - r1.left) + 'px,' + (r0.top - r1.top) + 'px) scale(' + (r0.width / r1.width) + ',' + (r0.height / r1.height) + ')';
-        void fly.offsetWidth; fly.style.transform = 'none';
-        setTimeout(function(){
-          im.style.visibility = ''; f.style.visibility = ''; fly.remove();
+        glide(src, f.classList.contains('dr'), r0, im.getBoundingClientRect(), function(){
+          im.style.visibility = ''; f.style.visibility = '';
           requestAnimationFrame(function(){ wrap.classList.remove('qb-pick'); });
-        }, 780);
+        });
       };
       if(im.complete && im.naturalWidth) requestAnimationFrame(land);
       else { im.addEventListener('load', land); im.addEventListener('error', land); }

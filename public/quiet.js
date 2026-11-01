@@ -75,7 +75,17 @@
   // a dark project (projects.js "dark: true", trial 2026-10-29 with Joint's night render): while its picture is up, and
   // on its page, the whole page slowly goes dark (the ground near-black, the words and marks light). Drawings are never
   // inverted: they keep their own white
-  function night(on){ document.body.classList.toggle('q-night', !!on); }
+  // Safari's tab icon (the page's head leaves it none, see there): ink on light pages, white on dark ones, set as soon as
+  // the page knows which it is, and again whenever that changes (a new link each time, the likeliest way Safari redraws)
+  function tabIcon(dark){
+    if(!window.GC_SAFARI) return;
+    var h = 'fav/logo-' + (dark ? 'white' : 'ink') + '.png?v=8', l = document.getElementById('gc-fav');
+    if(l && l.getAttribute('href') === h) return;
+    var n = document.createElement('link'); n.id = 'gc-fav'; n.rel = 'icon'; n.type = 'image/png'; n.href = h;
+    if(l) l.remove(); document.head.appendChild(n);
+  }
+  tabIcon(false);
+  function night(on){ document.body.classList.toggle('q-night', !!on); tabIcon(!!on); }
   function quietHref(s, i){ return 'project.html?p=' + s + (i ? '&i=' + i : ''); }
   // going into a project from a picture on the home (test, 2026-10-26): the page doesn't reload. The picture lifts off
   // the home and glides to its place in the project while the home fades away and the project fades in around it; the

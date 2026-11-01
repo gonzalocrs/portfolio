@@ -666,11 +666,14 @@
     if(BACK !== 'off' && all.length > 1){
       // the way in sits under the project's lines, where its pictures' marks end (his note, 2026-11-01: "the B at the
       // bottom was really cool but it needs to be more subtle than a letter"): a small mark, &bmark=
-      //   ring    a tiny record, a circle with its centre hole; solid while side B shows (default)
+      //   square  a small square with round corners and a centre hole, like a sleeve; solid while side B shows (his pick,
+      //           2026-11-01: "make it a square with round edge, same effect"; default)
+      //   ring    a tiny record, a circle with its centre hole; solid while side B shows
       //   groove  two short lines close together, like the run-out groove at the end of a side
       //   corner  a short line whose end turns down, like a corner about to be turned over
-      var BM = (Q.get('bmark') || 'ring').toLowerCase(); if(['ring', 'groove', 'corner'].indexOf(BM) === -1) BM = 'ring';
+      var BM = (Q.get('bmark') || 'square').toLowerCase(); if(['square', 'ring', 'groove', 'corner'].indexOf(BM) === -1) BM = 'square';
       var SVG = {
+        square: '<svg viewBox="0 0 10 10" width="10" height="10"><rect class="o" x=".5" y=".5" width="9" height="9" rx="2.2"/><circle class="h" cx="5" cy="5" r="1"/></svg>',
         ring: '<svg viewBox="0 0 10 10" width="10" height="10"><circle class="o" cx="5" cy="5" r="4.2"/><circle class="h" cx="5" cy="5" r="1"/></svg>',
         groove: '<svg viewBox="0 0 12 6" width="12" height="6"><path d="M0 1.5h12M0 4.5h12"/></svg>',
         corner: '<svg viewBox="0 0 12 8" width="12" height="8"><path d="M0 1h9.5l2 2.5V7.5"/></svg>'

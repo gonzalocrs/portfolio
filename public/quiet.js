@@ -98,6 +98,24 @@
   try{ if(WORDS) sessionStorage.setItem('gc-words', WORDS); WORDS = sessionStorage.getItem('gc-words'); }catch(e){}
   WORDS = WORDS || 'mix';
   if(['label', 'lede', 'mono', 'plain', 'first', 'bare', 'line', 'tail', 'mix'].indexOf(WORDS) > -1) document.body.classList.add('wd-' + WORDS);
+  // trial ?back= (2026-11-01, his ask: "a way to show all the images at once, like the gallery before or like the back
+  // side of the record"): a project's side B, all its pictures at once, reached by a small "B" under its lines or by
+  // scrolling on past the last picture; a click on one turns the record back to that picture. Four ways:
+  //   sheet   the picture turns over and its back is a contact sheet: every picture uncropped, in even rows (default)
+  //   sleeve  the back of a record sleeve: a strict grid, each picture in its own square with its track number (A1, A2...)
+  //   crate   the pictures stand in a row like records in a crate, leaning; pointing at one pulls it upright
+  //   strip   every picture in one line at the same height, the wheel sliding it along
+  // kept for the visit, ?back=off for the live page without a side B
+  // walk-through notes (his note, 2026-11-01: some of the work is conceptual, so the viewer still needs walking through it,
+  // very minimally): a short note with each picture, from the project's notes in projects.js, beside the picture (under the
+  // widest ones). He tried under (a caption) and chapter (opening on the first paragraph) and kept this one only.
+  // ?walk=off hides the notes for the session
+  var WALK = Q.get('walk');
+  try{ if(WALK) sessionStorage.setItem('gc-walk', WALK); WALK = sessionStorage.getItem('gc-walk') || WALK; }catch(e){}
+  WALK = WALK === 'off' ? 'off' : 'side';
+  var BACK = Q.get('back');
+  try{ if(BACK) sessionStorage.setItem('gc-back', BACK); BACK = sessionStorage.getItem('gc-back') || BACK; }catch(e){}
+  BACK = ['sheet', 'sleeve', 'crate', 'strip', 'off'].indexOf(BACK) > -1 ? BACK : 'sheet';
   var TICK = Q.get('tick');
   try{ if(TICK === 'off') sessionStorage.removeItem('gc-tick'); else if(TICK) sessionStorage.setItem('gc-tick', TICK); TICK = sessionStorage.getItem('gc-tick'); }catch(e){}
   TICK = TICK && TICK !== 'off' ? TICK : 'tilt';
@@ -451,7 +469,11 @@
   }
   addEventListener('resize', function(){ Array.prototype.forEach.call(document.querySelectorAll('.qf'), function(f){ if(f.fit) f.fit(); }); });
   function buildQuietProject(slug, startAt){
-    var p = P[slug], all = pictures(slug), n = Math.max(1, all.length);
+    var p = P[slug], all = pictures(slug);
+    if(WALK !== 'off'){
+      (p.notes || []).forEach(function(t, i){ if(all[i] && t) all[i].note = t; });
+    }
+    var n = Math.max(1, all.length);
     var i0 = SLUGS.indexOf(slug); CUR = slug;
     document.title = p.title + ' — Gonzalo Cáceres';
     document.body.classList.add('qh-proj');
@@ -492,6 +514,18 @@
     function nameY(){ var a = nameEl.getBoundingClientRect(), b = st.getBoundingClientRect(); return Math.max(0, Math.round(a.top + a.height / 2 - b.top)); }
     function curImg(){ return st.querySelector('.p-layer.on img, .p-layer.on .plate'); }
     function isOpen(){ return wrap.classList.contains('open'); }
+    // centred (his notes, 2026-11-01: the picture "looks shifted"; then: keep the size it had, just centred): the picture
+    // keeps its size and slides sideways until the room between the "+" after the name and the picture matches the room
+    // right of it. Each picture on its own (narrow ones need more); not while the words are open (they place it)
+    function centre(L, im){
+      if(!L || !im) return;
+      if(innerWidth <= 700){ L.style.translate = ''; return; }
+      var cur = parseFloat(L.style.translate) || 0, r = im.getBoundingClientRect(); if(!r.width) return;
+      var a = r.left - cur, b = r.right - cur, P = plus.getBoundingClientRect().right;
+      var sh = Math.round((innerWidth - b - a + P) / 2);
+      L.style.translate = Math.min(0, sh) + 'px 0';
+    }
+    on(window, 'resize', function(){ var L = st.querySelector('.p-layer.on'); centre(L, L && L.querySelector('.qf img, .qf .plate')); });
     // beside: the words start a short, fixed step after the "+" (whatever the width of the window), the kicker on the
     // name's line; the picture follows a little after the words
     function placeBeside(){
@@ -575,10 +609,13 @@
     on(window, 'resize', function(){ if(D === 'beside' && isOpen()) placeBeside(); if(D === 'under' && isOpen()) placeUnder(); });
     function toggle(on){
       on = on == null ? !isOpen() : on;
+      if(on && bOn) flip(false);   // the words belong to side A
       if(on === isOpen()) return;
       st.style.setProperty('--ny', nameY() + 'px');
       if(D === 'beside') placeBeside();
       if(D === 'under' && innerWidth > 700) turn(on);
+      // the picture's centring slide eases along with the words coming or going
+      wrap.classList.add('qc-move'); clearTimeout(wrap.qcT); wrap.qcT = setTimeout(function(){ wrap.classList.remove('qc-move'); }, 900);
       if(D !== 'fold'){ wrap.classList.toggle('open', on); return; }
       // fold: the picture closes into its middle line, the line rises to the name, the words come in under it and the
       // picture opens again beside them, out of a line; closing just lets the words go and the picture slide back
@@ -641,7 +678,45 @@
           // stays in projects.js as the picture's alt text
           var cap = null;
           var fit = function(){ if(cap) cap.style.width = im.offsetWidth ? im.offsetWidth + 'px' : ''; };
-          im.addEventListener('load', fit); f.fit = fit;
+          if(it.note){
+            // beside: a narrow column left of the picture, its last line on the picture's bottom edge; under the picture
+            // when there isn't room beside it
+            var nt = el('p', 'qn qn-side', L, it.note);
+            fit = function(){
+              var r = im.getBoundingClientRect(), lr = L.getBoundingClientRect(), rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+              if(!r.width) return;
+              // the column may reach left past the stage, but stays clear of the project's name in the index
+              var w = 11 * rem, g = 1.8 * rem, room = r.left - Math.max(me.getBoundingClientRect().right + 2 * rem, 0);
+              // wide pictures take the note under them, from their left edge; upright and square ones beside (his rule,
+              // 2026-11-01: "if the image is wide do under, if it's vertical or square do side")
+              // then beside for all (below). Every wide picture keeps the size it had with a note under it ("don't resize anything")
+              var ratio = im.naturalWidth ? im.naturalWidth / im.naturalHeight : 1, wide = ratio > 1.15;
+              // a note under the picture gets its own room under it, the picture a little smaller for it (as in the
+              // version he liked, 2026-11-01), so the note never runs off the bottom
+              // every note beside its picture (his call, 2026-11-01: "keep the side version only, no caption at the bottom
+              // no more"); on a phone there's no room beside, so there it stays under
+              var low = innerWidth <= 700, sized = wide || low;
+              if(f.classList.contains('qf-low') !== sized){ f.classList.toggle('qf-low', sized); r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
+              if(!low){
+                if(im.style.marginBottom){ im.style.marginBottom = ''; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
+                // short of room: first a narrower column, then the picture steps right (never past the window's edge)
+                if(room < w + g) w = Math.max(7.5 * rem, room - g);
+                var push = Math.min(w + g - room, innerWidth - rem - r.right);
+                if(push > 0){ L.style.translate = ((parseFloat(L.style.translate) || 0) + push) + 'px 0'; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
+                nt.classList.remove('qn-low'); nt.style.width = w + 'px'; nt.style.left = (r.left - lr.left - w - g) + 'px'; nt.style.top = (r.bottom - lr.top - nt.offsetHeight) + 'px';
+              }
+              else {
+                // phone: the picture and its note centred together as one block, the note under it
+                nt.classList.add('qn-low'); nt.style.width = Math.min(r.width, 26 * rem) + 'px';
+                var mb = Math.round(nt.offsetHeight + .7 * rem) + 'px';
+                if(im.style.marginBottom !== mb){ im.style.marginBottom = mb; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
+                nt.style.left = (r.left - lr.left) + 'px'; nt.style.top = (r.bottom - lr.top + .7 * rem) + 'px';
+              }
+            };
+            if(window.ResizeObserver) new ResizeObserver(function(){ fit(); }).observe(L);
+          }
+          var fit0 = fit; fit = function(){ fit0(); centre(L, im); fit0(); };
+          im.addEventListener('load', fit); f.fit = fit; if(im.complete) requestAnimationFrame(fit);
         }
         else el('div', 'plate', f, 'In preparation');
       }, first);
@@ -649,19 +724,236 @@
       if(up){ up.classList.toggle('off', k === 0); dn.classList.toggle('off', k === n - 1); }
       if(hint && !first) hint.classList.add('off');
     }
+    // side B (trial ?back=): all the pictures at once
+    var sideB = null, bOn = false, bBtn = null, bTurn = 0, nameEl0 = me.querySelector('span');
+    if(BACK !== 'off' && all.length > 1){
+      // the way in sits under the project's lines, where its pictures' marks end (his note, 2026-11-01: "the B at the
+      // bottom was really cool but it needs to be more subtle than a letter"): a small mark, &bmark=
+      //   square  a small square with round corners and a centre hole; solid while side B shows (tried 2026-11-01)
+      //   ring    a tiny record, a circle with its centre hole; solid while side B shows
+      //   groove  two short lines close together, like the run-out groove at the end of a side
+      //   corner  a short line whose end turns down, like a corner about to be turned over
+      //   sleeve  a square sleeve with the record peeking out of its side
+      //   half    half a record, as if sliding out of view
+      //   stack   three short lines stepped like a stack of sheets
+      //   grid    nine tiny dots, all the pictures at once
+      //   tilt    one more line, leaning like the project lines in the index
+      //   cross   one more line crossed by a short upright one
+      //   logo    his GCV mark, small (his ask, 2026-11-01: "do one with my logo as well")
+      var BM = (Q.get('bmark') || 'ring').toLowerCase();
+      var SVG = {
+        square: '<svg viewBox="0 0 10 10" width="10" height="10"><rect class="o" x=".5" y=".5" width="9" height="9" rx="2.2"/><circle class="h" cx="5" cy="5" r="1"/></svg>',
+        ring: '<svg viewBox="0 0 10 10" width="10" height="10"><circle class="o" cx="5" cy="5" r="4.2"/><circle class="h" cx="5" cy="5" r="1"/></svg>',  // his pick 2026-11-01: the circle with its point (he dropped the point, then asked for it back)
+        groove: '<svg viewBox="0 0 12 6" width="12" height="6"><path d="M0 1.5h12M0 4.5h12"/></svg>',
+        corner: '<svg viewBox="0 0 12 8" width="12" height="8"><path d="M0 1h9.5l2 2.5V7.5"/></svg>',
+        sleeve: '<svg viewBox="0 0 15 10" width="15" height="10"><path class="r" d="M9 1.2a3.8 3.8 0 0 1 0 7.6"/><rect class="o" x=".5" y=".5" width="9" height="9"/></svg>',
+        half: '<svg viewBox="0 0 7 10" width="7" height="10"><path class="o" d="M1.5 .6a4.4 4.4 0 0 1 0 8.8z"/></svg>',
+        grid: '<svg viewBox="0 0 10 10" width="10" height="10"><g class="d"><circle cx="1.5" cy="1.5" r=".9"/><circle cx="5" cy="1.5" r=".9"/><circle cx="8.5" cy="1.5" r=".9"/><circle cx="1.5" cy="5" r=".9"/><circle cx="5" cy="5" r=".9"/><circle cx="8.5" cy="5" r=".9"/><circle cx="1.5" cy="8.5" r=".9"/><circle cx="5" cy="8.5" r=".9"/><circle cx="8.5" cy="8.5" r=".9"/></g></svg>',
+        tilt: '<svg viewBox="0 0 12 8" width="12" height="8"><path d="M.5 7.5L11.5.5"/></svg>',
+        logo: '<svg viewBox="26 26 148 148" width="13" height="13"><circle cx="100" cy="100" r="70" stroke-width="9"/><g stroke-width="15" class="lg"><path d="M120.09 60.74L132.29 48.54M143.75 100H161M120.09 139.26L132.29 151.46M67.71 151.46L79.91 139.26M42.13 108.55A58.5 58.5 0 0 1 42.13 91.45M67.71 48.54L79.91 60.74"/></g></svg>',
+        cross: '<svg viewBox="0 0 12 9" width="12" height="9"><path d="M0 4.5h12M6 0v9"/></svg>'
+      };
+      // the stack family (his ask, 2026-11-01: "i kind of like the stacked. do several iterations. one can be vertical
+      // lines as showing all together as well"). One <path> per line so each line can move on its own.
+      //   stack   three lines stepping down to the right (the one he liked); on side B the steps turn the other way,
+      //           like the record turned over (same for stack2, stack4, stackl)
+      //   stack2  two lines, wider step
+      //   stack4  four finer steps
+      //   stackl  stepping down to the left
+      //   turn    the stack on side A; on side B each line stands up, three uprights side by side
+      //   bars    one upright per picture, side by side: all of them together
+      //   rack    uprights of uneven height, like records in a rack
+      //   lean    uprights leaning like the index lines; on side B they stand straight
+      //   spread  uprights packed tight like records seen edge-on; on side B they spread apart
+      var NB = Math.min(all.length, 9);
+      function sv(w, h, ds, st){ return '<svg viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" height="' + h + '" overflow="visible">' + ds.map(function(d, i){ return '<path style="--i:' + i + (st ? ';' + st(i) : '') + '" d="' + d + '"/>'; }).join('') + '</svg>'; }
+      function ups(gap, hs){ var a = []; for(var i = 0; i < NB; i++){ var h = hs ? hs[i % hs.length] : 9; a.push('M' + (.5 + i * gap) + ' ' + (9.5 - h) + 'v' + h); } return a; }
+      SVG.stack = sv(14, 8, ['M0 1h10', 'M2 4h10', 'M4 7h10']);
+      SVG.stack2 = sv(14, 6, ['M0 .5h9', 'M5 5.5h9']);
+      SVG.stack4 = sv(14, 8, ['M0 .5h8', 'M2 2.83h8', 'M4 5.17h8', 'M6 7.5h8']);
+      SVG.stackl = sv(14, 8, ['M4 1h10', 'M2 4h10', 'M0 7h10']);
+      SVG.turn = sv(14, 8, ['M0 1h10', 'M2 4h10', 'M4 7h10'], function(i){ return '--x:' + (i - 1) * 2 + 'px;--y:' + (1 - i) * 3 + 'px'; });
+      SVG.bars = sv(.5 + (NB - 1) * 2.5 + .5, 10, ups(2.5));
+      SVG.rack = sv(.5 + (NB - 1) * 2.5 + .5, 10, ups(2.5, [9, 7, 8.5, 6, 9, 7.5, 8, 6.5, 9]));
+      SVG.lean = sv(.5 + (NB - 1) * 2.5 + 3, 10, ups(2.5));
+      SVG.spread = sv(.5 + (NB - 1) * 2 + .5, 10, ups(2));
+      // one vertical line (his ask, 2026-11-01: "just one vertical line, when you click it makes all the other [ticks]
+      // disappear (idk if it should increase on length or not) and then i'll have all the images"):
+      //   line   the ticks fade and close up; the line keeps its length and rises under the name
+      //   grow   the ticks fade; the line grows up through the place where they stood
+      SVG.line = SVG.grow = '<i></i>';
+      if(!SVG[BM]) BM = 'ring';
+      subs.classList.add('bm-' + BM);
+      bBtn = el('button', 'qs-x qs-' + BM, subs); bBtn.type = 'button'; bBtn.setAttribute('aria-label', 'All the pictures');
+      bBtn.innerHTML = SVG[BM];
+      bBtn.addEventListener('click', function(e){ e.stopPropagation(); flip(!bOn); });
+    }
+    function buildB(){
+      sideB = el('div', 'qb qb-' + BACK, st);
+      var box = el('div', 'qb-box', sideB);
+      sideB.ready = loadAll(all).then(function(got){
+        got.forEach(function(o, k){
+          var f = el('figure', 'qb-f', box); f.r = o.r; f.k = k;
+          var im = el('img', '', f); im.alt = o.it.caption || p.title; im.src = o.it.src; im.loading = 'lazy';
+          if(/\.(svg|png)$/i.test(o.it.src)) f.classList.add('dr');
+          if(BACK === 'sleeve') el('span', 'k', f, 'A' + (k + 1));
+          f.addEventListener('click', function(e){ e.stopPropagation(); pick(k, f); });
+        });
+        layB();
+      });
+    }
+    // the pictures laid out to fit the stage: sheet in even rows (one height per row, every row the full width, the
+    // height chosen so that all the rows fit), sleeve in the largest squares that fit, crate and strip in one line
+    function layB(){
+      if(!sideB) return;
+      var box = sideB.firstChild, F = Array.prototype.slice.call(box.children), W = sideB.clientWidth, H = sideB.clientHeight, g = Math.max(10, W * .012);
+      if(!F.length) return;
+      if(BACK === 'sheet'){
+        var rows = function(h){
+          var out = [], row = [], w = 0;
+          F.forEach(function(f){ var fw = f.r * h; if(row.length && w + fw + g * row.length > W){ out.push(row); row = []; w = 0; } row.push(f); w += fw; });
+          if(row.length) out.push(row);
+          return out;
+        };
+        var lo = 20, hi = H, best = null;
+        for(var t = 0; t < 24; t++){
+          var h = (lo + hi) / 2, R = rows(h), tot = 0;
+          R.forEach(function(row, i){ var sw = row.reduce(function(a, f){ return a + f.r; }, 0), rh = i < R.length - 1 ? (W - g * (row.length - 1)) / sw : h; tot += Math.min(rh, h * 1.25); });
+          tot += g * (R.length - 1);
+          if(tot <= H * .92){ best = {h: h, R: R}; lo = h; } else hi = h;
+        }
+        if(!best) best = {h: lo, R: rows(lo)};
+        var y = 0, hs = best.R.map(function(row, i){ var sw = row.reduce(function(a, f){ return a + f.r; }, 0); return i < best.R.length - 1 ? Math.min((W - g * (row.length - 1)) / sw, best.h * 1.25) : best.h; });
+        var total = hs.reduce(function(a, b){ return a + b; }, 0) + g * (hs.length - 1), y0 = Math.max(0, (H - total) / 2);
+        y = y0;
+        best.R.forEach(function(row, i){
+          var rh = hs[i], rw = row.reduce(function(a, f){ return a + f.r * rh; }, 0) + g * (row.length - 1), x = (W - rw) / 2;
+          row.forEach(function(f){ f.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + (f.r * rh) + 'px;height:' + rh + 'px'; x += f.r * rh + g; });
+          y += rh + g;
+        });
+      } else if(BACK === 'sleeve'){
+        var n2 = F.length, bestS = 0, bc = 1, lab = 22; W -= 2;
+        for(var c = 1; c <= n2; c++){ var r2 = Math.ceil(n2 / c), sz = Math.min((W - g * (c - 1)) / c, (H * .94 - (g + lab) * r2) / r2); if(sz > bestS){ bestS = sz; bc = c; } }
+        var rr = Math.ceil(n2 / bc), gw = bc * bestS + g * (bc - 1), gh = rr * (bestS + lab) + g * (rr - 1), x0 = (W - gw) / 2, y1 = (H - gh) / 2;
+        F.forEach(function(f, i){ var cx = i % bc, cy = Math.floor(i / bc); f.style.cssText = 'left:' + (x0 + cx * (bestS + g)) + 'px;top:' + (y1 + cy * (bestS + lab + g)) + 'px;width:' + bestS + 'px;height:' + bestS + 'px'; });
+      } else {
+        // crate and strip: one line, centred while it fits, otherwise starting at the left and sliding with the wheel.
+        // In the crate the pictures stand close, each leaning back from its left edge so only a slice of it shows,
+        // spaced so that the whole crate fits when it can
+        var hh = BACK === 'crate' ? H * .56 : H * .4, xx = 0, ws = F.map(function(f){ return f.r * hh; });
+        var step = BACK === 'crate' ? Math.max(W * .045, Math.min(Math.min.apply(null, ws) * .55, (W * .96 - ws[ws.length - 1]) / Math.max(1, F.length - 1))) : 0;
+        F.forEach(function(f, i){ f.style.cssText = 'left:' + xx + 'px;top:' + ((H - hh) / 2) + 'px;width:' + ws[i] + 'px;height:' + hh + 'px;z-index:' + (BACK === 'crate' ? F.length - i : 1); xx += BACK === 'crate' ? step : ws[i] + g * 1.6; });
+        var last = F[F.length - 1], endX = parseFloat(last.style.left) + parseFloat(last.style.width);
+        box.dataset.w = endX; box.style.width = endX + 'px';
+        slide(0);
+      }
+    }
+    var bx = 0;
+    function slide(d){
+      var box = sideB.firstChild, w = parseFloat(box.dataset.w || 0), W = sideB.clientWidth;
+      if(w <= W){ bx = (W - w) / 2; } else { bx = Math.min(0, Math.max(W - w, bx - d)); }
+      box.style.transform = 'translateX(' + bx + 'px)';
+      return w > W;
+    }
+    on(window, 'resize', function(){ if(bOn) layB(); });
+    // the way over to side B and back (his note, 2026-11-01: the turn "is like a wall turning, should be smoother"):
+    // nothing turns. The picture on show glides from its place to its own place on the sheet while the rest of the sheet
+    // fades in round it; coming back, it glides from the sheet to its place again while the sheet fades out
+    function tileAt(k){ return sideB ? Array.prototype.filter.call(sideB.querySelectorAll('.qb-f'), function(f){ return f.k === k; })[0] : null; }
+    function rectIn(f){
+      var src = f.querySelector('img'), fr = src.getBoundingClientRect(), cs = getComputedStyle(src);
+      var pl = parseFloat(cs.paddingLeft) || 0, pt = parseFloat(cs.paddingTop) || 0;
+      var cw = fr.width - 2 * pl, ch = fr.height - 2 * pt, w0 = Math.min(cw, ch * f.r), h0 = w0 / f.r;
+      return {left: fr.left + pl + (cw - w0) / 2, top: fr.top + pt + (ch - h0) / 2, width: w0, height: h0};
+    }
+    function glide(src, dr, from, to, done){
+      var fly = el('img', 'qb-fly' + (dr ? ' dr' : ''), document.body); fly.src = src; fly.alt = '';
+      fly.style.cssText = 'left:' + to.left + 'px;top:' + to.top + 'px;width:' + to.width + 'px;height:' + to.height + 'px;transform:translate(' + (from.left - to.left) + 'px,' + (from.top - to.top) + 'px) scale(' + (from.width / to.width) + ',' + (from.height / to.height) + ')';
+      void fly.offsetWidth; fly.style.transform = 'none';
+      setTimeout(function(){ done(); fly.remove(); }, 780);
+    }
+    function flip(to){
+      if(to === bOn) return;
+      if(to && isOpen()) toggle(false);
+      if(!to){
+        var t0 = tileAt(at);
+        if(t0){ pick(at, t0); return; }
+        bOn = false; bTurn = Date.now(); wrap.classList.remove('qb-show'); return;
+      }
+      if(!sideB) buildB();
+      bOn = true; bTurn = Date.now();
+      if(bBtn && (BM === 'grow' || BM === 'line')){
+        // grow: how far the line grows, from the first tick down to its own foot; line: how far it rises to stand
+        // where the first tick was (the column itself never moves, so the name stays put)
+        var li = bBtn.querySelector('i'), lr = li.getBoundingClientRect(), d0 = dots[0].getBoundingClientRect();
+        if(lr.height){
+          bBtn.style.setProperty('--g', ((lr.bottom - d0.top - d0.height / 2 + 1) / lr.height).toFixed(3));
+          bBtn.style.setProperty('--u', (d0.top + d0.height / 2 - 1 - lr.top).toFixed(1) + 'px');
+        }
+      }
+      wrap.classList.add('qb-going');
+      sideB.ready.then(function(){
+        if(!bOn) return;
+        layB();
+        var L = st.querySelector('.p-layer.on'), im = L && L.querySelector('img'), t = tileAt(at);
+        if(im && t && im.getBoundingClientRect().width){
+          var rA = im.getBoundingClientRect(), rB = rectIn(t);
+          t.style.visibility = 'hidden'; im.style.visibility = 'hidden';
+          glide(t.querySelector('img').src, t.classList.contains('dr'), rA, rB, function(){ t.style.visibility = ''; im.style.visibility = ''; });
+        }
+        wrap.classList.remove('qb-going'); wrap.classList.add('qb-show');
+      });
+    }
+    // a picture clicked on side B (his note, 2026-11-01: "if i click an image i don't need the whole gallery to turn, it
+    // should be a smooth transition of just that one image"): that picture glides from its place on the sheet to its
+    // place on side A; the others fade where they are; nothing turns
+    function pick(k, f){
+      if(!bOn) return;
+      var r0 = rectIn(f), src = f.querySelector('img').src;
+      wrap.classList.add('qb-pick');
+      if(k !== at) go(k);
+      bOn = false; bTurn = Date.now();
+      wrap.classList.remove('qb-show');
+      var L = st.querySelector('.p-layer.on'), im = L && L.querySelector('img');
+      if(!im){ wrap.classList.remove('qb-pick'); return; }
+      im.style.visibility = 'hidden'; f.style.visibility = 'hidden';
+      var land = function(){
+        glide(src, f.classList.contains('dr'), r0, im.getBoundingClientRect(), function(){
+          im.style.visibility = ''; f.style.visibility = '';
+          requestAnimationFrame(function(){ wrap.classList.remove('qb-pick'); });
+        });
+      };
+      if(im.complete && im.naturalWidth) requestAnimationFrame(land);
+      else { im.addEventListener('load', land); im.addEventListener('error', land); }
+    }
     // a click on the picture goes on (or back, on its left part); a click anywhere outside the pictures, the marks and the
     // words goes back to the home (his note, 2026-10-29)
+    // a safe margin round the picture (his note, 2026-11-01: with narrow pictures a click just beside one went back to the
+    // home): a click within it counts as a click on the picture; the note beside a picture is safe ground too
+    function picRect(){
+      var L = st.querySelector('.p-layer.on'), t = L && L.querySelector('.qf img, .qf .plate');
+      return t ? t.getBoundingClientRect() : null;
+    }
+    function nearPic(e){
+      var r = picRect(); if(!r || !r.width) return false;
+      var mx = Math.max(110, innerWidth * .08), my = Math.max(50, innerHeight * .06);
+      if(e.clientX > r.left - mx && e.clientX < r.right + mx && e.clientY > r.top - my && e.clientY < r.bottom + my) return true;
+      var nt = st.querySelector('.p-layer.on .qn'), q = nt && nt.getBoundingClientRect();
+      return !!(q && q.width && e.clientX > q.left - 20 && e.clientX < q.right + 20 && e.clientY > q.top - 20 && e.clientY < q.bottom + 20);
+    }
     st.addEventListener('click', function(e){
       if(isOpen() && D === 'float'){ toggle(false); return; }
-      if(!e.target.closest('img, .plate')) return;
+      if(bOn) return;
+      if(!e.target.closest('img, .plate') && !nearPic(e)) return;
       e.stopPropagation();
       // clicking on past the last picture comes round to the first, and back past the first to the last (his ask,
-      // 2026-10-29); scrolling still stops at the ends
-      var r = st.getBoundingClientRect(); go((at + (e.clientX < r.left + r.width * .35 ? -1 : 1) + n) % n);
+      // 2026-10-29); scrolling still stops at the ends. Back on the picture's left part (or left of it), on elsewhere
+      var r = picRect() || st.getBoundingClientRect(); go((at + (e.clientX < r.left + r.width * .35 ? -1 : 1) + n) % n);
     });
     on(document, 'click', function(e){
       if(e.defaultPrevented || e.button || e.target.closest('a, button, img, .plate, input, textarea, select, label, .qp-card')) return;
       if(isOpen() && D === 'float') return;
+      if(!bOn && nearPic(e)) return;
       if(String(getSelection())) return;
       goHome(slug);
     });
@@ -670,17 +962,27 @@
       var d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
       if(Math.abs(d) < 8) return;
       e.preventDefault();
+      if(bOn){
+        // on side B: the line slides with the wheel (crate, strip); scrolling back up (or left) turns the record over
+        if((BACK === 'crate' || BACK === 'strip') && slide(d * 1.2) && !(d < 0 && bx >= -1)) return;
+        var nb = Date.now(); if(nb - bTurn < 900) return;
+        if(d < 0){ lock = nb; flip(false); }
+        return;
+      }
       var now = Date.now(); if(now - lock < 750) return; lock = now;
+      // on past the last picture, the record turns over to side B
+      if(d > 0 && at === n - 1 && bBtn){ flip(true); return; }
       go(at + (d > 0 ? 1 : -1));
     }, {passive: false});
     on(window, 'keydown', function(e){
+      if(bOn && /^Arrow/.test(e.key)){ if(e.key === 'ArrowUp') flip(false); e.preventDefault(); return; }
       if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){ go(at + 1); e.preventDefault(); }
       if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ go(at - 1); e.preventDefault(); }
-      if(e.key === 'Escape'){ if(isOpen()) toggle(false); else goHome(slug); }
+      if(e.key === 'Escape'){ if(bOn) flip(false); else if(isOpen()) toggle(false); else goHome(slug); }
     });
     var sx = null;
     st.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive: true});
-    st.addEventListener('touchend', function(e){ if(sx == null) return; var dx = e.changedTouches[0].clientX - sx; sx = null; if(Math.abs(dx) > 40) go(at + (dx < 0 ? 1 : -1)); }, {passive: true});
+    st.addEventListener('touchend', function(e){ if(sx == null) return; var dx = e.changedTouches[0].clientX - sx; sx = null; if(bOn){ if(BACK === 'crate' || BACK === 'strip') slide(-dx * 2); return; } if(Math.abs(dx) > 40) go(at + (dx < 0 ? 1 : -1)); }, {passive: true});
     var start = Q.get('i'); go(startAt != null ? Math.min(n - 1, startAt) : start === 'last' ? n - 1 : Math.max(0, Math.min(n - 1, (parseInt(start, 10) || 1) - 1)));
   }
 

@@ -462,3 +462,81 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
   .qd-under.open.hv-top .qk:not(.cur) span{background:var(--paper);padding:.15rem .6rem .15rem 0;margin-right:-.6rem;box-shadow:.9rem 0 1rem -.2rem var(--paper)}
   .qd-under.open.hv-none .qk:not(.cur):not(.qa) span{display:none}
 }
+
+/* trial ?back=sheet|sleeve|crate|strip: a project's side B, all its pictures at once; the record turns over to it */
+.qs-x{display:flex;align-items:center;height:1.05rem;margin-top:.35rem;padding:0 0 0 1.2rem;line-height:0}
+.qs-x svg{display:block;fill:none;stroke:var(--faint);stroke-width:1;transition:stroke .3s,fill .3s}
+.qs-x .h{fill:var(--faint);stroke:none;transition:fill .3s}
+.qs-x:hover svg{stroke:var(--ink)}
+.qs-x:hover .h{fill:var(--ink)}
+.qb-show .qs-x svg{stroke:var(--ink)}
+.qb-show .qs-ring .o,.qb-show .qs-square .o{fill:var(--ink)}
+.qs-x .d{fill:var(--faint);stroke:none;transition:fill .3s}
+.qs-x:hover .d,.qb-show .qs-x .d{fill:var(--ink)}
+.qs-sleeve .o{fill:var(--paper)}
+.qs-sleeve .r{transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.qs-sleeve:hover .r,.qb-show .qs-sleeve .r{transform:translateX(2px)}
+.qb-show .qs-half .o{fill:var(--ink)}
+.qb-show .qs-ring .h,.qb-show .qs-square .h{fill:var(--paper)}
+.qb-show .qp-subs .qs i{background:var(--faint);width:.6rem}
+/* stack family: each line moves on its own */
+.qs-x path{transform-box:fill-box;transition:transform .55s cubic-bezier(.2,.7,.2,1),stroke .3s}
+.qs-turn path{transform-origin:center}
+.qb-show .qs-turn path{transform:translate(var(--x),var(--y)) rotate(90deg) scaleX(.8)}
+.qs-turn:hover:not(:focus-visible) path{transition-delay:calc(var(--i) * 40ms)}
+.qs-lean path{transform-origin:50% 100%;transform:rotate(22deg)}
+.qs-lean:hover path{transform:rotate(14deg)}
+.qb-show .qs-lean path{transform:none}
+.qb-show .qs-spread path{transform:translateX(calc(var(--i) * 1.5px))}
+.qs-spread:hover path{transform:translateX(calc(var(--i) * .5px))}
+.qs-stack path,.qs-stack2 path,.qs-stack4 path,.qs-stackl path{transition:transform .5s cubic-bezier(.2,.7,.2,1),stroke .3s}
+.qs-stack:hover path,.qs-stack4:hover path{transform:translateX(calc(var(--i) * -.6px))}
+.qs-stackl:hover path{transform:translateX(calc(var(--i) * .6px))}
+.qb-show .qs-stack path,.qb-show .qs-stack4 path{transform:translateX(calc(var(--i) * -4px))}
+.qb-show .qs-stackl path{transform:translateX(calc(var(--i) * 4px))}
+.qb-show .qs-stack2 path{transform:translateX(calc(var(--i) * -10px))}
+@media (max-width:700px){ .qs-x{margin:0 0 0 .35rem;padding:0;height:auto;align-self:flex-end} }
+/* to side B and back (his note 2026-11-01: no "wall turning"): nothing turns; the picture on show glides to (or from)
+   its place on the sheet while the sheet fades in (or out) round it and the picture's own layer fades */
+.qb-show .qt-stage .p-layer.on{opacity:0;pointer-events:none;transition:opacity .35s ease}
+.qb-show .qt-stage .p-layer.on img{pointer-events:none}
+.qb{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .5s ease;overflow:hidden}
+.qb-show .qb{opacity:1;pointer-events:auto;transition:opacity .55s ease .08s}
+.qb-pick .qt-stage .p-layer{transition:none!important}
+.qb-fly{position:fixed;z-index:60;margin:0;pointer-events:none;transform-origin:0 0;object-fit:contain;transition:transform .75s cubic-bezier(.3,0,.15,1)}
+.q-night .qb-fly.dr{background:#fff}
+.qb-show .qt-stage{cursor:default}
+.qb-box{position:absolute;inset:0;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.qb-f{position:absolute;margin:0;cursor:pointer;transition:opacity .35s ease,transform .5s cubic-bezier(.2,.7,.2,1)}
+.qb-f img{display:block;width:100%;height:100%;object-fit:contain}
+.q-night .qb-f.dr img{background:#fff}
+.qb-sleeve .qb-f{outline:1px solid var(--rule);outline-offset:0}
+.qb-sleeve .qb-f img{padding:7%;box-sizing:border-box}
+.qb-sleeve .qb-f .k{position:absolute;left:0;top:100%;margin-top:.45rem;line-height:1}
+.qb-crate .qb-f{transform-origin:left center;transform:perspective(2400px) rotateY(58deg);box-shadow:0 0 0 1px var(--paper)}
+.qb-crate .qb-f:hover{transform:perspective(2400px) rotateY(0deg) translateY(-3%);z-index:99!important}
+
+/* one vertical line (&bmark=line|grow, default line): the ticks go, all the pictures come */
+.qs-line i,.qs-grow i{display:block;width:1px;height:.8rem;background:var(--faint);transform-origin:50% 100%;transition:background .3s,transform .6s cubic-bezier(.2,.7,.2,1)}
+.qs-line:hover i,.qs-grow:hover i,.qb-show .qs-line i,.qb-show .qs-grow i{background:var(--ink)}
+.bm-line .qs,.bm-grow .qs{transition:opacity .35s ease,height .55s cubic-bezier(.2,.7,.2,1)}
+.qb-show .bm-line .qs,.qb-show .bm-grow .qs{opacity:0;pointer-events:none}
+.qb-show .bm-line .qs-line i{transform:translateY(var(--u,0))}
+.qb-show .bm-grow .qs-grow i{transform:scaleY(var(--g,1))}
+.qb-ret .bm-line .qs,.qb-ret .bm-grow .qs{transition-delay:.15s}
+@media (max-width:700px){
+  .qs-line i,.qs-grow i{height:.55rem}
+  .qb-show .bm-line .qs-line i{transform:none}
+  .qb-show .bm-grow .qs-grow i{transform:scaleY(2.4)}
+}
+
+/* walk-through notes: a short note with each picture, quiet grey, small; gone while the words or side B show */
+.qn{margin:0;font-size:.8rem;line-height:1.5;color:var(--mute);font-weight:400;text-align:left;opacity:0;animation:qn-in .8s ease .5s forwards}
+@keyframes qn-in{to{opacity:1}}
+.qn-side{position:absolute;left:0;top:0;pointer-events:none}
+.qt.open .qn,.qb-show .qn{opacity:0!important;animation:none;transition:opacity .3s}
+.qp .qt-ticks{z-index:3}
+.qt.open .qt-stage .p-layer{translate:none!important}
+.qc-move .qt-stage .p-layer{transition:opacity 1.1s ease,left .7s cubic-bezier(.2,.7,.2,1),translate .7s cubic-bezier(.2,.7,.2,1)}
+.qf-low img{max-height:calc(100% - 5.2rem)}
+@media (max-width:700px){ .qn{font-size:.75rem} }

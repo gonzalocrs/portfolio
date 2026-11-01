@@ -707,12 +707,16 @@
               // wide pictures take the note under them, from their left edge; upright and square ones beside (his rule,
               // 2026-11-01: "if the image is wide do under, if it's vertical or square do side")
               var wide = im.naturalWidth && im.naturalWidth / im.naturalHeight > 1.15;
-              if(!wide && room >= w + g){ nt.classList.remove('qn-low'); nt.style.width = w + 'px'; nt.style.left = (r.left - lr.left - w - g) + 'px'; nt.style.top = (r.bottom - lr.top - nt.offsetHeight) + 'px'; }
+              // a note under the picture gets its own room under it, the picture a little smaller for it (as in the
+              // version he liked, 2026-11-01), so the note never runs off the bottom
+              var low = wide || room < w + g;
+              if(f.classList.contains('qf-low') !== low){ f.classList.toggle('qf-low', low); r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
+              if(!low){ nt.classList.remove('qn-low'); nt.style.width = w + 'px'; nt.style.left = (r.left - lr.left - w - g) + 'px'; nt.style.top = (r.bottom - lr.top - nt.offsetHeight) + 'px'; }
               else { nt.classList.add('qn-low'); nt.style.width = Math.min(r.width, 26 * rem) + 'px'; nt.style.left = (r.left - lr.left) + 'px'; nt.style.top = (r.bottom - lr.top + .7 * rem) + 'px'; }
             };
             if(window.ResizeObserver) new ResizeObserver(function(){ fit(); }).observe(L);
           }
-          var fit0 = fit; fit = function(){ centre(L, im); fit0(); };
+          var fit0 = fit; fit = function(){ fit0(); centre(L, im); fit0(); };
           im.addEventListener('load', fit); f.fit = fit; if(im.complete) requestAnimationFrame(fit);
         }
         else el('div', 'plate', f, 'In preparation');

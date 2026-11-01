@@ -734,7 +734,7 @@
           var im = el('img', '', f); im.alt = o.it.caption || p.title; im.src = o.it.src; im.loading = 'lazy';
           if(/\.(svg|png)$/i.test(o.it.src)) f.classList.add('dr');
           if(BACK === 'sleeve') el('span', 'k', f, 'A' + (k + 1));
-          f.addEventListener('click', function(e){ e.stopPropagation(); go(k); flip(false); });
+          f.addEventListener('click', function(e){ e.stopPropagation(); pick(k, f); });
         });
         layB();
       });
@@ -796,7 +796,8 @@
     function flip(to){
       if(to === bOn) return;
       if(to && isOpen()) toggle(false);
-      if(!sideB){ buildB(); }
+      // built on the first turn: its resting (turned-away) style has to exist before it turns in, or it just appears
+      if(!sideB){ buildB(); void sideB.offsetWidth; }
       bOn = to; bTurn = Date.now();
       if(to && bBtn && (BM === 'grow' || BM === 'line')){
         // grow: how far the line grows, from the first tick down to its own foot; line: how far it rises to stand
@@ -810,6 +811,35 @@
       wrap.classList.toggle('qb-show', to);
       if(!to){ wrap.classList.add('qb-ret'); setTimeout(function(){ wrap.classList.remove('qb-ret'); }, 1300); }
       if(to) requestAnimationFrame(layB);
+    }
+    // a picture clicked on side B (his note, 2026-11-01: "if i click an image i don't need the whole gallery to turn, it
+    // should be a smooth transition of just that one image"): that picture glides from its place on the sheet to its
+    // place on side A; the others fade where they are; nothing turns
+    function pick(k, f){
+      if(!bOn) return;
+      var src = f.querySelector('img'), fr = src.getBoundingClientRect(), cs = getComputedStyle(src);
+      var pl = parseFloat(cs.paddingLeft) || 0, pt = parseFloat(cs.paddingTop) || 0;
+      var cw = fr.width - 2 * pl, ch = fr.height - 2 * pt, w0 = Math.min(cw, ch * f.r), h0 = w0 / f.r;
+      var r0 = {left: fr.left + pl + (cw - w0) / 2, top: fr.top + pt + (ch - h0) / 2, width: w0, height: h0};
+      wrap.classList.add('qb-pick');
+      if(k !== at) go(k);
+      bOn = false; bTurn = Date.now();
+      wrap.classList.remove('qb-show');
+      var L = st.querySelector('.p-layer.on'), im = L && L.querySelector('img');
+      if(!im){ wrap.classList.remove('qb-pick'); return; }
+      im.style.visibility = 'hidden'; f.style.visibility = 'hidden';
+      var land = function(){
+        var r1 = im.getBoundingClientRect();
+        var fly = el('img', 'qb-fly' + (f.classList.contains('dr') ? ' dr' : ''), document.body); fly.src = src.src; fly.alt = '';
+        fly.style.cssText = 'left:' + r1.left + 'px;top:' + r1.top + 'px;width:' + r1.width + 'px;height:' + r1.height + 'px;transform:translate(' + (r0.left - r1.left) + 'px,' + (r0.top - r1.top) + 'px) scale(' + (r0.width / r1.width) + ',' + (r0.height / r1.height) + ')';
+        void fly.offsetWidth; fly.style.transform = 'none';
+        setTimeout(function(){
+          im.style.visibility = ''; f.style.visibility = ''; fly.remove();
+          requestAnimationFrame(function(){ wrap.classList.remove('qb-pick'); });
+        }, 780);
+      };
+      if(im.complete && im.naturalWidth) requestAnimationFrame(land);
+      else { im.addEventListener('load', land); im.addEventListener('error', land); }
     }
     // a click on the picture goes on (or back, on its left part); a click anywhere outside the pictures, the marks and the
     // words goes back to the home (his note, 2026-10-29)

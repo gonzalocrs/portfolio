@@ -586,6 +586,7 @@
     on(window, 'resize', function(){ if(D === 'beside' && isOpen()) placeBeside(); if(D === 'under' && isOpen()) placeUnder(); });
     function toggle(on){
       on = on == null ? !isOpen() : on;
+      if(on && bOn) flip(false);   // the words belong to side A
       if(on === isOpen()) return;
       st.style.setProperty('--ny', nameY() + 'px');
       if(D === 'beside') placeBeside();
@@ -663,8 +664,13 @@
     // side B (trial ?back=): all the pictures at once
     var sideB = null, bOn = false, bBtn = null, bTurn = 0;
     if(BACK !== 'off' && all.length > 1){
-      bBtn = el('button', 'qs-b', subs, 'B'); bBtn.type = 'button'; bBtn.setAttribute('aria-label', 'All the pictures');
-      bBtn.addEventListener('click', function(e){ e.stopPropagation(); flip(!bOn); });
+      // the two sides as a switch beside the title, after the "+" (his note, 2026-11-01: a "B" under the lines was hard
+      // to find): A, the pictures one at a time; B, all of them; the side showing in full ink
+      bBtn = el('span', 'qp-side', me.querySelector('span'));
+      [['A', false, 'One picture at a time'], ['B', true, 'All the pictures']].forEach(function(o){
+        var x = el('button', 'qp-sd' + (o[1] ? '' : ' on'), bBtn, o[0]); x.type = 'button'; x.setAttribute('aria-label', o[2]);
+        x.addEventListener('click', function(e){ e.stopPropagation(); e.preventDefault(); flip(o[1]); });
+      });
     }
     function buildB(){
       sideB = el('div', 'qb qb-' + BACK, st);
@@ -741,7 +747,7 @@
       bOn = to; bTurn = Date.now();
       wrap.classList.toggle('qb-show', to);
       if(!to){ wrap.classList.add('qb-ret'); setTimeout(function(){ wrap.classList.remove('qb-ret'); }, 1300); }
-      if(bBtn) bBtn.textContent = to ? 'A' : 'B';
+      if(bBtn) Array.prototype.forEach.call(bBtn.children, function(x, i){ x.classList.toggle('on', !!i === to); });
       if(to) requestAnimationFrame(layB);
     }
     // a click on the picture goes on (or back, on its left part); a click anywhere outside the pictures, the marks and the

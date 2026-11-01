@@ -499,24 +499,10 @@
     // under, while the words are open, another project's name on hover (his note, 2026-10-29, try both): &hov=top (the
     // name over the words, on the page's own ground; default) or &hov=none (no names while the words are open)
     var HOV = (Q.get('hov') || 'top').toLowerCase(); wrap.classList.add('hv-' + (HOV === 'none' ? 'none' : 'top'));
-    // trial &head= (his ask, 2026-11-01: "title, program as subtitle (no PROGRAM written), then the rest, some mock
-    // ups"): the project's program under its name, unlabelled, then the rest
-    //   sub    the program large and light in ink, then the place and year, then the other credits
-    //   quiet  the program smaller in grey, the other credits, the place and year last
-    //   pair   the program, the place and year right under it in the same face (not the mono), then the other credits
-    //   off    as live (Program among the credits)
-    var HEAD = Q.get('head');
-    try{ if(HEAD) sessionStorage.setItem('gc-head', HEAD); HEAD = sessionStorage.getItem('gc-head') || HEAD; }catch(e){}
-    HEAD = ['sub', 'quiet', 'pair', 'off'].indexOf(HEAD) > -1 ? HEAD : 'sub';
-    var prog = (p.credits || []).filter(function(r){ return r[0] === 'Program' && r[1]; })[0];
-    if(!prog) HEAD = 'off';
-    wrap.classList.add('hd-' + HEAD);
     var card = el('aside', 'qp-card', st), meta = el('div', 'meta', card);
-    if(HEAD !== 'off') el('p', 'sub', meta, prog[1]);
-    var kk = el('span', 'k', meta, p.kicker || '');
+    el('span', 'k', meta, p.kicker || '');
     var cr = el('div', 'cr', meta);
-    (p.credits || []).forEach(function(r){ if(r[0] === 'Year' || !r[1] || (HEAD !== 'off' && r[0] === 'Program')) return; var c = el('p', '', cr); el('b', '', c, r[0]); c.appendChild(document.createTextNode('  ' + r[1])); });
-    if(HEAD === 'quiet') meta.appendChild(kk);
+    (p.credits || []).forEach(function(r){ if(r[0] === 'Year' || !r[1]) return; var c = el('p', '', cr); el('b', '', c, r[0]); c.appendChild(document.createTextNode('  ' + r[1])); });
     var tx = el('div', 'tx', card);
     (p.lede ? [p.lede] : []).concat(p.text ? (Array.isArray(p.text) ? p.text : [p.text]) : []).forEach(function(t, i){
       // the first sentence in its own span (for ?words=first); the words themselves unchanged

@@ -540,10 +540,3 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 .qc-move .qt-stage .p-layer{transition:opacity 1.1s ease,left .7s cubic-bezier(.2,.7,.2,1),translate .7s cubic-bezier(.2,.7,.2,1)}
 .qf-low img{max-height:calc(100% - 5.2rem)}
 @media (max-width:700px){ .qn{font-size:.75rem} }
-/* trial &head=sub|quiet|pair: the program as an unlabelled subtitle under the project's name */
-.qp-card .sub{margin:0 0 1.1rem;color:var(--ink)}
-.hd-sub .qp-card .sub{font-size:1.25rem;line-height:1.3;font-weight:300}
-.hd-quiet .qp-card .sub{font-size:.95rem;line-height:1.4;font-weight:400;color:var(--mute)}
-.hd-quiet .qp-card .meta .k{margin:1rem 0 0}
-.hd-pair .qp-card .sub{font-size:1.1rem;line-height:1.35;font-weight:400;margin-bottom:.25rem}
-.hd-pair .qp-card .meta .k{font-family:var(--font);text-transform:none;letter-spacing:0;font-size:.95rem;color:var(--mute);margin-bottom:1.3rem}

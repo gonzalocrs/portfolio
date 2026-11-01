@@ -83,7 +83,7 @@
     if(!SAFARI) return;
     var ico = document.querySelector('link[rel="icon"][href^="favicon.ico"]'); if(ico) ico.remove();
     var l = document.querySelector('link[rel="icon"][type="image/svg+xml"]'); if(!l) return;
-    var h = 'fav/logo-' + (dark ? 'white' : 'ink') + '.svg?v=3';
+    var h = 'fav/logo-' + (dark ? 'white' : 'ink') + '.svg?v=4';
     if(l.getAttribute('href') !== h){ var n = l.cloneNode(); n.setAttribute('href', h); l.replaceWith(n); }
   }
   tabIcon(false);

@@ -615,7 +615,7 @@
       if(D === 'beside') placeBeside();
       if(D === 'under' && innerWidth > 700) turn(on);
       // the picture's centring slide eases along with the words coming or going
-      wrap.classList.add('qc-move'); clearTimeout(wrap.qcT); wrap.qcT = setTimeout(function(){ wrap.classList.remove('qc-move'); var L = st.querySelector('.p-layer.on'); placeCue(L && L.querySelector('.qf img')); }, 900);
+      wrap.classList.add('qc-move'); clearTimeout(wrap.qcT); wrap.qcT = setTimeout(function(){ wrap.classList.remove('qc-move'); }, 900);
       if(D !== 'fold'){ wrap.classList.toggle('open', on); return; }
       // fold: the picture closes into its middle line, the line rises to the name, the words come in under it and the
       // picture opens again beside them, out of a line; closing just lets the words go and the picture slide back
@@ -680,19 +680,18 @@
       else cue.innerHTML = '<svg viewBox="0 0 16 8" width="16" height="8"><path d="M1 1l7 6 7-6"/></svg>';
       cue.addEventListener('click', function(e){ e.stopPropagation(); go(at + 1); });
     }
-    // centred under the picture, halfway down the margin between its foot and the bottom of the window
-    function placeCue(im){
-      if(!cue || cue.classList.contains('off') || !im) return;
-      var r = im.getBoundingClientRect(); if(!r.width) return;
-      var y = r.bottom + Math.max(10, (innerHeight - r.bottom) / 2);
-      // on a phone the walk-through note sits under the picture: the prompt goes just under both
-      if(innerWidth <= 700){ var L = im.closest('.p-layer'), q = L && L.querySelector('.qn'), b = r.bottom;
-        if(q && q.getBoundingClientRect().height) b = Math.max(b, q.getBoundingClientRect().bottom);
-        y = b + 28; }
-      cue.style.left = Math.round(r.left + r.width / 2) + 'px';
-      cue.style.top = Math.round(Math.min(y, innerHeight - 12)) + 'px';
+    // one fixed spot, the same for every picture (his note, 2026-11-05: "it should [not] jump position according to the
+    // drawings, it should stay"): across the middle of the picture area (pictures centre between the "+" and the right
+    // edge), halfway down the margin under the stage; on a phone, centred just above the marks at the foot
+    function placeCue(){
+      if(!cue || cue.classList.contains('off')) return;
+      var x, y;
+      if(innerWidth <= 700){ var t = wrap.querySelector('.qt-ticks'), tt = t ? t.getBoundingClientRect().top : innerHeight - 90; x = innerWidth / 2; y = tt - 22; }
+      else { var s = st.getBoundingClientRect(), P = plus.getBoundingClientRect().right; x = (P + innerWidth) / 2; y = Math.min(s.bottom + Math.max(14, (innerHeight - s.bottom) / 2), innerHeight - 16); }
+      cue.style.left = Math.round(x) + 'px'; cue.style.top = Math.round(y) + 'px';
       cue.classList.add('in');
     }
+    if(cue){ on(window, 'resize', placeCue); requestAnimationFrame(placeCue); }
     function go(k){
       // a project ends at its last picture (his call, 2026-10-26): no scrolling on into the next one; the marks go there
       if(k >= n || k < 0) return;
@@ -746,7 +745,7 @@
             };
             if(window.ResizeObserver) new ResizeObserver(function(){ fit(); }).observe(L);
           }
-          var fit0 = fit; fit = function(){ fit0(); centre(L, im); fit0(); placeCue(im); setTimeout(function(){ placeCue(im); }, 750); };   // the chevron comes with the picture (his note, 2026-11-05)
+          var fit0 = fit; fit = function(){ fit0(); centre(L, im); fit0(); };
           im.addEventListener('load', fit); f.fit = fit; if(im.complete) requestAnimationFrame(fit);
         }
         else el('div', 'plate', f, 'In preparation');
@@ -754,9 +753,9 @@
       dots.forEach(function(d, j){ d.classList.toggle('cur', j === k); });
       if(up){ up.classList.toggle('off', k === 0); dn.classList.toggle('off', k === n - 1); }
       if(hint && !first) hint.classList.add('off');
-      // the chevron stays under every picture (his note, 2026-11-05: "keep it and make it clickable"); it fades while the
-      // picture changes, comes back under the new one, and is gone only at the last picture (there is nothing further)
-      if(cue){ cue.classList.remove('in'); cue.classList.toggle('off', k === n - 1); }
+      // the chevron stays under every picture (his note, 2026-11-05: "keep it and make it clickable"); it stays put while the
+      // pictures change, and is gone only at the last picture (there is nothing further)
+      if(cue) cue.classList.toggle('off', k === n - 1);
     }
     // side B (trial ?back=): all the pictures at once
     var sideB = null, bOn = false, bBtn = null, bTurn = 0, nameEl0 = me.querySelector('span');

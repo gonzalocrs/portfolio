@@ -687,7 +687,10 @@
       if(!cue || cue.classList.contains('off')) return;
       var x, y;
       if(innerWidth <= 700){ var t = wrap.querySelector('.qt-ticks'), tt = t ? t.getBoundingClientRect().top : innerHeight - 90; x = innerWidth / 2; y = tt - 22; }
-      else { var s = st.getBoundingClientRect(), P = plus.getBoundingClientRect().right; x = (P + innerWidth) / 2; y = Math.min(s.bottom + Math.max(14, (innerHeight - s.bottom) / 2), innerHeight - 16); }
+      else { var s = st.getBoundingClientRect(), P = plus.getBoundingClientRect().right, rem = parseFloat(getComputedStyle(document.documentElement).fontSize), pb = s.bottom - innerHeight * .03 - 1.3 * rem; x = (P + innerWidth) / 2;
+        // halfway between the lowest a picture reaches (the stage less its padding) and the window's foot, never closer
+        // to the foot than 1.8rem (his note, 2026-11-05: "give the chevron some offset from the base of the page")
+        y = Math.min(pb + (innerHeight - pb) / 2, innerHeight - 1.8 * rem); }
       cue.style.left = Math.round(x) + 'px'; cue.style.top = Math.round(y) + 'px';
       cue.classList.add('in');
     }
@@ -988,8 +991,15 @@
       if(isOpen() && D === 'float') return;
       if(!bOn && nearPic(e)) return;
       if(String(getSelection())) return;
+      // only a click in the index's own column goes back to the home (on this project's title); to its right, the
+      // pictures' side, a stray click does nothing (his note, 2026-11-05, a line drawn just right of the name and the marks)
+      if(innerWidth > 700 && e.clientX > indexEdge()) return;
       goHome(slug);
     });
+    function indexEdge(){
+      var rem = parseFloat(getComputedStyle(document.documentElement).fontSize), m = document.querySelector('.gv-mark');
+      return Math.max(m ? m.getBoundingClientRect().right : 0, plus.getBoundingClientRect().right) + 2 * rem;
+    }
     on(window, 'wheel', function(e){
       if(card.contains(e.target) && card.scrollHeight > card.clientHeight) return;
       var d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;

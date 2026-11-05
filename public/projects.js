@@ -52,7 +52,6 @@ window.PROJECTS = {
       {src: "img/sierra-hotel/elevation.svg", size: "half", drawing: true, caption: "Front elevation"},
       {src: "img/sierra-hotel/floor-plans.svg", size: "wide", drawing: true, caption: "Floor plans"},
       {src: "img/sierra-hotel/photo-1.jpg", size: "half"},
-      {src: "img/sierra-hotel/photo-3.jpg", size: "half"},
       // his note, 2026-10-29: this one last
       {src: "img/sierra-hotel/photo-4-crop.jpg", size: "full"}
     ],
@@ -64,7 +63,6 @@ window.PROJECTS = {
       ],
       photos: [
         {src: "img/sierra-hotel/photo-1.jpg", caption: ""},
-        {src: "img/sierra-hotel/photo-3.jpg", caption: ""},
         {src: "img/sierra-hotel/photo-4.jpg", caption: ""},
         {src: "img/sierra-hotel/render-facade.jpg", caption: ""}
       ]

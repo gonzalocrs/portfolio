@@ -678,7 +678,9 @@
       if(CUE === 'word') el('span', '', cue, innerWidth <= 700 ? 'Swipe' : 'Scroll');
       else if(CUE === 'line') el('i', '', cue);
       else cue.innerHTML = '<svg viewBox="0 0 16 8" width="16" height="8"><path d="M1 1l7 6 7-6"/></svg>';
-      cue.addEventListener('click', function(e){ e.stopPropagation(); go(at + 1); });
+      // on the last picture it opens all the pictures (side B), as scrolling on does there (his note, 2026-11-05: "after the
+      // last photo keep the chevron even when in gallery mode"); on side B it stays as it is, a still mark
+      cue.addEventListener('click', function(e){ e.stopPropagation(); if(bOn) return; if(at === n - 1 && bBtn){ flip(true); return; } go(at + 1); });
     }
     // one fixed spot, the same for every picture (his note, 2026-11-05: "it should [not] jump position according to the
     // drawings, it should stay"): across the middle of the picture area (pictures centre between the "+" and the right
@@ -757,8 +759,8 @@
       if(up){ up.classList.toggle('off', k === 0); dn.classList.toggle('off', k === n - 1); }
       if(hint && !first) hint.classList.add('off');
       // the chevron stays under every picture (his note, 2026-11-05: "keep it and make it clickable"); it stays put while the
-      // pictures change, and is gone only at the last picture (there is nothing further)
-      if(cue) cue.classList.toggle('off', k === n - 1);
+      // pictures change; past the last picture it leads into all the pictures (gone there only if a project has no side B)
+      if(cue) cue.classList.toggle('off', k === n - 1 && !bBtn);
     }
     // side B (trial ?back=): all the pictures at once
     var sideB = null, bOn = false, bBtn = null, bTurn = 0, nameEl0 = me.querySelector('span');

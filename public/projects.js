@@ -87,9 +87,24 @@ window.PROJECTS = {
   "social-sanctuary": {
     title: "East 5th", group: "Unbuilt", hue: 42,
     kicker: "New York, 2025",
+    text: [
+      "East 5th proposes collective housing for newly arrived immigrants and refugees on a through-block site in New York’s East Village. The project understands sanctuary as a sense of safety and belonging formed through relationships. Drawing on Constant’s New Babylon and Gordon Pask’s concept of underspecified design, it leaves aspects of domestic and shared space open to interpretation, allowing residents to shape their surroundings as their needs and communities evolve.",
+      "A diagonal dog-leg stair organizes the building, connecting residential levels with shared terraces, gardens, and cultural spaces. Its landings and adjoining spaces turn everyday movement into opportunities for conversation and exchange. Beneath the cantilevered housing, workshops, learning incubators, and a market connect residents with the surrounding neighborhood. Together, these spaces provide a framework for newcomers to establish roots, support one another, and participate in the life of the city."
+    ],
     // Term: Fall 2025 (not shown; Program replaced Term)
-    credits: [["Site", ""], ["Studio", "Core III, Columbia GSAPP"], ["Program", "Housing as social infrastructure"], ["Critic", "Lindy Roy"], ["Year", "2025"]],
-    diagram: {src: "img/social-sanctuary/hand-drawing.jpg"}
+    credits: [["Site", "324 E 5th St, New York"], ["Studio", "Core III, Columbia GSAPP"], ["Program", "Housing as social infrastructure"], ["Critic", "Lindy Roy"], ["Year", "2025"]],
+    diagram: {src: "img/social-sanctuary/hand-drawing.jpg"},
+    hero: "img/social-sanctuary/render-aerial.jpg",
+    // his sheets 11-15 (2026-11-05), words, titles, scales and the photo's dashed leader taken off; his order
+    inOrder: true,
+    grid: [
+      {src: "img/social-sanctuary/plan-first-floor.png", drawing: true, caption: "First floor plan"},
+      {src: "img/social-sanctuary/plan-fourth-floor.png", drawing: true, caption: "Fourth floor plan"},
+      {src: "img/social-sanctuary/plan-typical-floor.png", drawing: true, caption: "Typical floor plan"},
+      {src: "img/social-sanctuary/section-ns.png", drawing: true, caption: "Section north-south"},
+      {src: "img/social-sanctuary/section-ew.png", drawing: true, caption: "Section east-west"},
+      {src: "img/social-sanctuary/render-stairs.jpg", caption: "Stairs"}
+    ]
   },
   "permanent-impermanence": {
     title: "Joint", group: "Unbuilt", hue: 330, dark: true,

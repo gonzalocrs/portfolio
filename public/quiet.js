@@ -662,6 +662,37 @@
       el('span', 'k', hint, 'Scroll'); el('i', '', hint);
       hint.addEventListener('click', function(e){ e.stopPropagation(); go(at + 1); });
     }
+    // a tiny prompt under the first picture so a visitor knows to scroll (his ask, 2026-11-05: a friend inside a project
+    // didn't know how to move through the pictures). It sits in the margin under the picture, never taking room from it
+    // ("don't resize anything"), and goes after the first step. &cue= (kept for the visit):
+    //   word   "Scroll" (on a phone "Swipe"), small, grey
+    //   line   a short hairline drawing downwards, no word
+    //   chev   a small thin chevron pointing down, drifting gently
+    //   off    nothing (as live until now)
+    var CUE = Q.get('cue');
+    try{ if(CUE) sessionStorage.setItem('gc-cue', CUE); CUE = sessionStorage.getItem('gc-cue') || CUE; }catch(e){}
+    CUE = ['word', 'line', 'chev', 'off'].indexOf(CUE) > -1 ? CUE : 'word';
+    var cue = null;
+    if(CUE !== 'off' && n > 1){
+      cue = el('button', 'qcue qcue-' + CUE, wrap); cue.type = 'button'; cue.setAttribute('aria-label', 'Next picture');
+      if(CUE === 'word') el('span', '', cue, innerWidth <= 700 ? 'Swipe' : 'Scroll');
+      else if(CUE === 'line') el('i', '', cue);
+      else cue.innerHTML = '<svg viewBox="0 0 16 8" width="16" height="8"><path d="M1 1l7 6 7-6"/></svg>';
+      cue.addEventListener('click', function(e){ e.stopPropagation(); go(at + 1); });
+    }
+    // centred under the picture, halfway down the margin between its foot and the bottom of the window
+    function placeCue(im){
+      if(!cue || cue.classList.contains('off') || !im) return;
+      var r = im.getBoundingClientRect(); if(!r.width) return;
+      var y = r.bottom + Math.max(10, (innerHeight - r.bottom) / 2);
+      // on a phone the walk-through note sits under the picture: the prompt goes just under both
+      if(innerWidth <= 700){ var L = im.closest('.p-layer'), q = L && L.querySelector('.qn'), b = r.bottom;
+        if(q && q.getBoundingClientRect().height) b = Math.max(b, q.getBoundingClientRect().bottom);
+        y = b + 28; }
+      cue.style.left = Math.round(r.left + r.width / 2) + 'px';
+      cue.style.top = Math.round(Math.min(y, innerHeight - 12)) + 'px';
+      cue.classList.add('in');
+    }
     function go(k){
       // a project ends at its last picture (his call, 2026-10-26): no scrolling on into the next one; the marks go there
       if(k >= n || k < 0) return;
@@ -715,7 +746,7 @@
             };
             if(window.ResizeObserver) new ResizeObserver(function(){ fit(); }).observe(L);
           }
-          var fit0 = fit; fit = function(){ fit0(); centre(L, im); fit0(); };
+          var fit0 = fit; fit = function(){ fit0(); centre(L, im); fit0(); setTimeout(function(){ placeCue(im); }, 750); };
           im.addEventListener('load', fit); f.fit = fit; if(im.complete) requestAnimationFrame(fit);
         }
         else el('div', 'plate', f, 'In preparation');
@@ -723,6 +754,7 @@
       dots.forEach(function(d, j){ d.classList.toggle('cur', j === k); });
       if(up){ up.classList.toggle('off', k === 0); dn.classList.toggle('off', k === n - 1); }
       if(hint && !first) hint.classList.add('off');
+      if(cue && !first) cue.classList.add('off');
     }
     // side B (trial ?back=): all the pictures at once
     var sideB = null, bOn = false, bBtn = null, bTurn = 0, nameEl0 = me.querySelector('span');

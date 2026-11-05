@@ -746,7 +746,7 @@
             };
             if(window.ResizeObserver) new ResizeObserver(function(){ fit(); }).observe(L);
           }
-          var fit0 = fit; fit = function(){ fit0(); centre(L, im); fit0(); setTimeout(function(){ placeCue(im); }, 750); };
+          var fit0 = fit; fit = function(){ fit0(); centre(L, im); fit0(); placeCue(im); setTimeout(function(){ placeCue(im); }, 750); };   // the chevron comes with the picture (his note, 2026-11-05)
           im.addEventListener('load', fit); f.fit = fit; if(im.complete) requestAnimationFrame(fit);
         }
         else el('div', 'plate', f, 'In preparation');

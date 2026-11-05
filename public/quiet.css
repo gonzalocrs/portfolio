@@ -542,9 +542,9 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 @media (max-width:700px){ .qn{font-size:.75rem} }
 
 /* the scroll prompt under a project's first picture (&cue=word|line|chev|off, 2026-11-05) */
-.qcue{position:fixed;left:50%;top:auto;transform:translate(-50%,-50%);z-index:4;display:flex;align-items:center;justify-content:center;padding:.4rem .6rem;color:var(--mute);opacity:0;pointer-events:none;transition:opacity .8s ease}
+.qcue{position:fixed;left:50%;top:auto;transform:translate(-50%,-50%);z-index:4;display:flex;align-items:center;justify-content:center;padding:.7rem 1.1rem;cursor:pointer;color:var(--mute);opacity:0;pointer-events:none;transition:opacity .8s ease}
 .qcue.in{opacity:1;pointer-events:auto;transition:opacity 1s ease .9s}
-.qcue.off,.qp.open .qcue,.qb-show .qcue{opacity:0!important;pointer-events:none!important;transition:opacity .4s ease}
+.qcue.off,.qb-show .qcue{opacity:0!important;pointer-events:none!important;transition:opacity .4s ease}
 .qcue:hover{color:var(--ink)}
 .qcue-word span{font-size:.68rem;font-weight:400;letter-spacing:.06em}
 .qcue-line i{display:block;width:1px;height:1.1rem;background:currentColor;transform-origin:top;animation:qcue-draw 2.4s cubic-bezier(.7,0,.2,1) infinite}

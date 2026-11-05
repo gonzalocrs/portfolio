@@ -615,7 +615,7 @@
       if(D === 'beside') placeBeside();
       if(D === 'under' && innerWidth > 700) turn(on);
       // the picture's centring slide eases along with the words coming or going
-      wrap.classList.add('qc-move'); clearTimeout(wrap.qcT); wrap.qcT = setTimeout(function(){ wrap.classList.remove('qc-move'); }, 900);
+      wrap.classList.add('qc-move'); clearTimeout(wrap.qcT); wrap.qcT = setTimeout(function(){ wrap.classList.remove('qc-move'); var L = st.querySelector('.p-layer.on'); placeCue(L && L.querySelector('.qf img')); }, 900);
       if(D !== 'fold'){ wrap.classList.toggle('open', on); return; }
       // fold: the picture closes into its middle line, the line rises to the name, the words come in under it and the
       // picture opens again beside them, out of a line; closing just lets the words go and the picture slide back
@@ -664,14 +664,14 @@
     }
     // a tiny prompt under the first picture so a visitor knows to scroll (his ask, 2026-11-05: a friend inside a project
     // didn't know how to move through the pictures). It sits in the margin under the picture, never taking room from it
-    // ("don't resize anything"), and goes after the first step. &cue= (kept for the visit):
+    // ("don't resize anything"). &cue= (kept for the visit):
     //   word   "Scroll" (on a phone "Swipe"), small, grey
     //   line   a short hairline drawing downwards, no word
     //   chev   a small thin chevron pointing down, drifting gently
     //   off    nothing (as live until now)
     var CUE = Q.get('cue');
     try{ if(CUE) sessionStorage.setItem('gc-cue', CUE); CUE = sessionStorage.getItem('gc-cue') || CUE; }catch(e){}
-    CUE = ['word', 'line', 'chev', 'off'].indexOf(CUE) > -1 ? CUE : 'word';
+    CUE = ['word', 'line', 'chev', 'off'].indexOf(CUE) > -1 ? CUE : 'chev';   // his pick, 2026-11-05: the chevron, kept on every picture
     var cue = null;
     if(CUE !== 'off' && n > 1){
       cue = el('button', 'qcue qcue-' + CUE, wrap); cue.type = 'button'; cue.setAttribute('aria-label', 'Next picture');
@@ -754,7 +754,9 @@
       dots.forEach(function(d, j){ d.classList.toggle('cur', j === k); });
       if(up){ up.classList.toggle('off', k === 0); dn.classList.toggle('off', k === n - 1); }
       if(hint && !first) hint.classList.add('off');
-      if(cue && !first) cue.classList.add('off');
+      // the chevron stays under every picture (his note, 2026-11-05: "keep it and make it clickable"); it fades while the
+      // picture changes, comes back under the new one, and is gone only at the last picture (there is nothing further)
+      if(cue){ cue.classList.remove('in'); cue.classList.toggle('off', k === n - 1); }
     }
     // side B (trial ?back=): all the pictures at once
     var sideB = null, bOn = false, bBtn = null, bTurn = 0, nameEl0 = me.querySelector('span');

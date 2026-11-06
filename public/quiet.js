@@ -682,6 +682,15 @@
       // last photo keep the chevron even when in gallery mode"); on side B it stays as it is, a still mark
       cue.addEventListener('click', function(e){ e.stopPropagation(); if(bOn) return; if(at === n - 1 && bBtn){ flip(true); return; } go(at + 1); });
     }
+    // and one pointing up, at the head of the picture area (his ask, 2026-11-06: "we need another chevron to go up as
+    // well"): back one picture; on side B back to the pictures; gone on the first picture, where there's nothing above
+    var cueUp = null;
+    if(cue && CUE === 'chev'){
+      cueUp = el('button', 'qcue qcue-chev qcue-up off', wrap); cueUp.type = 'button'; cueUp.setAttribute('aria-label', 'Previous picture');
+      cueUp.innerHTML = '<svg viewBox="0 0 16 8" width="16" height="8"><path d="M1 7l7-6 7 6"/></svg>';
+      cueUp.addEventListener('click', function(e){ e.stopPropagation(); if(bOn){ flip(false); return; } go(at - 1); });
+    }
+    function syncUp(){ if(cueUp) cueUp.classList.toggle('off', !bOn && at <= 0); }
     // one fixed spot, the same for every picture (his note, 2026-11-05: "it should [not] jump position according to the
     // drawings, it should stay"): across the middle of the picture area (pictures centre between the "+" and the right
     // edge), halfway down the margin under the stage; on a phone, centred just above the marks at the foot
@@ -696,6 +705,18 @@
       cue.style.left = Math.round(x) + 'px'; cue.style.top = Math.round(y) + 'px';
       cue.classList.add('in');
     }
+    // the up chevron mirrors it: same line across, halfway between the top a picture reaches and the window's head (at
+    // least 1.8rem down); on a phone just under the head of the picture area
+    function placeUp(){
+      if(!cueUp) return;
+      var x, y, rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
+      if(innerWidth <= 700){ var s0 = st.getBoundingClientRect(); x = innerWidth / 2; y = Math.max(s0.top + 4, 1.8 * rem); }
+      else { var s = st.getBoundingClientRect(), P = plus.getBoundingClientRect().right, pt = s.top + innerHeight * .03; x = (P + innerWidth) / 2;
+        y = Math.max(pt / 2, 1.8 * rem); }
+      cueUp.style.left = Math.round(x) + 'px'; cueUp.style.top = Math.round(y) + 'px';
+      cueUp.classList.add('in');
+    }
+    if(cueUp){ on(window, 'resize', placeUp); requestAnimationFrame(placeUp); }
     if(cue){ on(window, 'resize', placeCue); requestAnimationFrame(placeCue); }
     function go(k){
       // a project ends at its last picture (his call, 2026-10-26): no scrolling on into the next one; the marks go there
@@ -761,6 +782,7 @@
       // the chevron stays under every picture (his note, 2026-11-05: "keep it and make it clickable"); it stays put while the
       // pictures change; past the last picture it leads into all the pictures (gone there only if a project has no side B)
       if(cue) cue.classList.toggle('off', k === n - 1 && !bBtn);
+      syncUp();
     }
     // side B (trial ?back=): all the pictures at once
     var sideB = null, bOn = false, bBtn = null, bTurn = 0, nameEl0 = me.querySelector('span');
@@ -916,10 +938,10 @@
       if(!to){
         var t0 = tileAt(at);
         if(t0){ pick(at, t0); return; }
-        bOn = false; bTurn = Date.now(); wrap.classList.remove('qb-show'); return;
+        bOn = false; bTurn = Date.now(); wrap.classList.remove('qb-show'); syncUp(); return;
       }
       if(!sideB) buildB();
-      bOn = true; bTurn = Date.now();
+      bOn = true; bTurn = Date.now(); syncUp();
       if(bBtn && (BM === 'grow' || BM === 'line')){
         // grow: how far the line grows, from the first tick down to its own foot; line: how far it rises to stand
         // where the first tick was (the column itself never moves, so the name stays put)
@@ -950,7 +972,7 @@
       var r0 = rectIn(f), src = f.querySelector('img').src;
       wrap.classList.add('qb-pick');
       if(k !== at) go(k);
-      bOn = false; bTurn = Date.now();
+      bOn = false; bTurn = Date.now(); syncUp();
       wrap.classList.remove('qb-show');
       var L = st.querySelector('.p-layer.on'), im = L && L.querySelector('img');
       if(!im){ wrap.classList.remove('qb-pick'); return; }

@@ -552,3 +552,6 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 .qcue-chev svg{fill:none;stroke:currentColor;stroke-width:1;overflow:visible;animation:qcue-drift 2.4s ease-in-out infinite}
 @keyframes qcue-drift{0%,100%{transform:translateY(-1px)}50%{transform:translateY(2px)}}
 .qb-show .qcue.in{pointer-events:none}
+.qb-show .qcue-up.in{pointer-events:auto}
+.qcue-up svg{animation-name:qcue-drift-up}
+@keyframes qcue-drift-up{0%,100%{transform:translateY(1px)}50%{transform:translateY(-2px)}}

@@ -29,7 +29,7 @@
         var s = (tv && it.trial[tv]) || (it.src && web(it.src));
         if(!s || seen[s]) return; seen[s] = 1;
         var dr = isDrawing(it);
-        out.push({src: s, drawing: dr, sheet: it.sheet, sheetSrc: it.sheetSrc, fitAs: it.fitAs, kind: dr ? 'drawing' : /\/physical\//.test(s) ? 'physical' : 'photo', caption: it.caption || ''});
+        out.push({src: s, drawing: dr, sheet: it.sheet, sheetSrc: it.sheetSrc, fitAs: it.fitAs, scale: it.scale, kind: dr ? 'drawing' : /\/physical\//.test(s) ? 'physical' : 'photo', caption: it.caption || ''});
       });
     });
     // order: the pictures' order set by hand, hero and diagram included (Sierra Hotel, his numbering 2026-11-06); any
@@ -800,6 +800,8 @@
                   var mw = 'calc(100% - ' + Math.round(w + g) + 'px)';
                   if(it.fitAs){ var mhs0 = getComputedStyle(im).maxHeight, mhm0 = /calc\(100% - ([\d.]+)px\)/.exec(mhs0); mw = 'min(' + mw + ', ' + Math.floor((mhm0 ? f.clientHeight - +mhm0[1] : parseFloat(mhs0) || f.clientHeight) * it.fitAs) + 'px)'; }
                   if(im.style.maxWidth !== mw){ im.style.maxWidth = mw; r = im.getBoundingClientRect(); }
+                  // scale: shown at that share of its usual size (East 5th's site map, his ask 2026-11-06: "make it smaller")
+                  if(it.scale){ im.style.maxWidth = ''; im.style.maxWidth = mw; var w1 = im.getBoundingClientRect().width; mw = 'min(' + mw + ', ' + Math.floor(w1 * it.scale) + 'px)'; im.style.maxWidth = mw; r = im.getBoundingClientRect(); }
                   var cur = parseFloat(L.style.translate) || 0, a0 = r.left - cur, P = plusX();
                   L.style.translate = Math.min(0, Math.round((innerWidth + P - a0 - (r.right - cur + g + w)) / 2)) + 'px 0';
                   r = im.getBoundingClientRect(); lr = L.getBoundingClientRect();

@@ -87,7 +87,7 @@ window.PROJECTS = {
     // every drawing at half its usual size (his ask, 2026-11-06): scale .5; the wordmark's file carries its own margin
     inOrder: true,
     // his note for the step-by-step isotype (2026-11-06), word for word, beside the pictures as on Joint: one paragraph each beside the posters, the step-by-step and the Ur mark (his ask)
-    notes: ["", "Urba’s mark reflects a city that is always evolving. Its shifting letterforms trace a process of forming ideas, building, and adapting to changing needs.", "While sketching variations of the name, I found that the relationship between the drawings mattered more than any single version. That discovery became the basis of the identity: a form that remains recognizable while allowing for change.", "The mark expresses a principle for Urba’s work: each project should respond to its surroundings, improve everyday life, and remain useful as the city grows."],
+    notes: ["", "Urba’s mark reflects a city that is always evolving. Its shifting letterforms trace a process of forming ideas, building, and adapting to changing needs.", "While sketching variations of the name, I found that the relationship between the drawings mattered more than any single version. That discovery became the basis of the identity: a form that remains recognizable while allowing for change."],   // the Ur mark's note ("The mark expresses a principle...") taken off at his ask
     grid: [
       {src: "img/urba-branding/wordmark-tagline-2.png", drawing: true, caption: "Wordmark: Creamos espacios, construimos comunidad"},
       {src: "img/urba-branding/posters.png", drawing: true, scale: .5, caption: "Isotype in the three colours"},

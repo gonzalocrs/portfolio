@@ -265,13 +265,13 @@ window.PROJECTS = {
     title: "Open Assembly", group: "Research", hue: 120,
     kicker: "New York, 2025",
     // his text (2026-11-06), word for word; it replaced the earlier one-line lede
-    text: "The Geometry & Scaffolds section of the Ecosystem of Exploration kit features modular, 3D-printed components derived from a set of regular polygons. These elements aim the designer to explore patterns, tiling systems, and form generation. They can be freely assembled for open-ended experimentation or systematically arranged to construct fundamental geometric structures like Platonic solids and Archimedean polyhedra. More than just a tool for geometric exploration, this kit serves as a platform for reimagining living architecture, responsive structures that blur the boundaries between organic and engineered environments.",
+    text: ["The Geometry & Scaffolds section of the Ecosystem of Exploration kit features modular, 3D-printed components derived from a set of regular polygons. These elements aim the designer to explore patterns, tiling systems, and form generation. They can be freely assembled for open-ended experimentation or systematically arranged to construct fundamental geometric structures like Platonic solids and Archimedean polyhedra. More than just a tool for geometric exploration, this kit serves as a platform for reimagining living architecture, responsive structures that blur the boundaries between organic and engineered environments.",
+      "In preparation."],   // his ask, 2026-11-06, as on Outer Dock
     credits: [["Type", "Modular Systems"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2025"]],
     // his diagram.pdf (2026-11-06 ~1:15am NY), one picture per page, in its order; it replaced everything before
     inOrder: true,
     grid: [
       {src: "img/modular-living-architecture/cuboctahedron.webp", drawing: true, caption: "Truncated cuboctahedron, net and assembly"},
-      {src: "img/modular-living-architecture/assembled.jpg", caption: "Assembled truncated cuboctahedron"},   // his photo, after the net (his ask, 2026-11-06)
       {src: "img/modular-living-architecture/hexagon-tiling.webp", drawing: true, caption: "Hexagon tiling"},
       {src: "img/modular-living-architecture/sheet-3.webp", drawing: true, caption: "Ring and connector parts"}
     ]

@@ -277,11 +277,11 @@ window.PROJECTS = {
       {src: "img/vaulted-shell-structure/house-elevation.png", drawing: true, caption: "End elevation with the existing house"}
     ]
   },
-  // his ask (2026-11-06): first just below Joint, then moved below Lean Shells (Research); "a model study for TECH II with Zak Kostura". Year assumed 2025, no text yet
+  // his ask (2026-11-06): first just below Joint, then moved below Lean Shells (Research); "a model study for TECH II with Zak Kostura" (Spring 2025, from his syllabus); no text yet
   "puente-de-la-mujer": {
     title: "Puente de la Mujer", group: "Research", hue: 190,
     kicker: "New York, 2025",
-    credits: [["Course", "TECH II, Columbia GSAPP"], ["Type", "Model study"], ["Instructor", "Zak Kostura"], ["Year", "2025"]],
+    credits: [["Course", "TECH II, Columbia GSAPP"], ["Type", "Structures in Architecture"], ["Instructor", "Zak Kostura"], ["Term", "Spring 2025"], ["Year", "2025"]],   // from his syllabus header (2026-11-06); course code ARCH A4112 left out so the line does not wrap
     hero: "img/puente-de-la-mujer/perspective.jpg",
     // his order (2026-11-06), after the perspective
     inOrder: true,
@@ -293,7 +293,6 @@ window.PROJECTS = {
     ]
   },
   "modular-living-architecture": {
-    hidden: true,   // off the site for now (his ask, 2026-11-06)
     title: "Open Assembly", group: "Research", hue: 120,
     kicker: "New York, 2025",
     // his text (2026-11-06), word for word; it replaced the earlier one-line lede

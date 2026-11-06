@@ -50,6 +50,16 @@ def step1():
     out.append(rect(X0, 797.8, 759.4, 803.4, 'none'))
     return out, (740.1, 550.1, 797.9, 803.4)
 
+def step0():
+    """the co-op tenement it starts from: his elevation from the same sheet (words taken off), set to the diagram's
+    height on the same top line"""
+    import base64
+    src = os.path.join(os.path.dirname(__file__), 'tenement-elevation.jpg')
+    w, h = 1100, 1124                                   # the jpg's size
+    H = 803.4 - 551; W = H * w / h
+    data = base64.b64encode(open(src, 'rb').read()).decode()
+    return ['<image x="0" y="551" width="%.2f" height="%.2f" href="data:image/jpeg;base64,%s"/>' % (W, H, data)], (0, 551, W, 803.4)
+
 def step2():
     """pulled apart: the rooms keep their outline, the hall empties, the stoop takes the colour"""
     return [poly([(886.2, 551.3), (911.7, 551.3), (911.7, 598), (906.1, 598), (906.1, 629.1), (886.2, 629.1)], C['room']),
@@ -121,6 +131,8 @@ if __name__ == '__main__':
     import sys
     # on the site without the townhouse step (his call, 2026-11-06: "the iteration with the townhouse is not working");
     # --townhouse writes the five-step version beside it
+    # his diagram is all five steps, the townhouse's plan first; "with the townhouse" puts his tenement elevation in
+    # front of it in the same image (his note, 2026-11-06: "do one image with the townhouse elevation, then my diagram")
     s = [step1(), step2(), step3(), step4(), step5()]
-    build(s[1:], os.path.join(out, 'underspecificity.svg'))
-    if '--townhouse' in sys.argv: build(s, os.path.join(out, 'underspecificity-townhouse.svg'))
+    build(s, os.path.join(out, 'underspecificity.svg'))
+    build([step0()] + s, os.path.join(out, 'underspecificity-townhouse.svg'))

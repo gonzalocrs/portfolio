@@ -100,7 +100,7 @@ window.PROJECTS = {
     grid: [
       // his "underspecificity" diagram from sheet 8, redrawn without the townhouse step (tools/diagrams/east5th_underspecificity.py,
       // 2026-11-06)
-      // to compare (2026-11-06): the five-step version with the townhouse first, then the one without; one goes
+      // to compare (2026-11-06): with the townhouse (his tenement elevation, then the steps), then without; one goes
       {src: "img/social-sanctuary/underspecificity-townhouse.svg", drawing: true, caption: "Underspecificity diagram, with the townhouse"},
       {src: "img/social-sanctuary/underspecificity.svg", drawing: true, caption: "Underspecificity diagram"},
       {src: "img/social-sanctuary/render-stairs.jpg", caption: "Stairs"},

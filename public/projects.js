@@ -98,9 +98,10 @@ window.PROJECTS = {
     // dashed leader taken off, model photos removed and the three plans cropped by one shared window centred on the building, wide enough that no car is cut, 2026-11-06), his two model photos, the aerial render last (his order, 2026-11-05)
     inOrder: true,
     grid: [
-        // his tenement elevation, then his underspecificity diagram, in one image (his pick, 2026-11-06; the diagram alone was dropped)
-      {src: "img/social-sanctuary/underspecificity-townhouse.svg", drawing: true, caption: "Co-op tenement, underspecificity diagram, Pask and Constant references"},
       {src: "img/social-sanctuary/render-stairs.jpg", caption: "Stairs"},
+        // the site plan from his sheet, words and the three massing iterations taken off (his call, 2026-11-06; the
+        // underspecificity diagram page was dropped)
+      {src: "img/social-sanctuary/site-plan.png", drawing: true, caption: "Site plan"},
       {src: "img/social-sanctuary/plan-first-floor.png", drawing: true, caption: "First floor plan"},
       {src: "img/social-sanctuary/model-2.jpg", caption: "Physical model"},
       {src: "img/social-sanctuary/plan-fourth-floor.png", drawing: true, caption: "Fourth floor plan"},

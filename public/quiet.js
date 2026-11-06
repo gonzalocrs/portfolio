@@ -24,7 +24,9 @@
     if(p.inOrder && grid.length){ drawings = grid; physical = []; photos = []; }
     [p.hero ? [{src: p.hero}] : [], p.diagram && p.diagram.src ? [{src: p.diagram.src, caption: p.diagram.caption, drawing: true}] : [], drawings, physical, photos].forEach(function(list){
       list.forEach(function(it){
-        var s = it.src && web(it.src);
+        // a trial version of a picture by address (&ref=b|c on East 5th's references slide, 2026-11-06)
+        var tv = it.trial && (location.search.match(/[?&]ref=([a-z])/) || [])[1];
+        var s = (tv && it.trial[tv]) || (it.src && web(it.src));
         if(!s || seen[s]) return; seen[s] = 1;
         var dr = isDrawing(it);
         out.push({src: s, drawing: dr, kind: dr ? 'drawing' : /\/physical\//.test(s) ? 'physical' : 'photo', caption: it.caption || ''});

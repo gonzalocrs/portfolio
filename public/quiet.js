@@ -29,7 +29,7 @@
         var s = (tv && it.trial[tv]) || (it.src && web(it.src));
         if(!s || seen[s]) return; seen[s] = 1;
         var dr = isDrawing(it);
-        out.push({src: s, drawing: dr, sheet: it.sheet, kind: dr ? 'drawing' : /\/physical\//.test(s) ? 'physical' : 'photo', caption: it.caption || ''});
+        out.push({src: s, drawing: dr, sheet: it.sheet, fitAs: it.fitAs, kind: dr ? 'drawing' : /\/physical\//.test(s) ? 'physical' : 'photo', caption: it.caption || ''});
       });
     });
     return out;
@@ -802,7 +802,11 @@
                   // image is smaller"; it had been squeezed into the gap, a thin tower for a long note). The picture starts
                   // from its usual place (Joint's spacing); if the gap left of it is short of the note, only its left edge
                   // comes in by what's missing, so its right edge and the page's margins stay where every picture has them
-                  if(im.style.maxWidth){ im.style.maxWidth = ''; }
+                  // fitAs: a picture cropped to a wider shape keeps the size it had at its old proportions (East 5th's site
+                  // artboard, his ask 2026-11-06: top and bottom cropped, the drawings kept where they were)
+                  var mhs = getComputedStyle(im).maxHeight, mhm = /calc\(100% - ([\d.]+)px\)/.exec(mhs);
+                  var base = it.fitAs ? Math.floor((mhm ? f.clientHeight - +mhm[1] : parseFloat(mhs) || f.clientHeight) * it.fitAs) + 'px' : '';
+                  if(im.style.maxWidth !== base){ im.style.maxWidth = base; }
                   centre(L, im); r = im.getBoundingClientRect();
                   var M = Math.max(me.getBoundingClientRect().right - nameShift() + 2 * rem, 0), miss = (w + g) - (r.left - M);
                   if(miss > 0){

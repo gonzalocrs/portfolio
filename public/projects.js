@@ -123,8 +123,9 @@ window.PROJECTS = {
         // 2026-11-06 ~10:40pm NY his redone Artboard 10 (white ground, new palette), refs in the same places;
         // lines as his. Note on the left (notes below)
       {src: "img/social-sanctuary/tenement-diagram-references.webp", drawing: true, sheet: .6, caption: "Co-op tenement, underspecificity diagram, Constant and Pask references"},
-        // his artboard: neighbourhood map with the site, then the block plan, uncropped (his ask, 2026-11-06)
-      {src: "img/social-sanctuary/site-context.webp", drawing: true, caption: "Site in the East Village and block plan"},
+        // his artboard: neighbourhood map with the site, then the block plan; full width kept, the white above and below
+        // cropped off so the tag sits beside the map (his ask, 2026-11-06)
+      {src: "img/social-sanctuary/site-context.webp", drawing: true, fitAs: 1.5, caption: "Site in the East Village and block plan"},
       {src: "img/social-sanctuary/plan-first-floor.png", drawing: true, caption: "First floor plan"},
       {src: "img/social-sanctuary/plan-fourth-floor.png", drawing: true, caption: "Fourth floor plan"},
       {src: "img/social-sanctuary/plan-typical-floor.png", drawing: true, caption: "Typical floor plan"},

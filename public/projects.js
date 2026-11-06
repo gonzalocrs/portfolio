@@ -125,8 +125,9 @@ window.PROJECTS = {
         // diagram under the diagram, inside the black box (option A, his pick, 2026-11-06; no separate slide);
         // no effects; his own original colours (his call, 2026-11-06, after copper, Joint and 30%-darker versions); since
         // 2026-11-06 ~10:40pm NY his redone Artboard 10 (white ground, new palette), refs in the same places;
-        // lines as his. Note on the left (notes below)
-      {src: "img/social-sanctuary/tenement-diagram-references.webp", drawing: true, sheet: .6, sheetSrc: "img/social-sanctuary/sheet-diagram.webp", caption: "Co-op tenement, underspecificity diagram, Constant and Pask references"},
+        // lines as his. Note on the left (notes below). Since 2026-11-06 ~12:15am NY his Artboard 30 (tenement facades +
+        // the five diagrams, no references); the sheet still shows only the five diagrams
+      {src: "img/social-sanctuary/tenement-diagram-references.webp", drawing: true, sheet: .6, sheetSrc: "img/social-sanctuary/sheet-diagram.webp", caption: "Tenement facades and underspecificity diagram"},
         // his artboard: neighbourhood map with the site, then the block plan; full width kept, the white above and below
         // cropped off so the tag sits beside the map (his ask, 2026-11-06)
       {src: "img/social-sanctuary/site-context.webp", drawing: true, scale: .75, caption: "Site in the East Village"},

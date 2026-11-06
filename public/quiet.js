@@ -29,7 +29,7 @@
         var s = (tv && it.trial[tv]) || (it.src && web(it.src));
         if(!s || seen[s]) return; seen[s] = 1;
         var dr = isDrawing(it);
-        out.push({src: s, drawing: dr, kind: dr ? 'drawing' : /\/physical\//.test(s) ? 'physical' : 'photo', caption: it.caption || ''});
+        out.push({src: s, drawing: dr, sheet: it.sheet, kind: dr ? 'drawing' : /\/physical\//.test(s) ? 'physical' : 'photo', caption: it.caption || ''});
       });
     });
     return out;
@@ -908,7 +908,7 @@
       var box = el('div', 'qb-box', sideB);
       sideB.ready = loadAll(all).then(function(got){
         got.forEach(function(o, k){
-          var f = el('figure', 'qb-f', box); f.r = o.r; f.k = k;
+          var f = el('figure', 'qb-f', box); f.r = o.r; f.k = k; f.s = o.it.sheet || 1;
           var im = el('img', '', f); im.alt = o.it.caption || p.title; im.src = o.it.src; im.loading = 'lazy';
           if(/\.(svg|png)$/i.test(o.it.src)) f.classList.add('dr');
           if(BACK === 'sleeve') el('span', 'k', f, 'A' + (k + 1));
@@ -923,27 +923,29 @@
       if(!sideB) return;
       var box = sideB.firstChild, F = Array.prototype.slice.call(box.children), W = sideB.clientWidth, H = sideB.clientHeight, g = Math.max(10, W * .012);
       if(!F.length) return;
+      // a picture can be set smaller on the sheet (sheet: .6 in projects.js): it takes that share of the row's height,
+      // centred in the row (East 5th's references slide, his note 2026-11-06: "should be small as the site plan")
       if(BACK === 'sheet'){
         var rows = function(h){
           var out = [], row = [], w = 0;
-          F.forEach(function(f){ var fw = f.r * h; if(row.length && w + fw + g * row.length > W){ out.push(row); row = []; w = 0; } row.push(f); w += fw; });
+          F.forEach(function(f){ var fw = f.r * f.s * h; if(row.length && w + fw + g * row.length > W){ out.push(row); row = []; w = 0; } row.push(f); w += fw; });
           if(row.length) out.push(row);
           return out;
         };
         var lo = 20, hi = H, best = null;
         for(var t = 0; t < 24; t++){
           var h = (lo + hi) / 2, R = rows(h), tot = 0;
-          R.forEach(function(row, i){ var sw = row.reduce(function(a, f){ return a + f.r; }, 0), rh = i < R.length - 1 ? (W - g * (row.length - 1)) / sw : h; tot += Math.min(rh, h * 1.25); });
+          R.forEach(function(row, i){ var sw = row.reduce(function(a, f){ return a + f.r * f.s; }, 0), rh = i < R.length - 1 ? (W - g * (row.length - 1)) / sw : h; tot += Math.min(rh, h * 1.25); });
           tot += g * (R.length - 1);
           if(tot <= H * .92){ best = {h: h, R: R}; lo = h; } else hi = h;
         }
         if(!best) best = {h: lo, R: rows(lo)};
-        var y = 0, hs = best.R.map(function(row, i){ var sw = row.reduce(function(a, f){ return a + f.r; }, 0); return i < best.R.length - 1 ? Math.min((W - g * (row.length - 1)) / sw, best.h * 1.25) : best.h; });
+        var y = 0, hs = best.R.map(function(row, i){ var sw = row.reduce(function(a, f){ return a + f.r * f.s; }, 0); return i < best.R.length - 1 ? Math.min((W - g * (row.length - 1)) / sw, best.h * 1.25) : best.h; });
         var total = hs.reduce(function(a, b){ return a + b; }, 0) + g * (hs.length - 1), y0 = Math.max(0, (H - total) / 2);
         y = y0;
         best.R.forEach(function(row, i){
-          var rh = hs[i], rw = row.reduce(function(a, f){ return a + f.r * rh; }, 0) + g * (row.length - 1), x = (W - rw) / 2;
-          row.forEach(function(f){ f.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + (f.r * rh) + 'px;height:' + rh + 'px'; x += f.r * rh + g; });
+          var rh = hs[i], rw = row.reduce(function(a, f){ return a + f.r * f.s * rh; }, 0) + g * (row.length - 1), x = (W - rw) / 2;
+          row.forEach(function(f){ f.style.cssText = 'left:' + x + 'px;top:' + (y + rh * (1 - f.s) / 2) + 'px;width:' + (f.r * f.s * rh) + 'px;height:' + (rh * f.s) + 'px'; x += f.r * f.s * rh + g; });
           y += rh + g;
         });
       } else if(BACK === 'sleeve'){

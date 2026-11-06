@@ -831,10 +831,16 @@
               else {
                 // phone: the picture and its note centred together as one block, the note under it
                 if(im.style.maxWidth){ im.style.maxWidth = ''; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
-                nt.classList.add('qn-low'); nt.style.width = Math.min(r.width, 26 * rem) + 'px';
+                // a long note (Urba's, 2026-11-06) under a narrow picture: the note takes the frame's width, not the
+                // picture's, and the picture gives up the note's height so the two still fit the screen together
+                var fw = Math.round(lr.width - 2 * rem), long = nt.textContent.length > 160;
+                nt.classList.add('qn-low'); nt.style.width = (long ? Math.min(fw, 26 * rem) : Math.min(r.width, 26 * rem)) + 'px';
                 var mb = Math.round(nt.offsetHeight + .7 * rem) + 'px';
+                var mh = long ? 'calc(100% - ' + Math.round(nt.offsetHeight + 2.4 * rem) + 'px)' : '';
+                if(im.style.maxHeight !== mh){ im.style.maxHeight = mh; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
                 if(im.style.marginBottom !== mb){ im.style.marginBottom = mb; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
-                nt.style.left = (r.left - lr.left) + 'px'; nt.style.top = (r.bottom - lr.top + .7 * rem) + 'px';
+                var fl = (lr.width - fw) / 2;
+                nt.style.left = (long ? fl + (fw - nt.offsetWidth) / 2 : r.left - lr.left) + 'px'; nt.style.top = (r.bottom - lr.top + .7 * rem) + 'px';
               }
             };
             if(window.ResizeObserver) new ResizeObserver(function(){ fit(); }).observe(L);

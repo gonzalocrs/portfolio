@@ -535,6 +535,7 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 .qn{margin:0;font-size:.8rem;line-height:1.5;color:var(--mute);font-weight:400;text-align:left;opacity:0;animation:qn-in .8s ease .5s forwards}
 @keyframes qn-in{to{opacity:1}}
 .qn-side{position:absolute;left:0;top:0;pointer-events:none}
+.qn{white-space:pre-line}   /* a note of several paragraphs (Urba, 2026-11-06): blank lines between them */
 .qt.open .qn,.qb-show .qn{opacity:0!important;animation:none;transition:opacity .3s}
 .qp .qt-ticks{z-index:3}
 .qt.open .qt-stage .p-layer{translate:none!important}

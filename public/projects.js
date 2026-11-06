@@ -82,9 +82,11 @@ window.PROJECTS = {
       "Urba began with a desire to contribute to a more thoughtful way of building in the city. I believe each project carries a responsibility to the people who will inhabit it, the neighborhood around it, and the places and resources already there. That responsibility starts with listening, understanding the context, and asking what a project can give back.",
       "The name reflects an interest in the city as a shared place, shaped over time by many hands. My hope is for Urba to bring design, engineering, and development into closer conversation, creating spaces that meet everyday needs, make careful use of resources, and offer lasting value. It is an ambition to grow with the city, learning from its communities and helping build places where more people can feel they belong."
     ],
-    credits: [["Studio", "Cirkel"], ["Program", "Brand identity"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2020"]],
+    credits: [["Program", "Brand design"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2020"]],   // Studio Cirkel dropped, Program from Brand identity (his ask, 2026-11-06)
     // his brand pages (portfolio spreads 13-16 + brand manual 27/29/31, 2026-11-06), words taken off: visuals only
     inOrder: true,
+    // his note for the step-by-step isotype (2026-11-06), word for word, beside that picture as on Joint (6th picture)
+    notes: ["", "", "", "", "", "Urba’s mark reflects a city that is always evolving. Its shifting letterforms trace a process of forming ideas, building, and adapting to changing needs.\n\nWhile sketching variations of the name, I found that the relationship between the drawings mattered more than any single version. That discovery became the basis of the identity: a form that remains recognizable while allowing for change.\n\nThe mark expresses a principle for Urba’s work: each project should respond to its surroundings, improve everyday life, and remain useful as the city grows."],
     grid: [
       {src: "img/urba-branding/wordmark-tagline.png", drawing: true, caption: "Wordmark: Creamos espacios, construimos comunidad"},
       {src: "img/urba-branding/posters.png", drawing: true, caption: "Isotype in the three colours"},

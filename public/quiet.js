@@ -792,6 +792,7 @@
                   // on the right (his note, 2026-11-06: keep the margins every other page has): the picture gives up the
                   // note's width, and picture + note are centred together in the same space a picture alone takes
                   var mw = 'calc(100% - ' + Math.round(w + g) + 'px)';
+                  if(it.fitAs){ var mhs0 = getComputedStyle(im).maxHeight, mhm0 = /calc\(100% - ([\d.]+)px\)/.exec(mhs0); mw = 'min(' + mw + ', ' + Math.floor((mhm0 ? f.clientHeight - +mhm0[1] : parseFloat(mhs0) || f.clientHeight) * it.fitAs) + 'px)'; }
                   if(im.style.maxWidth !== mw){ im.style.maxWidth = mw; r = im.getBoundingClientRect(); }
                   var cur = parseFloat(L.style.translate) || 0, a0 = r.left - cur, P = plusX();
                   L.style.translate = Math.min(0, Math.round((innerWidth + P - a0 - (r.right - cur + g + w)) / 2)) + 'px 0';

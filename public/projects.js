@@ -105,7 +105,7 @@ window.PROJECTS = {
       "",
       "",
       {text: "Drawing on Constant’s New Babylon and Gordon Pask’s concept of underspecified design, it leaves aspects of domestic and shared space open to interpretation, allowing residents to shape their surroundings as their needs and communities evolve.", side: "right"},
-      "A through-block site in New York’s East Village.",
+      {text: "A through-block site in New York’s East Village.", side: "right"},
       "Beneath the cantilevered housing, workshops, learning incubators, and a market connect residents with the surrounding neighborhood.",
       "A diagonal dog-leg stair organizes the building, connecting residential levels with shared terraces, gardens, and cultural spaces.",
       "Collective housing for newly arrived immigrants and refugees.",

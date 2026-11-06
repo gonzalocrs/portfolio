@@ -86,13 +86,11 @@ window.PROJECTS = {
     // his brand pages (portfolio spreads 13-16 + brand manual 27/29/31, 2026-11-06), words taken off: visuals only
     // every drawing at half its usual size (his ask, 2026-11-06): scale .5; the wordmark's file carries its own margin
     inOrder: true,
-    // his note for the step-by-step isotype (2026-11-06), word for word, beside that picture as on Joint (5th picture)
-    notes: ["", "", "", "", "Urba’s mark reflects a city that is always evolving. Its shifting letterforms trace a process of forming ideas, building, and adapting to changing needs.\n\nWhile sketching variations of the name, I found that the relationship between the drawings mattered more than any single version. That discovery became the basis of the identity: a form that remains recognizable while allowing for change.\n\nThe mark expresses a principle for Urba’s work: each project should respond to its surroundings, improve everyday life, and remain useful as the city grows."],
+    // his note for the step-by-step isotype (2026-11-06), word for word, beside that picture as on Joint (3rd picture)
+    notes: ["", "", "Urba’s mark reflects a city that is always evolving. Its shifting letterforms trace a process of forming ideas, building, and adapting to changing needs.\n\nWhile sketching variations of the name, I found that the relationship between the drawings mattered more than any single version. That discovery became the basis of the identity: a form that remains recognizable while allowing for change.\n\nThe mark expresses a principle for Urba’s work: each project should respond to its surroundings, improve everyday life, and remain useful as the city grows."],
     grid: [
       {src: "img/urba-branding/wordmark-tagline-2.png", drawing: true, caption: "Wordmark: Creamos espacios, construimos comunidad"},
       {src: "img/urba-branding/posters.png", drawing: true, scale: .5, caption: "Isotype in the three colours"},
-      {src: "img/urba-branding/construction.png", drawing: true, scale: .5, caption: "Isotype construction"},
-      {src: "img/urba-branding/icons.png", drawing: true, scale: .5, caption: "Isotype icons"},
       {src: "img/urba-branding/isotype-steps.png", drawing: true, scale: .5, caption: "Isotype, step by step"}
     ]
   },

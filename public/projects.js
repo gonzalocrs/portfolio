@@ -91,7 +91,7 @@ window.PROJECTS = {
     ],
     credits: [["Site", "Napeague Harbor, New York"], ["Studio", "Columbia GSAPP"], ["Program", "Reciprocal Infrastructure"], ["Critic", "Robert Marino"], ["Year", "2026"]],
     // his sketch sheet (2026-11-06), the only picture so far, with a quiet "In preparation" beside it (his ask)
-    diagram: {src: "img/the-outermost-dock/diagram.jpg"},
+    diagram: {src: "img/the-outermost-dock/diagram-2.jpg"},
     notes: [{text: "In preparation", side: "right"}]
   },
   "social-sanctuary": {

@@ -90,15 +90,9 @@ window.PROJECTS = {
       "The project proposes a dry dock around the Art Barge, a temporary architectural apparatus that holds the barge, shelters it, and provides the missing housing for the artists who arrive each summer. The barge tends to the artists, the artists tend to the barge, the dock tends to both."
     ],
     credits: [["Site", "Napeague Harbor, New York"], ["Studio", "Columbia GSAPP"], ["Program", "Reciprocal Infrastructure"], ["Critic", "Robert Marino"], ["Year", "2026"]],
-    // his sketch sheet (2026-11-06), the only picture so far, with a quiet "In preparation" beside it (his ask)
-    diagram: {src: "img/the-outermost-dock/diagram-2.jpg"},
-    notes: [{text: "In preparation", side: "right"}],
-    // his elevation (scale label taken off, cropped to the drawing), 2026-11-06; the site plan and model photo he sent
-    // with it were taken off again at his ask the same night
-    inOrder: true,
-    grid: [
-      {src: "img/the-outermost-dock/elevation.webp", drawing: true, caption: "Elevation"}
-    ]
+    // his sketch sheet (2026-11-06), the only picture so far ("In preparation" beside it was taken off at his ask)
+    diagram: {src: "img/the-outermost-dock/diagram-2.jpg"}
+    // (a site plan, an elevation and a model photo were added and taken off again at his ask, 2026-11-06)
   },
   "social-sanctuary": {
     title: "East 5th", group: "Unbuilt", hue: 42,
@@ -271,6 +265,13 @@ window.PROJECTS = {
     kicker: "New York, 2025",
     lede: "A modular system for sphere-like structures, built from the fewest possible parts that assemble with one another, like an organic system.",
     credits: [["Type", "Modular Systems"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2025"]],
-    diagram: {}
+    // his four sheets (2026-11-06), in the order he sent them; the aggregation's two labels cropped off
+    inOrder: true,
+    grid: [
+      {src: "img/modular-living-architecture/parts.webp", drawing: true, caption: "Ring and connector parts"},
+      {src: "img/modular-living-architecture/tiling.webp", drawing: true, caption: "Flat tiling"},
+      {src: "img/modular-living-architecture/sphere.webp", drawing: true, caption: "Net and sphere"},
+      {src: "img/modular-living-architecture/aggregation.webp", drawing: true, caption: "Field driven aggregation"}
+    ]
   }
 };

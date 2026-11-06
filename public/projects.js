@@ -77,17 +77,21 @@ window.PROJECTS = {
   "urba-branding": {
     title: "Urba Inmobiliaria", group: "Built", hue: 96,
     kicker: "Lima, 2020",
+    // his text (2026-11-06), word for word
+    text: [
+      "Urba began with a desire to contribute to a more thoughtful way of building in the city. I believe each project carries a responsibility to the people who will inhabit it, the neighborhood around it, and the places and resources already there. That responsibility starts with listening, understanding the context, and asking what a project can give back.",
+      "The name reflects an interest in the city as a shared place, shaped over time by many hands. My hope is for Urba to bring design, engineering, and development into closer conversation, creating spaces that meet everyday needs, make careful use of resources, and offer lasting value. It is an ambition to grow with the city, learning from its communities and helping build places where more people can feel they belong."
+    ],
     credits: [["Studio", "Cirkel"], ["Program", "Brand identity"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2020"]],
     // his brand pages (portfolio spreads 13-16 + brand manual 27/29/31, 2026-11-06), words taken off: visuals only
     inOrder: true,
     grid: [
-      {src: "img/urba-branding/wordmark.png", drawing: true, caption: "Wordmark"},
-      {src: "img/urba-branding/colours.png", drawing: true, caption: "Colours: housing, office and commercial, retail"},
-      {src: "img/urba-branding/isotype-steps.png", drawing: true, caption: "Isotype, step by step"},
+      {src: "img/urba-branding/wordmark-tagline.png", drawing: true, caption: "Wordmark: Creamos espacios, construimos comunidad"},
       {src: "img/urba-branding/posters.png", drawing: true, caption: "Isotype in the three colours"},
       {src: "img/urba-branding/construction.png", drawing: true, caption: "Isotype construction"},
       {src: "img/urba-branding/frames.png", drawing: true, caption: "Isotype in its frame"},
-      {src: "img/urba-branding/icons.png", drawing: true, caption: "Isotype icons"}
+      {src: "img/urba-branding/icons.png", drawing: true, caption: "Isotype icons"},
+      {src: "img/urba-branding/isotype-steps.png", drawing: true, caption: "Isotype, step by step"}
     ]
   },
 
@@ -206,7 +210,7 @@ window.PROJECTS = {
     grid: [
       {src: "img/puente-de-la-mujer/model-black.jpg", caption: "Physical model"},
       {src: "img/puente-de-la-mujer/front.jpg", caption: "Front view"},
-      {src: "img/puente-de-la-mujer/model-white.jpg", caption: "Physical model, cable detail"},
+      {src: "img/puente-de-la-mujer/detail.jpg", caption: "Physical model, detail"},
       {src: "img/puente-de-la-mujer/top.jpg", caption: "Top view"}
     ]
   },

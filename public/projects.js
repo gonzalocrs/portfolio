@@ -97,9 +97,24 @@ window.PROJECTS = {
     // no hero: the hand drawing opens, then the stair render, his sheets 11-15 (words, titles, scales and the photo's
     // dashed leader taken off, model photos removed and the three plans cropped by one shared window centred on the building, wide enough that no car is cut, 2026-11-06), his two model photos, the aerial render last (his order, 2026-11-05)
     inOrder: true,
-    // one note, on the references slide (3rd picture), on its right (his call, 2026-11-06, after trying it on the left like
-    // Joint's): his own sentence from the text above, word for word, until he writes the tag himself
-    notes: ["", "", {text: "Drawing on Constant’s New Babylon and Gordon Pask’s concept of underspecified design, it leaves aspects of domestic and shared space open to interpretation, allowing residents to shape their surroundings as their needs and communities evolve.", side: "right"}],
+    // a short tag beside each drawing, like Joint's (his ask, 2026-11-06: "a little tag explaining each drawing,
+    // something very minimal"): his own sentences and phrases from the text above, word for word, until he writes his
+    // own; one per picture in order (hand drawing first), "" = none. The references slide's note sits on its right (his
+    // call, 2026-11-06)
+    notes: [
+      "",
+      "",
+      {text: "Drawing on Constant’s New Babylon and Gordon Pask’s concept of underspecified design, it leaves aspects of domestic and shared space open to interpretation, allowing residents to shape their surroundings as their needs and communities evolve.", side: "right"},
+      "A through-block site in New York’s East Village.",
+      "Beneath the cantilevered housing, workshops, learning incubators, and a market connect residents with the surrounding neighborhood.",
+      "A diagonal dog-leg stair organizes the building, connecting residential levels with shared terraces, gardens, and cultural spaces.",
+      "Collective housing for newly arrived immigrants and refugees.",
+      "",
+      "Its landings and adjoining spaces turn everyday movement into opportunities for conversation and exchange.",
+      "Together, these spaces provide a framework for newcomers to establish roots, support one another, and participate in the life of the city.",
+      "",
+      ""
+    ],
     grid: [
       {src: "img/social-sanctuary/render-stairs.jpg", caption: "Stairs"},
         // his diagram1.pdf as it is (black ground, no crop; tenement-diagram.webp alone), with Constant's map and Pask's
@@ -110,9 +125,9 @@ window.PROJECTS = {
       {src: "img/social-sanctuary/tenement-diagram-references.webp", drawing: true, caption: "Co-op tenement, underspecificity diagram, Constant and Pask references"},
         // his artboard: neighbourhood map with the site, then the block plan, uncropped (his ask, 2026-11-06)
       {src: "img/social-sanctuary/site-context.webp", drawing: true, caption: "Site in the East Village and block plan"},
-      {src: "img/social-sanctuary/plan-first-floor.png", drawing: true, frame: true, caption: "First floor plan"},
-      {src: "img/social-sanctuary/plan-fourth-floor.png", drawing: true, frame: true, caption: "Fourth floor plan"},
-      {src: "img/social-sanctuary/plan-typical-floor.png", drawing: true, frame: true, caption: "Typical floor plan"},
+      {src: "img/social-sanctuary/plan-first-floor.png", drawing: true, caption: "First floor plan"},
+      {src: "img/social-sanctuary/plan-fourth-floor.png", drawing: true, caption: "Fourth floor plan"},
+      {src: "img/social-sanctuary/plan-typical-floor.png", drawing: true, caption: "Typical floor plan"},
       {src: "img/social-sanctuary/model-1.jpg", caption: "Physical model"},
       {src: "img/social-sanctuary/section-ns.png", drawing: true, caption: "Section north-south"},
       {src: "img/social-sanctuary/section-ew.png", drawing: true, caption: "Section east-west"},

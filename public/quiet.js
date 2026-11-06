@@ -29,7 +29,7 @@
         var s = (tv && it.trial[tv]) || (it.src && web(it.src));
         if(!s || seen[s]) return; seen[s] = 1;
         var dr = isDrawing(it);
-        out.push({src: s, drawing: dr, sheet: it.sheet, fitAs: it.fitAs, kind: dr ? 'drawing' : /\/physical\//.test(s) ? 'physical' : 'photo', caption: it.caption || ''});
+        out.push({src: s, drawing: dr, sheet: it.sheet, sheetSrc: it.sheetSrc, fitAs: it.fitAs, kind: dr ? 'drawing' : /\/physical\//.test(s) ? 'physical' : 'photo', caption: it.caption || ''});
       });
     });
     return out;
@@ -911,11 +911,14 @@
     function buildB(){
       sideB = el('div', 'qb qb-' + BACK, st);
       var box = el('div', 'qb-box', sideB);
-      sideB.ready = loadAll(all).then(function(got){
+      // sheetSrc: on the sheet a picture can show just a part of itself (East 5th's references and site artboards, his
+      // ask 2026-11-06: "in the gallery view just show this part of each of these pages"); clicking it still opens the whole
+      sideB.ready = loadAll(all.map(function(it){ return it.sheetSrc ? {src: it.sheetSrc, caption: it.caption, sheet: it.sheet, crop: true} : it; })).then(function(got){
         got.forEach(function(o, k){
           var f = el('figure', 'qb-f', box); f.r = o.r; f.k = k; f.s = o.it.sheet || 1;
           // a picture set smaller on the sheet also gets a very faint frame, so its edges read (his ask, 2026-11-06)
-          if(o.it.sheet) f.classList.add('qb-small');
+          if(o.it.crop) f.crop = true;
+          else if(o.it.sheet) f.classList.add('qb-small');
           var im = el('img', '', f); im.alt = o.it.caption || p.title; im.src = o.it.src; im.loading = 'lazy';
           if(/\.(svg|png)$/i.test(o.it.src)) f.classList.add('dr');
           if(BACK === 'sleeve') el('span', 'k', f, 'A' + (k + 1));
@@ -1020,7 +1023,7 @@
         if(!bOn) return;
         layB();
         var L = st.querySelector('.p-layer.on'), im = L && L.querySelector('img'), t = tileAt(at);
-        if(im && t && im.getBoundingClientRect().width){
+        if(im && t && !t.crop && im.getBoundingClientRect().width){
           var rA = im.getBoundingClientRect(), rB = rectIn(t);
           t.style.visibility = 'hidden'; im.style.visibility = 'hidden';
           glide(t.querySelector('img').src, t.classList.contains('dr'), rA, rB, function(){ t.style.visibility = ''; im.style.visibility = ''; });
@@ -1047,6 +1050,7 @@
           requestAnimationFrame(function(){ wrap.classList.remove('qb-pick'); });
         });
       };
+      if(f.crop){ im.style.visibility = ''; f.style.visibility = ''; requestAnimationFrame(function(){ wrap.classList.remove('qb-pick'); }); return; }
       if(im.complete && im.naturalWidth) requestAnimationFrame(land);
       else { im.addEventListener('load', land); im.addEventListener('error', land); }
     }

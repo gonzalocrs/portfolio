@@ -122,10 +122,10 @@ window.PROJECTS = {
         // no effects; his own original colours (his call, 2026-11-06, after copper, Joint and 30%-darker versions); since
         // 2026-11-06 ~10:40pm NY his redone Artboard 10 (white ground, new palette), refs in the same places;
         // lines as his. Note on the left (notes below)
-      {src: "img/social-sanctuary/tenement-diagram-references.webp", drawing: true, sheet: .5, caption: "Co-op tenement, underspecificity diagram, Constant and Pask references"},
+      {src: "img/social-sanctuary/tenement-diagram-references.webp", drawing: true, sheet: .6, sheetSrc: "img/social-sanctuary/sheet-diagram.webp", caption: "Co-op tenement, underspecificity diagram, Constant and Pask references"},
         // his artboard: neighbourhood map with the site, then the block plan; full width kept, the white above and below
         // cropped off so the tag sits beside the map (his ask, 2026-11-06)
-      {src: "img/social-sanctuary/site-context.webp", drawing: true, fitAs: 1.5, sheet: .38, caption: "Site in the East Village and block plan"},
+      {src: "img/social-sanctuary/site-context.webp", drawing: true, fitAs: 1.5, sheet: .6, sheetSrc: "img/social-sanctuary/sheet-site-block-plan.webp", caption: "Site in the East Village and block plan"},
       {src: "img/social-sanctuary/plan-first-floor.png", drawing: true, caption: "First floor plan"},
       {src: "img/social-sanctuary/plan-fourth-floor.png", drawing: true, caption: "Fourth floor plan"},
       {src: "img/social-sanctuary/plan-typical-floor.png", drawing: true, caption: "Typical floor plan"},

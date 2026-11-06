@@ -78,7 +78,17 @@ window.PROJECTS = {
     title: "Urba Inmobiliaria", group: "Built", hue: 96,
     kicker: "Lima, 2020",
     credits: [["Studio", "Cirkel"], ["Program", "Brand identity"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2020"]],
-    diagram: {}
+    // his brand pages (portfolio spreads 13-16 + brand manual 27/29/31, 2026-11-06), words taken off: visuals only
+    inOrder: true,
+    grid: [
+      {src: "img/urba-branding/wordmark.png", drawing: true, caption: "Wordmark"},
+      {src: "img/urba-branding/colours.png", drawing: true, caption: "Colours: housing, office and commercial, retail"},
+      {src: "img/urba-branding/isotype-steps.png", drawing: true, caption: "Isotype, step by step"},
+      {src: "img/urba-branding/posters.png", drawing: true, caption: "Isotype in the three colours"},
+      {src: "img/urba-branding/construction.png", drawing: true, caption: "Isotype construction"},
+      {src: "img/urba-branding/frames.png", drawing: true, caption: "Isotype in its frame"},
+      {src: "img/urba-branding/icons.png", drawing: true, caption: "Isotype icons"}
+    ]
   },
 
   "the-outermost-dock": {

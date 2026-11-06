@@ -93,7 +93,7 @@ window.PROJECTS = {
       {src: "img/urba-branding/posters.png", drawing: true, scale: .5, caption: "Isotype in the three colours"},
       {src: "img/urba-branding/isotype-steps.png", drawing: true, scale: .5, caption: "Isotype, step by step"},
       // his Ur mark (logo_black_white-100.jpg, 2026-11-06) with the note's last paragraph; trimmed, shown smaller (scale .3) so it sits at the size of the other half-size drawings
-      {src: "img/urba-branding/ur-mark.png", drawing: true, scale: .3, caption: "Ur mark"}
+      {src: "img/urba-branding/ur-mark.png", drawing: true, scale: .3, caption: "Ur mark", link: {href: "https://urba.pe", text: "urba.pe"}}
     ]
   },
 
@@ -201,21 +201,6 @@ window.PROJECTS = {
       {src: "img/permanent-impermanence/hallway.jpg", caption: "Hallway"}
     ]
   },
-  // his ask (2026-11-06): just below Joint; "a model study for TECH II with Zak Kostura". Year assumed 2025, no text yet
-  "puente-de-la-mujer": {
-    title: "Puente de la Mujer", group: "Unbuilt", hue: 190,
-    kicker: "New York, 2025",
-    credits: [["Course", "TECH II, Columbia GSAPP"], ["Type", "Model study"], ["Instructor", "Zak Kostura"], ["Year", "2025"]],
-    hero: "img/puente-de-la-mujer/perspective.jpg",
-    // his order (2026-11-06), after the perspective
-    inOrder: true,
-    grid: [
-      {src: "img/puente-de-la-mujer/model-black.jpg", caption: "Physical model"},
-      {src: "img/puente-de-la-mujer/front.jpg", caption: "Front view"},
-      {src: "img/puente-de-la-mujer/detail-black.jpg", caption: "Physical model, detail"},
-      {src: "img/puente-de-la-mujer/top.jpg", caption: "Top view"}
-    ]
-  },
   "anticlastic-roof-structure": {
     title: "Anticlastic Surfaces", group: "Research", hue: 8,
     kicker: "New York, 2026",
@@ -292,7 +277,23 @@ window.PROJECTS = {
       {src: "img/vaulted-shell-structure/house-elevation.png", drawing: true, caption: "End elevation with the existing house"}
     ]
   },
+  // his ask (2026-11-06): first just below Joint, then moved below Lean Shells (Research); "a model study for TECH II with Zak Kostura". Year assumed 2025, no text yet
+  "puente-de-la-mujer": {
+    title: "Puente de la Mujer", group: "Research", hue: 190,
+    kicker: "New York, 2025",
+    credits: [["Course", "TECH II, Columbia GSAPP"], ["Type", "Model study"], ["Instructor", "Zak Kostura"], ["Year", "2025"]],
+    hero: "img/puente-de-la-mujer/perspective.jpg",
+    // his order (2026-11-06), after the perspective
+    inOrder: true,
+    grid: [
+      {src: "img/puente-de-la-mujer/model-black.jpg", caption: "Physical model"},
+      {src: "img/puente-de-la-mujer/front.jpg", caption: "Front view"},
+      {src: "img/puente-de-la-mujer/detail-black.jpg", caption: "Physical model, detail"},
+      {src: "img/puente-de-la-mujer/top.jpg", caption: "Top view"}
+    ]
+  },
   "modular-living-architecture": {
+    hidden: true,   // off the site for now (his ask, 2026-11-06)
     title: "Open Assembly", group: "Research", hue: 120,
     kicker: "New York, 2025",
     // his text (2026-11-06), word for word; it replaced the earlier one-line lede

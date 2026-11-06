@@ -1,7 +1,7 @@
 // The site (2026-10-26, the "quiet" round, first tried in mockups.html?v=a&l=quiet). index.html is the home, project.html
 // one project (?p=<slug>, &i=<picture number> or &i=last). Projects come from projects.js; pictures are never cropped.
 (function(){
-  var P = window.PROJECTS || {}, SLUGS = Object.keys(P);
+  var P = window.PROJECTS || {}, SLUGS = Object.keys(P).filter(function(s){ return !P[s].hidden; });   // hidden: true keeps a project off the site for now (Open Assembly, his ask 2026-11-06)
   var Q = new URLSearchParams(location.search);
   var main = document.getElementById('main');
 
@@ -29,7 +29,7 @@
         var s = (tv && it.trial[tv]) || (it.src && web(it.src));
         if(!s || seen[s]) return; seen[s] = 1;
         var dr = isDrawing(it);
-        out.push({src: s, drawing: dr, sheet: it.sheet, sheetSrc: it.sheetSrc, fitAs: it.fitAs, scale: it.scale, kind: dr ? 'drawing' : /\/physical\//.test(s) ? 'physical' : 'photo', caption: it.caption || ''});
+        out.push({src: s, drawing: dr, sheet: it.sheet, sheetSrc: it.sheetSrc, fitAs: it.fitAs, scale: it.scale, kind: dr ? 'drawing' : /\/physical\//.test(s) ? 'physical' : 'photo', caption: it.caption || '', link: it.link});
       });
     });
     // order: the pictures' order set by hand, hero and diagram included (Sierra Hotel, his numbering 2026-11-06); any
@@ -767,6 +767,8 @@
         var f = el('figure', 'qf', L);
         if(it){
           var im = el('img', '', f); im.alt = it.caption || p.title; im.src = it.src;
+          // a link under the picture (Urba's website under its mark, his ask 2026-11-06)
+          if(it.link){ var lk = el('a', 'qf-link', f, it.link.text || it.link.href); lk.href = it.link.href; lk.target = '_blank'; lk.rel = 'noopener'; }
           // no captions under the pictures (his call, 2026-10-26: first the photos, then the drawings too); the caption text
           // stays in projects.js as the picture's alt text
           var cap = null;
@@ -1290,7 +1292,7 @@
   if(document.body.getAttribute('data-page') === 'about'){ buildAbout(); return; }
   if(document.body.getAttribute('data-page') === 'project'){
     var slug = Q.get('p');
-    if(!P[slug]){ location.replace('/'); return; }
+    if(!P[slug] || P[slug].hidden){ location.replace('/'); return; }
     buildQuietProject(slug);
   } else {
     // old addresses of a project on the home page (?show= / ?open=) go to its page

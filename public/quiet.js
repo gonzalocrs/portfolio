@@ -798,21 +798,20 @@
                   r = im.getBoundingClientRect(); lr = L.getBoundingClientRect();
                 }
                 else {
-                  if(room < w + g) w = Math.max(7.5 * rem, room - g);
-                  if(room >= w + g){
-                    if(im.style.maxWidth){ im.style.maxWidth = ''; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
+                  // on the left the note always keeps its full width (his ask, 2026-11-06: "this was better. wider so
+                  // image is smaller"; it had been squeezed into the gap, a thin tower for a long note). The picture starts
+                  // from its usual place (Joint's spacing); if the gap left of it is short of the note, only its left edge
+                  // comes in by what's missing, so its right edge and the page's margins stay where every picture has them
+                  if(im.style.maxWidth){ im.style.maxWidth = ''; }
+                  centre(L, im); r = im.getBoundingClientRect();
+                  var M = Math.max(me.getBoundingClientRect().right - nameShift() + 2 * rem, 0), miss = (w + g) - (r.left - M);
+                  if(miss > 0){
+                    var r0 = r;
+                    im.style.maxWidth = Math.floor(r0.width - miss) + 'px'; r = im.getBoundingClientRect();
+                    L.style.translate = Math.round((parseFloat(L.style.translate) || 0) + r0.right - r.right) + 'px 0';
+                    r = im.getBoundingClientRect();
                   }
-                  else {
-                    // short of room on the left (a wide picture): the picture no longer steps right past the page's margin
-                    // (his note, 2026-11-06: "why are you changing the margin again?"); like a note on the right, the
-                    // picture gives up the note's width and note + picture are centred together in the picture's usual space
-                    w = 11 * rem;
-                    var mwl = 'calc(100% - ' + Math.round(w + g) + 'px)';
-                    if(im.style.maxWidth !== mwl){ im.style.maxWidth = mwl; r = im.getBoundingClientRect(); }
-                    var cl = parseFloat(L.style.translate) || 0, al = r.left - cl, bl = r.right - cl, Pl = plusX();
-                    L.style.translate = Math.round((innerWidth + Pl - (al - g - w) - bl) / 2) + 'px 0';
-                    r = im.getBoundingClientRect(); lr = L.getBoundingClientRect();
-                  }
+                  lr = L.getBoundingClientRect();
                 }
                 nt.classList.remove('qn-low'); nt.style.width = w + 'px'; nt.style.left = (right ? r.right - lr.left + g : r.left - lr.left - w - g) + 'px'; nt.style.top = (r.bottom - lr.top - nt.offsetHeight) + 'px';
               }

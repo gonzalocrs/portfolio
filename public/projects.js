@@ -133,6 +133,7 @@ window.PROJECTS = {
       {src: "img/social-sanctuary/section-ew.png", drawing: true, caption: "Section east-west"},
         // the second model photo just before the aerial render (his call, 2026-11-06)
       {src: "img/social-sanctuary/model-2.jpg", caption: "Physical model"},
+      // his new aerial render (Image2_5, 2026-11-06), replacing the earlier one
       {src: "img/social-sanctuary/render-aerial.jpg", caption: "Aerial view"}
     ]
   },

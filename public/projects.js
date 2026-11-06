@@ -99,13 +99,13 @@ window.PROJECTS = {
     inOrder: true,
     grid: [
       {src: "img/social-sanctuary/render-stairs.jpg", caption: "Stairs"},
+      {src: "img/social-sanctuary/model-2.jpg", caption: "Physical model"},
       {src: "img/social-sanctuary/plan-first-floor.png", drawing: true, caption: "First floor plan"},
       {src: "img/social-sanctuary/plan-fourth-floor.png", drawing: true, caption: "Fourth floor plan"},
       {src: "img/social-sanctuary/plan-typical-floor.png", drawing: true, caption: "Typical floor plan"},
       {src: "img/social-sanctuary/model-1.jpg", caption: "Physical model"},
       {src: "img/social-sanctuary/section-ns.png", drawing: true, caption: "Section north-south"},
       {src: "img/social-sanctuary/section-ew.png", drawing: true, caption: "Section east-west"},
-      {src: "img/social-sanctuary/model-2.jpg", caption: "Physical model"},
       {src: "img/social-sanctuary/render-aerial.jpg", caption: "Aerial view"}
     ]
   },

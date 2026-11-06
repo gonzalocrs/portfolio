@@ -210,7 +210,7 @@ window.PROJECTS = {
     grid: [
       {src: "img/puente-de-la-mujer/model-black.jpg", caption: "Physical model"},
       {src: "img/puente-de-la-mujer/front.jpg", caption: "Front view"},
-      {src: "img/puente-de-la-mujer/detail.jpg", caption: "Physical model, detail"},
+      {src: "img/puente-de-la-mujer/detail-black.jpg", caption: "Physical model, detail"},
       {src: "img/puente-de-la-mujer/top.jpg", caption: "Top view"}
     ]
   },

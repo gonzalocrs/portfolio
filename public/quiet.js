@@ -916,6 +916,8 @@
     }
     function buildB(){
       sideB = el('div', 'qb qb-' + BACK, st);
+      // sheetFrame: every picture on the sheet in a very faint frame, so each page reads as a page (East 5th, his ask 2026-11-06)
+      if(p.sheetFrame) sideB.classList.add('qb-framed');
       var box = el('div', 'qb-box', sideB);
       // sheetSrc: on the sheet a picture can show just a part of itself (East 5th's references and site artboards, his
       // ask 2026-11-06: "in the gallery view just show this part of each of these pages"); clicking it still opens the whole

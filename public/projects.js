@@ -89,6 +89,7 @@ window.PROJECTS = {
   },
   "social-sanctuary": {
     title: "East 5th", group: "Unbuilt", hue: 42,
+    sheetFrame: true,   // a very faint frame round each picture on the gallery sheet (his ask, 2026-11-06)
     kicker: "New York, 2025",
     text: [
       "East 5th proposes collective housing for newly arrived immigrants and refugees on a through-block site in New York’s East Village. The project understands sanctuary as a sense of safety and belonging formed through relationships. Drawing on Constant’s New Babylon and Gordon Pask’s concept of underspecified design, it leaves aspects of domestic and shared space open to interpretation, allowing residents to shape their surroundings as their needs and communities evolve.",

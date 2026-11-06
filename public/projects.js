@@ -92,7 +92,14 @@ window.PROJECTS = {
     credits: [["Site", "Napeague Harbor, New York"], ["Studio", "Columbia GSAPP"], ["Program", "Reciprocal Infrastructure"], ["Critic", "Robert Marino"], ["Year", "2026"]],
     // his sketch sheet (2026-11-06), the only picture so far, with a quiet "In preparation" beside it (his ask)
     diagram: {src: "img/the-outermost-dock/diagram-2.jpg"},
-    notes: [{text: "In preparation", side: "right"}]
+    notes: [{text: "In preparation", side: "right"}],
+    // his site plan and east-west elevation (scale label taken off, cropped to the drawing) and model photo, 2026-11-06
+    inOrder: true,
+    grid: [
+      {src: "img/the-outermost-dock/site-plan.webp", drawing: true, caption: "Site plan, Napeague Harbor"},
+      {src: "img/the-outermost-dock/elevation.webp", drawing: true, caption: "Elevation"},
+      {src: "img/the-outermost-dock/model.jpg", caption: "Model"}
+    ]
   },
   "social-sanctuary": {
     title: "East 5th", group: "Unbuilt", hue: 42,

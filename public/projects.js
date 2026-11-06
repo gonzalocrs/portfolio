@@ -89,7 +89,7 @@ window.PROJECTS = {
       "The site is Napeague Harbor on Long Island’s south fork, where Victor D’Amico anchored a WWII Navy barge in 1960 and converted it into a teaching studio for painters. For more than sixty years the barge has hosted artists each summer, but the surrounding real estate has priced out the very teachers the barge was built for.",
       "The project proposes a dry dock around the Art Barge, a temporary architectural apparatus that holds the barge, shelters it, and provides the missing housing for the artists who arrive each summer. The barge tends to the artists, the artists tend to the barge, the dock tends to both."
     ],
-    credits: [["Site", "Napeague Harbor, New York"], ["Studio", "Columbia GSAPP"], ["Program", "Reciprocal Infrastructure"], ["Critic", "Robert Marino"], ["Year", "2026"]],
+    credits: [["Site", "Napeague Harbor, New York"], ["Studio", "Columbia GSAPP"], ["Program", "Reciprocal Infrastructure"], ["Critic", "Robert Marino"], ["Status", "In preparation"], ["Year", "2026"]],   // Status: his ask, 2026-11-06 ("in preparation inside description")
     // his sketch sheet (2026-11-06), the only picture so far ("In preparation" beside it was taken off at his ask)
     diagram: {src: "img/the-outermost-dock/diagram-2.jpg"}
     // (a site plan, an elevation and a model photo were added and taken off again at his ask, 2026-11-06)

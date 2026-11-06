@@ -104,10 +104,10 @@ window.PROJECTS = {
       {src: "img/social-sanctuary/render-stairs.jpg", caption: "Stairs"},
         // his diagram1.pdf as it is (black ground, no crop; tenement-diagram.webp alone), with Constant's map and Pask's
         // diagram under the diagram, inside the black box (option A, his pick, 2026-11-06; no separate slide);
-        // finish of the diagram's coloured boxes on trial (he disliked the grain, 2026-11-06): default a = clean flat colour,
-        // &tex=b fine quiet grain, c risograph, d dusty and lit, e translucent planes, f drawn strokes. Note on the right
-      {src: "img/social-sanctuary/tenement-diagram-references.webp", drawing: true, caption: "Co-op tenement, underspecificity diagram, Constant and Pask references",
-        trial: {b: "img/social-sanctuary/tex-trial-b.webp", c: "img/social-sanctuary/tex-trial-c.webp", d: "img/social-sanctuary/tex-trial-d.webp", e: "img/social-sanctuary/tex-trial-e.webp", f: "img/social-sanctuary/tex-trial-f.webp"}},
+        // no effects; the diagram recoloured in his PDF to the project's palette (his call, 2026-11-06: "copper, etc."):
+        // copper rooms, brick living, pale concrete kitchens, verdigris baths, ochre shared, brass meeting circle,
+        // warm grey lines. Note on the right (notes below)
+      {src: "img/social-sanctuary/tenement-diagram-references.webp", drawing: true, caption: "Co-op tenement, underspecificity diagram, Constant and Pask references"},
         // the site plan from his sheet, words and the three massing iterations taken off (his call, 2026-11-06; the
         // underspecificity diagram page was dropped); set smaller inside a white margin (his ask); replaced by his vector site plan PDF, whole page, uncropped (his ask, 2026-11-06)
       {src: "img/social-sanctuary/site-plan.png", drawing: true, caption: "Site plan"},

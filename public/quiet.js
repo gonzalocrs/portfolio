@@ -704,9 +704,17 @@
       var s = st.getBoundingClientRect(), P = innerWidth <= 700 ? 0 : plus.getBoundingClientRect().right;
       return {left: P, right: innerWidth, top: s.top + innerHeight * .03, bottom: s.bottom - innerHeight * .03};
     }
+    // desktop: both chevrons stay in one place for every picture (his note, 2026-11-06: "make the chevron stay fixed as
+    // they were in every other photo"): where a picture that fills the height has its top and bottom, centred on the space
+    function chevRect(){
+      if(innerWidth <= 700) return picRect();
+      var L = st.querySelector('.p-layer.on') || st, b = L.getBoundingClientRect(), cs = getComputedStyle(L);
+      var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16, P = plus.getBoundingClientRect().right;
+      return {left: P, right: innerWidth, top: b.top + parseFloat(cs.paddingTop) + 1.3 * rem, bottom: b.bottom - parseFloat(cs.paddingBottom) - 1.3 * rem};
+    }
     function placeCue(){
       if(!cue) return;
-      var r = picRect(), rem = parseFloat(getComputedStyle(document.documentElement).fontSize), x = (r.left + r.right) / 2, y = r.bottom + (curIm && curIm.isConnected ? parseFloat(curIm.style.marginBottom) || 0 : 0) + 1.5 * rem;   // under a phone note too (the note sits in the picture's bottom margin)
+      var r = chevRect(), rem = parseFloat(getComputedStyle(document.documentElement).fontSize), x = (r.left + r.right) / 2, y = r.bottom + (curIm && curIm.isConnected ? parseFloat(curIm.style.marginBottom) || 0 : 0) + 1.5 * rem;   // under a phone note too (the note sits in the picture's bottom margin)
       if(innerWidth <= 700){ var t = wrap.querySelector('.qt-ticks'), tt = t ? t.getBoundingClientRect().top : innerHeight - 90; y = Math.min(y, tt - 22); }
       else y = Math.min(y, innerHeight - 1.8 * rem);
       cue.style.left = Math.round(x) + 'px'; cue.style.top = Math.round(y) + 'px';
@@ -714,7 +722,7 @@
     }
     function placeUp(){
       if(!cueUp) return;
-      var r = picRect(), rem = parseFloat(getComputedStyle(document.documentElement).fontSize), x = (r.left + r.right) / 2, y = Math.max(r.top - 1.5 * rem, 1.8 * rem);
+      var r = chevRect(), rem = parseFloat(getComputedStyle(document.documentElement).fontSize), x = (r.left + r.right) / 2, y = Math.max(r.top - 1.5 * rem, 1.8 * rem);
       cueUp.style.left = Math.round(x) + 'px'; cueUp.style.top = Math.round(y) + 'px';
       if(curIm) cueUp.classList.add('in');
     }

@@ -270,9 +270,9 @@ window.PROJECTS = {
     // his diagram.pdf (2026-11-06 ~1:15am NY), one picture per page, in its order; it replaced everything before
     inOrder: true,
     grid: [
-      {src: "img/modular-living-architecture/sheet-1.webp", drawing: true, caption: "Net and sphere"},
+      {src: "img/modular-living-architecture/cuboctahedron.webp", drawing: true, caption: "Truncated cuboctahedron, net and assembly"},
       {src: "img/modular-living-architecture/assembled.jpg", caption: "Assembled truncated cuboctahedron"},   // his photo, after the net (his ask, 2026-11-06)
-      {src: "img/modular-living-architecture/sheet-2.webp", drawing: true, caption: "Flat tiling"},
+      {src: "img/modular-living-architecture/hexagon-tiling.webp", drawing: true, caption: "Hexagon tiling"},
       {src: "img/modular-living-architecture/sheet-3.webp", drawing: true, caption: "Ring and connector parts"}
     ]
   }

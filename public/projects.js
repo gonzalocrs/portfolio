@@ -168,16 +168,17 @@ window.PROJECTS = {
       "Joint imagines a Manhattan where music, art, and independent culture can continue to claim space.",
       "Its name carries two meanings: the structural joint that connects individual parts, and the cultural space that brings people together.",
       "Inspired by Konrad Wachsmann’s systems of assembly, a modular framework allows spaces to evolve with the artists who inhabit them.",
+      "",   // the aerial perspective's note ("Conceived above the working DSNY Garage...") taken off at his ask (2026-11-06); the picture stays
       "Structure becomes a means of supporting creative freedom, allowing different practices, voices, and audiences to meet.",
       "For artists without institutional backing or a lasting place in the city, it offers room to create, be heard, and build a community.",
       "",
       "Joint seeks to give something lasting to an inherently changing culture: a place to belong, and the freedom to become something new."
     ],
-    // the aerial perspective (pavilion.jpg) and its note taken off at his ask (2026-11-06)
     inOrder: true,
     grid: [
       {src: "img/permanent-impermanence/stair.jpg", caption: "Pavilion"},
       {src: "img/permanent-impermanence/elevations.jpg", drawing: true, caption: "Pavilion elevations"},
+      {src: "img/permanent-impermanence/pavilion.jpg", caption: "Perspective"},
       {src: "img/permanent-impermanence/section.jpg", drawing: true, caption: "Section"},
       {src: "img/permanent-impermanence/flyer.jpg", drawing: true, caption: "Flyer"},
       {src: "img/permanent-impermanence/theater.jpg", caption: "Theater"},

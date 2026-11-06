@@ -135,7 +135,7 @@ window.PROJECTS = {
         // 2026-11-06 ~10:40pm NY his redone Artboard 10 (white ground, new palette), refs in the same places;
         // lines as his. Note on the left (notes below). Since 2026-11-06 ~12:15am NY his Artboard 30 (tenement facades +
         // the five diagrams, no references); the sheet still shows only the five diagrams
-      {src: "img/social-sanctuary/tenement-diagram-references.webp", drawing: true, sheet: .6, sheetSrc: "img/social-sanctuary/sheet-diagram.webp", caption: "Tenement facades and underspecificity diagram"},
+      {src: "img/social-sanctuary/tenement-diagram.webp", drawing: true, sheet: .6, sheetSrc: "img/social-sanctuary/sheet-diagram-2.webp", caption: "Tenement facades and underspecificity diagram"},
         // his artboard: neighbourhood map with the site, then the block plan; full width kept, the white above and below
         // cropped off so the tag sits beside the map (his ask, 2026-11-06)
       {src: "img/social-sanctuary/site-context.webp", drawing: true, scale: .75, caption: "Site in the East Village"},
@@ -264,7 +264,8 @@ window.PROJECTS = {
   "modular-living-architecture": {
     title: "Open Assembly", group: "Research", hue: 120,
     kicker: "New York, 2025",
-    lede: "A modular system for sphere-like structures, built from the fewest possible parts that assemble with one another, like an organic system.",
+    // his text (2026-11-06), word for word; it replaced the earlier one-line lede
+    text: "The Geometry & Scaffolds section of the Ecosystem of Exploration kit features modular, 3D-printed components derived from a set of regular polygons. These elements aim the designer to explore patterns, tiling systems, and form generation. They can be freely assembled for open-ended experimentation or systematically arranged to construct fundamental geometric structures like Platonic solids and Archimedean polyhedra. More than just a tool for geometric exploration, this kit serves as a platform for reimagining living architecture, responsive structures that blur the boundaries between organic and engineered environments.",
     credits: [["Type", "Modular Systems"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2025"]],
     // his diagram.pdf (2026-11-06 ~1:15am NY), one picture per page, in its order; it replaced everything before
     inOrder: true,

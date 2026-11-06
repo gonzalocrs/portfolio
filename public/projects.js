@@ -97,15 +97,15 @@ window.PROJECTS = {
     // no hero: the hand drawing opens, then the stair render, his sheets 11-15 (words, titles, scales and the photo's
     // dashed leader taken off, model photos removed and the three plans cropped by one shared window centred on the building, wide enough that no car is cut, 2026-11-06), his two model photos, the aerial render last (his order, 2026-11-05)
     inOrder: true,
-    // one note, on the references slide (3rd picture), set on its right (his ask, 2026-11-06): his own sentence from the
-    // text above, word for word, until he writes the tag himself
-    notes: ["", "", {text: "Drawing on Constant’s New Babylon and Gordon Pask’s concept of underspecified design, it leaves aspects of domestic and shared space open to interpretation, allowing residents to shape their surroundings as their needs and communities evolve.", side: "right"}],
+    // one note, on the references slide (3rd picture), on its left like Joint's (his ask, 2026-11-06; it sat on the right
+    // before): his own sentence from the text above, word for word, until he writes the tag himself
+    notes: ["", "", "Drawing on Constant’s New Babylon and Gordon Pask’s concept of underspecified design, it leaves aspects of domestic and shared space open to interpretation, allowing residents to shape their surroundings as their needs and communities evolve."],
     grid: [
       {src: "img/social-sanctuary/render-stairs.jpg", caption: "Stairs"},
         // his diagram1.pdf as it is (black ground, no crop; tenement-diagram.webp alone), with Constant's map and Pask's
         // diagram under the diagram, inside the black box (option A, his pick, 2026-11-06; no separate slide);
-        // no effects; his own colours, each darkened by 30% (his call, 2026-11-06, after the copper and Joint palettes);
-        // lines as his. Note on the right (notes below)
+        // no effects; his own original colours (his call, 2026-11-06, after copper, Joint and 30%-darker versions);
+        // lines as his. Note on the left (notes below)
       {src: "img/social-sanctuary/tenement-diagram-references.webp", drawing: true, caption: "Co-op tenement, underspecificity diagram, Constant and Pask references"},
         // his artboard: neighbourhood map with the site, then the block plan, uncropped (his ask, 2026-11-06)
       {src: "img/social-sanctuary/site-context.webp", drawing: true, caption: "Site in the East Village and block plan"},

@@ -560,3 +560,6 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 .qb-show .qcue-up.in{pointer-events:auto}
 .qcue-up svg{animation-name:qcue-drift-up}
 @keyframes qcue-drift-up{0%,100%{transform:translateY(1px)}50%{transform:translateY(-2px)}}
+/* a faded-out picture layer stays in place under the current one: nothing in it may take a click (its picture sat
+   over the urba.pe link, 2026-11-06) */
+.p-layer:not(.on),.p-layer:not(.on) *{pointer-events:none!important}

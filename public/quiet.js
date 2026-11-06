@@ -759,15 +759,25 @@
                 if(im.style.marginBottom){ im.style.marginBottom = ''; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
                 // short of room: first a narrower column, then the picture steps right (never past the window's edge)
                 var right = it.noteSide === 'right';
-                // on the right: the room is up to the window's edge, and the picture steps left if short (never into the index)
-                if(right) room = innerWidth - rem - r.right;
-                if(room < w + g) w = Math.max(7.5 * rem, room - g);
-                var push = right ? -Math.min(w + g - room, r.left - Math.max(me.getBoundingClientRect().right + 2 * rem, 0)) : Math.min(w + g - room, innerWidth - rem - r.right);
-                if(right ? push < 0 : push > 0){ L.style.translate = ((parseFloat(L.style.translate) || 0) + push) + 'px 0'; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
+                if(right){
+                  // on the right (his note, 2026-11-06: keep the margins every other page has): the picture gives up the
+                  // note's width, and picture + note are centred together in the same space a picture alone takes
+                  var mw = 'calc(100% - ' + Math.round(w + g) + 'px)';
+                  if(im.style.maxWidth !== mw){ im.style.maxWidth = mw; r = im.getBoundingClientRect(); }
+                  var cur = parseFloat(L.style.translate) || 0, a0 = r.left - cur, P = plus.getBoundingClientRect().right;
+                  L.style.translate = Math.min(0, Math.round((innerWidth + P - a0 - (r.right - cur + g + w)) / 2)) + 'px 0';
+                  r = im.getBoundingClientRect(); lr = L.getBoundingClientRect();
+                }
+                else {
+                  if(room < w + g) w = Math.max(7.5 * rem, room - g);
+                  var push = Math.min(w + g - room, innerWidth - rem - r.right);
+                  if(push > 0){ L.style.translate = ((parseFloat(L.style.translate) || 0) + push) + 'px 0'; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
+                }
                 nt.classList.remove('qn-low'); nt.style.width = w + 'px'; nt.style.left = (right ? r.right - lr.left + g : r.left - lr.left - w - g) + 'px'; nt.style.top = (r.bottom - lr.top - nt.offsetHeight) + 'px';
               }
               else {
                 // phone: the picture and its note centred together as one block, the note under it
+                if(im.style.maxWidth){ im.style.maxWidth = ''; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
                 nt.classList.add('qn-low'); nt.style.width = Math.min(r.width, 26 * rem) + 'px';
                 var mb = Math.round(nt.offsetHeight + .7 * rem) + 'px';
                 if(im.style.marginBottom !== mb){ im.style.marginBottom = mb; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }

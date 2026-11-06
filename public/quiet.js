@@ -914,6 +914,8 @@
       sideB.ready = loadAll(all).then(function(got){
         got.forEach(function(o, k){
           var f = el('figure', 'qb-f', box); f.r = o.r; f.k = k; f.s = o.it.sheet || 1;
+          // a picture set smaller on the sheet also gets a very faint frame, so its edges read (his ask, 2026-11-06)
+          if(o.it.sheet) f.classList.add('qb-small');
           var im = el('img', '', f); im.alt = o.it.caption || p.title; im.src = o.it.src; im.loading = 'lazy';
           if(/\.(svg|png)$/i.test(o.it.src)) f.classList.add('dr');
           if(BACK === 'sleeve') el('span', 'k', f, 'A' + (k + 1));

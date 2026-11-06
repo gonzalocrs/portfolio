@@ -941,30 +941,39 @@
       if(!sideB) return;
       var box = sideB.firstChild, F = Array.prototype.slice.call(box.children), W = sideB.clientWidth, H = sideB.clientHeight, g = Math.max(10, W * .012);
       if(!F.length) return;
-      // a picture can be set smaller on the sheet (sheet: .6 in projects.js): it takes that share of the row's height,
-      // centred in the row (East 5th's references slide, his note 2026-11-06: "should be small as the site plan")
+      // sheet, justified (his ask 2026-11-06: "make the grid more justified"): the pictures, in order, are split into
+      // rows whose proportions add up as evenly as possible; every row runs the full width (its height follows), and the
+      // number of rows is the one that shows the pictures largest with rows of similar height. If the rows are too tall together, the whole block
+      // shrinks evenly and stays centred, so all rows still share one width. No picture is drawn smaller than its row.
       if(BACK === 'sheet'){
-        var rows = function(h){
-          var out = [], row = [], w = 0;
-          F.forEach(function(f){ var fw = f.r * f.s * h; if(row.length && w + fw + g * row.length > W){ out.push(row); row = []; w = 0; } row.push(f); w += fw; });
-          if(row.length) out.push(row);
+        var n = F.length, rs = F.map(function(f){ return f.r; }), Rtot = rs.reduce(function(a, b){ return a + b; }, 0), Hl = H * .92, best = null;
+        var split = function(k){
+          // ordered partition of the pictures into k rows, sums close to Rtot / k (least squares)
+          var tgt = Rtot / k, pre = [0], D = [], B = [];
+          rs.forEach(function(r, i){ pre[i + 1] = pre[i] + r; });
+          for(var j = 0; j <= k; j++){ D[j] = []; B[j] = []; for(var i = 0; i <= n; i++) D[j][i] = Infinity; }
+          D[0][0] = 0;
+          for(j = 1; j <= k; j++) for(i = j; i <= n - (k - j); i++) for(var q = j - 1; q < i; q++){
+            var c = D[j - 1][q] + Math.pow(pre[i] - pre[q] - tgt, 2);
+            if(c < D[j][i]){ D[j][i] = c; B[j][i] = q; }
+          }
+          var out = [], e = n;
+          for(j = k; j > 0; j--){ var st = B[j][e]; out.unshift(F.slice(st, e)); e = st; }
           return out;
         };
-        var lo = 20, hi = H, best = null;
-        for(var t = 0; t < 24; t++){
-          var h = (lo + hi) / 2, R = rows(h), tot = 0;
-          R.forEach(function(row, i){ var sw = row.reduce(function(a, f){ return a + f.r * f.s; }, 0), rh = i < R.length - 1 ? (W - g * (row.length - 1)) / sw : h; tot += Math.min(rh, h * 1.25); });
-          tot += g * (R.length - 1);
-          if(tot <= H * .92){ best = {h: h, R: R}; lo = h; } else hi = h;
+        for(var k = 1; k <= n; k++){
+          var R = split(k), hs = R.map(function(row){ return (W - g * (row.length - 1)) / row.reduce(function(a, f){ return a + f.r; }, 0); });
+          var tot = hs.reduce(function(a, b){ return a + b; }, 0) + g * (k - 1), sc = Math.min(1, Hl / tot);
+          var area = hs.reduce(function(a, h, i){ return a + h * h * sc * sc * R[i].reduce(function(s, f){ return s + f.r; }, 0); }, 0);
+          // rows of very different heights read as a big picture and a strip: weigh the area by how even they are
+          area *= Math.min.apply(null, hs) / Math.max.apply(null, hs);
+          if(!best || area > best.area) best = {area: area, R: R, hs: hs, sc: sc, tot: tot};
         }
-        if(!best) best = {h: lo, R: rows(lo)};
-        var y = 0, hs = best.R.map(function(row, i){ var sw = row.reduce(function(a, f){ return a + f.r * f.s; }, 0); return i < best.R.length - 1 ? Math.min((W - g * (row.length - 1)) / sw, best.h * 1.25) : best.h; });
-        var total = hs.reduce(function(a, b){ return a + b; }, 0) + g * (hs.length - 1), y0 = Math.max(0, (H - total) / 2);
-        y = y0;
+        var sc = best.sc, bw = W * sc, x0 = (W - bw) / 2, y = Math.max(0, (H - best.tot * sc) / 2);
         best.R.forEach(function(row, i){
-          var rh = hs[i], rw = row.reduce(function(a, f){ return a + f.r * f.s * rh; }, 0) + g * (row.length - 1), x = (W - rw) / 2;
-          row.forEach(function(f){ f.style.cssText = 'left:' + x + 'px;top:' + (y + rh * (1 - f.s) / 2) + 'px;width:' + (f.r * f.s * rh) + 'px;height:' + (rh * f.s) + 'px'; x += f.r * f.s * rh + g; });
-          y += rh + g;
+          var rh = best.hs[i] * sc, x = x0;
+          row.forEach(function(f){ var fw = f.r * rh; f.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + fw + 'px;height:' + rh + 'px'; x += fw + g * sc; });
+          y += rh + g * sc;
         });
       } else if(BACK === 'sleeve'){
         var n2 = F.length, bestS = 0, bc = 1, lab = 22; W -= 2;

@@ -95,7 +95,7 @@ window.PROJECTS = {
     credits: [["Site", "324 E 5th St, New York"], ["Studio", "Core III, Columbia GSAPP"], ["Program", "Housing as social infrastructure"], ["Critic", "Lindy Roy"], ["Year", "2025"]],
     diagram: {src: "img/social-sanctuary/hand-drawing.jpg"},
     // no hero: the hand drawing opens, then the stair render, his sheets 11-15 (words, titles, scales and the photo's
-    // dashed leader taken off, model photos removed and the three plans cropped by one shared window centred on the building, 2026-11-06), the aerial render last (his order, 2026-11-05)
+    // dashed leader taken off, model photos removed and the three plans cropped by one shared window centred on the building, wide enough that no car is cut, 2026-11-06), his two model photos, the aerial render last (his order, 2026-11-05)
     inOrder: true,
     grid: [
       {src: "img/social-sanctuary/render-stairs.jpg", caption: "Stairs"},
@@ -104,6 +104,8 @@ window.PROJECTS = {
       {src: "img/social-sanctuary/plan-typical-floor.png", drawing: true, caption: "Typical floor plan"},
       {src: "img/social-sanctuary/section-ns.png", drawing: true, caption: "Section north-south"},
       {src: "img/social-sanctuary/section-ew.png", drawing: true, caption: "Section east-west"},
+      {src: "img/social-sanctuary/model-1.jpg", caption: "Physical model"},
+      {src: "img/social-sanctuary/model-2.jpg", caption: "Physical model"},
       {src: "img/social-sanctuary/render-aerial.jpg", caption: "Aerial view"}
     ]
   },

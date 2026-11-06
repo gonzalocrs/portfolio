@@ -279,6 +279,7 @@ window.PROJECTS = {
   },
   // his ask (2026-11-06): first just below Joint, then moved below Lean Shells (Research); "a model study for TECH II with Zak Kostura" (Spring 2025, from his syllabus); no text yet
   "puente-de-la-mujer": {
+    hidden: true,   // off the site for now (his ask, 2026-11-06 ~2:45am NY)
     title: "Puente de la Mujer", group: "Research", hue: 190,
     kicker: "New York, 2025",
     credits: [["Course", "TECH II, Columbia GSAPP"], ["Type", "Structures in Architecture"], ["Instructor", "Zak Kostura"], ["Term", "Spring 2025"], ["Year", "2025"]],   // from his syllabus header (2026-11-06); course code ARCH A4112 left out so the line does not wrap
@@ -295,9 +296,18 @@ window.PROJECTS = {
   "modular-living-architecture": {
     title: "Open Assembly", group: "Research", hue: 120,
     kicker: "New York, 2025",
-    // his text (2026-11-06), word for word; it replaced the earlier one-line lede
-    text: ["The Geometry & Scaffolds section of the Ecosystem of Exploration kit features modular, 3D-printed components derived from a set of regular polygons. These elements aim the designer to explore patterns, tiling systems, and form generation. They can be freely assembled for open-ended experimentation or systematically arranged to construct fundamental geometric structures like Platonic solids and Archimedean polyhedra. More than just a tool for geometric exploration, this kit serves as a platform for reimagining living architecture, responsive structures that blur the boundaries between organic and engineered environments.",
-      "In preparation."],   // his ask, 2026-11-06, as on Outer Dock
+    // his text (2026-11-06 ~2:45am NY), word for word; it replaced the Geometry & Scaffolds paragraph
+    text: [
+      "Living Assemble is a modular kit based on regular polygons. Its pieces can form Platonic solids or be taken apart and recombined into unexpected patterns and spatial arrangements. Each assembly opens up another possibility.",
+      "The kit brings my engineering background into a more intuitive, hands-on process. Through building and rebuilding, I test geometric rules while following discoveries made along the way. These experiments become a way to explore living architecture: how simple connections and repeated parts can create structures that adapt and change, drawing on both the precision of engineering and the complexity of natural systems.",
+      "In preparation."   // his earlier ask (2026-11-06), kept
+    ],
+    // captions this time (his ask, 2026-11-06): his own sentences from the text, word for word, beside each picture as on Joint
+    notes: [
+      "Its pieces can form Platonic solids or be taken apart and recombined into unexpected patterns and spatial arrangements.",
+      "Through building and rebuilding, I test geometric rules while following discoveries made along the way.",
+      "Living Assemble is a modular kit based on regular polygons."
+    ],
     credits: [["Studio", "ADR 2, Columbia GSAPP"], ["Type", "Modular Systems"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2025"]],
     // his diagram.pdf (2026-11-06 ~1:15am NY), one picture per page, in its order; it replaced everything before
     inOrder: true,

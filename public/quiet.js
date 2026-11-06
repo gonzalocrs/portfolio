@@ -768,7 +768,8 @@
         if(it){
           var im = el('img', '', f); im.alt = it.caption || p.title; im.src = it.src;
           // a link under the picture (Urba's website under its mark, his ask 2026-11-06)
-          if(it.link){ var lk = el('a', 'qf-link', f, it.link.text || it.link.href); lk.href = it.link.href; lk.target = '_blank'; lk.rel = 'noopener'; }
+          if(it.link){ var lk = el('a', 'qf-link', f, it.link.text || it.link.href); lk.href = it.link.href; lk.target = '_blank'; lk.rel = 'noopener';
+            ['click', 'pointerdown', 'mousedown', 'touchstart'].forEach(function(t){ lk.addEventListener(t, function(e){ e.stopPropagation(); }); }); }
           // no captions under the pictures (his call, 2026-10-26: first the photos, then the drawings too); the caption text
           // stays in projects.js as the picture's alt text
           var cap = null;

@@ -185,6 +185,21 @@ window.PROJECTS = {
       {src: "img/permanent-impermanence/hallway.jpg", caption: "Hallway"}
     ]
   },
+  // his ask (2026-11-06): just below Joint; "a model study for TECH II with Zak Kostura". Year assumed 2025, no text yet
+  "puente-de-la-mujer": {
+    title: "Puente de la Mujer", group: "Unbuilt", hue: 190,
+    kicker: "New York, 2025",
+    credits: [["Course", "TECH II, Columbia GSAPP"], ["Type", "Model study"], ["Instructor", "Zak Kostura"], ["Year", "2025"]],
+    hero: "img/puente-de-la-mujer/perspective.jpg",
+    // his order (2026-11-06), after the perspective
+    inOrder: true,
+    grid: [
+      {src: "img/puente-de-la-mujer/model-black.jpg", caption: "Physical model"},
+      {src: "img/puente-de-la-mujer/front.jpg", caption: "Front view"},
+      {src: "img/puente-de-la-mujer/model-white.jpg", caption: "Physical model, cable detail"},
+      {src: "img/puente-de-la-mujer/top.jpg", caption: "Top view"}
+    ]
+  },
   "anticlastic-roof-structure": {
     title: "Anticlastic Surfaces", group: "Research", hue: 8,
     kicker: "New York, 2026",

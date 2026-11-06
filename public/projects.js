@@ -103,10 +103,9 @@ window.PROJECTS = {
     grid: [
       {src: "img/social-sanctuary/render-stairs.jpg", caption: "Stairs"},
         // his diagram1.pdf as it is (black ground, no crop; tenement-diagram.webp alone), with Constant's map and Pask's
-        // diagram under the diagram (his ask, 2026-11-06; no separate slide). Trials by address: default = inside the black,
-        // &ref=b on white below the panel, &ref=c the black panel taller. Its note is on the right (notes below)
-      {src: "img/social-sanctuary/tenement-diagram-references.webp", drawing: true, caption: "Co-op tenement, underspecificity diagram, Constant and Pask references",
-        trial: {b: "img/social-sanctuary/refs-trial-b.webp", c: "img/social-sanctuary/refs-trial-c.webp"}},
+        // diagram under the diagram, half inside the black and half below it (his pick, 2026-11-06; no separate slide);
+        // grain on the diagram's coloured boxes (his ask). Its note is on the right (notes below)
+      {src: "img/social-sanctuary/tenement-diagram-references.webp", drawing: true, caption: "Co-op tenement, underspecificity diagram, Constant and Pask references"},
         // the site plan from his sheet, words and the three massing iterations taken off (his call, 2026-11-06; the
         // underspecificity diagram page was dropped); set smaller inside a white margin (his ask); street names kept, at twice his sheet size so they read at that size
       {src: "img/social-sanctuary/site-plan.png", drawing: true, caption: "Site plan"},

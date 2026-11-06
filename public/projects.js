@@ -266,13 +266,12 @@ window.PROJECTS = {
     kicker: "New York, 2025",
     lede: "A modular system for sphere-like structures, built from the fewest possible parts that assemble with one another, like an organic system.",
     credits: [["Type", "Modular Systems"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2025"]],
-    // his four sheets (2026-11-06), in the order he sent them; the aggregation's two labels cropped off
+    // his diagram.pdf (2026-11-06 ~1:15am NY), one picture per page, in its order; it replaced everything before
     inOrder: true,
     grid: [
-      {src: "img/modular-living-architecture/parts.webp", drawing: true, caption: "Ring and connector parts"},
-      {src: "img/modular-living-architecture/tiling.webp", drawing: true, caption: "Flat tiling"},
-      {src: "img/modular-living-architecture/sphere.webp", drawing: true, caption: "Net and sphere"},
-      {src: "img/modular-living-architecture/aggregation.webp", drawing: true, caption: "Field driven aggregation"}
+      {src: "img/modular-living-architecture/sheet-1.webp", drawing: true, caption: "Net and sphere"},
+      {src: "img/modular-living-architecture/sheet-2.webp", drawing: true, caption: "Flat tiling"},
+      {src: "img/modular-living-architecture/sheet-3.webp", drawing: true, caption: "Ring and connector parts"}
     ]
   }
 };

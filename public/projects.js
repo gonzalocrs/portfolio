@@ -168,7 +168,7 @@ window.PROJECTS = {
       "Joint imagines a Manhattan where music, art, and independent culture can continue to claim space.",
       "Its name carries two meanings: the structural joint that connects individual parts, and the cultural space that brings people together.",
       "Inspired by Konrad Wachsmann’s systems of assembly, a modular framework allows spaces to evolve with the artists who inhabit them.",
-      "",   // the aerial perspective's note ("Conceived above the working DSNY Garage...") taken off at his ask (2026-11-06); the picture stays
+      "Conceived the working DSNY Garage on 12th Avenue, the project builds on public infrastructure to create venues for gathering, experimentation, and performance.",   // "above" taken out at his ask (2026-11-06), in this note only
       "Structure becomes a means of supporting creative freedom, allowing different practices, voices, and audiences to meet.",
       "For artists without institutional backing or a lasting place in the city, it offers room to create, be heard, and build a community.",
       "",

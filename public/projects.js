@@ -100,15 +100,16 @@ window.PROJECTS = {
     grid: [
       {src: "img/social-sanctuary/render-stairs.jpg", caption: "Stairs"},
         // the site plan from his sheet, words and the three massing iterations taken off (his call, 2026-11-06; the
-        // underspecificity diagram page was dropped)
+        // underspecificity diagram page was dropped); set smaller inside a white margin (his ask)
       {src: "img/social-sanctuary/site-plan.png", drawing: true, caption: "Site plan"},
       {src: "img/social-sanctuary/plan-first-floor.png", drawing: true, caption: "First floor plan"},
-      {src: "img/social-sanctuary/model-2.jpg", caption: "Physical model"},
       {src: "img/social-sanctuary/plan-fourth-floor.png", drawing: true, caption: "Fourth floor plan"},
       {src: "img/social-sanctuary/plan-typical-floor.png", drawing: true, caption: "Typical floor plan"},
       {src: "img/social-sanctuary/model-1.jpg", caption: "Physical model"},
       {src: "img/social-sanctuary/section-ns.png", drawing: true, caption: "Section north-south"},
       {src: "img/social-sanctuary/section-ew.png", drawing: true, caption: "Section east-west"},
+        // the second model photo just before the aerial render (his call, 2026-11-06)
+      {src: "img/social-sanctuary/model-2.jpg", caption: "Physical model"},
       {src: "img/social-sanctuary/render-aerial.jpg", caption: "Aerial view"}
     ]
   },

@@ -100,7 +100,7 @@ window.PROJECTS = {
     grid: [
       {src: "img/social-sanctuary/render-stairs.jpg", caption: "Stairs"},
         // the site plan from his sheet, words and the three massing iterations taken off (his call, 2026-11-06; the
-        // underspecificity diagram page was dropped); set smaller inside a white margin (his ask)
+        // underspecificity diagram page was dropped); set smaller inside a white margin (his ask); street names kept, at twice his sheet size so they read at that size
       {src: "img/social-sanctuary/site-plan.png", drawing: true, caption: "Site plan"},
       {src: "img/social-sanctuary/plan-first-floor.png", drawing: true, caption: "First floor plan"},
       {src: "img/social-sanctuary/plan-fourth-floor.png", drawing: true, caption: "Fourth floor plan"},

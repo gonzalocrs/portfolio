@@ -129,7 +129,7 @@ window.PROJECTS = {
       {src: "img/social-sanctuary/tenement-diagram-references.webp", drawing: true, sheet: .6, sheetSrc: "img/social-sanctuary/sheet-diagram.webp", caption: "Co-op tenement, underspecificity diagram, Constant and Pask references"},
         // his artboard: neighbourhood map with the site, then the block plan; full width kept, the white above and below
         // cropped off so the tag sits beside the map (his ask, 2026-11-06)
-      {src: "img/social-sanctuary/site-context.webp", drawing: true, fitAs: 1.5, sheet: .6, sheetSrc: "img/social-sanctuary/sheet-site-block-plan.webp", caption: "Site in the East Village and block plan"},
+      {src: "img/social-sanctuary/site-context.webp", drawing: true, caption: "Site in the East Village"},
       {src: "img/social-sanctuary/plan-first-floor.png", drawing: true, caption: "First floor plan"},
       {src: "img/social-sanctuary/plan-fourth-floor.png", drawing: true, caption: "Fourth floor plan"},
       {src: "img/social-sanctuary/plan-typical-floor.png", drawing: true, caption: "Typical floor plan"},

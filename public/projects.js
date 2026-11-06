@@ -102,9 +102,9 @@ window.PROJECTS = {
     notes: ["", "", {text: "Drawing on Constant’s New Babylon and Gordon Pask’s concept of underspecified design, it leaves aspects of domestic and shared space open to interpretation, allowing residents to shape their surroundings as their needs and communities evolve.", side: "right"}],
     grid: [
       {src: "img/social-sanctuary/render-stairs.jpg", caption: "Stairs"},
-        // his artboard (tenement elevation + underspecificity diagram) with Constant's New Babylon map and Pask's diagram
-        // set at its bottom right (his ask, 2026-11-06); its note is on the right (notes below)
-      {src: "img/social-sanctuary/tenement-diagram-references.webp", drawing: true, caption: "Co-op tenement, underspecificity diagram, Constant and Pask references"},
+        // his diagram1.pdf exactly as it is: black ground, no crop, nothing added (his call, 2026-11-06); its note is on the
+        // right (notes below)
+      {src: "img/social-sanctuary/tenement-diagram-references.webp", drawing: true, caption: "Co-op tenement and underspecificity diagram"},
         // the site plan from his sheet, words and the three massing iterations taken off (his call, 2026-11-06; the
         // underspecificity diagram page was dropped); set smaller inside a white margin (his ask); street names kept, at twice his sheet size so they read at that size
       {src: "img/social-sanctuary/site-plan.png", drawing: true, caption: "Site plan"},

@@ -490,6 +490,22 @@
       m.addEventListener('click', function(e){ if(e.metaKey || e.ctrlKey || e.shiftKey || e.button) return; e.preventDefault(); goProject(m.slug); });
     });
     var plus = el('button', 'qp-plus', me.querySelector('span'), '+'); plus.type = 'button'; plus.setAttribute('aria-label', 'About this project');
+    // every project lays out from Joint's spacing (his ask, 2026-11-06: "make Joint spacing and everything else the
+    // baseline for every project"): the picture, its note and the chevrons are centred on the space right of where
+    // Joint's "+" would be, not right of this project's own name, so a longer or shorter name no longer moves them
+    var shiftX = null;
+    function nameShift(){
+      if(shiftX === null){
+        var t = el('span', '', me); t.style.cssText = 'position:absolute;visibility:hidden;white-space:pre;pointer-events:none';
+        t.textContent = (P['permanent-impermanence'] || {}).title || 'Joint'; var wj = t.getBoundingClientRect().width;
+        t.textContent = p.title; var wt = t.getBoundingClientRect().width; t.remove();
+        shiftX = wj && wt ? wt - wj : 0;
+      }
+      return shiftX;
+    }
+    function plusX(){ return plus.getBoundingClientRect().right - nameShift(); }
+    on(window, 'resize', function(){ shiftX = null; });
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ shiftX = null; });
     var subs = el('div', 'qp-subs', nav); nav.insertBefore(subs, me.nextSibling);
     var dots = [];
     for(var k = 0; k < n; k++){ (function(k){ var b = el('button', 'qs', subs); b.type = 'button'; el('i', '', b); b.setAttribute('aria-label', 'Picture ' + (k + 1)); b.addEventListener('click', function(){ go(k); }); dots.push(b); })(k); }
@@ -525,8 +541,11 @@
       if(!L || !im) return;
       if(innerWidth <= 700){ L.style.translate = ''; return; }
       var cur = parseFloat(L.style.translate) || 0, r = im.getBoundingClientRect(); if(!r.width) return;
-      var a = r.left - cur, b = r.right - cur, P = plus.getBoundingClientRect().right;
+      var a = r.left - cur, b = r.right - cur, P = plusX();
       var sh = Math.round((innerWidth - b - a + P) / 2);
+      // never under this project's own name (a name longer than Joint's)
+      var rem0 = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      sh = Math.max(sh, Math.round(plus.getBoundingClientRect().right + 2 * rem0 - a));
       L.style.translate = Math.min(0, sh) + 'px 0';
     }
     on(window, 'resize', function(){ var L = st.querySelector('.p-layer.on'); centre(L, L && L.querySelector('.qf img, .qf .plate')); });
@@ -703,7 +722,7 @@
     function picRect(){
       var r = curIm && curIm.isConnected ? curIm.getBoundingClientRect() : null;
       if(r && r.width) return r;
-      var s = st.getBoundingClientRect(), P = innerWidth <= 700 ? 0 : plus.getBoundingClientRect().right;
+      var s = st.getBoundingClientRect(), P = innerWidth <= 700 ? 0 : plusX();
       return {left: P, right: innerWidth, top: s.top + innerHeight * .03, bottom: s.bottom - innerHeight * .03};
     }
     // desktop: both chevrons stay in one place for every picture (his note, 2026-11-06: "make the chevron stay fixed as
@@ -711,7 +730,7 @@
     function chevRect(){
       if(innerWidth <= 700) return picRect();
       var L = st.querySelector('.p-layer.on') || st, b = L.getBoundingClientRect(), cs = getComputedStyle(L);
-      var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16, P = plus.getBoundingClientRect().right;
+      var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16, P = plusX();
       return {left: P, right: innerWidth, top: b.top + parseFloat(cs.paddingTop) + 1.3 * rem, bottom: b.bottom - parseFloat(cs.paddingBottom) - 1.3 * rem};
     }
     function placeCue(){
@@ -754,7 +773,7 @@
               var r = im.getBoundingClientRect(), lr = L.getBoundingClientRect(), rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
               if(!r.width) return;
               // the column may reach left past the stage, but stays clear of the project's name in the index
-              var w = 11 * rem, g = 1.8 * rem, room = r.left - Math.max(me.getBoundingClientRect().right + 2 * rem, 0);
+              var w = 11 * rem, g = 1.8 * rem, room = r.left - Math.max(me.getBoundingClientRect().right - nameShift() + 2 * rem, 0);
               // wide pictures take the note under them, from their left edge; upright and square ones beside (his rule,
               // 2026-11-01: "if the image is wide do under, if it's vertical or square do side")
               // then beside for all (below). Every wide picture keeps the size it had with a note under it ("don't resize anything")
@@ -774,7 +793,7 @@
                   // note's width, and picture + note are centred together in the same space a picture alone takes
                   var mw = 'calc(100% - ' + Math.round(w + g) + 'px)';
                   if(im.style.maxWidth !== mw){ im.style.maxWidth = mw; r = im.getBoundingClientRect(); }
-                  var cur = parseFloat(L.style.translate) || 0, a0 = r.left - cur, P = plus.getBoundingClientRect().right;
+                  var cur = parseFloat(L.style.translate) || 0, a0 = r.left - cur, P = plusX();
                   L.style.translate = Math.min(0, Math.round((innerWidth + P - a0 - (r.right - cur + g + w)) / 2)) + 'px 0';
                   r = im.getBoundingClientRect(); lr = L.getBoundingClientRect();
                 }
@@ -790,7 +809,7 @@
                     w = 11 * rem;
                     var mwl = 'calc(100% - ' + Math.round(w + g) + 'px)';
                     if(im.style.maxWidth !== mwl){ im.style.maxWidth = mwl; r = im.getBoundingClientRect(); }
-                    var cl = parseFloat(L.style.translate) || 0, al = r.left - cl, bl = r.right - cl, Pl = plus.getBoundingClientRect().right;
+                    var cl = parseFloat(L.style.translate) || 0, al = r.left - cl, bl = r.right - cl, Pl = plusX();
                     L.style.translate = Math.round((innerWidth + Pl - (al - g - w) - bl) / 2) + 'px 0';
                     r = im.getBoundingClientRect(); lr = L.getBoundingClientRect();
                   }

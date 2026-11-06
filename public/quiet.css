@@ -171,7 +171,6 @@
 .qp .qt-stage .p-layer{padding:3vh 4%}
 .qf{margin:0;height:100%;max-width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .qf img{display:block;max-width:100%;max-height:calc(100% - 2.6rem);width:auto;height:auto;cursor:inherit;pointer-events:auto}
-.qf img.qf-cut{box-sizing:border-box;border:1px dashed #9a9a9a;border-top:0}
 .qf figcaption{margin-top:.8rem;max-width:100%;text-align:center;line-height:1.3}
 .qf .plate{height:calc(100% - 2.6rem);aspect-ratio:3/2;max-width:100%}
 @media (max-width:700px){ .qp .qt-stage .p-layer{padding:0} .qf figcaption{margin-top:.5rem} }

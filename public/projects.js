@@ -125,9 +125,9 @@ window.PROJECTS = {
       {src: "img/social-sanctuary/tenement-diagram-references.webp", drawing: true, caption: "Co-op tenement, underspecificity diagram, Constant and Pask references"},
         // his artboard: neighbourhood map with the site, then the block plan, uncropped (his ask, 2026-11-06)
       {src: "img/social-sanctuary/site-context.webp", drawing: true, caption: "Site in the East Village and block plan"},
-      {src: "img/social-sanctuary/plan-first-floor.png", drawing: true, cut: true, caption: "First floor plan"},
-      {src: "img/social-sanctuary/plan-fourth-floor.png", drawing: true, cut: true, caption: "Fourth floor plan"},
-      {src: "img/social-sanctuary/plan-typical-floor.png", drawing: true, cut: true, caption: "Typical floor plan"},
+      {src: "img/social-sanctuary/plan-first-floor.png", drawing: true, caption: "First floor plan"},
+      {src: "img/social-sanctuary/plan-fourth-floor.png", drawing: true, caption: "Fourth floor plan"},
+      {src: "img/social-sanctuary/plan-typical-floor.png", drawing: true, caption: "Typical floor plan"},
       {src: "img/social-sanctuary/model-1.jpg", caption: "Physical model"},
       {src: "img/social-sanctuary/section-ns.png", drawing: true, caption: "Section north-south"},
       {src: "img/social-sanctuary/section-ew.png", drawing: true, caption: "Section east-west"},

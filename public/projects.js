@@ -27,6 +27,8 @@
               { src: "img/...", caption: "Massing model", text: "Basswood, 1:200" }
     physicalNote  one line shown under every physical model photo (same for all of
               them); an individual item's own "text" above overrides it for that photo
+    hidden    true: the project is off the site (not in the index; its page goes to the home)
+    notFirst  true: the home never opens a visit on this project (it still comes up as you scroll)
 
   Drop image files into public/img/<slug>/ and reference them here.
 */
@@ -75,6 +77,7 @@ window.PROJECTS = {
     diagram: {}
   },
   "urba-branding": {
+    notFirst: true,   // never the project a visit opens on (his ask, 2026-11-06)
     title: "Urba Inmobiliaria", group: "Built", hue: 96,
     kicker: "Lima, 2020",
     // his text (2026-11-06), word for word
@@ -294,6 +297,7 @@ window.PROJECTS = {
     ]
   },
   "modular-living-architecture": {
+    notFirst: true,   // never the project a visit opens on (his ask, 2026-11-06)
     title: "Open Assembly", group: "Research", hue: 120,
     kicker: "New York, 2025",
     // his text (2026-11-06 ~2:45am NY), word for word; it replaced the Geometry & Scaffolds paragraph

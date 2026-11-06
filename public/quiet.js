@@ -397,7 +397,8 @@
     // each visit opens on a different project (his call, 2026-10-26: "i always see sierra"): picked at random, never the
     // one the last visit opened on; scrolling then goes on through the others in the usual order and comes round again
     var last = null; try { last = localStorage.getItem('gc-first'); } catch(e){}
-    var firsts = withPics.filter(function(s){ return s !== last; }); if(!firsts.length) firsts = withPics;
+    var opens = withPics.filter(function(s){ return !P[s].notFirst; }); if(!opens.length) opens = withPics;   // notFirst: never opens a visit
+    var firsts = opens.filter(function(s){ return s !== last; }); if(!firsts.length) firsts = opens;
     var first = firsts[Math.floor(Math.random() * firsts.length)];
     // coming back from a project (a click outside its pictures, or Esc): /?at=<slug> opens on that project, so the visit
     // carries on scrolling from there (his note, 2026-10-29); the address is then cleaned

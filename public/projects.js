@@ -99,7 +99,7 @@ window.PROJECTS = {
     inOrder: true,
     grid: [
         // his tenement elevation, then his underspecificity diagram, in one image (his pick, 2026-11-06; the diagram alone was dropped)
-      {src: "img/social-sanctuary/underspecificity-townhouse.svg", drawing: true, caption: "Co-op tenement and underspecificity diagram"},
+      {src: "img/social-sanctuary/underspecificity-townhouse.svg", drawing: true, caption: "Co-op tenement, underspecificity diagram, Pask and Constant references"},
       {src: "img/social-sanctuary/render-stairs.jpg", caption: "Stairs"},
       {src: "img/social-sanctuary/plan-first-floor.png", drawing: true, caption: "First floor plan"},
       {src: "img/social-sanctuary/model-2.jpg", caption: "Physical model"},

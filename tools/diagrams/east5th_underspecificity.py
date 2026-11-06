@@ -11,8 +11,8 @@ import os
 # his colour coding, calmed (the bathroom cyan was the loud one)
 C = dict(room='#94A8AB', kitchen='#F2F1EC', bath='#A6D6D4', living='#AEB3C6', shared='#DFAA74', meet='#E9D766')
 INK, GREY = '#1b1b1b', '#8b8c8e'
-HAIR = 'stroke="%s" stroke-width="0.7" vector-effect="non-scaling-stroke" stroke-linejoin="miter"' % INK
-LINE = 'stroke="%s" stroke-width="0.7" vector-effect="non-scaling-stroke" fill="none" stroke-linecap="round"' % GREY
+HAIR = 'stroke="%s" stroke-width="0.45" vector-effect="non-scaling-stroke" stroke-linejoin="miter"' % INK
+LINE = 'stroke="%s" stroke-width="0.45" vector-effect="non-scaling-stroke" fill="none" stroke-linecap="round"' % GREY
 
 def poly(pts, fill, extra=''):
     return '<path d="M%s Z" fill="%s" %s %s/>' % (' L'.join('%.2f %.2f' % p for p in pts), fill, HAIR, extra)
@@ -35,13 +35,13 @@ def step1():
     def walls(w, *runs):
         return ''.join('<path d="M%s" fill="none" stroke="%s" stroke-width="%s" stroke-linecap="square" stroke-linejoin="miter"/>'
                        % (' L'.join('%.2f %.2f' % q for q in r), INK, w) for r in runs)
-    out.append(walls(.9,
+    out.append(walls(.6,
         [(769, Y0), (769, 598)], [(761.5, 630.5), (761.5, 598), (778.4, 598), (778.4, 630.5)],   # front rooms, little hall
         [(X0, 630.5), (X1, 630.5)],                                                                # across the house
         [(762, 630.5), (762, 698), (776.4, 698), (776.4, Y1)],                                     # rooms | hall and stair
         [(X0, 657), (762, 657)], [(X0, 684), (762, 684)],                                          # kitchen | bath | living
         [(776.4, 732), (X1, 732)]))                                                                # vestibule
-    out.append(walls(1.8, [(X0, Y0), (X1, Y0), (X1, Y1), (X0, Y1), (X0, Y0)]))
+    out.append(walls(1.25, [(X0, Y0), (X1, Y0), (X1, Y1), (X0, Y1), (X0, Y0)]))
     # the stoop: steps down from the door, the landing, steps on to the street
     out.append(rect(776.4, Y1 + 1.2, X1, 776.4, 'none'))
     out += [line((776.4, y), (X1, y)) for y in (760.6, 764.6, 768.5, 772.5)]
@@ -126,13 +126,44 @@ def build(steps, path, gap=58, pad=14):
     open(path, 'w').write(svg)
     print(path, round(W), 'x', round(H))
 
+def img(name, x, y, h):
+    """an embedded jpg (an <img> SVG can't fetch files), h units tall; returns (svg, width)"""
+    import base64, struct
+    path = os.path.join(os.path.dirname(__file__), name)
+    data = open(path, 'rb').read()
+    # jpg size from its SOF marker
+    i = 2
+    while True:
+        m, ln = data[i + 1], struct.unpack('>H', data[i + 2:i + 4])[0]
+        if m in (0xC0, 0xC1, 0xC2): hh, ww = struct.unpack('>HH', data[i + 5:i + 9]); break
+        i += 2 + ln
+    w = h * ww / hh
+    return '<image x="%.2f" y="%.2f" width="%.2f" height="%.2f" href="data:image/jpeg;base64,%s"/>' % (x, y, w, h, base64.b64encode(data).decode()), w
+
+def compose(path, scale=.68, gap=58, pad=14):
+    """his tenement elevation; beside it his diagram, smaller (his note, 2026-11-06: "make the diagram smaller and the
+    lines thinner"), centred on the elevation's height; under the diagram his two references, Pask's Architecture of
+    Conversations (1960) and Constant's New Babylon/Amsterdam (1963) (his note: "add these two references below")"""
+    EH = 260                                             # the elevation's height
+    el, ew = img('tenement-elevation.jpg', pad, pad, EH)
+    steps = [step1(), step2(), step3(), step4(), step5()]
+    top, bottom = min(b[1] for _, b in steps), max(b[3] for _, b in steps)
+    parts, x = [], 0
+    for items, (x0, y0, x1, y1) in steps:
+        parts.append('<g transform="translate(%.2f %.2f)">%s</g>' % (x - x0, -top, ''.join(items)))
+        x += (x1 - x0) + gap
+    dw, dh = (x - gap) * scale, (bottom - top) * scale
+    dx, dy = pad + ew + 70, pad + (EH - dh) / 2
+    diagram = '<g transform="translate(%.2f %.2f) scale(%.4f)">%s</g>' % (dx, dy, scale, ''.join(parts))
+    RH, ry = 150, pad + EH + 46
+    r1, w1 = img('ref-pask.jpg', dx, ry, RH)
+    r2, w2 = img('ref-constant.jpg', dx + w1 + 40, ry, RH)
+    W, H = max(dx + dw, dx + w1 + 40 + w2) + pad, ry + RH + pad
+    svg = ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 %.1f %.1f" width="%d" height="%d">'
+           '<rect width="100%%" height="100%%" fill="#fff"/>%s%s%s%s</svg>\n') % (W, H, round(W * 3.5), round(H * 3.5), el, diagram, r1, r2)
+    open(path, 'w').write(svg)
+    print(path, round(W), 'x', round(H), round(len(svg) / 1024), 'KB')
+
 if __name__ == '__main__':
     out = os.path.join(os.path.dirname(__file__), '..', '..', 'public', 'img', 'social-sanctuary')
-    import sys
-    # on the site without the townhouse step (his call, 2026-11-06: "the iteration with the townhouse is not working");
-    # --townhouse writes the five-step version beside it
-    # his diagram is all five steps, the townhouse's plan first; "with the townhouse" puts his tenement elevation in
-    # front of it in the same image (his note, 2026-11-06: "do one image with the townhouse elevation, then my diagram")
-    s = [step1(), step2(), step3(), step4(), step5()]
-    build([step0()] + s, os.path.join(out, 'underspecificity-townhouse.svg'))   # the one on the site (his pick)
-    if '--alone' in sys.argv: build(s, os.path.join(out, 'underspecificity.svg'))
+    compose(os.path.join(out, 'underspecificity-townhouse.svg'))

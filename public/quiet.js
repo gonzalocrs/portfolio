@@ -770,7 +770,12 @@
           // no captions under the pictures (his call, 2026-10-26: first the photos, then the drawings too); the caption text
           // stays in projects.js as the picture's alt text
           var cap = null;
-          var fit = function(){ if(cap) cap.style.width = im.offsetWidth ? im.offsetWidth + 'px' : ''; };
+          var fit = function(){
+            // scale: the picture shown at that share of its usual size (Urba's drawings, his ask 2026-11-06: "half the
+            // size"); not on a phone, where pictures are small already
+            if(it.scale && !it.note){ im.style.maxWidth = ''; var w0 = im.getBoundingClientRect().width; if(w0 && innerWidth > 700) im.style.maxWidth = Math.floor(w0 * it.scale) + 'px'; }
+            if(cap) cap.style.width = im.offsetWidth ? im.offsetWidth + 'px' : '';
+          };
           if(it.note){
             // beside: a narrow column left of the picture, its last line on the picture's bottom edge; under the picture
             // when there isn't room beside it
@@ -816,6 +821,7 @@
                   var mhs = getComputedStyle(im).maxHeight, mhm = /calc\(100% - ([\d.]+)px\)/.exec(mhs);
                   var base = it.fitAs ? Math.floor((mhm ? f.clientHeight - +mhm[1] : parseFloat(mhs) || f.clientHeight) * it.fitAs) + 'px' : '';
                   if(im.style.maxWidth !== base){ im.style.maxWidth = base; }
+                  if(it.scale){ im.style.maxWidth = base; var w2 = im.getBoundingClientRect().width; if(w2) im.style.maxWidth = 'min(' + (base || '100%') + ', ' + Math.floor(w2 * it.scale) + 'px)'; }
                   centre(L, im); r = im.getBoundingClientRect();
                   var M = Math.max(me.getBoundingClientRect().right - nameShift() + 2 * rem, 0), miss = (w + g) - (r.left - M);
                   if(miss > 0){

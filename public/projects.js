@@ -104,7 +104,8 @@ window.PROJECTS = {
       {src: "img/social-sanctuary/render-stairs.jpg", caption: "Stairs"},
         // his diagram1.pdf as it is (black ground, no crop; tenement-diagram.webp alone), with Constant's map and Pask's
         // diagram under the diagram, inside the black box (option A, his pick, 2026-11-06; no separate slide);
-        // no effects; his own original colours (his call, 2026-11-06, after copper, Joint and 30%-darker versions);
+        // no effects; his own original colours (his call, 2026-11-06, after copper, Joint and 30%-darker versions); since
+        // 2026-11-06 ~10:40pm NY his redone Artboard 10 (white ground, new palette), refs in the same places;
         // lines as his. Note on the left (notes below)
       {src: "img/social-sanctuary/tenement-diagram-references.webp", drawing: true, caption: "Co-op tenement, underspecificity diagram, Constant and Pask references"},
         // his artboard: neighbourhood map with the site, then the block plan, uncropped (his ask, 2026-11-06)

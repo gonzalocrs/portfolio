@@ -304,7 +304,8 @@ window.PROJECTS = {
     ],
     // captions this time (his ask, 2026-11-06): his own sentences from the text, word for word, beside each picture as on Joint
     notes: [
-      "Its pieces can form Platonic solids or be taken apart and recombined into unexpected patterns and spatial arrangements.",
+      // "Platonic solids" -> "developable polyhedra" in this caption only (his note, 2026-11-06)
+      "Its pieces can form developable polyhedra or be taken apart and recombined into unexpected patterns and spatial arrangements.",
       "Building and rebuilding reveal how simple connections and repeated parts can create adaptable structures.",
       "Living Assemble is a modular kit based on regular polygons."
     ],

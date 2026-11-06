@@ -691,30 +691,30 @@
       cueUp.addEventListener('click', function(e){ e.stopPropagation(); if(bOn){ flip(false); return; } go(at - 1); });
     }
     function syncUp(){ if(cueUp) cueUp.classList.toggle('off', !bOn && at <= 0); }
-    // one fixed spot, the same for every picture (his note, 2026-11-05: "it should [not] jump position according to the
-    // drawings, it should stay"): across the middle of the picture area (pictures centre between the "+" and the right
-    // edge), halfway down the margin under the stage; on a phone, centred just above the marks at the foot
-    function placeCue(){
-      if(!cue || cue.classList.contains('off')) return;
-      var x, y;
-      if(innerWidth <= 700){ var t = wrap.querySelector('.qt-ticks'), tt = t ? t.getBoundingClientRect().top : innerHeight - 90; x = innerWidth / 2; y = tt - 22; }
-      else { var s = st.getBoundingClientRect(), P = plus.getBoundingClientRect().right, rem = parseFloat(getComputedStyle(document.documentElement).fontSize), pb = s.bottom - innerHeight * .03 - 1.3 * rem; x = (P + innerWidth) / 2;
-        // halfway between the lowest a picture reaches (the stage less its padding) and the window's foot, never closer
-        // to the foot than 1.8rem (his note, 2026-11-05: "give the chevron some offset from the base of the page")
-        y = Math.min(pb + (innerHeight - pb) / 2, innerHeight - 1.8 * rem); }
-      cue.style.left = Math.round(x) + 'px'; cue.style.top = Math.round(y) + 'px';
-      cue.classList.add('in');
+    // close to the picture (his note, 2026-11-06: "put both chevrons closer to the image"): the down one a short step under
+    // the picture on show, the up one the same step above it, both on its centre line; when the next picture is a
+    // different size they glide there rather than jump. Never past the window's foot or head (1.8rem), and on a phone
+    // never into the marks at the foot. (Before, 2026-11-05: one fixed spot in the margin under the stage.)
+    var curIm = null;
+    function picRect(){
+      var r = curIm && curIm.isConnected ? curIm.getBoundingClientRect() : null;
+      if(r && r.width) return r;
+      var s = st.getBoundingClientRect(), P = innerWidth <= 700 ? 0 : plus.getBoundingClientRect().right;
+      return {left: P, right: innerWidth, top: s.top + innerHeight * .03, bottom: s.bottom - innerHeight * .03};
     }
-    // the up chevron mirrors it: same line across, halfway between the top a picture reaches and the window's head (at
-    // least 1.8rem down); on a phone just under the head of the picture area
+    function placeCue(){
+      if(!cue) return;
+      var r = picRect(), rem = parseFloat(getComputedStyle(document.documentElement).fontSize), x = (r.left + r.right) / 2, y = r.bottom + 1.5 * rem;
+      if(innerWidth <= 700){ var t = wrap.querySelector('.qt-ticks'), tt = t ? t.getBoundingClientRect().top : innerHeight - 90; y = Math.min(y, tt - 22); }
+      else y = Math.min(y, innerHeight - 1.8 * rem);
+      cue.style.left = Math.round(x) + 'px'; cue.style.top = Math.round(y) + 'px';
+      if(curIm && !cue.classList.contains('off')) cue.classList.add('in');   // shows with the first picture
+    }
     function placeUp(){
       if(!cueUp) return;
-      var x, y, rem = parseFloat(getComputedStyle(document.documentElement).fontSize);
-      if(innerWidth <= 700){ var s0 = st.getBoundingClientRect(); x = innerWidth / 2; y = Math.max(s0.top + 4, 1.8 * rem); }
-      else { var s = st.getBoundingClientRect(), P = plus.getBoundingClientRect().right, pt = s.top + innerHeight * .03; x = (P + innerWidth) / 2;
-        y = Math.max(pt / 2, 1.8 * rem); }
+      var r = picRect(), rem = parseFloat(getComputedStyle(document.documentElement).fontSize), x = (r.left + r.right) / 2, y = Math.max(r.top - 1.5 * rem, 1.8 * rem);
       cueUp.style.left = Math.round(x) + 'px'; cueUp.style.top = Math.round(y) + 'px';
-      cueUp.classList.add('in');
+      if(curIm) cueUp.classList.add('in');
     }
     if(cueUp){ on(window, 'resize', placeUp); requestAnimationFrame(placeUp); }
     if(cue){ on(window, 'resize', placeCue); requestAnimationFrame(placeCue); }
@@ -771,7 +771,7 @@
             };
             if(window.ResizeObserver) new ResizeObserver(function(){ fit(); }).observe(L);
           }
-          var fit0 = fit; fit = function(){ fit0(); centre(L, im); fit0(); };
+          var fit0 = fit; fit = function(){ fit0(); centre(L, im); fit0(); curIm = im; placeCue(); placeUp(); };
           im.addEventListener('load', fit); f.fit = fit; if(im.complete) requestAnimationFrame(fit);
         }
         else el('div', 'plate', f, 'In preparation');

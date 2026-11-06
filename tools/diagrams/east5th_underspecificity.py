@@ -24,38 +24,31 @@ def line(*pts):
     return '<path d="M%s" %s/>' % (' L'.join('%.2f %.2f' % p for p in pts), LINE)
 
 def step1():
-    """the townhouse: his plan, colour zones under black walls, the stoop in hairline"""
-    out = []
-    # zones
-    out += [poly([(741, 551), (770.4, 551), (770.4, 598), (761.5, 598), (761.5, 630.5), (741, 630.5)], C['room']),
-            poly([(770.4, 551), (796.4, 551), (796.4, 630.5), (778.4, 630.5), (778.4, 598), (770.4, 598)], C['room']),
-            rect(741, 631.5, 761.5, 656.5, C['kitchen']), rect(741, 657.5, 761.5, 683.5, C['bath']),
-            poly([(741, 684.5), (761.5, 684.5), (761.5, 698), (776.4, 698), (776.4, 755), (741, 755)], C['living']),
-            poly([(763.4, 631.5), (796.4, 631.5), (796.4, 731.7), (777.4, 731.7), (777.4, 697), (763.4, 697)], C['shared'])]
-    # walls (filled, so they scale with the plan): outer shell, then partitions, door gaps left open
-    W, w = 1.7, 1.1
-    def wall(x0, y0, x1, y1, t):
-        if x0 == x1: return '<rect x="%.2f" y="%.2f" width="%.2f" height="%.2f" fill="%s"/>' % (x0 - t / 2, y0, t, y1 - y0, INK)
-        return '<rect x="%.2f" y="%.2f" width="%.2f" height="%.2f" fill="%s"/>' % (x0, y0 - t / 2, x1 - x0, t, INK)
-    out += [wall(740.2, 551 - W / 2, 740.2, 755.8, W), wall(797.2, 551 - W / 2, 797.2, 755.8, W),
-            wall(740.2, 551, 797.2, 551, W),
-            wall(740.2, 755.8, 747.5, 755.8, W), wall(770.5, 755.8, 778.4, 755.8, W), wall(794.5, 755.8, 797.2, 755.8, W),
-            wall(770.4, 551, 770.4, 598, w),                                         # between the two front rooms
-            wall(761.5, 598, 765, 598, w), wall(775, 598, 778.4, 598, w),            # the little front hall
-            wall(761.5, 598, 761.5, 603, w), wall(761.5, 611, 761.5, 631, w), wall(778.4, 598, 778.4, 611, w), wall(778.4, 619, 778.4, 631, w),
-            wall(740.2, 631, 763.4, 631, w), wall(770.5, 631, 797.2, 631, w),        # across the house
-            wall(740.2, 657, 762.4, 657, w), wall(740.2, 684, 762.4, 684, w),        # kitchen | bath | living
-            wall(762.4, 631, 762.4, 646, w), wall(762.4, 653, 762.4, 690, w),
-            wall(762.4, 697.5, 776.4, 697.5, w * .6),
-            wall(777, 631, 777, 653.5, w), wall(776.4, 674, 776.4, 755.8, w),          # the stair's spine
-            wall(777, 732.3, 797.2, 732.3, w)]                                       # vestibule
-    # the stoop, in hairline: steps down from the door, the landing, the steps on to the street
-    out.append(rect(777.4, 756.6, 797.2, 776.4, 'none'))
-    out += [line((777.4, y), (797.2, y)) for y in (760.6, 764.6, 768.5, 772.5)]
-    out.append(rect(740.8, 776.4, 797.2, 797.8, 'none'))
+    """the townhouse: the same rooms as the next step, packed in the house, walls drawn as one clean set of lines
+    (outer shell heavier), the stoop in hairline"""
+    X0, X1, Y0, Y1 = 741, 797, 551, 755
+    out = [poly([(X0, Y0), (769, Y0), (769, 598), (761.5, 598), (761.5, 630.5), (X0, 630.5)], C['room']),
+           poly([(769, Y0), (X1, Y0), (X1, 630.5), (778.4, 630.5), (778.4, 598), (769, 598)], C['room']),
+           rect(X0, 630.5, 762, 657, C['kitchen']), rect(X0, 657, 762, 684, C['bath']),
+           poly([(X0, 684), (762, 684), (762, 698), (776.4, 698), (776.4, Y1), (X0, Y1)], C['living']),
+           poly([(762, 630.5), (X1, 630.5), (X1, 732), (776.4, 732), (776.4, 698), (762, 698)], C['shared'])]
+    def walls(w, *runs):
+        return ''.join('<path d="M%s" fill="none" stroke="%s" stroke-width="%s" stroke-linecap="square" stroke-linejoin="miter"/>'
+                       % (' L'.join('%.2f %.2f' % q for q in r), INK, w) for r in runs)
+    out.append(walls(.9,
+        [(769, Y0), (769, 598)], [(761.5, 630.5), (761.5, 598), (778.4, 598), (778.4, 630.5)],   # front rooms, little hall
+        [(X0, 630.5), (X1, 630.5)],                                                                # across the house
+        [(762, 630.5), (762, 698), (776.4, 698), (776.4, Y1)],                                     # rooms | hall and stair
+        [(X0, 657), (762, 657)], [(X0, 684), (762, 684)],                                          # kitchen | bath | living
+        [(776.4, 732), (X1, 732)]))                                                                # vestibule
+    out.append(walls(1.8, [(X0, Y0), (X1, Y0), (X1, Y1), (X0, Y1), (X0, Y0)]))
+    # the stoop: steps down from the door, the landing, steps on to the street
+    out.append(rect(776.4, Y1 + 1.2, X1, 776.4, 'none'))
+    out += [line((776.4, y), (X1, y)) for y in (760.6, 764.6, 768.5, 772.5)]
+    out.append(rect(X0, 776.4, X1, 797.8, 'none'))
     out += [line((x, 776.4), (x, 797.8)) for x in (759.4, 763.5, 767.6, 771.6)]
-    out.append(rect(740.8, 797.8, 759.4, 803.4, 'none'))
-    return out, (740.2, 551, 797.9, 803.4)
+    out.append(rect(X0, 797.8, 759.4, 803.4, 'none'))
+    return out, (740.1, 550.1, 797.9, 803.4)
 
 def step2():
     """pulled apart: the rooms keep their outline, the hall empties, the stoop takes the colour"""

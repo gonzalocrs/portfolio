@@ -304,10 +304,10 @@ window.PROJECTS = {
     ],
     // captions this time (his ask, 2026-11-06): his own sentences from the text, word for word, beside each picture as on Joint
     notes: [
-      // "Platonic solids" -> "developable polyhedra" in this caption only (his note, 2026-11-06)
-      "Its pieces can form developable polyhedra or be taken apart and recombined into unexpected patterns and spatial arrangements.",
-      "Building and rebuilding reveal how simple connections and repeated parts can create adaptable structures.",
-      "Living Assemble is a modular kit based on regular polygons."
+      // his pairing (2026-11-06 ~2:55am NY): cube, tiling ("minus the polyhedra"), kit of parts
+      "Living Assemble is a modular kit based on regular polygons.",
+      "Its pieces can be taken apart and recombined into unexpected patterns and spatial arrangements.",
+      "Building and rebuilding reveal how simple connections and repeated parts can create adaptable structures."
     ],
     credits: [["Studio", "ADR 2, Columbia GSAPP"], ["Type", "Modular Systems"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2025"]],
     // his diagram.pdf (2026-11-06 ~1:15am NY), one picture per page, in its order; it replaced everything before

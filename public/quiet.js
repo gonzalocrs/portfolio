@@ -29,7 +29,7 @@
         var s = (tv && it.trial[tv]) || (it.src && web(it.src));
         if(!s || seen[s]) return; seen[s] = 1;
         var dr = isDrawing(it);
-        out.push({src: s, drawing: dr, kind: dr ? 'drawing' : /\/physical\//.test(s) ? 'physical' : 'photo', caption: it.caption || ''});
+        out.push({src: s, drawing: dr, cut: !!it.cut, kind: dr ? 'drawing' : /\/physical\//.test(s) ? 'physical' : 'photo', caption: it.caption || ''});
       });
     });
     return out;
@@ -761,6 +761,9 @@
         var f = el('figure', 'qf', L);
         if(it){
           var im = el('img', '', f); im.alt = it.caption || p.title; im.src = it.src;
+          // a fine dashed line where a drawing is cut off (East 5th's plans, his ask 2026-11-06: "a pointed line where
+          // you're cutting, on the street there's no problem"): left, right and foot; none along the street at the top
+          if(it.cut) im.classList.add('qf-cut');
           // no captions under the pictures (his call, 2026-10-26: first the photos, then the drawings too); the caption text
           // stays in projects.js as the picture's alt text
           var cap = null;

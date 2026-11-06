@@ -134,5 +134,5 @@ if __name__ == '__main__':
     # his diagram is all five steps, the townhouse's plan first; "with the townhouse" puts his tenement elevation in
     # front of it in the same image (his note, 2026-11-06: "do one image with the townhouse elevation, then my diagram")
     s = [step1(), step2(), step3(), step4(), step5()]
-    build(s, os.path.join(out, 'underspecificity.svg'))
-    build([step0()] + s, os.path.join(out, 'underspecificity-townhouse.svg'))
+    build([step0()] + s, os.path.join(out, 'underspecificity-townhouse.svg'))   # the one on the site (his pick)
+    if '--alone' in sys.argv: build(s, os.path.join(out, 'underspecificity.svg'))

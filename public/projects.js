@@ -98,11 +98,8 @@ window.PROJECTS = {
     // dashed leader taken off, model photos removed and the three plans cropped by one shared window centred on the building, wide enough that no car is cut, 2026-11-06), his two model photos, the aerial render last (his order, 2026-11-05)
     inOrder: true,
     grid: [
-      // his "underspecificity" diagram from sheet 8, redrawn without the townhouse step (tools/diagrams/east5th_underspecificity.py,
-      // 2026-11-06)
-      // to compare (2026-11-06): with the townhouse (his tenement elevation, then the steps), then without; one goes
-      {src: "img/social-sanctuary/underspecificity-townhouse.svg", drawing: true, caption: "Underspecificity diagram, with the townhouse"},
-      {src: "img/social-sanctuary/underspecificity.svg", drawing: true, caption: "Underspecificity diagram"},
+        // his tenement elevation, then his underspecificity diagram, in one image (his pick, 2026-11-06; the diagram alone was dropped)
+      {src: "img/social-sanctuary/underspecificity-townhouse.svg", drawing: true, caption: "Co-op tenement and underspecificity diagram"},
       {src: "img/social-sanctuary/render-stairs.jpg", caption: "Stairs"},
       {src: "img/social-sanctuary/plan-first-floor.png", drawing: true, caption: "First floor plan"},
       {src: "img/social-sanctuary/model-2.jpg", caption: "Physical model"},

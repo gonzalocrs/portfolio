@@ -780,8 +780,20 @@
                 }
                 else {
                   if(room < w + g) w = Math.max(7.5 * rem, room - g);
-                  var push = Math.min(w + g - room, innerWidth - rem - r.right);
-                  if(push > 0){ L.style.translate = ((parseFloat(L.style.translate) || 0) + push) + 'px 0'; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
+                  if(room >= w + g){
+                    if(im.style.maxWidth){ im.style.maxWidth = ''; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
+                  }
+                  else {
+                    // short of room on the left (a wide picture): the picture no longer steps right past the page's margin
+                    // (his note, 2026-11-06: "why are you changing the margin again?"); like a note on the right, the
+                    // picture gives up the note's width and note + picture are centred together in the picture's usual space
+                    w = 11 * rem;
+                    var mwl = 'calc(100% - ' + Math.round(w + g) + 'px)';
+                    if(im.style.maxWidth !== mwl){ im.style.maxWidth = mwl; r = im.getBoundingClientRect(); }
+                    var cl = parseFloat(L.style.translate) || 0, al = r.left - cl, bl = r.right - cl, Pl = plus.getBoundingClientRect().right;
+                    L.style.translate = Math.round((innerWidth + Pl - (al - g - w) - bl) / 2) + 'px 0';
+                    r = im.getBoundingClientRect(); lr = L.getBoundingClientRect();
+                  }
                 }
                 nt.classList.remove('qn-low'); nt.style.width = w + 'px'; nt.style.left = (right ? r.right - lr.left + g : r.left - lr.left - w - g) + 'px'; nt.style.top = (r.bottom - lr.top - nt.offsetHeight) + 'px';
               }

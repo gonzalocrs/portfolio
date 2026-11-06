@@ -4,7 +4,7 @@ Geometry is his, read from the sheet's PDF (points, y down); the redraw only fix
 nothing clipped by the frame, one hairline for every block, equal gaps between the steps, one shared top line,
 a calmer palette that keeps his colour coding, no words, no dashed frame.
 
-    python3 tools/diagrams/east5th_underspecificity.py   ->  public/img/social-sanctuary/underspecificity{,-no-townhouse}.svg
+    python3 tools/diagrams/east5th_underspecificity.py   ->  public/img/social-sanctuary/underspecificity.svg
 """
 import os
 
@@ -118,6 +118,9 @@ def build(steps, path, gap=58, pad=14):
 
 if __name__ == '__main__':
     out = os.path.join(os.path.dirname(__file__), '..', '..', 'public', 'img', 'social-sanctuary')
+    import sys
+    # on the site without the townhouse step (his call, 2026-11-06: "the iteration with the townhouse is not working");
+    # --townhouse writes the five-step version beside it
     s = [step1(), step2(), step3(), step4(), step5()]
-    build(s, os.path.join(out, 'underspecificity.svg'))
-    build(s[1:], os.path.join(out, 'underspecificity-no-townhouse.svg'))
+    build(s[1:], os.path.join(out, 'underspecificity.svg'))
+    if '--townhouse' in sys.argv: build(s, os.path.join(out, 'underspecificity-townhouse.svg'))

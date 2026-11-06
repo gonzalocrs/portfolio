@@ -471,7 +471,9 @@
   function buildQuietProject(slug, startAt){
     var p = P[slug], all = pictures(slug);
     if(WALK !== 'off'){
-      (p.notes || []).forEach(function(t, i){ if(all[i] && t) all[i].note = t; });
+      // a note is a string (beside the picture, left), or {text, side: 'right'} for one on the picture's right (East 5th's
+      // references slide, his ask 2026-11-06)
+      (p.notes || []).forEach(function(t, i){ if(!all[i] || !t) return; if(typeof t === 'object'){ all[i].note = t.text; all[i].noteSide = t.side; } else all[i].note = t; });
     }
     var n = Math.max(1, all.length);
     var i0 = SLUGS.indexOf(slug); CUR = slug;
@@ -704,7 +706,7 @@
     }
     function placeCue(){
       if(!cue) return;
-      var r = picRect(), rem = parseFloat(getComputedStyle(document.documentElement).fontSize), x = (r.left + r.right) / 2, y = r.bottom + 1.5 * rem;
+      var r = picRect(), rem = parseFloat(getComputedStyle(document.documentElement).fontSize), x = (r.left + r.right) / 2, y = r.bottom + (curIm && curIm.isConnected ? parseFloat(curIm.style.marginBottom) || 0 : 0) + 1.5 * rem;   // under a phone note too (the note sits in the picture's bottom margin)
       if(innerWidth <= 700){ var t = wrap.querySelector('.qt-ticks'), tt = t ? t.getBoundingClientRect().top : innerHeight - 90; y = Math.min(y, tt - 22); }
       else y = Math.min(y, innerHeight - 1.8 * rem);
       cue.style.left = Math.round(x) + 'px'; cue.style.top = Math.round(y) + 'px';
@@ -756,10 +758,13 @@
               if(!low){
                 if(im.style.marginBottom){ im.style.marginBottom = ''; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
                 // short of room: first a narrower column, then the picture steps right (never past the window's edge)
+                var right = it.noteSide === 'right';
+                // on the right: the room is up to the window's edge, and the picture steps left if short (never into the index)
+                if(right) room = innerWidth - rem - r.right;
                 if(room < w + g) w = Math.max(7.5 * rem, room - g);
-                var push = Math.min(w + g - room, innerWidth - rem - r.right);
-                if(push > 0){ L.style.translate = ((parseFloat(L.style.translate) || 0) + push) + 'px 0'; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
-                nt.classList.remove('qn-low'); nt.style.width = w + 'px'; nt.style.left = (r.left - lr.left - w - g) + 'px'; nt.style.top = (r.bottom - lr.top - nt.offsetHeight) + 'px';
+                var push = right ? -Math.min(w + g - room, r.left - Math.max(me.getBoundingClientRect().right + 2 * rem, 0)) : Math.min(w + g - room, innerWidth - rem - r.right);
+                if(right ? push < 0 : push > 0){ L.style.translate = ((parseFloat(L.style.translate) || 0) + push) + 'px 0'; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
+                nt.classList.remove('qn-low'); nt.style.width = w + 'px'; nt.style.left = (right ? r.right - lr.left + g : r.left - lr.left - w - g) + 'px'; nt.style.top = (r.bottom - lr.top - nt.offsetHeight) + 'px';
               }
               else {
                 // phone: the picture and its note centred together as one block, the note under it

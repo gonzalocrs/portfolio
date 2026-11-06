@@ -104,9 +104,9 @@ window.PROJECTS = {
       {src: "img/social-sanctuary/render-stairs.jpg", caption: "Stairs"},
         // his diagram1.pdf as it is (black ground, no crop; tenement-diagram.webp alone), with Constant's map and Pask's
         // diagram under the diagram, inside the black box (option A, his pick, 2026-11-06; no separate slide);
-        // no effects; the diagram recoloured in his PDF to the project's palette (his call, 2026-11-06: "copper, etc."):
-        // copper rooms, brick living, pale concrete kitchens, verdigris baths, ochre shared, brass meeting circle,
-        // warm grey lines. Note on the right (notes below)
+        // no effects; the diagram recoloured in his PDF to the colours of Joint's hero (his call, 2026-11-06): copper
+        // tints for rooms, living and shared, the hero's cool glass greys for kitchens, baths and the corridor, pale grey
+        // lines. Note on the right (notes below)
       {src: "img/social-sanctuary/tenement-diagram-references.webp", drawing: true, caption: "Co-op tenement, underspecificity diagram, Constant and Pask references"},
       {src: "img/social-sanctuary/plan-first-floor.png", drawing: true, caption: "First floor plan"},
       {src: "img/social-sanctuary/plan-fourth-floor.png", drawing: true, caption: "Fourth floor plan"},

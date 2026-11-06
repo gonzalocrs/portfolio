@@ -84,8 +84,15 @@ window.PROJECTS = {
   "the-outermost-dock": {
     title: "Outer Dock", group: "Unbuilt", hue: 200,
     kicker: "New York, 2026",
-    credits: [["Site", ""], ["Studio", "Columbia GSAPP"], ["Program", "Architecture as reciprocal infrastructure"], ["Critic", ""], ["Year", "2026"]],
-    diagram: {}
+    // his words, from his project sheet (2026-11-06)
+    text: [
+      "The site is Napeague Harbor on Long Island’s south fork, where Victor D’Amico anchored a WWII Navy barge in 1960 and converted it into a teaching studio for painters. For more than sixty years the barge has hosted artists each summer, but the surrounding real estate has priced out the very teachers the barge was built for.",
+      "The project proposes a dry dock around the Art Barge, a temporary architectural apparatus that holds the barge, shelters it, and provides the missing housing for the artists who arrive each summer. The barge tends to the artists, the artists tend to the barge, the dock tends to both."
+    ],
+    credits: [["Site", "Napeague Harbor, New York"], ["Studio", "Columbia GSAPP"], ["Program", "Reciprocal Infrastructure"], ["Critic", "Robert Marino"], ["Year", "2026"]],
+    // his sketch sheet (2026-11-06), the only picture so far, with a quiet "In preparation" beside it (his ask)
+    diagram: {src: "img/the-outermost-dock/sketch.jpg"},
+    notes: [{text: "In preparation", side: "right"}]
   },
   "social-sanctuary": {
     title: "East 5th", group: "Unbuilt", hue: 42,

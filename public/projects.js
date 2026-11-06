@@ -108,9 +108,6 @@ window.PROJECTS = {
         // copper rooms, brick living, pale concrete kitchens, verdigris baths, ochre shared, brass meeting circle,
         // warm grey lines. Note on the right (notes below)
       {src: "img/social-sanctuary/tenement-diagram-references.webp", drawing: true, caption: "Co-op tenement, underspecificity diagram, Constant and Pask references"},
-        // the site plan from his sheet, words and the three massing iterations taken off (his call, 2026-11-06; the
-        // underspecificity diagram page was dropped); set smaller inside a white margin (his ask); replaced by his vector site plan PDF, whole page, uncropped (his ask, 2026-11-06)
-      {src: "img/social-sanctuary/site-plan.png", drawing: true, caption: "Site plan"},
       {src: "img/social-sanctuary/plan-first-floor.png", drawing: true, caption: "First floor plan"},
       {src: "img/social-sanctuary/plan-fourth-floor.png", drawing: true, caption: "Fourth floor plan"},
       {src: "img/social-sanctuary/plan-typical-floor.png", drawing: true, caption: "Typical floor plan"},

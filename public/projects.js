@@ -299,13 +299,13 @@ window.PROJECTS = {
     // his text (2026-11-06 ~2:45am NY), word for word; it replaced the Geometry & Scaffolds paragraph
     text: [
       "Living Assemble is a modular kit based on regular polygons. Its pieces can form Platonic solids or be taken apart and recombined into unexpected patterns and spatial arrangements. Each assembly opens up another possibility.",
-      "The kit brings my engineering background into a more intuitive, hands-on process. Through building and rebuilding, I test geometric rules while following discoveries made along the way. These experiments become a way to explore living architecture: how simple connections and repeated parts can create structures that adapt and change, drawing on both the precision of engineering and the complexity of natural systems.",
+      "Through hands-on experimentation, the kit connects geometric precision with intuitive discovery. Building and rebuilding reveal how simple connections and repeated parts can create adaptable structures. These experiments explore living architecture through the relationship between engineered order and the complexity of natural systems.",
       "In preparation."   // his earlier ask (2026-11-06), kept
     ],
     // captions this time (his ask, 2026-11-06): his own sentences from the text, word for word, beside each picture as on Joint
     notes: [
       "Its pieces can form Platonic solids or be taken apart and recombined into unexpected patterns and spatial arrangements.",
-      "Through building and rebuilding, I test geometric rules while following discoveries made along the way.",
+      "Building and rebuilding reveal how simple connections and repeated parts can create adaptable structures.",
       "Living Assemble is a modular kit based on regular polygons."
     ],
     credits: [["Studio", "ADR 2, Columbia GSAPP"], ["Type", "Modular Systems"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2025"]],

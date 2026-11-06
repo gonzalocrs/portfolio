@@ -93,12 +93,11 @@ window.PROJECTS = {
     // his sketch sheet (2026-11-06), the only picture so far, with a quiet "In preparation" beside it (his ask)
     diagram: {src: "img/the-outermost-dock/diagram-2.jpg"},
     notes: [{text: "In preparation", side: "right"}],
-    // his site plan and east-west elevation (scale label taken off, cropped to the drawing) and model photo, 2026-11-06
+    // his elevation (scale label taken off, cropped to the drawing), 2026-11-06; the site plan and model photo he sent
+    // with it were taken off again at his ask the same night
     inOrder: true,
     grid: [
-      {src: "img/the-outermost-dock/site-plan.webp", drawing: true, caption: "Site plan, Napeague Harbor"},
-      {src: "img/the-outermost-dock/elevation.webp", drawing: true, caption: "Elevation"},
-      {src: "img/the-outermost-dock/model.jpg", caption: "Model"}
+      {src: "img/the-outermost-dock/elevation.webp", drawing: true, caption: "Elevation"}
     ]
   },
   "social-sanctuary": {

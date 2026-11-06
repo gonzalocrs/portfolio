@@ -43,6 +43,9 @@ window.PROJECTS = {
     diagram: {src: "img/sierra-hotel/exploded-diagram.jpg", caption: "Exploded axonometric"},
     hero: "img/sierra-hotel/hero.jpg",
     home: ["img/sierra-hotel/elevation.svg", "img/sierra-hotel/floor-plans.svg"],
+    // the order of the pictures (his numbering, 2026-11-06): elevation, street render, exploded axonometric, floor plans,
+    // the facade against the sky, the tiles
+    order: ["img/sierra-hotel/elevation.svg", "img/sierra-hotel/render-facade.jpg", "img/sierra-hotel/exploded-diagram.jpg", "img/sierra-hotel/floor-plans.svg", "img/sierra-hotel/hero.jpg", "img/sierra-hotel/photo-1.jpg"],
     heroPosition: "center",
     heroPositionPhone: "78% center",   // where a phone-shaped crop of the hero looks (the building is on the right)
     // all the pictures in one grid after the text, (see project.js: grid)

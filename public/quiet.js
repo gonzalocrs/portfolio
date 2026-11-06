@@ -32,6 +32,12 @@
         out.push({src: s, drawing: dr, sheet: it.sheet, sheetSrc: it.sheetSrc, fitAs: it.fitAs, kind: dr ? 'drawing' : /\/physical\//.test(s) ? 'physical' : 'photo', caption: it.caption || ''});
       });
     });
+    // order: the pictures' order set by hand, hero and diagram included (Sierra Hotel, his numbering 2026-11-06); any
+    // picture not listed keeps its place after the listed ones
+    if(p.order){
+      var rank = p.order.map(web);
+      out.sort(function(a, b){ var i = rank.indexOf(a.src), j = rank.indexOf(b.src); return (i < 0 ? 99 : i) - (j < 0 ? 99 : j); });
+    }
     return out;
   }
   function coverOf(slug){ var p = P[slug], all = pictures(slug); return all.length ? (p.cover ? {src: p.cover} : all[0]) : null; }

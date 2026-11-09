@@ -674,6 +674,7 @@
     function toggle(on){
       on = on == null ? !isOpen() : on;
       autoW = false;   // set again by the last picture when it opened them itself
+      setTimeout(placeX2, 1100);   // INDEX follows the first mark if the lines moved
       if(on && bOn) flip(false);   // the words belong to side A
       if(on === isOpen()) return;
       st.style.setProperty('--ny', nameY() + 'px');

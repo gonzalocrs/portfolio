@@ -693,7 +693,7 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
    centered vertically to the logo"); Index only its chevron, with room round it for a thumb */
 @media (max-width:700px){
   .qt-ticks .qk.qa{top:var(--ab-top,32px);padding:.4rem 0;transform:translateY(-50%)}
-  .qt-ticks .qk.qa span{font-family:'Archivo',sans-serif;font-size:10px;font-weight:300;line-height:1;letter-spacing:.3em;margin-right:-.3em;text-transform:uppercase;color:var(--ink)}
+  .qt-ticks .qk.qa span{font-family:'Archivo',sans-serif;font-size:10px;font-weight:300;line-height:1;letter-spacing:.3em;margin-right:-.3em;text-transform:none;color:var(--ink)}   /* "About": capital first letter only (his fifth note) */
   /* the word goes, the chevron stays exactly where it was (his note: "you didn't have to move the position of the chevron") */
   .qt-ticks .qp-x span{visibility:hidden}
 }

@@ -627,3 +627,6 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 /* INDEX and the tags in the same type as the place and year ("NEW YORK, 2026", .k), not a type of their own (his note,
    2026-11-09: "make the index match this font, it can't be just random") */
 .qp-x{font-family:var(--mono);font-size:.66rem;font-weight:400;letter-spacing:.05em;text-transform:uppercase}
+/* INDEX in the home's "Scroll" type instead (his note, 2026-11-09: "for index use the same font as this") */
+.qp-x{font-family:inherit;font-size:.68rem;font-weight:400;letter-spacing:.06em;text-transform:none;color:var(--mute)}
+.qp-x:hover{color:var(--ink)}

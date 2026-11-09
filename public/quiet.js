@@ -1242,7 +1242,9 @@
     // then (same day: "that back is terrible. my friend uses ... an index button"): "INDEX" with a hooked return arrow, small
     // spaced capitals in full ink, as on his friend's site. &ix=col (default: a step above the first mark) | top (top right,
     // level with the name)
-    ix.innerHTML = '<svg viewBox="0 0 9 10" width="9" height="10"><path d="M8 9.5V3.5H1.5M4 1L1.5 3.5 4 6"/></svg><span>Index</span>';
+    // its mark: the pictures' chevron turned to point left (his note, 2026-11-09: "change the line of Index to match the
+    // chevron"), same size and line
+    ix.innerHTML = '<svg class="ix-chev" viewBox="0 0 8 16" width="8" height="16"><path d="M7 1L1 8l6 7"/></svg><span>Index</span>';
     var IX = Q.get('ix'); try{ if(IX) sessionStorage.setItem('gc-ix', IX); IX = sessionStorage.getItem('gc-ix') || IX; }catch(e){}
     if(IX === 'top') ix.classList.add('qp-x-top');
     // how the other names show (his note, 2026-11-09: "i don't like those titles showing there. make two iterations"):
@@ -1257,7 +1259,7 @@
     function placeX(){
       var k = nav.querySelector('.qk'), rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
       var o = ix.offsetParent;
-      if(k && o) ix.style.top = Math.round(k.getBoundingClientRect().top - o.getBoundingClientRect().top - 2.2 * rem) + 'px';
+      if(k && o) ix.style.top = Math.round(k.getBoundingClientRect().top - o.getBoundingClientRect().top - 3 * rem) + 'px';   // a little more room (his note, 2026-11-09)
     }
     function followX(ms){
       var end = performance.now() + ms;

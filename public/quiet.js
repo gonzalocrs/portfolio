@@ -664,6 +664,7 @@
     on(window, 'resize', function(){ if(D === 'beside' && isOpen()) placeBeside(); if(D === 'under' && isOpen()) placeUnder(); });
     function toggle(on){
       on = on == null ? !isOpen() : on;
+      autoW = false;   // set again by the last picture when it opened them itself
       if(on && bOn) flip(false);   // the words belong to side A
       if(on === isOpen()) return;
       st.style.setProperty('--ny', nameY() + 'px');
@@ -892,7 +893,15 @@
       // pictures change; past the last picture it leads into all the pictures (gone there only if a project has no side B)
       if(cue) cue.classList.toggle('off', k === n - 1 && !bBtn);
       syncUp();
+      // the words come up by themselves with the last picture (his ask, 2026-11-09: "the description pops with the last
+      // image in each project"), and go again on the way back if they came by themselves; once the + or Esc has been used
+      // they're left as set. Not on a phone, where the words are a card over the picture
+      if(innerWidth > 700){
+        if(k === n - 1 && n > 1 && !isOpen()){ clearTimeout(autoT); autoT = setTimeout(function(){ if(at === n - 1 && !bOn && !isOpen()){ toggle(true); autoW = true; } }, first ? 900 : 450); }
+        else if(k < n - 1){ clearTimeout(autoT); if(autoW && isOpen()) toggle(false); autoW = false; }
+      }
     }
+    var autoW = false, autoT = 0;
     // side B (trial ?back=): all the pictures at once
     var sideB = null, bOn = false, bBtn = null, bTurn = 0, nameEl0 = me.querySelector('span');
     if(BACK !== 'off' && all.length > 1){

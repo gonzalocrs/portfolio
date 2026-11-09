@@ -33,73 +33,6 @@
   Drop image files into public/img/<slug>/ and reference them here.
 */
 window.PROJECTS = {
-  "sierra-hotel": {
-    title: "Sierra Hotel", group: "Built", hue: 18,
-    kicker: "Cusco, 2023",
-    ready: true,
-    text: [
-      "This project transformed an existing structural shell into a hotel, requiring a complete redesign of the interior layout and façade. As my first non-residential project, it gave me the opportunity to explore how architecture could shape a guest’s experience while working within the constraints of an existing structure.",
-      "Materiality became a central focus of the design, connecting the hotel to Cusco’s architectural character. The façade is organized into three elements: base, body, and crown. The base draws on the city’s rustic textures, while the body reinterprets the same warm palette through a contemporary, restrained composition. At the rooftop, natural materials and floor-to-ceiling glazing frame the surrounding mountains, making the landscape part of the guest experience."
-    ],
-    credits: [["Studio", "Urba Inmobiliaria"], ["Program", "Hospitality in Peru"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2023"]],
-    diagram: {src: "img/sierra-hotel/exploded-diagram.jpg", caption: "Exploded axonometric"},
-    hero: "img/sierra-hotel/hero.jpg",
-    home: ["img/sierra-hotel/elevation.svg", "img/sierra-hotel/floor-plans.svg"],
-    // the order of the pictures (his numbering, 2026-11-06): elevation, street render, exploded axonometric, floor plans,
-    // the facade against the sky, the tiles
-    order: ["img/sierra-hotel/elevation.svg", "img/sierra-hotel/render-facade.jpg", "img/sierra-hotel/exploded-diagram.jpg", "img/sierra-hotel/floor-plans.svg", "img/sierra-hotel/hero.jpg", "img/sierra-hotel/photo-1.jpg"],
-    heroPosition: "center",
-    heroPositionPhone: "78% center",   // where a phone-shaped crop of the hero looks (the building is on the right)
-    // all the pictures in one grid after the text, (see project.js: grid)
-    grid: [
-      {src: "img/sierra-hotel/render-facade.jpg", size: "xl"},
-      {src: "img/sierra-hotel/exploded-diagram.jpg", size: "tower", drawing: true, fill: true, caption: "Exploded axonometric"},
-      {src: "img/sierra-hotel/elevation.svg", size: "half", drawing: true, caption: "Front elevation"},
-      {src: "img/sierra-hotel/floor-plans.svg", size: "wide", drawing: true, caption: "Floor plans"},
-      {src: "img/sierra-hotel/photo-1.jpg", size: "half"}
-    ],
-    gallery: {
-      photosLayout: "grid",
-      drawings: [
-        {src: "img/sierra-hotel/facade.webp", caption: "Facade"},
-        {src: "img/sierra-hotel/floor-plans-3.webp", caption: "Floor plans"}
-      ],
-      photos: [
-        {src: "img/sierra-hotel/photo-1.jpg", caption: ""},
-        {src: "img/sierra-hotel/render-facade.jpg", caption: ""}
-      ]
-    }
-  },
-  "edificio-murano": {
-    title: "Edificio Murano", group: "Built", hue: 210,
-    kicker: "Cusco, 2021",
-    credits: [["Studio", "Urba Inmobiliaria"], ["Program", "Housing in Peru"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2021"]],
-    diagram: {}
-  },
-  "urba-branding": {
-    notFirst: true,   // never the project a visit opens on (his ask, 2026-11-06)
-    title: "Urba Inmobiliaria", group: "Built", hue: 96,
-    kicker: "Lima, 2020",
-    // his text (2026-11-06), word for word
-    text: [
-      "Urba began with a desire to contribute to a more thoughtful way of building in the city. I believe each project carries a responsibility to the people who will inhabit it, the neighborhood around it, and the places and resources already there. That responsibility starts with listening, understanding the context, and asking what a project can give back.",
-      "The name reflects an interest in the city as a shared place, shaped over time by many hands. My hope is for Urba to bring design, engineering, and development into closer conversation, creating spaces that meet everyday needs, make careful use of resources, and offer lasting value. It is an ambition to grow with the city, learning from its communities and helping build places where more people can feel they belong."
-    ],
-    credits: [["Program", "Brand design"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2020"]],   // Studio Cirkel dropped, Program from Brand identity (his ask, 2026-11-06)
-    // his brand pages (portfolio spreads 13-16 + brand manual 27/29/31, 2026-11-06), words taken off: visuals only
-    // every drawing at half its usual size (his ask, 2026-11-06): scale .5; the wordmark's file carries its own margin
-    inOrder: true,
-    // his note for the step-by-step isotype (2026-11-06), word for word, beside the pictures as on Joint: one paragraph each beside the posters, the step-by-step and the Ur mark (his ask)
-    notes: ["", "Urba’s mark reflects a city that is always evolving. Its shifting letterforms trace a process of forming ideas, building, and adapting to changing needs.", "While sketching variations of the name, I found that the relationship between the drawings mattered more than any single version. That discovery became the basis of the identity: a form that remains recognizable while allowing for change."],   // the Ur mark's note ("The mark expresses a principle...") taken off at his ask
-    grid: [
-      {src: "img/urba-branding/wordmark-tagline-2.png", drawing: true, caption: "Wordmark: Creamos espacios, construimos comunidad"},
-      {src: "img/urba-branding/posters.png", drawing: true, scale: .5, caption: "Isotype in the three colours"},
-      {src: "img/urba-branding/isotype-steps.png", drawing: true, scale: .5, caption: "Isotype, step by step"},
-      // his Ur mark (logo_black_white-100.jpg, 2026-11-06) with the note's last paragraph; trimmed, shown smaller (scale .3) so it sits at the size of the other half-size drawings
-      {src: "img/urba-branding/ur-mark.png", drawing: true, scale: .3, caption: "Ur mark", link: {href: "https://urba.pe", text: "urba.pe"}}
-    ]
-  },
-
   "the-outermost-dock": {
     title: "Outer Dock", group: "Unbuilt", hue: 200,
     kicker: "New York, 2026",
@@ -320,6 +253,73 @@ window.PROJECTS = {
       {src: "img/modular-living-architecture/cuboctahedron.webp", drawing: true, caption: "Truncated cuboctahedron, net and assembly"},
       {src: "img/modular-living-architecture/hexagon-tiling.webp", drawing: true, caption: "Hexagon tiling"},
       {src: "img/modular-living-architecture/sheet-3.webp", drawing: true, caption: "Ring and connector parts"}
+    ]
+  },
+  // Built at the bottom of the index (his ask, 2026-11-09)
+  "sierra-hotel": {
+    title: "Sierra Hotel", group: "Built", hue: 18,
+    kicker: "Cusco, 2023",
+    ready: true,
+    text: [
+      "This project transformed an existing structural shell into a hotel, requiring a complete redesign of the interior layout and façade. As my first non-residential project, it gave me the opportunity to explore how architecture could shape a guest’s experience while working within the constraints of an existing structure.",
+      "Materiality became a central focus of the design, connecting the hotel to Cusco’s architectural character. The façade is organized into three elements: base, body, and crown. The base draws on the city’s rustic textures, while the body reinterprets the same warm palette through a contemporary, restrained composition. At the rooftop, natural materials and floor-to-ceiling glazing frame the surrounding mountains, making the landscape part of the guest experience."
+    ],
+    credits: [["Studio", "Urba Inmobiliaria"], ["Program", "Hospitality in Peru"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2023"]],
+    diagram: {src: "img/sierra-hotel/exploded-diagram.jpg", caption: "Exploded axonometric"},
+    hero: "img/sierra-hotel/hero.jpg",
+    home: ["img/sierra-hotel/elevation.svg", "img/sierra-hotel/floor-plans.svg"],
+    // the order of the pictures (his numbering, 2026-11-06): elevation, street render, exploded axonometric, floor plans,
+    // the facade against the sky, the tiles
+    order: ["img/sierra-hotel/elevation.svg", "img/sierra-hotel/render-facade.jpg", "img/sierra-hotel/exploded-diagram.jpg", "img/sierra-hotel/floor-plans.svg", "img/sierra-hotel/hero.jpg", "img/sierra-hotel/photo-1.jpg"],
+    heroPosition: "center",
+    heroPositionPhone: "78% center",   // where a phone-shaped crop of the hero looks (the building is on the right)
+    // all the pictures in one grid after the text, (see project.js: grid)
+    grid: [
+      {src: "img/sierra-hotel/render-facade.jpg", size: "xl"},
+      {src: "img/sierra-hotel/exploded-diagram.jpg", size: "tower", drawing: true, fill: true, caption: "Exploded axonometric"},
+      {src: "img/sierra-hotel/elevation.svg", size: "half", drawing: true, caption: "Front elevation"},
+      {src: "img/sierra-hotel/floor-plans.svg", size: "wide", drawing: true, caption: "Floor plans"},
+      {src: "img/sierra-hotel/photo-1.jpg", size: "half"}
+    ],
+    gallery: {
+      photosLayout: "grid",
+      drawings: [
+        {src: "img/sierra-hotel/facade.webp", caption: "Facade"},
+        {src: "img/sierra-hotel/floor-plans-3.webp", caption: "Floor plans"}
+      ],
+      photos: [
+        {src: "img/sierra-hotel/photo-1.jpg", caption: ""},
+        {src: "img/sierra-hotel/render-facade.jpg", caption: ""}
+      ]
+    }
+  },
+  "edificio-murano": {
+    title: "Edificio Murano", group: "Built", hue: 210,
+    kicker: "Cusco, 2021",
+    credits: [["Studio", "Urba Inmobiliaria"], ["Program", "Housing in Peru"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2021"]],
+    diagram: {}
+  },
+  "urba-branding": {
+    notFirst: true,   // never the project a visit opens on (his ask, 2026-11-06)
+    title: "Urba Inmobiliaria", group: "Built", hue: 96,
+    kicker: "Lima, 2020",
+    // his text (2026-11-06), word for word
+    text: [
+      "Urba began with a desire to contribute to a more thoughtful way of building in the city. I believe each project carries a responsibility to the people who will inhabit it, the neighborhood around it, and the places and resources already there. That responsibility starts with listening, understanding the context, and asking what a project can give back.",
+      "The name reflects an interest in the city as a shared place, shaped over time by many hands. My hope is for Urba to bring design, engineering, and development into closer conversation, creating spaces that meet everyday needs, make careful use of resources, and offer lasting value. It is an ambition to grow with the city, learning from its communities and helping build places where more people can feel they belong."
+    ],
+    credits: [["Program", "Brand design"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2020"]],   // Studio Cirkel dropped, Program from Brand identity (his ask, 2026-11-06)
+    // his brand pages (portfolio spreads 13-16 + brand manual 27/29/31, 2026-11-06), words taken off: visuals only
+    // every drawing at half its usual size (his ask, 2026-11-06): scale .5; the wordmark's file carries its own margin
+    inOrder: true,
+    // his note for the step-by-step isotype (2026-11-06), word for word, beside the pictures as on Joint: one paragraph each beside the posters, the step-by-step and the Ur mark (his ask)
+    notes: ["", "Urba’s mark reflects a city that is always evolving. Its shifting letterforms trace a process of forming ideas, building, and adapting to changing needs.", "While sketching variations of the name, I found that the relationship between the drawings mattered more than any single version. That discovery became the basis of the identity: a form that remains recognizable while allowing for change."],   // the Ur mark's note ("The mark expresses a principle...") taken off at his ask
+    grid: [
+      {src: "img/urba-branding/wordmark-tagline-2.png", drawing: true, caption: "Wordmark: Creamos espacios, construimos comunidad"},
+      {src: "img/urba-branding/posters.png", drawing: true, scale: .5, caption: "Isotype in the three colours"},
+      {src: "img/urba-branding/isotype-steps.png", drawing: true, scale: .5, caption: "Isotype, step by step"},
+      // his Ur mark (logo_black_white-100.jpg, 2026-11-06) with the note's last paragraph; trimmed, shown smaller (scale .3) so it sits at the size of the other half-size drawings
+      {src: "img/urba-branding/ur-mark.png", drawing: true, scale: .3, caption: "Ur mark", link: {href: "https://urba.pe", text: "urba.pe"}}
     ]
   }
 };

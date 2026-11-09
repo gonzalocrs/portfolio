@@ -422,8 +422,9 @@
     });
     // a small prompt so a first visit knows the home moves by scrolling (his ask, 2026-11-09): "Scroll" ("Swipe" on a
     // phone) over the drifting chevron of the project pages, at the foot of the picture field; it comes in once the first
-    // picture has opened and goes for good (this visit) at the first step; a click on it is a step
-    var hint = null, hinted = false; try { hinted = !!sessionStorage.getItem('gc-scrolled'); } catch(e){}
+    // picture has opened and goes at the first step; it comes back each time the home does, coming back from a project
+    // too (his note, 2026-11-09: "the scroll message should appear after you return"); a click on it is a step
+    var hint = null, hinted = false;
     function hintIn(){
       if(hinted || hint) return;
       hint = el('button', 'qcue qcue-home', wrap); hint.type = 'button'; hint.setAttribute('aria-label', 'Next picture');
@@ -440,7 +441,7 @@
       hint.style.left = Math.round((r.left + r.right) / 2) + 'px'; hint.style.top = Math.round(y) + 'px';
     }
     function hintOut(){
-      hinted = true; try { sessionStorage.setItem('gc-scrolled', '1'); } catch(e){}
+      hinted = true;
       if(!hint) return; var h = hint; hint = null; h.classList.add('off'); setTimeout(function(){ h.remove(); }, 600);
     }
     on(window, 'resize', placeHint);
@@ -1164,38 +1165,33 @@
       var rem = parseFloat(getComputedStyle(document.documentElement).fontSize), m = document.querySelector('.gv-mark');
       return Math.max(m ? m.getBoundingClientRect().right : 0, plus.getBoundingClientRect().right) + 2 * rem;
     }
-    // the way out, made visible (trial, his ask 2026-11-09: "you can tap here to get out of a project but it's not very
-    // intuitive ... keeping it minimalistic"), &out= on a project (kept for the visit):
-    //   tag     over the empty index column a small "Back" rides beside the cursor
-    //   cursor  over the empty index column the cursor turns into a thin left arrow
-    //   mark    a small thin left arrow always under the name; the empty column darkens it, a click on it goes back
-    //   off     as live
+    // the way out, always in view (trial, his ask 2026-11-09: the empty-column click "is not very intuitive ... keeping it
+    // minimalistic"; then "it should be something that works even without pointing the cursor and prompts you to go back
+    // to the main menu"): a small "<- Index" that goes back to the home. &out= (kept for the visit):
+    //   foot   at the foot of the index column, level with the marks' left edge
+    //   head   under the name
+    //   close  a thin x in the top right corner
+    //   off    as live
+    // on a phone every version sits in the top right corner, level with the name
     var OUT = Q.get('out');
     try{ if(OUT) sessionStorage.setItem('gc-out', OUT); OUT = sessionStorage.getItem('gc-out') || OUT; }catch(e){}
-    OUT = ['tag', 'cursor', 'mark', 'off'].indexOf(OUT) > -1 ? OUT : 'tag';
+    OUT = ['foot', 'head', 'close', 'off'].indexOf(OUT) > -1 ? OUT : 'foot';
     if(OUT !== 'off'){
-      document.body.classList.add('qx-' + OUT); OFF.push(function(){ document.body.classList.remove('qx-' + OUT); });
-      var outTag = null, outMark = null;
-      if(OUT === 'tag'){ outTag = el('div', 'qout-tag', document.body); OFF.push(function(){ outTag.remove(); }); outTag.innerHTML = '<svg viewBox="0 0 12 8" width="12" height="8"><path d="M11.5 4H1M4 1L1 4l3 3"/></svg><span>Back</span>'; }
-      if(OUT === 'mark'){
-        outMark = el('button', 'qout-mark', document.body); OFF.push(function(){ outMark.remove(); }); outMark.type = 'button'; outMark.setAttribute('aria-label', 'Back to the home');
-        outMark.innerHTML = '<svg viewBox="0 0 20 8" width="20" height="8"><path d="M19.5 4H1M4 1L1 4l3 3"/></svg>';
-        outMark.addEventListener('click', function(e){ e.stopPropagation(); goHome(slug); });
-        var placeMark = function(){ var g = document.querySelector('.gv-mark'), r = g && g.getBoundingClientRect(); if(!r) return; outMark.style.left = Math.round(r.left) + 'px'; outMark.style.top = Math.round(r.bottom + 14) + 'px'; };
-        placeMark(); on(window, 'resize', placeMark); if(document.fonts && document.fonts.ready) document.fonts.ready.then(placeMark);
-      }
-      // the same test as the click that goes back (above): left of the column's edge, on nothing that takes a click itself
-      var inZone = function(e){
-        if(innerWidth <= 700 || bOn || (isOpen() && D === 'float')) return false;
-        if(e.clientX > indexEdge() || e.clientY < 0) return false;
-        return !e.target.closest('a, button, img, .plate, input, textarea, select, label, .qp-card, .qk, .gv-mark');
+      var outB = el('a', 'qout qout-' + OUT, document.body); outB.href = '/'; outB.setAttribute('aria-label', 'Back to the index');
+      outB.innerHTML = OUT === 'close' ? '<svg viewBox="0 0 12 12" width="12" height="12"><path d="M1 1l10 10M11 1L1 11"/></svg>'
+        : '<svg viewBox="0 0 12 8" width="12" height="8"><path d="M11.5 4H1M4 1L1 4l3 3"/></svg><span>Index</span>';
+      outB.addEventListener('click', function(e){ if(e.metaKey || e.ctrlKey || e.shiftKey || e.button) return; e.preventDefault(); e.stopPropagation(); goHome(slug); });
+      OFF.push(function(){ outB.remove(); });
+      var placeOut = function(){
+        var g = document.querySelector('.gv-mark'), r = g && g.getBoundingClientRect(), rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+        if(!r) return;
+        outB.style.left = outB.style.top = outB.style.right = outB.style.bottom = '';
+        if(innerWidth <= 700 || OUT === 'close'){ outB.style.right = Math.round(r.left) + 'px'; outB.style.top = Math.round(r.top + r.height / 2) + 'px'; outB.classList.add('mid'); return; }
+        outB.classList.remove('mid');
+        if(OUT === 'head'){ outB.style.left = Math.round(r.left) + 'px'; outB.style.top = Math.round(r.bottom + 1.1 * rem) + 'px'; }
+        else { outB.style.left = Math.round(r.left) + 'px'; outB.style.bottom = Math.round(r.top) + 'px'; }
       };
-      on(document, 'mousemove', function(e){
-        var z = inZone(e); document.body.classList.toggle('q-bz', z);
-        if(outTag && z){ outTag.style.transform = 'translate(' + Math.round(e.clientX + 14) + 'px,' + Math.round(e.clientY + 12) + 'px)'; }
-      });
-      on(document, 'mouseleave', function(){ document.body.classList.remove('q-bz'); });
-      OFF.push(function(){ document.body.classList.remove('q-bz'); });
+      placeOut(); on(window, 'resize', placeOut); if(document.fonts && document.fonts.ready) document.fonts.ready.then(placeOut);
     }
     on(window, 'wheel', function(e){
       if(card.contains(e.target) && card.scrollHeight > card.clientHeight) return;

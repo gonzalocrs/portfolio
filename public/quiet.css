@@ -661,6 +661,6 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 }
 /* &gend=none (trial 2026-11-09): no chevrons on the gallery */
 .qgend-none.qb-show .qcue{opacity:0!important;pointer-events:none!important}
-/* with &gend=none and &gend=loop (his note, 2026-11-09: "for both remove the faint titles when hovering inside a project.
-   just the index would do"): over the column the other names stay hidden; a name shows only on its own mark */
-.qp.qgend-none:not(.open) .qt-ticks.qz .qk:not(.cur):not(.qa) span,.qp.qgend-loop:not(.open) .qt-ticks.qz .qk:not(.cur):not(.qa) span{opacity:0}
+/* inside a project, back to only the pointed mark's name (his note, 2026-11-09: "i still see the faint word ... just put
+   back the previous version when only the title showed when hovering"): no faint names over the column, whatever the trial */
+.qp:not(.open) .qt-ticks .qk:not(.cur):not(.qa):not(:hover) span{opacity:0!important}

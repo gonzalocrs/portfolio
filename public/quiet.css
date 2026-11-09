@@ -650,9 +650,14 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 .qab-li:hover{color:var(--ink)}
 .qab-li.tbc{cursor:default}
 /* the mark way smaller with only the email and LinkedIn (his note, 2026-11-09); "Click to copy" shows on hover */
-.qab-links .qab-mark{width:6rem}
-@media (max-width:700px){ .qab-links .qab-mark{width:5rem} }
-.qab-links .qab-reach{margin-top:1.6rem}
+.qab-links .qab-mark{width:7.8rem}   /* 30% up from 6rem (his note: "not that small, make it 30% bigger") */
+@media (max-width:700px){ .qab-links .qab-mark{width:6.5rem} .qab-links .qab-reach{margin-top:1.6rem} }
+/* beside the mark (his sketch, 2026-11-09): the email level with the right-hand stitch, just outside the ring (the ring's
+   radius is .35 of the mark), LinkedIn under it on the same left edge; the mark stays centred where it was */
+@media (min-width:701px){
+  .qab-links .qab-reach{position:absolute;left:calc(50% + 7.8rem * .35 + 1.6rem);top:50%;margin:0;display:block;transform:translateY(-50%)}
+  .qab-links .qab-li{position:absolute;left:0;top:calc(100% + .7rem)}
+}
 .qab-mailrow:hover .qab-copied{opacity:1}
 /* the ring alone (2026-11-09); on the About page itself About stays as everywhere else, not bold (his note) */
 .qk.qa i.qa-logo svg{width:11px;height:11px}

@@ -522,8 +522,9 @@
     if(WALK !== 'off'){
       // a note is a string (beside the picture, left), or {text, side: 'right'} for one on the picture's right (East 5th's
       // references slide, his ask 2026-11-06)
-      // never on the opening picture (his note, 2026-11-09: "the starting image here shouldn't have a foot note")
-      (p.notes || []).forEach(function(t, i){ if(!i || !all[i] || !t) return; if(typeof t === 'object'){ all[i].note = t.text; all[i].noteSide = t.side; } else all[i].note = t; });
+      // never on the opening picture (his note, 2026-11-09: "the starting image here shouldn't have a foot note"), unless
+      // the project says firstNote: true (Joint and Open Assembly, his ask the same night: "bring back the note in this two")
+      (p.notes || []).forEach(function(t, i){ if((!i && !p.firstNote) || !all[i] || !t) return; if(typeof t === 'object'){ all[i].note = t.text; all[i].noteSide = t.side; } else all[i].note = t; });
     }
     var n = Math.max(1, all.length);
     var i0 = SLUGS.indexOf(slug); CUR = slug;

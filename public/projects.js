@@ -30,6 +30,7 @@
     hidden    true: the project is off the site (not in the index; its page goes to the home)
     order     optional: the pictures' order by hand, hero and diagram included, e.g. ["img/x/a.jpg", ...]
     hide      optional: pictures kept in the lists but not shown, e.g. ["img/x/b.jpg"]
+    firstNote optional: true lets the opening picture carry its note (otherwise notes[0] is never shown)
     notFirst  true: the home never opens a visit on this project (it still comes up as you scroll)
 
   Drop image files into public/img/<slug>/ and reference them here.
@@ -114,6 +115,7 @@ window.PROJECTS = {
     ]
   },
   "permanent-impermanence": {
+    firstNote: true,   // the opening picture keeps its note (his ask, 2026-11-09)
     title: "Joint", group: "Unbuilt", hue: 330, dark: true,
     kicker: "New York, 2025",
     hero: "img/permanent-impermanence/perspective.jpg",
@@ -278,6 +280,7 @@ window.PROJECTS = {
     ]
   },
   "modular-living-architecture": {
+    firstNote: true,   // the opening picture keeps its note (his ask, 2026-11-09)
     notFirst: true,   // never the project a visit opens on (his ask, 2026-11-06)
     title: "Open Assembly", group: "Research", hue: 120,
     kicker: "New York, 2025",

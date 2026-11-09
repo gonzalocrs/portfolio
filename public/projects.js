@@ -153,24 +153,22 @@ window.PROJECTS = {
     notes: [
       "Developing Curvature investigates the architectural potential of flat plywood: how the geometry of individual pieces can generate a surface of double curvature.",
       "The shell develops through the orientation, edges, and connections of planar elements, bringing material constraints directly into the production of form.",
+      "",
       "The study explores how changes in panel orientation generate structural depth, linking the shell’s geometric character to its potential stiffness.",
-      "Through making, the project pursues an economy of means in which construction, performance, and architectural expression develop together.",
+      "Physical models serve as the primary design tool, allowing the surface to be assessed through its assembly, thickness, and spatial presence.",
       "The resulting geometry holds together two scales of expression: the precise articulation of individual panels and the continuity of the larger shell.",
       "",
       "",
       "",
-      "",
-      "Physical models serve as the primary design tool, allowing the surface to be assessed through its assembly, thickness, and spatial presence.",
-      "",
-      "",
-      "This investigation opens a further direction: integrating insulation with the plywood skin so that thermal and structural functions might operate within one material system."
+      "This investigation opens a further direction: integrating insulation with the plywood skin so that thermal and structural functions might operate within one material system.",
+      ""
     ],
-    // his order (his numbers on the gallery sheet, 2026-11-09); the notes above moved with their pictures. The three he
-    // had taken off are back at the end for him to place (his ask, same night), IMG_9909 with its note
-    order: ["img/anticlastic-roof-structure/hero.jpg", "img/anticlastic-roof-structure/hand-drawing.jpg", "img/anticlastic-roof-structure/section.png", "img/anticlastic-roof-structure/physical/web/IMG_9921.jpg",
-      "img/anticlastic-roof-structure/elevation.png", "img/anticlastic-roof-structure/physical/web/IMG_9760.jpg", "img/anticlastic-roof-structure/plan.png", "img/anticlastic-roof-structure/physical/web/IMG_9801.jpg",
-      "img/anticlastic-roof-structure/physical/web/IMG_9872.jpg", "img/anticlastic-roof-structure/physical/web/IMG_9768.jpg",
-      "img/anticlastic-roof-structure/physical/web/IMG_9868.jpg", "img/anticlastic-roof-structure/physical/web/IMG_9865-Edit.jpg", "img/anticlastic-roof-structure/physical/web/IMG_9909-Edit.jpg"],
+    // his order (his second numbering on the gallery sheet, 2026-11-09 ~3:35am NY); the notes above moved with their
+    // pictures. IMG_9921 and IMG_9865 crossed out (hidden below); "Through making, the project pursues..." went with IMG_9921
+    order: ["img/anticlastic-roof-structure/hero.jpg", "img/anticlastic-roof-structure/hand-drawing.jpg", "img/anticlastic-roof-structure/physical/web/IMG_9868.jpg", "img/anticlastic-roof-structure/section.png",
+      "img/anticlastic-roof-structure/physical/web/IMG_9768.jpg", "img/anticlastic-roof-structure/elevation.png", "img/anticlastic-roof-structure/physical/web/IMG_9760.jpg", "img/anticlastic-roof-structure/plan.png",
+      "img/anticlastic-roof-structure/physical/web/IMG_9801.jpg", "img/anticlastic-roof-structure/physical/web/IMG_9909-Edit.jpg", "img/anticlastic-roof-structure/physical/web/IMG_9872.jpg"],
+    hide: ["img/anticlastic-roof-structure/physical/web/IMG_9921.jpg", "img/anticlastic-roof-structure/physical/web/IMG_9865-Edit.jpg"],
     kicker: "New York, 2026",
     text: [
       "Developing Curvature investigates the architectural potential of flat plywood: how the geometry of individual pieces can generate a surface of double curvature. The shell develops through the orientation, edges, and connections of planar elements, bringing material constraints directly into the production of form. Physical models serve as the primary design tool, allowing the surface to be assessed through its assembly, thickness, and spatial presence. The resulting geometry holds together two scales of expression: the precise articulation of individual panels and the continuity of the larger shell.",

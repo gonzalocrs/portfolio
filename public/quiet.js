@@ -681,7 +681,9 @@
       on = on == null ? !isOpen() : on;
       autoW = false;   // set again by the last picture when it opened them itself
       followX(1300);   // INDEX moves with the first mark, frame by frame, as the lines rise (his note, 2026-11-09: "there's a small delay on the index, it should move up with the title")
-      if(on && bOn) flip(false);   // the words belong to side A
+      // on the gallery the words open there too, the sheet making room beside them (his note, 2026-11-09: "even inside
+      // gallery if i click the + for description i should get it in gallery, not roll back to the previous image")
+      if(bOn) setTimeout(function(){ requestAnimationFrame(layB); }, 0);
       if(on === isOpen()) return;
       st.style.setProperty('--ny', nameY() + 'px');
       if(D === 'beside') placeBeside();
@@ -1024,6 +1026,11 @@
     // height chosen so that all the rows fit), sleeve in the largest squares that fit, crate and strip in one line
     function layB(){
       if(!sideB) return;
+      // with the words open on the gallery, the sheet starts a little past their right edge
+      if(isOpen()){
+        var rem0 = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+        sideB.style.left = Math.max(0, Math.round(card.getBoundingClientRect().right + 3 * rem0 - st.getBoundingClientRect().left)) + 'px';
+      } else sideB.style.left = '';
       var box = sideB.firstChild, F = Array.prototype.slice.call(box.children), W = sideB.clientWidth, H = sideB.clientHeight, g = Math.max(10, W * .012);
       if(!F.length) return;
       // sheet, justified (his ask 2026-11-06: "make the grid more justified"): the pictures, in order, are split into
@@ -1065,7 +1072,7 @@
           area *= Math.min.apply(null, hs) / Math.max.apply(null, hs);
           if(!best || area > best.area) best = {area: area, R: R, hs: hs, sc: sc, tot: tot};
         }
-        var sc = best.sc, bw = W * sc, x0 = (W - bw) / 2, y = yT + Math.max(0, (Hl - best.tot * sc) / 2);
+        var sc = best.sc, bw = W * sc, x0 = isOpen() ? 0 : (W - bw) / 2, y = yT + Math.max(0, (Hl - best.tot * sc) / 2);
         best.R.forEach(function(row, i){
           var rh = best.hs[i] * sc, x = x0;
           row.forEach(function(f){ var fw = f.r * rh; f.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + fw + 'px;height:' + rh + 'px'; x += fw + g * sc; });

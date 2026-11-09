@@ -674,7 +674,7 @@
     function toggle(on){
       on = on == null ? !isOpen() : on;
       autoW = false;   // set again by the last picture when it opened them itself
-      setTimeout(placeX2, 1100);   // INDEX follows the first mark if the lines moved
+      followX(1300);   // INDEX moves with the first mark, frame by frame, as the lines rise (his note, 2026-11-09: "there's a small delay on the index, it should move up with the title")
       if(on && bOn) flip(false);   // the words belong to side A
       if(on === isOpen()) return;
       st.style.setProperty('--ny', nameY() + 'px');
@@ -1227,7 +1227,12 @@
     ix.addEventListener('click', function(e){ e.stopPropagation(); goHome(slug); });
     function placeX(){
       var k = nav.querySelector('.qk'), rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-      if(k) ix.style.top = Math.round(k.offsetTop - 2.2 * rem) + 'px';
+      var o = ix.offsetParent;
+      if(k && o) ix.style.top = Math.round(k.getBoundingClientRect().top - o.getBoundingClientRect().top - 2.2 * rem) + 'px';
+    }
+    function followX(ms){
+      var end = performance.now() + ms;
+      (function f(){ placeX2(); if(performance.now() < end) requestAnimationFrame(f); })();
     }
     function placeX2(){
       if(innerWidth > 700 && IX !== 'top'){ placeX(); return; }

@@ -362,6 +362,7 @@ window.PROJECTS = {
     }
   },
   "edificio-murano": {
+    hidden: true,   // off the site for now (his ask, 2026-11-09 12:33pm NY)
     title: "Edificio Murano", group: "Built", hue: 210,
     kicker: "Cusco, 2021",
     credits: [["Studio", "Urba Inmobiliaria"], ["Program", "Housing in Peru"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2021"]],

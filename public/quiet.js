@@ -1524,6 +1524,44 @@
         // the right greyed out like we had it before"); the rest in ink. Also redraws the mark at its new size
         if(window.gcMark) [0, 1, 2].forEach(function(i){ window.gcMark.tone(i, 0); });
       };
+      // new iterations of the About (his note, 2026-11-09: "let's make new iteration of About. it does not fit the
+      // theme"): his words set like the project notes (small, grey, Archivo, no mono kicker, no black block of text).
+      // &ab=words: his words alone, one quiet column centred where a picture stands; email and LinkedIn under them.
+      // &ab=mark: the mark stands as the page's picture, his words a note beside it, bottom lines level, a drawing's gap.
+      // &ab=column: one column: his words, then a small mark with the email and LinkedIn under it.
+      // &ab=off: as it was. Kept for the visit; computers only (a phone keeps the page as it is)
+      var AB = Q.get('ab'); try{ if(AB) sessionStorage.setItem('gc-ab', AB); AB = sessionStorage.getItem('gc-ab') || AB; }catch(e){}
+      if(['words', 'mark', 'column'].indexOf(AB) > -1 && innerWidth > 700){
+        wrap.classList.add('abv', 'abv-' + AB);
+        var room = wrap.querySelector('.qab-room');
+        if(AB !== 'mark'){
+          // email and LinkedIn into the words column, under his words; the column a small mark above them
+          if(AB === 'column'){ var mini = el('div', 'abv-mini', wd); mini.appendChild(mk); }
+          wd.appendChild(box);
+          var layW = function(){
+            mk.style.transform = ''; wd.style.transform = '';
+            if(AB === 'column'){ mk.style.width = '3.2rem'; }
+            // the column centred in the room right of the index, as a picture is (Joint's spacing)
+            var w = wd.getBoundingClientRect(), nm = document.querySelector('.gv-mark'), nr = nm ? nm.getBoundingClientRect() : {left: 40, right: 270};
+            var want = nr.right + (innerWidth - nr.left - nr.right - w.width) / 2;
+            wd.style.transform = 'translateX(' + Math.round(want - w.left) + 'px)';
+            if(window.gcMark) [0, 1, 2].forEach(function(i){ window.gcMark.tone(i, 0); });
+          };
+          layW(); addEventListener('resize', layW); if(document.fonts) document.fonts.ready.then(layW);
+          return;
+        }
+        // mark: the mark as the picture, centred in the room; his words a note to its left, their last line level with
+        // the ring's lowest point, 6rem from it (a drawing's gap); the email and LinkedIn by the stitches as before
+        var layM = function(){
+          lay();
+          var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16, S = mk.offsetWidth;
+          wd.style.transform = '';
+          var m = mk.getBoundingClientRect(), r = .35 * m.width, cx = m.left + m.width / 2, cy = m.top + m.height / 2, w = wd.getBoundingClientRect();
+          wd.style.transform = 'translate(' + Math.round(cx - r - 6 * rem - w.right) + 'px,' + Math.round(cy + r - w.bottom) + 'px)';
+        };
+        layM(); addEventListener('resize', layM); if(document.fonts) document.fonts.ready.then(layM);
+        return;
+      }
       lay(); addEventListener('resize', lay); if(document.fonts) document.fonts.ready.then(lay);
       return;
     }

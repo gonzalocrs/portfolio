@@ -710,3 +710,28 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
   .qp-x span{opacity:0;transition:opacity .35s ease}
   .qp-x.qx-near span,.qp-x:hover span,.qp-x:focus-visible span{opacity:1}
 }
+/* About, new iterations (?ab=words|mark|column, his note 2026-11-09: "it does not fit the theme"): his words in the notes' type */
+@media (min-width:701px){
+  .qab.abv .qab-words{width:22rem;align-self:center;overflow:visible;max-height:none}
+  .qab.abv .qab-words .k{margin:0 0 .9rem;font:400 .8rem/1.5 var(--font);letter-spacing:0;text-transform:none;color:var(--mute)}
+  .qab.abv .qab-words h1{margin:0 0 .35rem;font-size:.8rem;line-height:1.5;font-weight:800;letter-spacing:0}
+  .qab.abv .qab-words .med{margin:0 0 .9rem;font:400 .8rem/1.5 var(--font);color:var(--ink)}
+  .qab.abv .qab-words .text{font:400 .8rem/1.5 var(--font);color:var(--mute)}
+  .qab.abv:not(.abv-mark) .qab-reach{position:static;margin-top:1.6rem;display:flex;flex-direction:column;gap:.15rem}
+  .qab.abv:not(.abv-mark) .qab-reach .qab-mailrow,.qab.abv:not(.abv-mark) .qab-reach .qab-li{position:static;transform:none}
+  .qab.abv .qab-reach a{font:400 .8rem/1.5 var(--font)}
+  .qab.abv-words .qab-side,.qab.abv-column .qab-side{display:none}
+  .qab.abv-words .qab-room,.qab.abv-column .qab-room{display:block;height:100%}
+  .qab.abv-words .qab-words,.qab.abv-column .qab-words{position:absolute;left:0;top:50%;translate:0 -50%}
+  .qab.abv-column .abv-mini{margin:1.8rem 0 0}
+  .qab.abv-column .abv-mini .qab-mark{width:3.2rem}
+  .qab.abv-column .qab-reach{margin-top:1rem}
+  .qab.abv-mark .qab-words{width:16rem;position:relative;z-index:2}
+}
+@media (min-width:701px){
+  .qab.abv:not(.abv-mark) .qab-reach{align-items:flex-start}
+  .qab.abv .qab-mail{font-weight:400;font-size:.8rem;color:var(--mute)}
+  .qab.abv .qab-mail:hover{color:var(--ink)}
+  .qab.abv .qab-li{border:0;padding:0;letter-spacing:0;font-size:.8rem}
+  .qab.abv-mark .qab-mailrow,.qab.abv-mark .qab-li{position:absolute}
+}

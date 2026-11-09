@@ -1024,13 +1024,12 @@
     }
     // the pictures laid out to fit the stage: sheet in even rows (one height per row, every row the full width, the
     // height chosen so that all the rows fit), sleeve in the largest squares that fit, crate and strip in one line
-    function layB(){
+    function layB(pass){
       if(!sideB) return;
-      // with the words open on the gallery, the sheet starts a little past their right edge
-      if(isOpen()){
-        var rem0 = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-        sideB.style.left = Math.max(0, Math.round(card.getBoundingClientRect().right + 3 * rem0 - st.getBoundingClientRect().left)) + 'px';
-      } else sideB.style.left = '';
+      // with the words open on the gallery the sheet stays exactly where it is if it already clears them (his note,
+      // 2026-11-09: "if it has the space it should stay as it is"); only otherwise does it start a little past their right
+      // edge (a second pass, below)
+      if(pass !== 'room') sideB.style.left = '';
       var box = sideB.firstChild, F = Array.prototype.slice.call(box.children), W = sideB.clientWidth, H = sideB.clientHeight, g = Math.max(10, W * .012);
       if(!F.length) return;
       // sheet, justified (his ask 2026-11-06: "make the grid more justified"): the pictures, in order, are split into
@@ -1072,12 +1071,16 @@
           area *= Math.min.apply(null, hs) / Math.max.apply(null, hs);
           if(!best || area > best.area) best = {area: area, R: R, hs: hs, sc: sc, tot: tot};
         }
-        var sc = best.sc, bw = W * sc, x0 = isOpen() ? 0 : (W - bw) / 2, y = yT + Math.max(0, (Hl - best.tot * sc) / 2);
+        var sc = best.sc, bw = W * sc, x0 = (W - bw) / 2, y = yT + Math.max(0, (Hl - best.tot * sc) / 2);
         best.R.forEach(function(row, i){
           var rh = best.hs[i] * sc, x = x0;
           row.forEach(function(f){ var fw = f.r * rh; f.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + fw + 'px;height:' + rh + 'px'; x += fw + g * sc; });
           y += rh + g * sc;
         });
+        if(isOpen() && pass !== 'room'){
+          var rem0 = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16, need = card.getBoundingClientRect().right + 3 * rem0;
+          if(sideB.getBoundingClientRect().left + x0 < need){ sideB.style.left = Math.max(0, Math.round(need - st.getBoundingClientRect().left)) + 'px'; layB('room'); return; }
+        }
       } else if(BACK === 'sleeve'){
         var n2 = F.length, bestS = 0, bc = 1, lab = 22; W -= 2;
         for(var c = 1; c <= n2; c++){ var r2 = Math.ceil(n2 / c), sz = Math.min((W - g * (c - 1)) / c, (H * .94 - (g + lab) * r2) / r2); if(sz > bestS){ bestS = sz; bc = c; } }

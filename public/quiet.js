@@ -1531,6 +1531,7 @@
       // &ab=column: one column: his words, then a small mark with the email and LinkedIn under it.
       // &ab=off: as it was. Kept for the visit; computers only (a phone keeps the page as it is)
       var AB = Q.get('ab'); try{ if(AB) sessionStorage.setItem('gc-ab', AB); AB = sessionStorage.getItem('gc-ab') || AB; }catch(e){}
+      AB = AB || 'words';   // his pick (2026-11-09 12:48pm NY: "keep this."): A, his words alone; ?ab=off for the old page
       if(['words', 'mark', 'column'].indexOf(AB) > -1 && innerWidth > 700){
         wrap.classList.add('abv', 'abv-' + AB);
         var room = wrap.querySelector('.qab-room');

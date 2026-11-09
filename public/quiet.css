@@ -633,7 +633,8 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 /* About in the INDEX button's type (his note, 2026-11-09: "make the about match the Index font"); on the About page
    itself it stays the bold title */
 @media (min-width:701px){
-  .qk.qa:not(.cur) span{font-family:inherit;font-size:.68rem;font-weight:400;letter-spacing:.06em;text-transform:none;color:var(--mute)}
-  .qk.qa:not(.cur) i{font-size:.72rem;color:var(--mute)}
-  .qk.qa:not(.cur):hover span,.qk.qa:not(.cur):hover i{color:var(--ink)}
+  /* then (same night: "make about look like the faint title but not faint"): the faint names' type, in full ink */
+  .qk.qa:not(.cur) span{font-family:inherit;font-size:.8rem;font-weight:300;letter-spacing:0;text-transform:none;color:var(--ink);margin-left:.47rem}   /* starts where the names start */
+  .qk.qa:not(.cur) i{font-size:.72rem;color:var(--ink)}
+  .qk.qa:not(.cur):hover span,.qk.qa:not(.cur):hover i{color:var(--mute)}
 }

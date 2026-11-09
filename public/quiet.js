@@ -1649,6 +1649,11 @@
     V = V || 'col';
     if(['top', 'foot', 'name', 'col'].indexOf(V) === -1) return;
     document.documentElement.classList.add('abp', 'abp-' + V);
+    // About's type under the marks (trials, his note 2026-11-09 6:52pm NY: "do some more iteration, change the font. change
+    // more things. it does not fit"): &abs=title (the project names' bold, grey), note (the notes' small grey), logo (the
+    // name's light spaced capitals), ring (a small ring as its mark, the word only on hover, as the projects' names)
+    var A = Q.get('abs'); try{ if(A) sessionStorage.setItem('gc-abs', A); A = sessionStorage.getItem('gc-abs') || A; }catch(e){}
+    if(V === 'col' && ['title', 'note', 'logo', 'ring'].indexOf(A) > -1) document.documentElement.classList.add('abs', 'abs-' + A);
     var set = function(){
       var g = document.querySelector('.gv-mark'), r = g && g.getBoundingClientRect(); if(!r || !r.height) return;
       var d = document.documentElement.style;

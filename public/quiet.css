@@ -752,3 +752,25 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
   .abp .qt-ticks .qk.qa:hover span{color:var(--mute)}
   .abp .qt-ticks .qk.qa.cur span{color:var(--ink);font-weight:400}
 }
+/* About's type under the marks (trials ?abs=title|note|logo|ring, his note 2026-11-09 6:52pm NY) */
+@media (min-width:701px){
+  .abs .qt-ticks .qk.qa{align-items:center}
+  .abs .qt-ticks .qk.qa i{color:var(--faint);transition:color .25s}
+  .abs .qt-ticks .qk.qa:hover i{color:var(--ink)}
+  .abs-title .qt-ticks .qk.qa span{font:800 clamp(1rem,1.2vw,1.15rem)/1 var(--font);letter-spacing:-.02em;text-transform:none;color:var(--faint)}
+  .abs-title .qt-ticks .qk.qa i{font:300 1rem/1 var(--font)}
+  .abs-note .qt-ticks .qk.qa span{font:400 .8rem/1 var(--font);letter-spacing:0;text-transform:none;color:var(--mute)}
+  .abs-note .qt-ticks .qk.qa i{font:400 .8rem/1 var(--font)}
+  .abs-logo .qt-ticks .qk.qa span{font:300 14px/1 'Archivo',sans-serif;letter-spacing:.42em;margin-right:-.42em;text-transform:uppercase;color:var(--ink)}
+  .abs-logo .qt-ticks .qk.qa i{font:300 14px/1 'Archivo',sans-serif}
+  .abs-title .qt-ticks .qk.qa:hover span,.abs-note .qt-ticks .qk.qa:hover span,.abs-logo .qt-ticks .qk.qa:hover span{color:var(--ink)}
+  .abs-title .qt-ticks .qk.qa.cur span{color:var(--ink);font-weight:800}
+  .abs-ring .qt-ticks .qk.qa i{font-size:0;width:7px;height:7px;border:1px solid var(--faint);border-radius:50%;background:none;margin-left:1px}
+  .abs-ring .qt-ticks .qk.qa:hover i,.abs-ring .qt-ticks .qk.qa.cur i{border-color:var(--ink)}
+  .abs-ring .qt-ticks .qk.qa span{font:800 clamp(1rem,1.2vw,1.15rem)/1 var(--font);letter-spacing:-.02em;text-transform:none;color:var(--ink);opacity:0;transform:translateX(-.35rem);transition:opacity .4s ease,transform .4s ease}
+  .abs-ring .qt-ticks .qk.qa:hover span,.abs-ring .qt-ticks .qk.qa.cur span{opacity:1;transform:none}
+}
+@media (min-width:701px){
+  .abs-ring .qt-ticks .qk.qa:hover span,.abs-ring .qt-ticks .qk.qa.cur span,.abs-title .qt-ticks .qk.qa:hover span{color:var(--ink);font-weight:800}
+  .abs-note .qt-ticks .qk.qa:hover span,.abs-note .qt-ticks .qk.qa.cur span{font-weight:400}
+}

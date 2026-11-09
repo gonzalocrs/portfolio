@@ -603,3 +603,15 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
   .qp.qnm-index:not(.open) .qt-ticks:hover .qk:not(.cur):not(.qa):hover span{opacity:1;transform:none}
   .qp.qnm-index.ix-on:not(.open) .qt-ticks .qk:not(.cur):not(.qa) span{opacity:.32;transform:none}
 }
+/* the name pointed at lines up with the open project's name: its mark lies flat at the open mark's length (his note,
+   2026-11-09: "it should be the same length as lean shells to not make it confusing") */
+@media (min-width:701px){
+  .qp.qnm-thin .qt-ticks .qk:not(.cur):not(.qa):hover i{width:3rem;transform:none}
+  /* the home, the same index (his ask, same day): over the column every name thin and faint, the current one as it is,
+     the one pointed at in ink on a flat mark as long as the current one */
+  body.qh-one.qb-names-thin .qt-ticks .qk:not(.cur):not(.qa) span{font-size:.8rem;font-weight:300;letter-spacing:0}
+  body.qh-one.qb-names-thin .qt-ticks:hover .qk:not(.cur):not(.qa) span{opacity:.22;transform:none}
+  body.qh-one.qb-names-thin .qt-ticks:hover .qk:not(.cur):not(.qa):hover span{opacity:1}
+  body.qh-one.qb-names-thin .qt-ticks:hover .qk.cur:not(:hover) span{opacity:1}
+  body.qh-one.qb-names-thin .qt-ticks .qk:not(.cur):not(.qa):hover i{width:3rem;transform:none}
+}

@@ -88,6 +88,10 @@
   // grey ground, so white drawings read as sheets laid on it; ?tone=white back to white. Kept for the visit
   var TONE = Q.get('tone'); try{ if(TONE) sessionStorage.setItem('gc-tone', TONE); TONE = sessionStorage.getItem('gc-tone') || TONE; }catch(e){}
   if(TONE === 'grey') document.body.classList.add('q-grey');
+  // the other names on the home too (his ask, 2026-11-09: "then make an iteration in the home page"): body class from
+  // the same &names= as the project pages (thin by default)
+  var NAMES0 = Q.get('names'); try{ if(NAMES0) sessionStorage.setItem('gc-names', NAMES0); NAMES0 = sessionStorage.getItem('gc-names') || NAMES0; }catch(e){}
+  document.body.classList.add('qb-names-' + (['thin', 'index', 'full'].indexOf(NAMES0) > -1 ? NAMES0 : 'thin'));
   function quietHref(s, i){ return 'project.html?p=' + s + (i ? '&i=' + i : ''); }
   // going into a project from a picture on the home (test, 2026-10-26): the page doesn't reload. The picture lifts off
   // the home and glides to its place in the project while the home fades away and the project fades in around it; the

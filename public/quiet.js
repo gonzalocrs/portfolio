@@ -1366,6 +1366,21 @@
       });
       var li = el('a', 'qab-li', box, 'LinkedIn');
       if(LINKEDIN){ li.href = LINKEDIN; li.target = '_blank'; li.rel = 'noopener'; } else li.classList.add('tbc');
+      // his sketch (2026-11-09, "something like this"): a larger mark, the email beside its top-right stitch and LinkedIn
+      // beside its bottom-right one, each the same step out from the ring (as the topics stood before); the whole group
+      // centred in the space. On a phone they stack under the mark
+      var mk = wrap.querySelector('.qab-mark'), sd = wrap.querySelector('.qab-side');
+      var lay = function(){
+        mk.style.transform = ''; [row, li].forEach(function(e){ e.style.left = e.style.top = ''; });
+        if(innerWidth <= 700) return;
+        var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16, S = mk.offsetWidth, r = .35 * S, a = r * Math.SQRT1_2, g = 2.2 * rem;
+        var cx0 = mk.offsetLeft + S / 2, cy = mk.offsetTop + S / 2, tw = Math.max(row.offsetWidth, li.offsetWidth);
+        var shift = Math.round(-(a + g + tw - r) / 2), cx = cx0 + shift;
+        mk.style.transform = 'translateX(' + shift + 'px)';
+        row.style.left = Math.round(cx + a + g) + 'px'; row.style.top = Math.round(cy - a - row.offsetHeight / 2) + 'px';
+        li.style.left = Math.round(cx + a + g) + 'px'; li.style.top = Math.round(cy + a - li.offsetHeight / 2) + 'px';
+      };
+      lay(); addEventListener('resize', lay); if(document.fonts) document.fonts.ready.then(lay);
       return;
     }
     var touch = document.getElementById('touch'), lock = 0;

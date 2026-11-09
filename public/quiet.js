@@ -1145,6 +1145,9 @@
       e.stopPropagation();
       // clicking on past the last picture comes round to the first, and back past the first to the last (his ask,
       // 2026-10-29); scrolling still stops at the ends. Back on the picture's left part (or left of it), on elsewhere
+      // a project with a single picture: a tap on it opens the words (his ask, 2026-11-09, Outer Dock: "at the first scroll
+      // or tap it should show the description"); so does the first scroll or swipe on, and scrolling back closes them
+      if(n === 1){ toggle(true); return; }
       var r = picRect() || st.getBoundingClientRect(); go((at + (e.clientX < r.left + r.width * .35 ? -1 : 1) + n) % n);
     });
     on(document, 'click', function(e){
@@ -1176,17 +1179,20 @@
       var now = Date.now(); if(now - lock < 750) return; lock = now;
       // on past the last picture, the record turns over to side B
       if(d > 0 && at === n - 1 && bBtn){ flip(true); return; }
+      if(n === 1){ toggle(d > 0); return; }
       go(at + (d > 0 ? 1 : -1));
     }, {passive: false});
     on(window, 'keydown', function(e){
       if(bOn && /^Arrow/.test(e.key)){ if(e.key === 'ArrowUp') flip(false); e.preventDefault(); return; }
-      if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){ go(at + 1); e.preventDefault(); }
+      if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){ if(n === 1) toggle(true); else go(at + 1); e.preventDefault(); }
       if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ go(at - 1); e.preventDefault(); }
       if(e.key === 'Escape'){ if(bOn) flip(false); else if(isOpen()) toggle(false); else goHome(slug); }
     });
-    var sx = null;
-    st.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; }, {passive: true});
-    st.addEventListener('touchend', function(e){ if(sx == null) return; var dx = e.changedTouches[0].clientX - sx; sx = null; if(bOn){ if(BACK === 'crate' || BACK === 'strip') slide(-dx * 2); return; } if(Math.abs(dx) > 40) go(at + (dx < 0 ? 1 : -1)); }, {passive: true});
+    var sx = null, sy0 = 0;
+    st.addEventListener('touchstart', function(e){ sx = e.touches[0].clientX; sy0 = e.touches[0].clientY; }, {passive: true});
+    st.addEventListener('touchend', function(e){ if(sx == null) return; var dx = e.changedTouches[0].clientX - sx; sx = null;
+      if(n === 1){ var dy = e.changedTouches[0].clientY - sy0, dd = Math.abs(dy) > Math.abs(dx) ? dy : dx; if(Math.abs(dd) > 40) toggle(dd < 0); return; }
+      if(bOn){ if(BACK === 'crate' || BACK === 'strip') slide(-dx * 2); return; } if(Math.abs(dx) > 40) go(at + (dx < 0 ? 1 : -1)); }, {passive: true});
     var start = Q.get('i'); go(startAt != null ? Math.min(n - 1, startAt) : start === 'last' ? n - 1 : Math.max(0, Math.min(n - 1, (parseInt(start, 10) || 1) - 1)));
   }
 

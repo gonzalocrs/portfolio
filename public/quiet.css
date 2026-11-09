@@ -634,3 +634,4 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
    2026-11-09: "make the index match this font, it can't be just random") */
 .qp-x,.qtag{font-family:var(--mono);font-size:.66rem;font-weight:400;letter-spacing:.05em;text-transform:uppercase}
 .qtag{gap:1rem}
+.qp-card .meta .k.qp-tags{margin-top:-.9rem;white-space:pre}   /* the tags line, just under the place and year */

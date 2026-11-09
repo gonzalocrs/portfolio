@@ -562,6 +562,8 @@
     var HOV = (Q.get('hov') || 'top').toLowerCase(); wrap.classList.add('hv-' + (HOV === 'none' ? 'none' : 'top'));
     var card = el('aside', 'qp-card', st), meta = el('div', 'meta', card);
     el('span', 'k', meta, p.kicker || '');
+    // the project's tags, under the place and year in the same type (his ask, 2026-11-09; first tried over the picture)
+    if(p.tags && p.tags.length) el('span', 'k qp-tags', meta, [p.group].concat(p.tags).join('   '));
     var cr = el('div', 'cr', meta);
     (p.credits || []).forEach(function(r){ if(r[0] === 'Year' || !r[1]) return; var c = el('p', '', cr); el('b', '', c, r[0]); c.appendChild(document.createTextNode('  ' + r[1])); });
     var tx = el('div', 'tx', card);
@@ -786,7 +788,7 @@
     // tags over the picture (his ask, 2026-11-09: "add tags for each project", after his friend's EXHIBIT / ARCHITECTURE /
     // 2025 line): the project's group in ink, then its tags and year in grey, small spaced capitals, standing on the
     // picture's top left corner and moving with it. Tags come from the project's tags: [...] in projects.js
-    var tagEl = el('div', 'qtag', wrap);
+    var tagEl = el('div', 'qtag', wrap); tagEl.style.display = 'none';   // moved into the words (2026-11-09)
     (function(){
       var yr = (p.kicker || '').match(/(\d{4})\s*$/), bits = [p.group].concat(p.tags || []).concat(yr ? [yr[1]] : []);
       bits.forEach(function(b, i){ el('span', i ? '' : 'qtag-lead', tagEl, b); });

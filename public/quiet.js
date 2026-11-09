@@ -1376,7 +1376,7 @@
     // &contact=links (default) | form (the topics and fields, as before). Kept for the visit
     var CONTACT = Q.get('contact'); try{ if(CONTACT) sessionStorage.setItem('gc-contact', CONTACT); CONTACT = sessionStorage.getItem('gc-contact') || CONTACT; }catch(e){}
     if(CONTACT !== 'form'){
-      var EMAIL = 'gc3139@columbia.edu', LINKEDIN = '';   // LINKEDIN: his profile address, still to come
+      var EMAIL = 'gc3139@columbia.edu', LINKEDIN = 'https://www.linkedin.com/in/gonzalocrs/';
       wrap.classList.add('qab-links');
       var box = el('div', 'qab-reach', wrap.querySelector('.qab-side'));
       var row = el('div', 'qab-mailrow', box), mail = el('a', 'qab-mail', row, EMAIL), said = el('span', 'qab-copied', row, 'Click to copy');   // 'Click to copy' on hover, 'Copied' once clicked (his note, 2026-11-09)

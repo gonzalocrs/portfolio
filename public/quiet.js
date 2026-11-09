@@ -1427,7 +1427,7 @@
       var mk = wrap.querySelector('.qab-mark'), sd = wrap.querySelector('.qab-side'), wd = wrap.querySelector('.qab-words');
       var lay = function(){
         mk.style.transform = ''; mk.style.width = ''; [row, li].forEach(function(e){ e.style.left = e.style.top = ''; });
-        if(innerWidth <= 700){ if(window.gcMark) [0, 1, 2].forEach(function(i){ window.gcMark.tone(i, 1); }); return; }
+        if(innerWidth <= 700){ if(window.gcMark) [0, 1, 2].forEach(function(i){ window.gcMark.tone(i, 0); }); return; }
         var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16, g = 2.2 * rem;
         var tw = Math.max(row.offsetWidth, li.offsetWidth), W = sd.clientWidth;
         // the ring (70 of the mark's 200 units, so .7 of its width across) as tall as the words; smaller if the room is short
@@ -1435,11 +1435,19 @@
         mk.style.width = Math.round(S) + 'px';
         var r = .35 * S, cx0 = mk.offsetLeft + S / 2, cy = mk.offsetTop + S / 2, a45 = r * Math.SQRT1_2;
         var reach = Math.max(r + g + row.offsetWidth, a45 + g + li.offsetWidth);
-        var shift = Math.round(-(reach - r) / 2), cx = cx0 + shift;
+        // the group (ring + email/LinkedIn) centred between his words and the page's right margin, so the space from the
+        // words to the ring equals the space from the email to the margin (his note, 2026-11-09: "space the circle + email
+        // so the distance is the same"); the right margin matches the name's on the left
+        var mr = mk.getBoundingClientRect(), ring0 = mr.left + S / 2 - r, wR = wd.getBoundingClientRect().right;
+        var nm = document.querySelector('.qt-name, .q-name, header a, .brand'), mL = nm ? Math.max(0, nm.getBoundingClientRect().left) : 2 * rem;
+        var gw = r + reach, want = wR + (innerWidth - mL - wR - gw) / 2;
+        var shift = Math.round(want - ring0), cx = cx0 + shift;
         mk.style.transform = 'translateX(' + shift + 'px)';
         row.style.left = Math.round(cx + r + g) + 'px'; row.style.top = Math.round(cy - row.offsetHeight / 2) + 'px';
         li.style.left = Math.round(cx + a45 + g) + 'px'; li.style.top = Math.round(cy + a45 - li.offsetHeight / 2) + 'px';
-        if(window.gcMark) [0, 1, 2].forEach(function(i){ window.gcMark.tone(i, 1); });   // all its stitches in full ink, and redrawn at the new size
+        // the three right-hand stitches greyed, as on the old contact desk (his note, 2026-11-09: "make the three ticks to
+        // the right greyed out like we had it before"); the rest in ink. Also redraws the mark at its new size
+        if(window.gcMark) [0, 1, 2].forEach(function(i){ window.gcMark.tone(i, 0); });
       };
       lay(); addEventListener('resize', lay); if(document.fonts) document.fonts.ready.then(lay);
       return;

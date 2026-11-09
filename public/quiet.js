@@ -196,6 +196,8 @@
   }
   function goHome(slug){ swap('/', 'home', function(){ document.title = HOME_TITLE; buildRollOne(slug); }); }
   function goProject(s){ swap(quietHref(s), 'project', function(){ buildQuietProject(s, 0); }); }
+  // back into the previous project at its end, on its gallery (the &gend=loop trial: scrolling up from a first picture)
+  function goProjectEnd(s){ swap(quietHref(s, 'last'), 'project', function(){ buildQuietProject(s, 1e3, true); }); }
   addEventListener('popstate', function(){
     var u = new URLSearchParams(location.search), s = u.get('p');
     if(PAGE === 'about' || (Q.get('home') || Q.has('flow'))){ location.reload(); return; }
@@ -513,7 +515,7 @@
     return it.kind === 'drawing' ? 'Drawing' : it.kind === 'physical' ? 'Physical model' : 'Photograph';
   }
   addEventListener('resize', function(){ Array.prototype.forEach.call(document.querySelectorAll('.qf'), function(f){ if(f.fit) f.fit(); }); });
-  function buildQuietProject(slug, startAt){
+  function buildQuietProject(slug, startAt, toB){
     var p = P[slug], all = pictures(slug);
     if(WALK !== 'off'){
       // a note is a string (beside the picture, left), or {text, side: 'right'} for one on the picture's right (East 5th's
@@ -710,7 +712,7 @@
     }
     plus.addEventListener('click', function(e){ e.stopPropagation(); toggle(); });
     card.addEventListener('click', function(e){ e.stopPropagation(); });
-    var at = -1, lock = 0;
+    var at = -1, lock = Date.now() + 500;   // a wheel still coasting from the page before doesn't carry on through this one
     // how the page shows there is more above or below (test, 2026-10-26; the pictures go by vertically, so no side
     // arrows): &nav=
     //   chev  a thin chevron centred over the picture area (back) and one under it (on); each hides at its end
@@ -743,14 +745,17 @@
     // what comes after the gallery (trial, his ask 2026-11-09: "make two iterations. one with no chevron in gallery so i
     // force people to click index or hover over the lines. and in the other, they keep scrolling back and forth"):
     // &gend=next (on to the next project, as built earlier tonight) | none (no chevrons on the gallery; scrolling on does
-    // nothing, scrolling back still returns to the pictures) | loop (the project goes round: on past the gallery comes the
-    // first picture again, back past the first picture comes the gallery). Kept for the visit
+    // nothing, scrolling back still returns to the pictures) | loop (back and forth between projects, his correction the
+    // same night: on past the gallery comes the next project, back past a first picture comes the previous project's
+    // gallery). Kept for the visit
     var GEND = Q.get('gend'); try{ if(GEND) sessionStorage.setItem('gc-gend', GEND); GEND = sessionStorage.getItem('gc-gend') || GEND; }catch(e){}
     GEND = ['next', 'none', 'loop'].indexOf(GEND) > -1 ? GEND : 'next';
+    var PREV = SLUGS[(SLUGS.indexOf(slug) - 1 + SLUGS.length) % SLUGS.length];
+    function beforeA(){ goProjectEnd(PREV); }   // back past the first picture (loop)
     wrap.classList.add('qgend-' + GEND);
     function pastB(){   // on past the gallery
       if(GEND === 'next') goProject(NEXT);
-      else if(GEND === 'loop'){ var t0 = tileAt(0); if(t0) pick(0, t0); else { flip(false); go(0); } }
+      else if(GEND === 'loop') goProject(NEXT);
     }
     try{ if(CUE) sessionStorage.setItem('gc-cue', CUE); CUE = sessionStorage.getItem('gc-cue') || CUE; }catch(e){}
     CUE = ['word', 'line', 'chev', 'off'].indexOf(CUE) > -1 ? CUE : 'chev';   // his pick, 2026-11-05: the chevron, kept on every picture
@@ -772,7 +777,7 @@
     if(cue && CUE === 'chev'){
       cueUp = el('button', 'qcue qcue-chev qcue-up off', wrap); cueUp.type = 'button'; cueUp.setAttribute('aria-label', 'Previous picture');
       cueUp.innerHTML = '<svg viewBox="0 0 16 8" width="16" height="8"><path d="M1 7l7-6 7 6"/></svg>';
-      cueUp.addEventListener('click', function(e){ e.stopPropagation(); if(bOn){ flip(false); return; } if(at === 0 && bBtn && GEND === 'loop'){ flip(true); return; } go(at - 1); });
+      cueUp.addEventListener('click', function(e){ e.stopPropagation(); if(bOn){ flip(false); return; } if(at === 0 && GEND === 'loop'){ beforeA(); return; } go(at - 1); });
     }
     function syncUp(){ if(cueUp) cueUp.classList.toggle('off', !bOn && at <= 0 && GEND !== 'loop'); }
     // close to the picture (his note, 2026-11-06: "put both chevrons closer to the image"): the down one a short step under
@@ -1275,14 +1280,15 @@
       var now = Date.now(); if(now - lock < 750) return; lock = now;
       // on past the last picture, the record turns over to side B
       if(d > 0 && at === n - 1 && bBtn){ flip(true); return; }
-      if(d < 0 && at === 0 && bBtn && GEND === 'loop'){ flip(true); return; }   // round the other way
+      if(d < 0 && at === 0 && GEND === 'loop' && !(n === 1 && isOpen())){ beforeA(); return; }   // back into the previous project
+      if(n === 1 && d > 0 && isOpen() && GEND === 'loop'){ goProject(NEXT); return; }
       if(n === 1){ toggle(d > 0); return; }
       go(at + (d > 0 ? 1 : -1));
     }, {passive: false});
     on(window, 'keydown', function(e){
       if(bOn && /^Arrow/.test(e.key)){ if(e.key === 'ArrowUp') flip(false); else if(e.key === 'ArrowDown' && cue) pastB(); e.preventDefault(); return; }
       if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){ if(n === 1) toggle(true); else go(at + 1); e.preventDefault(); }
-      if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ if(at === 0 && bBtn && GEND === 'loop') flip(true); else go(at - 1); e.preventDefault(); }
+      if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ if(at === 0 && GEND === 'loop') beforeA(); else go(at - 1); e.preventDefault(); }
       if(e.key === 'Escape'){ if(bOn) flip(false); else if(isOpen()) toggle(false); else goHome(slug); }
     });
     var sx = null, sy0 = 0;
@@ -1291,6 +1297,7 @@
       if(n === 1){ var dy = e.changedTouches[0].clientY - sy0, dd = Math.abs(dy) > Math.abs(dx) ? dy : dx; if(Math.abs(dd) > 40) toggle(dd < 0); return; }
       if(bOn){ if(BACK === 'crate' || BACK === 'strip') slide(-dx * 2); return; } if(Math.abs(dx) > 40) go(at + (dx < 0 ? 1 : -1)); }, {passive: true});
     var start = Q.get('i'); go(startAt != null ? Math.min(n - 1, startAt) : start === 'last' ? n - 1 : Math.max(0, Math.min(n - 1, (parseInt(start, 10) || 1) - 1)));
+    if(toB && bBtn) setTimeout(function(){ if(!bOn) flip(true); }, 350);
   }
 
   // the intro. The old one (the name large in the middle, its letters flipping in like an airport board, then

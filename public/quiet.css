@@ -563,3 +563,7 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 /* a faded-out picture layer stays in place under the current one: nothing in it may take a click (its picture sat
    over the urba.pe link, 2026-11-06) */
 .p-layer:not(.on),.p-layer:not(.on) *{pointer-events:none!important}
+/* the home's scroll prompt (his ask, 2026-11-09): the word over the project pages' chevron */
+.qcue-home{flex-direction:column;gap:.45rem}
+.qcue-home span{font-size:.68rem;font-weight:400;letter-spacing:.06em}
+.qcue-home svg{fill:none;stroke:currentColor;stroke-width:1;overflow:visible;animation:qcue-drift 2.4s ease-in-out infinite}

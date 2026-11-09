@@ -390,7 +390,7 @@
       flipping = now - lastStep < 900; lastStep = now;
       document.body.classList.toggle('qo-flip', flipping);
       clearTimeout(flipT); flipT = setTimeout(function(){ flipping = false; document.body.classList.remove('qo-flip'); }, 900);
-      show(at + d, d);
+      show(at + d, d); hintOut();
       return true;
     }
     var withPics = SLUGS.filter(coverOf);
@@ -418,7 +418,32 @@
         });
       });
       show(start, 1);
+      hintIn();
     });
+    // a small prompt so a first visit knows the home moves by scrolling (his ask, 2026-11-09): "Scroll" ("Swipe" on a
+    // phone) over the drifting chevron of the project pages, at the foot of the picture field; it comes in once the first
+    // picture has opened and goes for good (this visit) at the first step; a click on it is a step
+    var hint = null, hinted = false; try { hinted = !!sessionStorage.getItem('gc-scrolled'); } catch(e){}
+    function hintIn(){
+      if(hinted || hint) return;
+      hint = el('button', 'qcue qcue-home', wrap); hint.type = 'button'; hint.setAttribute('aria-label', 'Next picture');
+      el('span', '', hint, innerWidth <= 700 ? 'Swipe' : 'Scroll');
+      hint.insertAdjacentHTML('beforeend', '<svg viewBox="0 0 16 8" width="16" height="8"><path d="M1 1l7 6 7-6"/></svg>');
+      hint.addEventListener('click', function(e){ e.stopPropagation(); step(1); });
+      placeHint(); setTimeout(function(){ if(hint) hint.classList.add('in'); }, 1600);
+    }
+    function placeHint(){
+      if(!hint) return;
+      var r = st.getBoundingClientRect(), rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16, y;
+      if(innerWidth <= 700){ var t = nav.getBoundingClientRect().top; y = (t > innerHeight * .5 ? t : innerHeight) - 2.2 * rem; }
+      else y = Math.min(r.bottom + 1.2 * rem, innerHeight - 2.2 * rem);
+      hint.style.left = Math.round((r.left + r.right) / 2) + 'px'; hint.style.top = Math.round(y) + 'px';
+    }
+    function hintOut(){
+      hinted = true; try { sessionStorage.setItem('gc-scrolled', '1'); } catch(e){}
+      if(!hint) return; var h = hint; hint = null; h.classList.add('off'); setTimeout(function(){ h.remove(); }, 600);
+    }
+    on(window, 'resize', placeHint);
     // a project's name in the index goes straight into the project (his note, 2026-10-29; it used to only show its
     // picture here): from its picture when that is the one up, otherwise with the same soft change as between projects
     marks.forEach(function(m){

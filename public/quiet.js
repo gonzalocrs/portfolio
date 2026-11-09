@@ -751,7 +751,7 @@
     // same night: on past the gallery comes the next project, back past a first picture comes the previous project's
     // gallery). Kept for the visit
     var GEND = Q.get('gend'); try{ if(GEND) sessionStorage.setItem('gc-gend', GEND); GEND = sessionStorage.getItem('gc-gend') || GEND; }catch(e){}
-    GEND = ['next', 'none', 'loop'].indexOf(GEND) > -1 ? GEND : 'next';
+    GEND = ['next', 'none', 'loop'].indexOf(GEND) > -1 ? GEND : 'none';   // his pick, 2026-11-09: stop on the gallery, out by Index
     var PREV = SLUGS[(SLUGS.indexOf(slug) - 1 + SLUGS.length) % SLUGS.length];
     function beforeA(){ goProjectEnd(PREV); }   // back past the first picture (loop)
     wrap.classList.add('qgend-' + GEND);
@@ -1391,19 +1391,27 @@
       });
       var li = el('a', 'qab-li', box, 'LinkedIn');
       if(LINKEDIN){ li.href = LINKEDIN; li.target = '_blank'; li.rel = 'noopener'; } else li.classList.add('tbc');
-      // his sketch (2026-11-09, "something like this"): a larger mark, the email beside its top-right stitch and LinkedIn
-      // beside its bottom-right one, each the same step out from the ring (as the topics stood before); the whole group
-      // centred in the space. On a phone they stack under the mark
-      var mk = wrap.querySelector('.qab-mark'), sd = wrap.querySelector('.qab-side');
+      // the mark as it was, its ring as tall as his words beside it (his note, 2026-11-09: "bring back the logo to what it
+      // was, the only difference is that we make it have the height of the text to the left ... no more get in touch ...
+      // using the font that it already has we put the email and the linkedin"): the email beside the middle stitch and
+      // LinkedIn beside the lower one, where the topics stood, in the topics' type; the group centred in the space.
+      // On a phone they stack under the mark
+      var mk = wrap.querySelector('.qab-mark'), sd = wrap.querySelector('.qab-side'), wd = wrap.querySelector('.qab-words');
       var lay = function(){
-        mk.style.transform = ''; [row, li].forEach(function(e){ e.style.left = e.style.top = ''; });
-        if(innerWidth <= 700) return;
-        var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16, S = mk.offsetWidth, r = .35 * S, a = r * Math.SQRT1_2, g = 2.2 * rem;
-        var cx0 = mk.offsetLeft + S / 2, cy = mk.offsetTop + S / 2, tw = Math.max(row.offsetWidth, li.offsetWidth);
-        var shift = Math.round(-(a + g + tw - r) / 2), cx = cx0 + shift;
+        mk.style.transform = ''; mk.style.width = ''; [row, li].forEach(function(e){ e.style.left = e.style.top = ''; });
+        if(innerWidth <= 700){ if(window.gcMark) [0, 1, 2].forEach(function(i){ window.gcMark.tone(i, 1); }); return; }
+        var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16, g = 2.2 * rem;
+        var tw = Math.max(row.offsetWidth, li.offsetWidth), W = sd.clientWidth;
+        // the ring (70 of the mark's 200 units, so .7 of its width across) as tall as the words; smaller if the room is short
+        var S = Math.min(wd.offsetHeight / .7, sd.clientHeight, (W - g - tw) / .85);
+        mk.style.width = Math.round(S) + 'px';
+        var r = .35 * S, cx0 = mk.offsetLeft + S / 2, cy = mk.offsetTop + S / 2, a45 = r * Math.SQRT1_2;
+        var reach = Math.max(r + g + row.offsetWidth, a45 + g + li.offsetWidth);
+        var shift = Math.round(-(reach - r) / 2), cx = cx0 + shift;
         mk.style.transform = 'translateX(' + shift + 'px)';
-        row.style.left = Math.round(cx + a + g) + 'px'; row.style.top = Math.round(cy - a - row.offsetHeight / 2) + 'px';
-        li.style.left = Math.round(cx + a + g) + 'px'; li.style.top = Math.round(cy + a - li.offsetHeight / 2) + 'px';
+        row.style.left = Math.round(cx + r + g) + 'px'; row.style.top = Math.round(cy - row.offsetHeight / 2) + 'px';
+        li.style.left = Math.round(cx + a45 + g) + 'px'; li.style.top = Math.round(cy + a45 - li.offsetHeight / 2) + 'px';
+        if(window.gcMark) [0, 1, 2].forEach(function(i){ window.gcMark.tone(i, 1); });   // all its stitches in full ink, and redrawn at the new size
       };
       lay(); addEventListener('resize', lay); if(document.fonts) document.fonts.ready.then(lay);
       return;

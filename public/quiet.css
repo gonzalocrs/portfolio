@@ -645,18 +645,19 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 .qab-li:hover{color:var(--ink)}
 .qab-li.tbc{cursor:default}
 /* the mark way smaller with only the email and LinkedIn (his note, 2026-11-09); "Click to copy" shows on hover */
-@media (max-width:700px){ .qab-links .qab-mark{width:6.5rem} .qab-links .qab-reach{margin-top:1.6rem} }
+@media (max-width:700px){ .qab-links .qab-reach{margin-top:1.6rem} }
 .qab-mailrow:hover .qab-copied{opacity:1}
 /* the ring alone (2026-11-09); on the About page itself About stays as everywhere else, not bold (his note) */
 .qk.qa.cur span{font-weight:300;color:var(--mute)}
 .qk.qa.cur i{color:var(--mute)}
-/* About, his sketch (2026-11-09): mark larger, email and LinkedIn beside its right-hand stitches (placed by buildAbout) */
+/* About (2026-11-09): the mark as it was, ring as tall as his words (sized by buildAbout); email and LinkedIn where the
+   topics stood, in the topics' type */
 @media (min-width:701px){
-  .qab-links .qab-mark{width:15.5rem;transition:none}
+  .qab-links .qab-mark{transition:none}
   .qab-links .qab-reach{position:absolute;inset:0;margin:0;display:block;pointer-events:none}
   .qab-links .qab-mailrow,.qab-links .qab-li{position:absolute;pointer-events:auto}
-  .qab-links .qab-mail{font-size:1.7rem;font-weight:300}
-  .qab-links .qab-li{font-size:1.7rem;font-weight:300;letter-spacing:0;color:var(--mute);border-bottom-width:1px;padding-bottom:.1rem;line-height:1.2}
+  .qab-links .qab-mail,.qab-links .qab-li{font:300 .95rem/1.2 var(--font);letter-spacing:0;color:var(--mute);border:0;padding:.2rem 0;white-space:nowrap}
+  .qab-links .qab-mail:hover,.qab-links .qab-li:hover{color:var(--ink)}
   .qab-links .qab-copied{margin-left:.9rem}
 }
 /* &gend=none (trial 2026-11-09): no chevrons on the gallery */

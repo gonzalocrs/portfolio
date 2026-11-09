@@ -1211,6 +1211,14 @@
     ix.innerHTML = '<svg viewBox="0 0 9 10" width="9" height="10"><path d="M8 9.5V3.5H1.5M4 1L1.5 3.5 4 6"/></svg><span>Index</span>';
     var IX = Q.get('ix'); try{ if(IX) sessionStorage.setItem('gc-ix', IX); IX = sessionStorage.getItem('gc-ix') || IX; }catch(e){}
     if(IX === 'top') ix.classList.add('qp-x-top');
+    // how the other names show (his note, 2026-11-09: "i don't like those titles showing there. make two iterations"):
+    // &names=thin (default: very thin and faint over the column) | index (none over the column; they show while the
+    // pointer is on INDEX) | full (as before, bold at a third)
+    var NAMES = Q.get('names'); try{ if(NAMES) sessionStorage.setItem('gc-names', NAMES); NAMES = sessionStorage.getItem('gc-names') || NAMES; }catch(e){}
+    NAMES = ['thin', 'index', 'full'].indexOf(NAMES) > -1 ? NAMES : 'thin';
+    wrap.classList.add('qnm-' + NAMES);
+    ix.addEventListener('mouseenter', function(){ wrap.classList.add('ix-on'); });
+    ix.addEventListener('mouseleave', function(){ wrap.classList.remove('ix-on'); });
     ix.addEventListener('click', function(e){ e.stopPropagation(); goHome(slug); });
     function placeX(){
       var k = nav.querySelector('.qk'), rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;

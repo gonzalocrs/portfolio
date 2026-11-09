@@ -682,3 +682,9 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
   .qt-ticks .qp-x{position:static;margin-left:auto;align-self:flex-end;padding:0 0 .05rem;top:auto;right:auto;transform:none}
   .qcue{display:none!important}
 }
+/* phone, second note (2026-11-09): About in its own type, as in the column on a computer (light, larger), not Index's
+   small spaced type; on the About page the marks and Index go to the foot of the page, after the links, not at its head */
+@media (max-width:700px){
+  .qt-ticks .qk.qa span{font-size:1.05rem;font-weight:300;letter-spacing:-.02em;color:var(--mute)}
+  .qab .qt-ticks{order:2;padding-bottom:2.4rem;margin-top:1.2rem}
+}

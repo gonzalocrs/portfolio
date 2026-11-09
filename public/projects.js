@@ -313,11 +313,11 @@ window.PROJECTS = {
     // for word (his ask, 2026-11-09: "the small tag descriptions next to the images explaining the project"); "" = none
     notes: [
       "The façade is organized into three elements: base, body, and crown.",
+      "This project transformed an existing structural shell into a hotel, requiring a complete redesign of the interior layout and façade.",
       "As my first non-residential project, it gave me the opportunity to explore how architecture could shape a guest’s experience while working within the constraints of an existing structure.",
+      "Materiality became a central focus of the design, connecting the hotel to Cusco’s architectural character.",
       "Entrance details",   // his tag for the entrance details drawing (2026-11-09)
       "",   // the entrance render after it
-      "This project transformed an existing structural shell into a hotel, requiring a complete redesign of the interior layout and façade.",
-      "Materiality became a central focus of the design, connecting the hotel to Cusco’s architectural character.",
       "The base draws on the city’s rustic textures, while the body reinterprets the same warm palette through a contemporary, restrained composition.",
       "At the rooftop, natural materials and floor-to-ceiling glazing frame the surrounding mountains, making the landscape part of the guest experience."
     ],
@@ -331,10 +331,12 @@ window.PROJECTS = {
     diagram: {src: "img/sierra-hotel/exploded-diagram.jpg", caption: "Exploded axonometric"},
     hero: "img/sierra-hotel/hero.jpg",
     home: ["img/sierra-hotel/elevation.svg", "img/sierra-hotel/floor-plans-30.webp"],
-    // the order of the pictures (his numbering, 2026-11-09; the notes above moved with their pictures): elevation, floor
-    // plans, entrance details, entrance render (his View 05, 2026-11-09), exploded axonometric, street render, the facade against the sky, the tiles. The floor
-    // plans are his new sheet (floor_plans_30.webp, 2026-11-09) in place of floor-plans.svg; the entrance details added the same night
-    order: ["img/sierra-hotel/elevation.svg", "img/sierra-hotel/floor-plans-30.webp", "img/sierra-hotel/facade-details.webp", "img/sierra-hotel/render-entrance.jpg", "img/sierra-hotel/exploded-diagram.jpg", "img/sierra-hotel/render-facade.jpg", "img/sierra-hotel/hero.jpg", "img/sierra-hotel/photo-1.jpg"],
+    // the order of the pictures (his numbering, 2026-11-09 ~3:50am NY; the notes above moved with their pictures):
+    // elevation, exploded axonometric, floor plans (his new sheet floor_plans_30.webp, in place of floor-plans.svg), street
+    // render, entrance details, entrance render (his View 05, cropped square on the metal canopy), the facade against the
+    // sky, the tiles
+    order: ["img/sierra-hotel/elevation.svg", "img/sierra-hotel/exploded-diagram.jpg", "img/sierra-hotel/floor-plans-30.webp", "img/sierra-hotel/render-facade.jpg",
+      "img/sierra-hotel/facade-details.webp", "img/sierra-hotel/render-entrance-sq.jpg", "img/sierra-hotel/hero.jpg", "img/sierra-hotel/photo-1.jpg"],
     heroPosition: "center",
     heroPositionPhone: "78% center",   // where a phone-shaped crop of the hero looks (the building is on the right)
     // all the pictures in one grid after the text, (see project.js: grid)
@@ -344,7 +346,7 @@ window.PROJECTS = {
       {src: "img/sierra-hotel/elevation.svg", size: "half", drawing: true, caption: "Front elevation"},
       {src: "img/sierra-hotel/floor-plans-30.webp", size: "wide", drawing: true, caption: "Floor plans"},
       {src: "img/sierra-hotel/facade-details.webp", drawing: true, caption: "Entrance details"},
-      {src: "img/sierra-hotel/render-entrance.jpg", caption: "Entrance"},
+      {src: "img/sierra-hotel/render-entrance-sq.jpg", caption: "Entrance"},
       {src: "img/sierra-hotel/photo-1.jpg", size: "half"}
     ],
     gallery: {

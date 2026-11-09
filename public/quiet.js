@@ -1164,6 +1164,39 @@
       var rem = parseFloat(getComputedStyle(document.documentElement).fontSize), m = document.querySelector('.gv-mark');
       return Math.max(m ? m.getBoundingClientRect().right : 0, plus.getBoundingClientRect().right) + 2 * rem;
     }
+    // the way out, made visible (trial, his ask 2026-11-09: "you can tap here to get out of a project but it's not very
+    // intuitive ... keeping it minimalistic"), &out= on a project (kept for the visit):
+    //   tag     over the empty index column a small "Back" rides beside the cursor
+    //   cursor  over the empty index column the cursor turns into a thin left arrow
+    //   mark    a small thin left arrow always under the name; the empty column darkens it, a click on it goes back
+    //   off     as live
+    var OUT = Q.get('out');
+    try{ if(OUT) sessionStorage.setItem('gc-out', OUT); OUT = sessionStorage.getItem('gc-out') || OUT; }catch(e){}
+    OUT = ['tag', 'cursor', 'mark', 'off'].indexOf(OUT) > -1 ? OUT : 'tag';
+    if(OUT !== 'off'){
+      document.body.classList.add('qx-' + OUT); OFF.push(function(){ document.body.classList.remove('qx-' + OUT); });
+      var outTag = null, outMark = null;
+      if(OUT === 'tag'){ outTag = el('div', 'qout-tag', document.body); OFF.push(function(){ outTag.remove(); }); outTag.innerHTML = '<svg viewBox="0 0 12 8" width="12" height="8"><path d="M11.5 4H1M4 1L1 4l3 3"/></svg><span>Back</span>'; }
+      if(OUT === 'mark'){
+        outMark = el('button', 'qout-mark', document.body); OFF.push(function(){ outMark.remove(); }); outMark.type = 'button'; outMark.setAttribute('aria-label', 'Back to the home');
+        outMark.innerHTML = '<svg viewBox="0 0 20 8" width="20" height="8"><path d="M19.5 4H1M4 1L1 4l3 3"/></svg>';
+        outMark.addEventListener('click', function(e){ e.stopPropagation(); goHome(slug); });
+        var placeMark = function(){ var g = document.querySelector('.gv-mark'), r = g && g.getBoundingClientRect(); if(!r) return; outMark.style.left = Math.round(r.left) + 'px'; outMark.style.top = Math.round(r.bottom + 14) + 'px'; };
+        placeMark(); on(window, 'resize', placeMark); if(document.fonts && document.fonts.ready) document.fonts.ready.then(placeMark);
+      }
+      // the same test as the click that goes back (above): left of the column's edge, on nothing that takes a click itself
+      var inZone = function(e){
+        if(innerWidth <= 700 || bOn || (isOpen() && D === 'float')) return false;
+        if(e.clientX > indexEdge() || e.clientY < 0) return false;
+        return !e.target.closest('a, button, img, .plate, input, textarea, select, label, .qp-card, .qk, .gv-mark');
+      };
+      on(document, 'mousemove', function(e){
+        var z = inZone(e); document.body.classList.toggle('q-bz', z);
+        if(outTag && z){ outTag.style.transform = 'translate(' + Math.round(e.clientX + 14) + 'px,' + Math.round(e.clientY + 12) + 'px)'; }
+      });
+      on(document, 'mouseleave', function(){ document.body.classList.remove('q-bz'); });
+      OFF.push(function(){ document.body.classList.remove('q-bz'); });
+    }
     on(window, 'wheel', function(e){
       if(card.contains(e.target) && card.scrollHeight > card.clientHeight) return;
       var d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;

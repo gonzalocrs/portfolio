@@ -746,3 +746,9 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
   .abp-foot .qt-ticks .qk.qa{bottom:var(--nm-top,24px);left:var(--nm-left,40px)}
   .abp-name .qt-ticks .qk.qa{top:calc(var(--nm-bottom,48px) + 1.1rem);left:var(--nm-left,40px)}
 }
+/* About in the old header's type (his pick 2026-11-09: "use this about"): IBM Plex Mono capitals, as ABOUT / CONTACT were */
+@media (min-width:701px){
+  .abp .qt-ticks .qk.qa span{font:400 .78rem/1 var(--mono);text-transform:uppercase;letter-spacing:.04em;color:var(--ink)}
+  .abp .qt-ticks .qk.qa:hover span{color:var(--mute)}
+  .abp .qt-ticks .qk.qa.cur span{color:var(--ink);font-weight:400}
+}

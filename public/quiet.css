@@ -574,7 +574,8 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 .qout svg{fill:none;stroke:currentColor;stroke-width:1;overflow:visible}
 .qout:hover{color:var(--ink)}
 /* the index on hover, inside a project (his ask, 2026-11-09): every name faint, the one pointed at in full, a thin x to go back */
-.qp-x{position:absolute;left:0;top:0;padding:.35rem .35rem .35rem 0;color:var(--mute);opacity:0;pointer-events:none;transition:opacity .4s ease,color .25s ease;line-height:0}
+.qp-x{position:absolute;left:0;top:0;display:flex;align-items:center;gap:.45rem;padding:.35rem .35rem .35rem 0;color:var(--mute);opacity:0;pointer-events:none;transition:opacity .4s ease,color .25s ease;line-height:1;
+  font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em}
 .qp-x svg{fill:none;stroke:currentColor;stroke-width:1;overflow:visible}
 .qp-x:hover{color:var(--ink)}
 @media (min-width:701px){
@@ -585,5 +586,7 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
   .qp .qk:not(.cur):not(.qa) span{font-size:.8rem;letter-spacing:-.01em}
   /* "About" stays written at all times, on the home too (his note, 2026-11-09) */
   .qk.qa span,.qt-ticks:hover .qk.qa span{opacity:1;transform:none}
+  /* but not while a project's words are open, where it ran into them (his note, 2026-11-09) */
+  .qp.open .qk.qa span,.qp.open .qt-ticks:hover .qk.qa span{opacity:0}
 }
 @media (max-width:700px){ .qp-x{display:none} }

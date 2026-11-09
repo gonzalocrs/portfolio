@@ -1198,7 +1198,8 @@
     // faint (the CSS), and a thin x stands a step above the first mark; it goes back to the home. Not while the words
     // are open (they fill that column), and not on a phone (no hover there)
     var ix = el('button', 'qp-x', nav); ix.type = 'button'; ix.setAttribute('aria-label', 'Back to the index');
-    ix.innerHTML = '<svg viewBox="0 0 10 10" width="10" height="10"><path d="M1 1l8 8M9 1L1 9"/></svg>';
+    // the x gave way to a word (his note, 2026-11-09: "remove the X here. let's add a prompt to tap to go back")
+    ix.innerHTML = '<svg viewBox="0 0 12 8" width="12" height="8"><path d="M11.5 4H1M4 1L1 4l3 3"/></svg><span>Back</span>';
     ix.addEventListener('click', function(e){ e.stopPropagation(); goHome(slug); });
     function placeX(){
       var k = nav.querySelector('.qk'), rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;

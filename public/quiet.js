@@ -84,6 +84,10 @@
   // on its page, the whole page slowly goes dark (the ground near-black, the words and marks light). Drawings are never
   // inverted: they keep their own white
   function night(on){ document.body.classList.toggle('q-night', !!on); }
+  // trial (his ask, 2026-11-09, after a friend's site: "a slightly different tone"): ?tone=grey puts the site on a light
+  // grey ground, so white drawings read as sheets laid on it; ?tone=white back to white. Kept for the visit
+  var TONE = Q.get('tone'); try{ if(TONE) sessionStorage.setItem('gc-tone', TONE); TONE = sessionStorage.getItem('gc-tone') || TONE; }catch(e){}
+  if(TONE === 'grey') document.body.classList.add('q-grey');
   function quietHref(s, i){ return 'project.html?p=' + s + (i ? '&i=' + i : ''); }
   // going into a project from a picture on the home (test, 2026-10-26): the page doesn't reload. The picture lifts off
   // the home and glides to its place in the project while the home fades away and the project fades in around it; the
@@ -1201,13 +1205,22 @@
     // the x gave way to a word (his note, 2026-11-09: "remove the X here. let's add a prompt to tap to go back")
     // then (same day: "it's kind of hidden. should feel more like the scroll"): always in view, in the scroll prompt's
     // type, with its chevron turned to the left
-    ix.innerHTML = '<svg viewBox="0 0 8 16" width="8" height="16"><path d="M7 1L1 8l6 7"/></svg><span>Back</span>';
+    // then (same day: "that back is terrible. my friend uses ... an index button"): "INDEX" with a hooked return arrow, small
+    // spaced capitals in full ink, as on his friend's site. &ix=col (default: a step above the first mark) | top (top right,
+    // level with the name)
+    ix.innerHTML = '<svg viewBox="0 0 9 10" width="9" height="10"><path d="M8 9.5V3.5H1.5M4 1L1.5 3.5 4 6"/></svg><span>Index</span>';
+    var IX = Q.get('ix'); try{ if(IX) sessionStorage.setItem('gc-ix', IX); IX = sessionStorage.getItem('gc-ix') || IX; }catch(e){}
+    if(IX === 'top') ix.classList.add('qp-x-top');
     ix.addEventListener('click', function(e){ e.stopPropagation(); goHome(slug); });
     function placeX(){
       var k = nav.querySelector('.qk'), rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
       if(k) ix.style.top = Math.round(k.offsetTop - 2.2 * rem) + 'px';
     }
-    function placeX2(){ if(innerWidth > 700) placeX(); else { ix.style.top = ''; } }
+    function placeX2(){
+      if(innerWidth > 700 && IX !== 'top'){ placeX(); return; }
+      ix.style.top = '';
+      if(IX === 'top' && innerWidth > 700){ var g = document.querySelector('.gv-mark'), r = g && g.getBoundingClientRect(); if(r) ix.style.top = Math.round(r.top + r.height / 2) + 'px'; }
+    }
     nav.addEventListener('mouseenter', placeX2); on(window, 'resize', placeX2); placeX2(); requestAnimationFrame(placeX2);
     if(document.fonts && document.fonts.ready) document.fonts.ready.then(placeX2);
     setTimeout(function(){ placeX2(); ix.classList.add('in'); }, 900);

@@ -1644,8 +1644,10 @@
   // left, at the name's margin), name (just under the name). Kept for the visit; &abp=off: under the marks as before
   (function(){
     var V = Q.get('abp'); try{ if(V) sessionStorage.setItem('gc-abp', V); V = sessionStorage.getItem('gc-abp') || V; }catch(e){}
-    V = V || 'top';   // his pick (2026-11-09 1:08pm NY: "this is good"): top right, level with the name
-    if(['top', 'foot', 'name'].indexOf(V) === -1) return;
+    // then (his note, 2026-11-09 6:46pm NY: "let's put the about here again with the plus, keeping this font and size"):
+    // col, back under the marks with its "+", in the old header's capitals; top / foot / name by address
+    V = V || 'col';
+    if(['top', 'foot', 'name', 'col'].indexOf(V) === -1) return;
     document.documentElement.classList.add('abp', 'abp-' + V);
     var set = function(){
       var g = document.querySelector('.gv-mark'), r = g && g.getBoundingClientRect(); if(!r || !r.height) return;

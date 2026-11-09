@@ -71,7 +71,8 @@
     var ab = el('a', 'qk qa', nav); ab.href = 'about.html';
     // his logo in place of the "+" (his note, 2026-11-09: "for about don't use a +, use my logo"): the ring and its six
     // stitches from fav/logo.svg, strokes thickened so they hold at this size
-    el('i', 'qa-logo', ab).innerHTML = '<svg viewBox="22 22 156 156" aria-hidden="true"><circle cx="100" cy="100" r="70" fill="none" stroke="currentColor" stroke-width="7" opacity=".4"/><path fill="none" stroke="currentColor" stroke-width="15" d="M120.09 60.74L132.29 48.54M143.75 100H161M120.09 139.26L132.29 151.46M67.71 151.46L79.91 139.26M42.13 108.55A58.5 58.5 0 0 1 42.13 91.45M67.71 48.54L79.91 60.74"/></svg>';
+    // then (same night: "not the ticks in the logo, it's too busy"): only its ring
+    el('i', 'qa-logo', ab).innerHTML = '<svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1"/></svg>';
     el('span', '', ab, 'About');
     // fan ticks: each one knows how far it is from the current project, so the lean can grow with the distance
     if(TICK === 'fan'){

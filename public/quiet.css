@@ -654,3 +654,7 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 @media (max-width:700px){ .qab-links .qab-mark{width:5rem} }
 .qab-links .qab-reach{margin-top:1.6rem}
 .qab-mailrow:hover .qab-copied{opacity:1}
+/* the ring alone (2026-11-09); on the About page itself About stays as everywhere else, not bold (his note) */
+.qk.qa i.qa-logo svg{width:11px;height:11px}
+.qk.qa.cur span{font-weight:300;color:var(--mute)}
+.qk.qa.cur i{color:var(--mute)}

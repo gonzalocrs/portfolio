@@ -629,18 +629,25 @@
         var W = Math.min(400, im.naturalWidth), H = Math.max(1, Math.round(W * im.naturalHeight / im.naturalWidth));
         var c = document.createElement('canvas'); c.width = W; c.height = H;
         var x = c.getContext('2d', {willReadFrequently: true}); x.drawImage(im, 0, 0, W, H);
-        var d = x.getImageData(0, 0, W, H).data, l = W, t = H, r = -1, b = -1;
+        var d = x.getImageData(0, 0, W, H).data, l = W, t = H, r = -1, b = -1, cn = new Array(W).fill(0);
         for(var y = 0; y < H; y++) for(var i = 0; i < W; i++){
           var o = (y * W + i) * 4;
-          if(d[o + 3] > 24 && (d[o] < 235 || d[o + 1] < 235 || d[o + 2] < 235)){ if(i < l) l = i; if(i > r) r = i; if(y < t) t = y; if(y > b) b = y; }
+          if(d[o + 3] > 24 && (d[o] < 235 || d[o + 1] < 235 || d[o + 2] < 235)){ cn[i]++; if(i < l) l = i; if(i > r) r = i; if(y < t) t = y; if(y > b) b = y; }
         }
-        im._ink = r < 0 ? all : {l: l / W, t: t / H, r: (r + 1) / W, b: (b + 1) / H};
+        // the sides of the drawing's body: a long ground line running out past the building (one row of ink) doesn't
+        // count, so the gap to the note is measured from the building (his note, 2026-11-09, Anticlastic's section and
+        // elevation: "works for this but not for the other two drawings")
+        var bl = 0, br = W - 1; while(bl < W - 1 && cn[bl] < 3) bl++; while(br > 0 && cn[br] < 3) br--;
+        if(br < bl){ bl = l; br = r; }
+        im._ink = r < 0 ? all : {l: bl / W, t: t / H, r: (br + 1) / W, b: (b + 1) / H, fl: l / W, fr: (r + 1) / W};
       } catch(e){ im._ink = all; }
       return im._ink;
     }
     function inkRect(im, r){
       var k = ink(im);
-      return {left: r.left + k.l * r.width, right: r.left + k.r * r.width, top: r.top + k.t * r.height, bottom: r.top + k.b * r.height, width: r.width, k: k};
+      // left/right: the building's sides; fl/fr: the ink's own ends (a ground line's), which the note clears by a photo's gap
+      var fl = r.left + (k.fl == null ? k.l : k.fl) * r.width, fr = r.left + (k.fr == null ? k.r : k.fr) * r.width;
+      return {left: r.left + k.l * r.width, right: r.left + k.r * r.width, top: r.top + k.t * r.height, bottom: r.top + k.b * r.height, width: r.width, k: k, fl: fl, fr: fr};
     }
     // beside: the words start a short, fixed step after the "+" (whatever the width of the window), the kicker on the
     // name's line; the picture follows a little after the words
@@ -913,7 +920,9 @@
               // a drawing standing in white (its file wider than its lines) gets twice the gap to its note: open lines
               // need more air than a photo's hard edge (his note, 2026-11-09, Lean Shells' section: "give it more
               // breathing room")
-              var ik = ink(im); if(it.drawing || ik.l > .02 || ik.r < .98) g = 6 * rem;   // then more, for every drawing ("more spacing to all those drawings")
+              var g0 = g, ik = ink(im); if(it.drawing || ik.l > .02 || ik.r < .98) g = 6 * rem;
+              // where the note's gap is counted from: the building, but never closer than a photo's gap to a ground line's end
+              function edgeL(v){ return Math.min(v.left, v.fl + g - g0); } function edgeR(v){ return Math.max(v.right, v.fr - g + g0); }   // then more, for every drawing ("more spacing to all those drawings")
               if(!low){
                 if(im.style.marginBottom){ im.style.marginBottom = ''; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
                 // short of room: first a narrower column, then the picture steps right (never past the window's edge)
@@ -946,12 +955,12 @@
                   // Joint's note has (his note, 2026-11-09: "the margin between the title and the note in Joint ... is
                   // really good and then in Anticlastic is not working")
                   // the room is counted from the drawing itself, not its file's white margin
-                  var M = Math.max(me.getBoundingClientRect().right - nameShift() + 2 * rem, plus.getBoundingClientRect().right + 3 * rem, 0), miss = (w + g) - (inkRect(im, r).left - M);
+                  var M = Math.max(me.getBoundingClientRect().right - nameShift() + 2 * rem, plus.getBoundingClientRect().right + 3 * rem, 0), miss = (w + g) - (edgeL(inkRect(im, r)) - M);
                   // and Joint's own gap between the "+" and the note, measured where Joint's "+" would be (his example,
                   // 2026-11-09: Joint's screenshot, "use this as an example"): a longer name takes the picture's left edge
                   // in by what it adds, so the note keeps that gap after this project's own "+"
                   var MJ = Math.max(me.getBoundingClientRect().right - nameShift() + 2 * rem, plusX() + 3 * rem, 0);
-                  miss = Math.max(miss, Math.max(0, (w + g) - (inkRect(im, r).left - MJ)) + nameShift());
+                  miss = Math.max(miss, Math.max(0, (w + g) - (edgeL(inkRect(im, r)) - MJ)) + nameShift());
                   if(miss > 0){
                     var r0 = r;
                     im.style.maxWidth = Math.floor(r0.width - miss / Math.max(.2, 1 - ink(im).l)) + 'px'; r = im.getBoundingClientRect();
@@ -961,7 +970,7 @@
                   lr = L.getBoundingClientRect();
                 }
                 var v = inkRect(im, r);
-                nt.classList.remove('qn-low'); nt.style.width = w + 'px'; nt.style.left = (right ? v.right - lr.left + g : v.left - lr.left - w - g) + 'px'; nt.style.top = (v.bottom - lr.top - nt.offsetHeight) + 'px';
+                nt.classList.remove('qn-low'); nt.style.width = w + 'px'; nt.style.left = (right ? edgeR(v) - lr.left + g : edgeL(v) - lr.left - w - g) + 'px'; nt.style.top = (v.bottom - lr.top - nt.offsetHeight) + 'px';
               }
               else {
                 // phone: the picture and its note centred together as one block, the note under it

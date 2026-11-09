@@ -28,6 +28,7 @@
     physicalNote  one line shown under every physical model photo (same for all of
               them); an individual item's own "text" above overrides it for that photo
     hidden    true: the project is off the site (not in the index; its page goes to the home)
+    tags      ["Architecture", ...]: small capitals over the picture, after the group and before the year
     notFirst  true: the home never opens a visit on this project (it still comes up as you scroll)
 
   Drop image files into public/img/<slug>/ and reference them here.
@@ -35,6 +36,7 @@
 window.PROJECTS = {
   "the-outermost-dock": {
     title: "Outer Dock", group: "Unbuilt", hue: 200,
+    tags: ["Architecture"],   // over the picture after the group, before the year (2026-11-09; edit freely)
     kicker: "New York, 2026",
     // his words, from his project sheet (2026-11-06)
     text: [
@@ -49,6 +51,7 @@ window.PROJECTS = {
   },
   "social-sanctuary": {
     title: "East 5th", group: "Unbuilt", hue: 42,
+    tags: ["Architecture", "Housing"],   // over the picture after the group, before the year (2026-11-09; edit freely)
     sheetFrame: true,   // a very faint frame round each picture on the gallery sheet (his ask, 2026-11-06)
     kicker: "New York, 2025",
     text: [
@@ -105,6 +108,7 @@ window.PROJECTS = {
   },
   "permanent-impermanence": {
     title: "Joint", group: "Unbuilt", hue: 330, dark: true,
+    tags: ["Architecture"],   // over the picture after the group, before the year (2026-11-09; edit freely)
     kicker: "New York, 2025",
     hero: "img/permanent-impermanence/perspective.jpg",
     text: [
@@ -139,6 +143,7 @@ window.PROJECTS = {
   },
   "anticlastic-roof-structure": {
     title: "Anticlastic Surfaces", group: "Research", hue: 8,
+    tags: ["Structure", "Material"],   // over the picture after the group, before the year (2026-11-09; edit freely)
     kicker: "New York, 2026",
     text: [
       "Developing Curvature investigates the architectural potential of flat plywood: how the geometry of individual pieces can generate a surface of double curvature. The shell develops through the orientation, edges, and connections of planar elements, bringing material constraints directly into the production of form. Physical models serve as the primary design tool, allowing the surface to be assessed through its assembly, thickness, and spatial presence. The resulting geometry holds together two scales of expression: the precise articulation of individual panels and the continuity of the larger shell.",
@@ -187,6 +192,7 @@ window.PROJECTS = {
   },
   "vaulted-shell-structure": {
     title: "Lean Shells", group: "Research", hue: 260,
+    tags: ["Structure", "Material"],   // over the picture after the group, before the year (2026-11-09; edit freely)
     kicker: "New York, 2026",
     text: [
       "Lean Shells investigates how a roof can do more with less material. Thin plywood panels form hollow units whose angled connections generate a vault, combining structural depth with space for insulation. The study seeks an efficient enclosure through the careful arrangement of lightweight parts.",
@@ -217,6 +223,7 @@ window.PROJECTS = {
   "puente-de-la-mujer": {
     hidden: true,   // off the site for now (his ask, 2026-11-06 ~2:45am NY)
     title: "Puente de la Mujer", group: "Research", hue: 190,
+    tags: ["Structure"],   // over the picture after the group, before the year (2026-11-09; edit freely)
     kicker: "New York, 2025",
     credits: [["Course", "TECH II, Columbia GSAPP"], ["Type", "Structures in Architecture"], ["Instructor", "Zak Kostura"], ["Term", "Spring 2025"], ["Year", "2025"]],   // from his syllabus header (2026-11-06); course code ARCH A4112 left out so the line does not wrap
     hero: "img/puente-de-la-mujer/perspective.jpg",
@@ -232,6 +239,7 @@ window.PROJECTS = {
   "modular-living-architecture": {
     notFirst: true,   // never the project a visit opens on (his ask, 2026-11-06)
     title: "Open Assembly", group: "Research", hue: 120,
+    tags: ["Modular systems"],   // over the picture after the group, before the year (2026-11-09; edit freely)
     kicker: "New York, 2025",
     // his text (2026-11-06 ~2:45am NY), word for word; it replaced the Geometry & Scaffolds paragraph
     text: [
@@ -258,6 +266,7 @@ window.PROJECTS = {
   // Built at the bottom of the index (his ask, 2026-11-09)
   "sierra-hotel": {
     title: "Sierra Hotel", group: "Built", hue: 18,
+    tags: ["Architecture", "Hospitality"],   // over the picture after the group, before the year (2026-11-09; edit freely)
     kicker: "Cusco, 2023",
     ready: true,
     text: [
@@ -295,6 +304,7 @@ window.PROJECTS = {
   },
   "edificio-murano": {
     title: "Edificio Murano", group: "Built", hue: 210,
+    tags: ["Architecture", "Housing"],   // over the picture after the group, before the year (2026-11-09; edit freely)
     kicker: "Cusco, 2021",
     credits: [["Studio", "Urba Inmobiliaria"], ["Program", "Housing in Peru"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2021"]],
     diagram: {}
@@ -302,6 +312,7 @@ window.PROJECTS = {
   "urba-branding": {
     notFirst: true,   // never the project a visit opens on (his ask, 2026-11-06)
     title: "Urba Inmobiliaria", group: "Built", hue: 96,
+    tags: ["Brand design"],   // over the picture after the group, before the year (2026-11-09; edit freely)
     kicker: "Lima, 2020",
     // his text (2026-11-06), word for word
     text: [

@@ -783,6 +783,21 @@
       cue.style.left = Math.round(x) + 'px'; cue.style.top = Math.round(y) + 'px';
       if(curIm && !cue.classList.contains('off')) cue.classList.add('in');   // shows with the first picture
     }
+    // tags over the picture (his ask, 2026-11-09: "add tags for each project", after his friend's EXHIBIT / ARCHITECTURE /
+    // 2025 line): the project's group in ink, then its tags and year in grey, small spaced capitals, standing on the
+    // picture's top left corner and moving with it. Tags come from the project's tags: [...] in projects.js
+    var tagEl = el('div', 'qtag', wrap);
+    (function(){
+      var yr = (p.kicker || '').match(/(\d{4})\s*$/), bits = [p.group].concat(p.tags || []).concat(yr ? [yr[1]] : []);
+      bits.forEach(function(b, i){ el('span', i ? '' : 'qtag-lead', tagEl, b); });
+    })();
+    function placeTag(){
+      var r = curIm && curIm.isConnected ? curIm.getBoundingClientRect() : null, rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      if(!r || !r.width){ return; }
+      tagEl.style.left = Math.round(r.left) + 'px'; tagEl.style.top = Math.round(r.top - 1.5 * rem) + 'px';
+      tagEl.classList.add('in');
+    }
+    on(window, 'resize', placeTag);
     function placeUp(){
       if(!cueUp) return;
       var r = chevRect(), rem = parseFloat(getComputedStyle(document.documentElement).fontSize), x = (r.left + r.right) / 2, y = Math.max(r.top - 1.5 * rem, 1.8 * rem);
@@ -890,7 +905,7 @@
             };
             if(window.ResizeObserver) new ResizeObserver(function(){ fit(); }).observe(L);
           }
-          var fit0 = fit; fit = function(){ fit0(); centre(L, im); fit0(); curIm = im; placeCue(); placeUp(); };
+          var fit0 = fit; fit = function(){ fit0(); centre(L, im); fit0(); curIm = im; placeCue(); placeUp(); placeTag(); setTimeout(placeTag, 950); };
           im.addEventListener('load', fit); f.fit = fit; if(im.complete) requestAnimationFrame(fit);
         }
         else el('div', 'plate', f, 'In preparation');

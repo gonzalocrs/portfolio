@@ -624,3 +624,9 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
   .qp.qp .qt-ticks .qk:not(.cur):not(.qa):hover i,
   body.qh-one.qb-names-thin .qt-ticks .qk:not(.cur):not(.qa):hover i{height:2px;background:var(--ink)}
 }
+/* the project's tags over its picture (his ask, 2026-11-09) */
+.qtag{position:fixed;left:0;top:0;z-index:4;display:flex;gap:1.1rem;pointer-events:none;opacity:0;transition:opacity .6s ease,top .45s ease,left .45s ease;
+  font-size:.6rem;font-weight:600;text-transform:uppercase;letter-spacing:.12em;line-height:1;color:var(--mute);white-space:nowrap}
+.qtag.in{opacity:1}
+.qtag .qtag-lead{color:var(--ink)}
+.qb-show .qtag{opacity:0}

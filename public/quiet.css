@@ -618,6 +618,9 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 /* the name pointed at comes up to the open project's size (his note, 2026-11-09: "the other titles are still so small
    while hovering"); the rest stay small and faint */
 @media (min-width:701px){
-  .qp .qt-ticks .qk:not(.cur):not(.qa):hover span,
-  body.qh-one.qb-names-thin .qt-ticks .qk:not(.cur):not(.qa):hover span{font-size:clamp(1rem,1.2vw,1.15rem)}
+  .qp.qp .qt-ticks .qk:not(.cur):not(.qa):hover span,
+  body.qh-one.qb-names-thin .qt-ticks .qk:not(.cur):not(.qa):hover span{font-size:clamp(1rem,1.2vw,1.15rem);font-weight:800;letter-spacing:-.02em}
+  /* and in every way like the open one (his note, same day: "looks completely different"): bold, its mark as heavy */
+  .qp.qp .qt-ticks .qk:not(.cur):not(.qa):hover i,
+  body.qh-one.qb-names-thin .qt-ticks .qk:not(.cur):not(.qa):hover i{height:2px;background:var(--ink)}
 }

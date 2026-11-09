@@ -28,6 +28,8 @@
     physicalNote  one line shown under every physical model photo (same for all of
               them); an individual item's own "text" above overrides it for that photo
     hidden    true: the project is off the site (not in the index; its page goes to the home)
+    order     optional: the pictures' order by hand, hero and diagram included, e.g. ["img/x/a.jpg", ...]
+    hide      optional: pictures kept in the lists but not shown, e.g. ["img/x/b.jpg"]
     notFirst  true: the home never opens a visit on this project (it still comes up as you scroll)
 
   Drop image files into public/img/<slug>/ and reference them here.
@@ -152,17 +154,21 @@ window.PROJECTS = {
       "Developing Curvature investigates the architectural potential of flat plywood: how the geometry of individual pieces can generate a surface of double curvature.",
       "The shell develops through the orientation, edges, and connections of planar elements, bringing material constraints directly into the production of form.",
       "The study explores how changes in panel orientation generate structural depth, linking the shell’s geometric character to its potential stiffness.",
-      "",
+      "Through making, the project pursues an economy of means in which construction, performance, and architectural expression develop together.",
       "The resulting geometry holds together two scales of expression: the precise articulation of individual panels and the continuity of the larger shell.",
-      "Physical models serve as the primary design tool, allowing the surface to be assessed through its assembly, thickness, and spatial presence.",
-      "",
-      "",
-      "This investigation opens a further direction: integrating insulation with the plywood skin so that thermal and structural functions might operate within one material system.",
       "",
       "",
       "",
-      "Through making, the project pursues an economy of means in which construction, performance, and architectural expression develop together."
+      "",
+      "Physical models serve as the primary design tool, allowing the surface to be assessed through its assembly, thickness, and spatial presence."
     ],
+    // his order (his numbers on the gallery sheet, 2026-11-09); the notes above moved with their pictures. The note
+    // "This investigation opens a further direction..." went with IMG_9909, now hidden
+    order: ["img/anticlastic-roof-structure/hero.jpg", "img/anticlastic-roof-structure/hand-drawing.jpg", "img/anticlastic-roof-structure/section.png", "img/anticlastic-roof-structure/physical/web/IMG_9921.jpg",
+      "img/anticlastic-roof-structure/elevation.png", "img/anticlastic-roof-structure/physical/web/IMG_9760.jpg", "img/anticlastic-roof-structure/plan.png", "img/anticlastic-roof-structure/physical/web/IMG_9801.jpg",
+      "img/anticlastic-roof-structure/physical/web/IMG_9872.jpg", "img/anticlastic-roof-structure/physical/web/IMG_9768.jpg"],
+    // off the page (his marks, 2026-11-09): IMG_9868 crossed out; IMG_9865 and IMG_9909 hidden
+    hide: ["img/anticlastic-roof-structure/physical/web/IMG_9868.jpg", "img/anticlastic-roof-structure/physical/web/IMG_9865-Edit.jpg", "img/anticlastic-roof-structure/physical/web/IMG_9909-Edit.jpg"],
     kicker: "New York, 2026",
     text: [
       "Developing Curvature investigates the architectural potential of flat plywood: how the geometry of individual pieces can generate a surface of double curvature. The shell develops through the orientation, edges, and connections of planar elements, bringing material constraints directly into the production of form. Physical models serve as the primary design tool, allowing the surface to be assessed through its assembly, thickness, and spatial presence. The resulting geometry holds together two scales of expression: the precise articulation of individual panels and the continuity of the larger shell.",
@@ -215,11 +221,10 @@ window.PROJECTS = {
     // for word (his ask, 2026-11-09: "the small tag descriptions next to the images explaining the project"); "" = none
     notes: [
       "Lean Shells investigates how a roof can do more with less material.",
+      "",
       "Thin plywood panels form hollow units whose angled connections generate a vault, combining structural depth with space for insulation.",
       "",
       "The study seeks an efficient enclosure through the careful arrangement of lightweight parts.",
-      "",
-      "",
       "Exposed plywood edges and repeating facets give the assembly its architectural character.",
       "",
       "",
@@ -236,16 +241,17 @@ window.PROJECTS = {
     credits: [["Studio", "Robert Marino Architects"], ["Type", "Structural Systems, Material Research"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2026"]],
     hero: "img/vaulted-shell-structure/model-9751.jpg",
     home: ["img/vaulted-shell-structure/model-9751.jpg", "img/vaulted-shell-structure/section.png"],
-    // his order (2026-10-29): each drawing followed by the photo of the same view, the drawings with the house last
+    // his order (his numbers on the gallery sheet, 2026-11-09; before, 2026-10-29: each drawing followed by the photo
+    // of the same view): the hand drawing second, the drawings with the house last; the notes above moved with their pictures
     inOrder: true,
     grid: [
-      {src: "img/vaulted-shell-structure/section.png", drawing: true, caption: "Section"},
-      {src: "img/vaulted-shell-structure/model-9931.jpg", caption: "Physical model"},
-      {src: "img/vaulted-shell-structure/elevation.png", drawing: true, caption: "Elevation"},
-      {src: "img/vaulted-shell-structure/model-9746.jpg", caption: "Physical model"},
-      {src: "img/vaulted-shell-structure/roof-plan.png", drawing: true, caption: "Roof plan"},
-      {src: "img/vaulted-shell-structure/model-9795.jpg", caption: "Physical model"},
       {src: "img/vaulted-shell-structure/hand-drawing.jpg", drawing: true, caption: "Vaulted shell study"},
+      {src: "img/vaulted-shell-structure/section.png", drawing: true, caption: "Section"},
+      // model-9931 taken off (crossed out, his marks 2026-11-09)
+      {src: "img/vaulted-shell-structure/model-9746.jpg", caption: "Physical model"},
+      {src: "img/vaulted-shell-structure/elevation.png", drawing: true, caption: "Elevation"},
+      {src: "img/vaulted-shell-structure/model-9795.jpg", caption: "Physical model"},
+      {src: "img/vaulted-shell-structure/roof-plan.png", drawing: true, caption: "Roof plan"},
       {src: "img/vaulted-shell-structure/model-9937.jpg", caption: "Physical model, underside"},
       // model-9925 (front close-up of the joints) left out for now to try the page without it (his ask, 2026-10-29)
       {src: "img/vaulted-shell-structure/model-9928.jpg", caption: "Physical model, joints"},
@@ -303,9 +309,11 @@ window.PROJECTS = {
     // for word (his ask, 2026-11-09: "the small tag descriptions next to the images explaining the project"); "" = none
     notes: [
       "The façade is organized into three elements: base, body, and crown.",
-      "Materiality became a central focus of the design, connecting the hotel to Cusco’s architectural character.",
-      "This project transformed an existing structural shell into a hotel, requiring a complete redesign of the interior layout and façade.",
       "As my first non-residential project, it gave me the opportunity to explore how architecture could shape a guest’s experience while working within the constraints of an existing structure.",
+      "Entrance details",   // his tag for the entrance details drawing (2026-11-09)
+      "",   // the entrance render after it
+      "This project transformed an existing structural shell into a hotel, requiring a complete redesign of the interior layout and façade.",
+      "Materiality became a central focus of the design, connecting the hotel to Cusco’s architectural character.",
       "The base draws on the city’s rustic textures, while the body reinterprets the same warm palette through a contemporary, restrained composition.",
       "At the rooftop, natural materials and floor-to-ceiling glazing frame the surrounding mountains, making the landscape part of the guest experience."
     ],
@@ -318,10 +326,11 @@ window.PROJECTS = {
     credits: [["Studio", "Urba Inmobiliaria"], ["Program", "Hospitality in Peru"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2023"]],
     diagram: {src: "img/sierra-hotel/exploded-diagram.jpg", caption: "Exploded axonometric"},
     hero: "img/sierra-hotel/hero.jpg",
-    home: ["img/sierra-hotel/elevation.svg", "img/sierra-hotel/floor-plans.svg"],
-    // the order of the pictures (his numbering, 2026-11-06): elevation, street render, exploded axonometric, floor plans,
-    // the facade against the sky, the tiles
-    order: ["img/sierra-hotel/elevation.svg", "img/sierra-hotel/render-facade.jpg", "img/sierra-hotel/exploded-diagram.jpg", "img/sierra-hotel/floor-plans.svg", "img/sierra-hotel/hero.jpg", "img/sierra-hotel/photo-1.jpg"],
+    home: ["img/sierra-hotel/elevation.svg", "img/sierra-hotel/floor-plans-30.webp"],
+    // the order of the pictures (his numbering, 2026-11-09; the notes above moved with their pictures): elevation, floor
+    // plans, entrance details, entrance render (his View 05, 2026-11-09), exploded axonometric, street render, the facade against the sky, the tiles. The floor
+    // plans are his new sheet (floor_plans_30.webp, 2026-11-09) in place of floor-plans.svg; the entrance details added the same night
+    order: ["img/sierra-hotel/elevation.svg", "img/sierra-hotel/floor-plans-30.webp", "img/sierra-hotel/facade-details.webp", "img/sierra-hotel/render-entrance.jpg", "img/sierra-hotel/exploded-diagram.jpg", "img/sierra-hotel/render-facade.jpg", "img/sierra-hotel/hero.jpg", "img/sierra-hotel/photo-1.jpg"],
     heroPosition: "center",
     heroPositionPhone: "78% center",   // where a phone-shaped crop of the hero looks (the building is on the right)
     // all the pictures in one grid after the text, (see project.js: grid)
@@ -329,7 +338,9 @@ window.PROJECTS = {
       {src: "img/sierra-hotel/render-facade.jpg", size: "xl"},
       {src: "img/sierra-hotel/exploded-diagram.jpg", size: "tower", drawing: true, fill: true, caption: "Exploded axonometric"},
       {src: "img/sierra-hotel/elevation.svg", size: "half", drawing: true, caption: "Front elevation"},
-      {src: "img/sierra-hotel/floor-plans.svg", size: "wide", drawing: true, caption: "Floor plans"},
+      {src: "img/sierra-hotel/floor-plans-30.webp", size: "wide", drawing: true, caption: "Floor plans"},
+      {src: "img/sierra-hotel/facade-details.webp", drawing: true, caption: "Entrance details"},
+      {src: "img/sierra-hotel/render-entrance.jpg", caption: "Entrance"},
       {src: "img/sierra-hotel/photo-1.jpg", size: "half"}
     ],
     gallery: {
@@ -366,7 +377,8 @@ window.PROJECTS = {
     // his note for the step-by-step isotype (2026-11-06), word for word, beside the pictures as on Joint: one paragraph each beside the posters, the step-by-step and the Ur mark (his ask)
     notes: ["", "Urba’s mark reflects a city that is always evolving. Its shifting letterforms trace a process of forming ideas, building, and adapting to changing needs.", "While sketching variations of the name, I found that the relationship between the drawings mattered more than any single version. That discovery became the basis of the identity: a form that remains recognizable while allowing for change."],   // the Ur mark's note ("The mark expresses a principle...") taken off at his ask
     grid: [
-      {src: "img/urba-branding/wordmark-tagline-2.png", drawing: true, caption: "Wordmark: Creamos espacios, construimos comunidad"},
+      // 20% smaller than before (his ask, 2026-11-09)
+      {src: "img/urba-branding/wordmark-tagline-2.png", drawing: true, scale: .8, caption: "Wordmark: Creamos espacios, construimos comunidad"},
       {src: "img/urba-branding/posters.png", drawing: true, scale: .5, caption: "Isotype in the three colours"},
       {src: "img/urba-branding/isotype-steps.png", drawing: true, scale: .5, caption: "Isotype, step by step"},
       // his Ur mark (logo_black_white-100.jpg, 2026-11-06) with the note's last paragraph; trimmed, shown smaller (scale .3) so it sits at the size of the other half-size drawings

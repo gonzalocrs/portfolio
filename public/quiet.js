@@ -34,6 +34,8 @@
     });
     // order: the pictures' order set by hand, hero and diagram included (Sierra Hotel, his numbering 2026-11-06); any
     // picture not listed keeps its place after the listed ones
+    // hide: pictures kept in the list but not shown (Anticlastic, his marks 2026-11-09)
+    if(p.hide){ var hid = p.hide.map(web); out = out.filter(function(it){ return hid.indexOf(it.src) < 0; }); }
     if(p.order){
       var rank = p.order.map(web);
       out.sort(function(a, b){ var i = rank.indexOf(a.src), j = rank.indexOf(b.src); return (i < 0 ? 99 : i) - (j < 0 ? 99 : j); });
@@ -685,6 +687,7 @@
       // gallery if i click the + for description i should get it in gallery, not roll back to the previous image")
       if(bOn) setTimeout(function(){ requestAnimationFrame(layB); }, 0);
       if(on === isOpen()) return;
+      if(cue && n === 1) cue.classList.toggle('off', on);
       st.style.setProperty('--ny', nameY() + 'px');
       if(D === 'beside') placeBeside();
       if(D === 'under' && innerWidth > 700) turn(on);
@@ -762,7 +765,9 @@
     try{ if(CUE) sessionStorage.setItem('gc-cue', CUE); CUE = sessionStorage.getItem('gc-cue') || CUE; }catch(e){}
     CUE = ['word', 'line', 'chev', 'off'].indexOf(CUE) > -1 ? CUE : 'chev';   // his pick, 2026-11-05: the chevron, kept on every picture
     var cue = null;
-    if(CUE !== 'off' && n > 1){
+    // a project with one picture (Outer Dock) keeps the lower chevron too: it opens the words, as the first scroll does,
+    // and goes while they're open (his ask, 2026-11-09)
+    if(CUE !== 'off' && (n > 1 || CUE === 'chev')){
       cue = el('button', 'qcue qcue-' + CUE, wrap); cue.type = 'button'; cue.setAttribute('aria-label', 'Next picture');
       if(CUE === 'word') el('span', '', cue, innerWidth <= 700 ? 'Swipe' : 'Scroll');
       else if(CUE === 'line') el('i', '', cue);
@@ -771,7 +776,7 @@
       // last photo keep the chevron even when in gallery mode"); on side B it stays as it is, a still mark
       // on side B it goes on to the next project in the index, round to the first (his ask, 2026-11-09); the words "Next
       // project" over it were tried and dropped ("too busy")
-      cue.addEventListener('click', function(e){ e.stopPropagation(); if(bOn){ pastB(); return; } if(at === n - 1 && bBtn){ flip(true); return; } go(at + 1); });
+      cue.addEventListener('click', function(e){ e.stopPropagation(); if(n === 1){ toggle(true); return; } if(bOn){ pastB(); return; } if(at === n - 1 && bBtn){ flip(true); return; } go(at + 1); });
     }
     // and one pointing up, at the head of the picture area (his ask, 2026-11-06: "we need another chevron to go up as
     // well"): back one picture; on side B back to the pictures; gone on the first picture, where there's nothing above
@@ -926,7 +931,7 @@
       if(hint && !first) hint.classList.add('off');
       // the chevron stays under every picture (his note, 2026-11-05: "keep it and make it clickable"); it stays put while the
       // pictures change; past the last picture it leads into all the pictures (gone there only if a project has no side B)
-      if(cue) cue.classList.toggle('off', k === n - 1 && !bBtn);
+      if(cue) cue.classList.toggle('off', n === 1 ? isOpen() : k === n - 1 && !bBtn);
       syncUp();
       // the words come up by themselves with the last picture (his ask, 2026-11-09: "the description pops with the last
       // image in each project"), and go again on the way back if they came by themselves; once the + or Esc has been used

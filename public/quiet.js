@@ -1161,20 +1161,8 @@
       if(n === 1){ toggle(true); return; }
       var r = picRect() || st.getBoundingClientRect(); go((at + (e.clientX < r.left + r.width * .35 ? -1 : 1) + n) % n);
     });
-    on(document, 'click', function(e){
-      if(e.defaultPrevented || e.button || e.target.closest('a, button, img, .plate, input, textarea, select, label, .qp-card')) return;
-      if(isOpen() && D === 'float') return;
-      if(!bOn && nearPic(e)) return;
-      if(String(getSelection())) return;
-      // only a click in the index's own column goes back to the home (on this project's title); to its right, the
-      // pictures' side, a stray click does nothing (his note, 2026-11-05, a line drawn just right of the name and the marks)
-      if(innerWidth > 700 && e.clientX > indexEdge()) return;
-      goHome(slug);
-    });
-    function indexEdge(){
-      var rem = parseFloat(getComputedStyle(document.documentElement).fontSize), m = document.querySelector('.gv-mark');
-      return Math.max(m ? m.getBoundingClientRect().right : 0, plus.getBoundingClientRect().right) + 2 * rem;
-    }
+    // a click in the empty column no longer goes back to the home: only INDEX does (his note, 2026-11-09: "remove the
+    // clicking everything takes you to home page, now only index does")
     // the way out, always in view (trial, his ask 2026-11-09: the empty-column click "is not very intuitive ... keeping it
     // minimalistic"; then "it should be something that works even without pointing the cursor and prompts you to go back
     // to the main menu"): a small "<- Index" that goes back to the home. &out= (kept for the visit):

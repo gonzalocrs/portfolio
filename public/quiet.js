@@ -1639,6 +1639,21 @@
     });
   }
 
+  // where About stands on a computer (trial, his note 2026-11-09: "in the homescreen i don't like the about word. looks
+  // like it's in the middle. let's iterate"): &abp=top (top right, level with the name, as on a phone), foot (bottom
+  // left, at the name's margin), name (just under the name). Kept for the visit; &abp=off: under the marks as before
+  (function(){
+    var V = Q.get('abp'); try{ if(V) sessionStorage.setItem('gc-abp', V); V = sessionStorage.getItem('gc-abp') || V; }catch(e){}
+    if(['top', 'foot', 'name'].indexOf(V) === -1) return;
+    document.documentElement.classList.add('abp', 'abp-' + V);
+    var set = function(){
+      var g = document.querySelector('.gv-mark'), r = g && g.getBoundingClientRect(); if(!r || !r.height) return;
+      var d = document.documentElement.style;
+      d.setProperty('--nm-mid', Math.round(r.top + r.height / 2) + 'px'); d.setProperty('--nm-left', Math.round(r.left) + 'px');
+      d.setProperty('--nm-top', Math.round(r.top) + 'px'); d.setProperty('--nm-bottom', Math.round(r.bottom) + 'px');
+    };
+    set(); addEventListener('resize', set); if(document.fonts) document.fonts.ready.then(set); setTimeout(set, 600);
+  })();
   if(document.body.getAttribute('data-page') === 'about'){ buildAbout(); return; }
   if(document.body.getAttribute('data-page') === 'project'){
     var slug = Q.get('p');

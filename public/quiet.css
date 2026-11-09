@@ -735,3 +735,14 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
   .qab.abv .qab-li{border:0;padding:0;letter-spacing:0;font-size:.8rem}
   .qab.abv-mark .qab-mailrow,.qab.abv-mark .qab-li{position:absolute}
 }
+/* where About stands on a computer (trial ?abp=top|foot|name, his note 2026-11-09): out of the column of marks, in the
+   name's own type (Archivo 300, 14px), no "+" */
+@media (min-width:701px){
+  .abp .qt-ticks .qk.qa{position:fixed;margin:0;padding:.3rem 0;z-index:6;height:auto;flex-direction:row}
+  .abp .qt-ticks .qk.qa i{display:none}
+  .abp .qt-ticks .qk.qa span{font:300 14px/1 'Archivo',sans-serif;letter-spacing:0;text-transform:none;color:var(--mute);opacity:1;transform:none;transition:color .25s}
+  .abp .qt-ticks .qk.qa:hover span,.abp .qt-ticks .qk.qa.cur span{color:var(--ink);font-weight:300}
+  .abp-top .qt-ticks .qk.qa{top:var(--nm-mid,32px);right:var(--nm-left,40px);transform:translateY(-50%)}
+  .abp-foot .qt-ticks .qk.qa{bottom:var(--nm-top,24px);left:var(--nm-left,40px)}
+  .abp-name .qt-ticks .qk.qa{top:calc(var(--nm-bottom,48px) + 1.1rem);left:var(--nm-left,40px)}
+}

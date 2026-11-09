@@ -1345,6 +1345,27 @@
     var wrap = document.querySelector('.qab'), nav = wrap.querySelector('.qt-ticks');
     quietMarks(nav, null, function(s){ return quietHref(s); });
     var ab = nav.querySelector('.qk.qa'); ab.classList.add('cur'); ab.setAttribute('aria-current', 'page');
+    // just his email and LinkedIn, no form (trial, his note 2026-11-09: "in about i like how my friend only placed his
+    // email and his linkedin"): under his mark, the email (a click copies it and says "Copied") and a LinkedIn link.
+    // &contact=links (default) | form (the topics and fields, as before). Kept for the visit
+    var CONTACT = Q.get('contact'); try{ if(CONTACT) sessionStorage.setItem('gc-contact', CONTACT); CONTACT = sessionStorage.getItem('gc-contact') || CONTACT; }catch(e){}
+    if(CONTACT !== 'form'){
+      var EMAIL = 'gc3139@columbia.edu', LINKEDIN = '';   // LINKEDIN: his profile address, still to come
+      wrap.classList.add('qab-links');
+      var box = el('div', 'qab-reach', wrap.querySelector('.qab-side'));
+      var row = el('div', 'qab-mailrow', box), mail = el('a', 'qab-mail', row, EMAIL), said = el('span', 'qab-copied', row, 'Copied');
+      mail.href = 'mailto:' + EMAIL;
+      mail.addEventListener('click', function(e){
+        if(!navigator.clipboard || e.metaKey || e.ctrlKey) return;
+        e.preventDefault();
+        navigator.clipboard.writeText(EMAIL).then(function(){
+          said.classList.add('on'); clearTimeout(said.t); said.t = setTimeout(function(){ said.classList.remove('on'); }, 1800);
+        }, function(){ location.href = 'mailto:' + EMAIL; });
+      });
+      var li = el('a', 'qab-li', box, 'LinkedIn');
+      if(LINKEDIN){ li.href = LINKEDIN; li.target = '_blank'; li.rel = 'noopener'; } else li.classList.add('tbc');
+      return;
+    }
     var touch = document.getElementById('touch'), lock = 0;
     function isOpen(){ return wrap.classList.contains('open'); }
     function toggle(on){

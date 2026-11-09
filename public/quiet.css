@@ -638,3 +638,14 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 .qcue .qcue-next{display:none;font-size:.68rem;font-weight:400;letter-spacing:.06em;white-space:nowrap}
 .qb-show .qcue:not(.qcue-up){flex-direction:column-reverse;gap:.45rem;pointer-events:auto;transform:translate(-50%,calc(-100% + .7rem + 4px))}
 .qb-show .qcue:not(.qcue-up) .qcue-next{display:block}
+/* About, &contact=links (trial 2026-11-09): only his email and LinkedIn under the mark, no form */
+.qab-links #flow,.qab-links #touch{display:none!important}
+.qab-reach{margin-top:2.4rem;display:flex;flex-direction:column;align-items:center;gap:.9rem}
+.qab-mailrow{position:relative;display:flex;align-items:baseline}
+.qab-mail{font-weight:300;font-size:clamp(1rem,1.2vw,1.15rem);letter-spacing:0;color:var(--ink);text-decoration:none;transition:color .25s}
+.qab-mail:hover{color:var(--mute)}
+.qab-copied{position:absolute;left:100%;margin-left:.7rem;font-size:.68rem;letter-spacing:.06em;color:var(--mute);opacity:0;transition:opacity .3s;white-space:nowrap}
+.qab-copied.on{opacity:1}
+.qab-li{font-size:.68rem;font-weight:400;letter-spacing:.06em;color:var(--mute);text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:.15rem;transition:color .25s}
+.qab-li:hover{color:var(--ink)}
+.qab-li.tbc{cursor:default}

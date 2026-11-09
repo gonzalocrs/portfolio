@@ -910,6 +910,10 @@
               // no more"); on a phone there's no room beside, so there it stays under
               var low = innerWidth <= 700, sized = wide || low;
               if(f.classList.contains('qf-low') !== sized){ f.classList.toggle('qf-low', sized); r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
+              // a drawing standing in white (its file wider than its lines) gets twice the gap to its note: open lines
+              // need more air than a photo's hard edge (his note, 2026-11-09, Lean Shells' section: "give it more
+              // breathing room")
+              var ik = ink(im); if(ik.l > .02 || ik.r < .98) g = 3.6 * rem;
               if(!low){
                 if(im.style.marginBottom){ im.style.marginBottom = ''; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
                 // short of room: first a narrower column, then the picture steps right (never past the window's edge)
@@ -938,15 +942,15 @@
                   if(im.style.maxWidth !== base){ im.style.maxWidth = base; }
                   if(it.scale){ im.style.maxWidth = base; var w2 = im.getBoundingClientRect().width; if(w2) im.style.maxWidth = 'min(' + (base || '100%') + ', ' + Math.floor(w2 * it.scale) + 'px)'; }
                   centre(L, im); r = im.getBoundingClientRect();
-                  // and clear of the name itself, however long: the note starts at least 2.4rem past the name's "+", the gap
+                  // and clear of the name itself, however long: the note starts at least 3rem past the name's "+", about the gap
                   // Joint's note has (his note, 2026-11-09: "the margin between the title and the note in Joint ... is
                   // really good and then in Anticlastic is not working")
                   // the room is counted from the drawing itself, not its file's white margin
-                  var M = Math.max(me.getBoundingClientRect().right - nameShift() + 2 * rem, plus.getBoundingClientRect().right + 2.4 * rem, 0), miss = (w + g) - (inkRect(im, r).left - M);
+                  var M = Math.max(me.getBoundingClientRect().right - nameShift() + 2 * rem, plus.getBoundingClientRect().right + 3 * rem, 0), miss = (w + g) - (inkRect(im, r).left - M);
                   // and Joint's own gap between the "+" and the note, measured where Joint's "+" would be (his example,
                   // 2026-11-09: Joint's screenshot, "use this as an example"): a longer name takes the picture's left edge
                   // in by what it adds, so the note keeps that gap after this project's own "+"
-                  var MJ = Math.max(me.getBoundingClientRect().right - nameShift() + 2 * rem, plusX() + 2.4 * rem, 0);
+                  var MJ = Math.max(me.getBoundingClientRect().right - nameShift() + 2 * rem, plusX() + 3 * rem, 0);
                   miss = Math.max(miss, Math.max(0, (w + g) - (inkRect(im, r).left - MJ)) + nameShift());
                   if(miss > 0){
                     var r0 = r;

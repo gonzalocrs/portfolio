@@ -390,7 +390,7 @@
       flipping = now - lastStep < 900; lastStep = now;
       document.body.classList.toggle('qo-flip', flipping);
       clearTimeout(flipT); flipT = setTimeout(function(){ flipping = false; document.body.classList.remove('qo-flip'); }, 900);
-      show(at + d, d); hintOut();
+      show(at + d, d);   // the prompt stays (his note, 2026-11-09: "let's keep that scroll always present")
       return true;
     }
     var withPics = SLUGS.filter(coverOf);
@@ -1199,13 +1199,18 @@
     // are open (they fill that column), and not on a phone (no hover there)
     var ix = el('button', 'qp-x', nav); ix.type = 'button'; ix.setAttribute('aria-label', 'Back to the index');
     // the x gave way to a word (his note, 2026-11-09: "remove the X here. let's add a prompt to tap to go back")
-    ix.innerHTML = '<svg viewBox="0 0 12 8" width="12" height="8"><path d="M11.5 4H1M4 1L1 4l3 3"/></svg><span>Back</span>';
+    // then (same day: "it's kind of hidden. should feel more like the scroll"): always in view, in the scroll prompt's
+    // type, with its chevron turned to the left
+    ix.innerHTML = '<svg viewBox="0 0 8 16" width="8" height="16"><path d="M7 1L1 8l6 7"/></svg><span>Back</span>';
     ix.addEventListener('click', function(e){ e.stopPropagation(); goHome(slug); });
     function placeX(){
       var k = nav.querySelector('.qk'), rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
       if(k) ix.style.top = Math.round(k.offsetTop - 2.2 * rem) + 'px';
     }
-    nav.addEventListener('mouseenter', placeX); placeX();
+    function placeX2(){ if(innerWidth > 700) placeX(); else { ix.style.top = ''; } }
+    nav.addEventListener('mouseenter', placeX2); on(window, 'resize', placeX2); placeX2(); requestAnimationFrame(placeX2);
+    if(document.fonts && document.fonts.ready) document.fonts.ready.then(placeX2);
+    setTimeout(function(){ placeX2(); ix.classList.add('in'); }, 900);
     on(window, 'wheel', function(e){
       if(card.contains(e.target) && card.scrollHeight > card.clientHeight) return;
       var d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;

@@ -574,12 +574,14 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 .qout svg{fill:none;stroke:currentColor;stroke-width:1;overflow:visible}
 .qout:hover{color:var(--ink)}
 /* the index on hover, inside a project (his ask, 2026-11-09): every name faint, the one pointed at in full, a thin x to go back */
-.qp-x{position:absolute;left:0;top:0;display:flex;align-items:center;gap:.45rem;padding:.35rem .35rem .35rem 0;color:var(--mute);opacity:0;pointer-events:none;transition:opacity .4s ease,color .25s ease;line-height:1;
-  font-family:var(--mono);font-size:.62rem;text-transform:uppercase;letter-spacing:.08em}
-.qp-x svg{fill:none;stroke:currentColor;stroke-width:1;overflow:visible}
+.qp-x{position:absolute;left:0;top:0;display:flex;align-items:center;gap:.55rem;padding:.4rem .5rem .4rem 0;color:var(--mute);opacity:0;transition:opacity .8s ease,color .25s ease;line-height:1;
+  font-size:.68rem;font-weight:400;letter-spacing:.06em}   /* as the home's "Scroll" */
+.qp-x.in{opacity:1}
+.qp-x svg{fill:none;stroke:currentColor;stroke-width:1;overflow:visible;animation:qx-drift 2.4s ease-in-out infinite}
+@keyframes qx-drift{0%,100%{transform:translateX(1px)}50%{transform:translateX(-2px)}}
 .qp-x:hover{color:var(--ink)}
+.qp.open .qp-x{opacity:0;pointer-events:none}
 @media (min-width:701px){
-  .qp:not(.open) .qt-ticks:hover .qp-x{opacity:1;pointer-events:auto}
   .qp:not(.open) .qt-ticks:hover .qk:not(.cur):not(.qa) span{opacity:.32;transform:none}
   .qp:not(.open) .qt-ticks:hover .qk:not(.cur):hover span{opacity:1}
   /* the other names read smaller than the open project's (his note, 2026-11-09: "make them read smaller") */
@@ -589,4 +591,4 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
   /* but not while a project's words are open, where it ran into them (his note, 2026-11-09) */
   .qp.open .qk.qa span,.qp.open .qt-ticks:hover .qk.qa span{opacity:0}
 }
-@media (max-width:700px){ .qp-x{display:none} }
+@media (max-width:700px){ .qp-x{position:fixed;left:auto;right:var(--gut,1.25rem);top:1.6rem;padding:.4rem 0} }

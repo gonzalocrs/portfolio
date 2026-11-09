@@ -160,15 +160,17 @@ window.PROJECTS = {
       "",
       "",
       "",
-      "Physical models serve as the primary design tool, allowing the surface to be assessed through its assembly, thickness, and spatial presence."
+      "Physical models serve as the primary design tool, allowing the surface to be assessed through its assembly, thickness, and spatial presence.",
+      "",
+      "",
+      "This investigation opens a further direction: integrating insulation with the plywood skin so that thermal and structural functions might operate within one material system."
     ],
-    // his order (his numbers on the gallery sheet, 2026-11-09); the notes above moved with their pictures. The note
-    // "This investigation opens a further direction..." went with IMG_9909, now hidden
+    // his order (his numbers on the gallery sheet, 2026-11-09); the notes above moved with their pictures. The three he
+    // had taken off are back at the end for him to place (his ask, same night), IMG_9909 with its note
     order: ["img/anticlastic-roof-structure/hero.jpg", "img/anticlastic-roof-structure/hand-drawing.jpg", "img/anticlastic-roof-structure/section.png", "img/anticlastic-roof-structure/physical/web/IMG_9921.jpg",
       "img/anticlastic-roof-structure/elevation.png", "img/anticlastic-roof-structure/physical/web/IMG_9760.jpg", "img/anticlastic-roof-structure/plan.png", "img/anticlastic-roof-structure/physical/web/IMG_9801.jpg",
-      "img/anticlastic-roof-structure/physical/web/IMG_9872.jpg", "img/anticlastic-roof-structure/physical/web/IMG_9768.jpg"],
-    // off the page (his marks, 2026-11-09): IMG_9868 crossed out; IMG_9865 and IMG_9909 hidden
-    hide: ["img/anticlastic-roof-structure/physical/web/IMG_9868.jpg", "img/anticlastic-roof-structure/physical/web/IMG_9865-Edit.jpg", "img/anticlastic-roof-structure/physical/web/IMG_9909-Edit.jpg"],
+      "img/anticlastic-roof-structure/physical/web/IMG_9872.jpg", "img/anticlastic-roof-structure/physical/web/IMG_9768.jpg",
+      "img/anticlastic-roof-structure/physical/web/IMG_9868.jpg", "img/anticlastic-roof-structure/physical/web/IMG_9865-Edit.jpg", "img/anticlastic-roof-structure/physical/web/IMG_9909-Edit.jpg"],
     kicker: "New York, 2026",
     text: [
       "Developing Curvature investigates the architectural potential of flat plywood: how the geometry of individual pieces can generate a surface of double curvature. The shell develops through the orientation, edges, and connections of planar elements, bringing material constraints directly into the production of form. Physical models serve as the primary design tool, allowing the surface to be assessed through its assembly, thickness, and spatial presence. The resulting geometry holds together two scales of expression: the precise articulation of individual panels and the continuity of the larger shell.",

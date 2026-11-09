@@ -69,10 +69,7 @@
       marks.push(a);
     });
     var ab = el('a', 'qk qa', nav); ab.href = 'about.html';
-    // his logo in place of the "+" (his note, 2026-11-09: "for about don't use a +, use my logo"): the ring and its six
-    // stitches from fav/logo.svg, strokes thickened so they hold at this size
-    // then (same night: "not the ticks in the logo, it's too busy"): only its ring
-    el('i', 'qa-logo', ab).innerHTML = '<svg viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="none" stroke="currentColor" stroke-width="1"/></svg>';
+    el('i', '', ab, '+');   // the "+" again (his note, 2026-11-09: the logo and then its ring alone were tried)
     el('span', '', ab, 'About');
     // fan ticks: each one knows how far it is from the current project, so the lean can grow with the distance
     if(TICK === 'fan'){
@@ -753,9 +750,8 @@
       else cue.innerHTML = '<svg viewBox="0 0 16 8" width="16" height="8"><path d="M1 1l7 6 7-6"/></svg>';
       // on the last picture it opens all the pictures (side B), as scrolling on does there (his note, 2026-11-05: "after the
       // last photo keep the chevron even when in gallery mode"); on side B it stays as it is, a still mark
-      // on side B it says "Next project" and goes on to it (his ask, 2026-11-09: "let's test putting a Next Project in
-      // the lower chevron so people know they will go to the next one"); the next one in the index, round to the first
-      el('span', 'qcue-next', cue, 'Next project');
+      // on side B it goes on to the next project in the index, round to the first (his ask, 2026-11-09); the words "Next
+      // project" over it were tried and dropped ("too busy")
       cue.addEventListener('click', function(e){ e.stopPropagation(); if(bOn){ goProject(NEXT); return; } if(at === n - 1 && bBtn){ flip(true); return; } go(at + 1); });
     }
     // and one pointing up, at the head of the picture area (his ask, 2026-11-06: "we need another chevron to go up as
@@ -1020,14 +1016,14 @@
       if(BACK === 'sheet'){
         var n = F.length, rs = F.map(function(f){ return f.r; }), Rtot = rs.reduce(function(a, b){ return a + b; }, 0), best = null;
         // between the two chevrons, a clear margin from each (his note, 2026-11-09: "in every project the gallery should
-        // leave a margin from the chevron"); the lower one carries "Next project" above it on this side
+        // leave a margin from the chevron")
         var sb = sideB.getBoundingClientRect(), rm = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16, M = 2.6 * rm;
         placeCue(); placeUp();
         var uy = cueUp ? parseFloat(cueUp.style.top) : NaN;
         var yT = isFinite(uy) ? Math.max(0, uy + 4 - sb.top + M) : H * .04;
-        // the lower chevron's line (cue.style.top is its centre), less the word and its gap above it
+        // the lower chevron's line (cue.style.top is its centre)
         var cy = cue ? parseFloat(cue.style.top) : NaN;
-        var yB = isFinite(cy) ? Math.min(H, cy - 4 - 1.4 * rm - sb.top - M) : H * .96;
+        var yB = isFinite(cy) ? Math.min(H, cy - 4 - sb.top - M) : H * .96;
         if(yB - yT < H * .5){ yT = H * .04; yB = H * .96; }
         var Hl = yB - yT;
         var split = function(k){

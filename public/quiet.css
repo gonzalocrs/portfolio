@@ -631,13 +631,8 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 .qp-x:hover{color:var(--ink)}
 .qp-x{z-index:5}   /* stays with the words open too (his note, 2026-11-09: "keep index even with description") */
 /* his logo in place of About's "+" (2026-11-09) */
-.qk.qa i.qa-logo{display:inline-flex;align-items:center}
-.qk.qa i.qa-logo svg{display:block;width:13px;height:13px;overflow:visible}
-.qk.qa i.qa-logo{color:var(--mute)}
-/* "Next project" over the lower chevron, on the gallery side only (trial, 2026-11-09) */
-.qcue .qcue-next{display:none;font-size:.68rem;font-weight:400;letter-spacing:.06em;white-space:nowrap}
-.qb-show .qcue:not(.qcue-up){flex-direction:column-reverse;gap:.45rem;pointer-events:auto;transform:translate(-50%,calc(-100% + .7rem + 4px))}
-.qb-show .qcue:not(.qcue-up) .qcue-next{display:block}
+/* the lower chevron stays clickable on the gallery: it goes on to the next project (2026-11-09) */
+.qb-show .qcue:not(.qcue-up).in{pointer-events:auto}
 /* About, &contact=links (trial 2026-11-09): only his email and LinkedIn under the mark, no form */
 .qab-links #flow,.qab-links #touch{display:none!important}
 .qab-reach{margin-top:2.4rem;display:flex;flex-direction:column;align-items:center;gap:.9rem}
@@ -653,7 +648,6 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 @media (max-width:700px){ .qab-links .qab-mark{width:6.5rem} .qab-links .qab-reach{margin-top:1.6rem} }
 .qab-mailrow:hover .qab-copied{opacity:1}
 /* the ring alone (2026-11-09); on the About page itself About stays as everywhere else, not bold (his note) */
-.qk.qa i.qa-logo svg{width:11px;height:11px}
 .qk.qa.cur span{font-weight:300;color:var(--mute)}
 .qk.qa.cur i{color:var(--mute)}
 /* About, his sketch (2026-11-09): mark larger, email and LinkedIn beside its right-hand stitches (placed by buildAbout) */

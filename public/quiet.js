@@ -741,7 +741,7 @@
     //   line   a short hairline drawing downwards, no word
     //   chev   a small thin chevron pointing down, drifting gently
     //   off    nothing (as live until now)
-    var CUE = Q.get('cue');
+    var CUE = Q.get('cue'), NEXT = SLUGS[(SLUGS.indexOf(slug) + 1) % SLUGS.length];
     try{ if(CUE) sessionStorage.setItem('gc-cue', CUE); CUE = sessionStorage.getItem('gc-cue') || CUE; }catch(e){}
     CUE = ['word', 'line', 'chev', 'off'].indexOf(CUE) > -1 ? CUE : 'chev';   // his pick, 2026-11-05: the chevron, kept on every picture
     var cue = null;
@@ -752,7 +752,10 @@
       else cue.innerHTML = '<svg viewBox="0 0 16 8" width="16" height="8"><path d="M1 1l7 6 7-6"/></svg>';
       // on the last picture it opens all the pictures (side B), as scrolling on does there (his note, 2026-11-05: "after the
       // last photo keep the chevron even when in gallery mode"); on side B it stays as it is, a still mark
-      cue.addEventListener('click', function(e){ e.stopPropagation(); if(bOn) return; if(at === n - 1 && bBtn){ flip(true); return; } go(at + 1); });
+      // on side B it says "Next project" and goes on to it (his ask, 2026-11-09: "let's test putting a Next Project in
+      // the lower chevron so people know they will go to the next one"); the next one in the index, round to the first
+      el('span', 'qcue-next', cue, 'Next project');
+      cue.addEventListener('click', function(e){ e.stopPropagation(); if(bOn){ goProject(NEXT); return; } if(at === n - 1 && bBtn){ flip(true); return; } go(at + 1); });
     }
     // and one pointing up, at the head of the picture area (his ask, 2026-11-06: "we need another chevron to go up as
     // well"): back one picture; on side B back to the pictures; gone on the first picture, where there's nothing above
@@ -1014,7 +1017,18 @@
       // number of rows is the one that shows the pictures largest with rows of similar height. If the rows are too tall together, the whole block
       // shrinks evenly and stays centred, so all rows still share one width. No picture is drawn smaller than its row.
       if(BACK === 'sheet'){
-        var n = F.length, rs = F.map(function(f){ return f.r; }), Rtot = rs.reduce(function(a, b){ return a + b; }, 0), Hl = H * .92, best = null;
+        var n = F.length, rs = F.map(function(f){ return f.r; }), Rtot = rs.reduce(function(a, b){ return a + b; }, 0), best = null;
+        // between the two chevrons, a clear margin from each (his note, 2026-11-09: "in every project the gallery should
+        // leave a margin from the chevron"); the lower one carries "Next project" above it on this side
+        var sb = sideB.getBoundingClientRect(), rm = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16, M = 2.6 * rm;
+        placeCue(); placeUp();
+        var uy = cueUp ? parseFloat(cueUp.style.top) : NaN;
+        var yT = isFinite(uy) ? Math.max(0, uy + 4 - sb.top + M) : H * .04;
+        // the lower chevron's line (cue.style.top is its centre), less the word and its gap above it
+        var cy = cue ? parseFloat(cue.style.top) : NaN;
+        var yB = isFinite(cy) ? Math.min(H, cy - 4 - 1.4 * rm - sb.top - M) : H * .96;
+        if(yB - yT < H * .5){ yT = H * .04; yB = H * .96; }
+        var Hl = yB - yT;
         var split = function(k){
           // ordered partition of the pictures into k rows, sums close to Rtot / k (least squares)
           var tgt = Rtot / k, pre = [0], D = [], B = [];
@@ -1037,7 +1051,7 @@
           area *= Math.min.apply(null, hs) / Math.max.apply(null, hs);
           if(!best || area > best.area) best = {area: area, R: R, hs: hs, sc: sc, tot: tot};
         }
-        var sc = best.sc, bw = W * sc, x0 = (W - bw) / 2, y = Math.max(0, (H - best.tot * sc) / 2);
+        var sc = best.sc, bw = W * sc, x0 = (W - bw) / 2, y = yT + Math.max(0, (Hl - best.tot * sc) / 2);
         best.R.forEach(function(row, i){
           var rh = best.hs[i] * sc, x = x0;
           row.forEach(function(f){ var fw = f.r * rh; f.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + fw + 'px;height:' + rh + 'px'; x += fw + g * sc; });
@@ -1246,6 +1260,7 @@
         if((BACK === 'crate' || BACK === 'strip') && slide(d * 1.2) && !(d < 0 && bx >= -1)) return;
         var nb = Date.now(); if(nb - bTurn < 900) return;
         if(d < 0){ lock = nb; flip(false); }
+        else if(cue && nb - lock > 750){ lock = nb; goProject(NEXT); }   // on past the sheet: the next project
         return;
       }
       var now = Date.now(); if(now - lock < 750) return; lock = now;
@@ -1255,7 +1270,7 @@
       go(at + (d > 0 ? 1 : -1));
     }, {passive: false});
     on(window, 'keydown', function(e){
-      if(bOn && /^Arrow/.test(e.key)){ if(e.key === 'ArrowUp') flip(false); e.preventDefault(); return; }
+      if(bOn && /^Arrow/.test(e.key)){ if(e.key === 'ArrowUp') flip(false); else if(e.key === 'ArrowDown' && cue) goProject(NEXT); e.preventDefault(); return; }
       if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){ if(n === 1) toggle(true); else go(at + 1); e.preventDefault(); }
       if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ go(at - 1); e.preventDefault(); }
       if(e.key === 'Escape'){ if(bOn) flip(false); else if(isOpen()) toggle(false); else goHome(slug); }

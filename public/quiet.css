@@ -634,3 +634,7 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 .qk.qa i.qa-logo{display:inline-flex;align-items:center}
 .qk.qa i.qa-logo svg{display:block;width:13px;height:13px;overflow:visible}
 .qk.qa i.qa-logo{color:var(--mute)}
+/* "Next project" over the lower chevron, on the gallery side only (trial, 2026-11-09) */
+.qcue .qcue-next{display:none;font-size:.68rem;font-weight:400;letter-spacing:.06em;white-space:nowrap}
+.qb-show .qcue:not(.qcue-up){flex-direction:column-reverse;gap:.45rem;pointer-events:auto;transform:translate(-50%,calc(-100% + .7rem + 4px))}
+.qb-show .qcue:not(.qcue-up) .qcue-next{display:block}

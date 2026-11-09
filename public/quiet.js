@@ -68,7 +68,11 @@
       a.style.setProperty('--len', (.35 + ((marks.length + 1) * .618034 % 1) * 1.45).toFixed(2) + 'rem');
       marks.push(a);
     });
-    var ab = el('a', 'qk qa', nav); ab.href = 'about.html'; el('i', '', ab, '+'); el('span', '', ab, 'About');
+    var ab = el('a', 'qk qa', nav); ab.href = 'about.html';
+    // his logo in place of the "+" (his note, 2026-11-09: "for about don't use a +, use my logo"): the ring and its six
+    // stitches from fav/logo.svg, strokes thickened so they hold at this size
+    el('i', 'qa-logo', ab).innerHTML = '<svg viewBox="22 22 156 156" aria-hidden="true"><circle cx="100" cy="100" r="70" fill="none" stroke="currentColor" stroke-width="7" opacity=".4"/><path fill="none" stroke="currentColor" stroke-width="15" d="M120.09 60.74L132.29 48.54M143.75 100H161M120.09 139.26L132.29 151.46M67.71 151.46L79.91 139.26M42.13 108.55A58.5 58.5 0 0 1 42.13 91.45M67.71 48.54L79.91 60.74"/></svg>';
+    el('span', '', ab, 'About');
     // fan ticks: each one knows how far it is from the current project, so the lean can grow with the distance
     if(TICK === 'fan'){
       var spread = function(){
@@ -676,7 +680,8 @@
       on = on == null ? !isOpen() : on;
       autoW = false;   // set again by the last picture when it opened them itself
       followX(1300);   // INDEX moves with the first mark, frame by frame, as the lines rise (his note, 2026-11-09: "there's a small delay on the index, it should move up with the title")
-      if(on && bOn) flip(false);   // the words belong to side A
+      if(on && bOn && DESC !== 'gallery') flip(false);   // the words belong to side A (except in the &desc=gallery trial)
+      if(bOn && DESC === 'gallery') setTimeout(function(){ requestAnimationFrame(layB); }, 0);   // the sheet takes the room the words give or leave
       if(on === isOpen()) return;
       st.style.setProperty('--ny', nameY() + 'px');
       if(D === 'beside') placeBeside();
@@ -908,11 +913,17 @@
       // image in each project"), and go again on the way back if they came by themselves; once the + or Esc has been used
       // they're left as set. Not on a phone, where the words are a card over the picture
       if(innerWidth > 700){
-        if(k === n - 1 && n > 1 && !isOpen()){ clearTimeout(autoT); autoT = setTimeout(function(){ if(at === n - 1 && !bOn && !isOpen()){ toggle(true); autoW = true; } }, first ? 900 : 450); }
+        if(k === n - 1 && n > 1 && !isOpen() && DESC !== 'gallery'){ clearTimeout(autoT); autoT = setTimeout(function(){ if(at === n - 1 && !bOn && !isOpen()){ toggle(true); autoW = true; } }, first ? 900 : 450); }
         else if(k < n - 1){ clearTimeout(autoT); if(autoW && isOpen()) toggle(false); autoW = false; }
       }
     }
     var autoW = false, autoT = 0;
+    // when the words open by themselves (trial, his ask 2026-11-09: "make an iteration with the description appear with
+    // the gallery, not the last render, to evaluate it"): &desc=last (default: with the last picture) | gallery (with
+    // the sheet of all the pictures, the sheet laid out in the room right of the words). Kept for the visit
+    var DESC = Q.get('desc'); try{ if(DESC) sessionStorage.setItem('gc-desc', DESC); DESC = sessionStorage.getItem('gc-desc') || DESC; }catch(e){}
+    DESC = DESC === 'gallery' && BACK !== 'off' && all.length > 1 ? 'gallery' : 'last';
+    wrap.classList.add('qdesc-' + DESC);
     // side B (trial ?back=): all the pictures at once
     var sideB = null, bOn = false, bBtn = null, bTurn = 0, nameEl0 = me.querySelector('span');
     if(BACK !== 'off' && all.length > 1){
@@ -1002,6 +1013,11 @@
     // height chosen so that all the rows fit), sleeve in the largest squares that fit, crate and strip in one line
     function layB(){
       if(!sideB) return;
+      // &desc=gallery with the words open: the sheet starts a little past the words' right edge
+      if(DESC === 'gallery' && isOpen()){
+        var rem0 = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+        sideB.style.left = Math.max(0, Math.round(card.getBoundingClientRect().right + 3 * rem0 - st.getBoundingClientRect().left)) + 'px';
+      } else sideB.style.left = '';
       var box = sideB.firstChild, F = Array.prototype.slice.call(box.children), W = sideB.clientWidth, H = sideB.clientHeight, g = Math.max(10, W * .012);
       if(!F.length) return;
       // sheet, justified (his ask 2026-11-06: "make the grid more justified"): the pictures, in order, are split into
@@ -1032,7 +1048,7 @@
           area *= Math.min.apply(null, hs) / Math.max.apply(null, hs);
           if(!best || area > best.area) best = {area: area, R: R, hs: hs, sc: sc, tot: tot};
         }
-        var sc = best.sc, bw = W * sc, x0 = (W - bw) / 2, y = Math.max(0, (H - best.tot * sc) / 2);
+        var sc = best.sc, bw = W * sc, x0 = DESC === 'gallery' && isOpen() ? 0 : (W - bw) / 2, y = Math.max(0, (H - best.tot * sc) / 2);
         best.R.forEach(function(row, i){
           var rh = best.hs[i] * sc, x = x0;
           row.forEach(function(f){ var fw = f.r * rh; f.style.cssText = 'left:' + x + 'px;top:' + y + 'px;width:' + fw + 'px;height:' + rh + 'px'; x += fw + g * sc; });
@@ -1081,7 +1097,9 @@
     }
     function flip(to){
       if(to === bOn) return;
-      if(to && isOpen()) toggle(false);
+      if(to && isOpen() && DESC !== 'gallery') toggle(false);
+      if(!to && DESC === 'gallery' && isOpen()) toggle(false);   // the words leave with the sheet
+      if(to && DESC === 'gallery' && !isOpen()){ toggle(true); autoW = true; }   // and come with it
       if(!to){
         var t0 = tileAt(at);
         if(t0){ pick(at, t0); return; }
@@ -1116,6 +1134,7 @@
     // place on side A; the others fade where they are; nothing turns
     function pick(k, f){
       if(!bOn) return;
+      if(DESC === 'gallery' && isOpen()) toggle(false);
       var r0 = rectIn(f), src = f.querySelector('img').src;
       wrap.classList.add('qb-pick');
       if(k !== at) go(k);

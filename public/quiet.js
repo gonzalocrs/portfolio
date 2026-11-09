@@ -1441,20 +1441,23 @@
       var mk = wrap.querySelector('.qab-mark'), sd = wrap.querySelector('.qab-side'), wd = wrap.querySelector('.qab-words');
       var lay = function(){
         mk.style.transform = ''; mk.style.width = ''; [row, li].forEach(function(e){ e.style.left = e.style.top = ''; });
-        if(innerWidth <= 700){ if(window.gcMark) [0, 1, 2].forEach(function(i){ window.gcMark.tone(i, 0); }); return; }
-        var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16, g = 2.2 * rem;
-        var tw = Math.max(row.offsetWidth, li.offsetWidth), W = sd.clientWidth;
+        // a phone too, side by side as on a computer (his note, 2026-11-09: "make the logo and email be horizontal as it is
+        // in the full version"): the mark as large as the width leaves beside the email, the group centred
+        var phone = innerWidth <= 700;
+        var rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16, g = (phone ? 1.2 : 2.2) * rem;
+        var rowW = phone ? (row.querySelector('.qab-mail') || row).offsetWidth : row.offsetWidth;   // a phone centres on the email itself
+        var tw = Math.max(rowW, li.offsetWidth), W = sd.clientWidth;
         // the ring (70 of the mark's 200 units, so .7 of its width across) as tall as the words; smaller if the room is short
-        var S = Math.min(wd.offsetHeight / .7, sd.clientHeight, (W - g - tw) / .85);
+        var S = phone ? Math.min(W * .6, (W - g - tw - 8) / .7) : Math.min(wd.offsetHeight / .7, sd.clientHeight, (W - g - tw) / .85);
         mk.style.width = Math.round(S) + 'px';
         var r = .35 * S, cx0 = mk.offsetLeft + S / 2, cy = mk.offsetTop + S / 2, a45 = r * Math.SQRT1_2;
-        var reach = Math.max(r + g + row.offsetWidth, a45 + g + li.offsetWidth);
+        var reach = Math.max(r + g + rowW, a45 + g + li.offsetWidth);
         // the group (ring + email/LinkedIn) centred between his words and the page's right margin, so the space from the
         // words to the ring equals the space from the email to the margin (his note, 2026-11-09: "space the circle + email
         // so the distance is the same"); the right margin matches the name's on the left
         var mr = mk.getBoundingClientRect(), ring0 = mr.left + S / 2 - r, wR = wd.getBoundingClientRect().right;
         var nm = document.querySelector('.qt-name, .q-name, header a, .brand'), mL = nm ? Math.max(0, nm.getBoundingClientRect().left) : 2 * rem;
-        var gw = r + reach, want = wR + (innerWidth - mL - wR - gw) / 2;
+        var gw = r + reach, want = phone ? sd.getBoundingClientRect().left + (W - gw) / 2 : wR + (innerWidth - mL - wR - gw) / 2;
         var shift = Math.round(want - ring0), cx = cx0 + shift;
         mk.style.transform = 'translateX(' + shift + 'px)';
         row.style.left = Math.round(cx + r + g) + 'px'; row.style.top = Math.round(cy - row.offsetHeight / 2) + 'px';

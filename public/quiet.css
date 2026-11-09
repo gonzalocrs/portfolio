@@ -652,7 +652,7 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 .qk.qa.cur i{color:var(--mute)}
 /* About (2026-11-09): the mark as it was, ring as tall as his words (sized by buildAbout); email and LinkedIn where the
    topics stood, in the topics' type */
-@media (min-width:701px){
+@media all{   /* phones too since 2026-11-09 (his note: "horizontal as it is in the full version") */
   .qab-links .qab-mark{transition:none}
   .qab-links .qab-reach{position:absolute;inset:0;margin:0;display:block;pointer-events:none}
   .qab-links .qab-mailrow,.qab-links .qab-li{position:absolute;pointer-events:auto}
@@ -696,4 +696,12 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
   .qt-ticks .qk.qa span{font-family:'Archivo',sans-serif;font-size:10px;font-weight:300;line-height:1;letter-spacing:.3em;margin-right:-.3em;text-transform:none;color:var(--ink)}   /* "About": capital first letter only (his fifth note) */
   /* the word goes, the chevron stays exactly where it was (his note: "you didn't have to move the position of the chevron") */
   .qt-ticks .qp-x span{visibility:hidden}
+}
+/* phone, sixth note (2026-11-09): About without the wide spacing; on the About page no marks and no Index at all (About
+   at the top right stays) */
+@media (max-width:700px){
+  .qt-ticks .qk.qa span{letter-spacing:0;margin-right:0}
+  .qab .qt-ticks .qk:not(.qa),.qab .qt-ticks .qp-x{display:none!important}
+  .qab .qt-ticks{padding:0;margin:0;min-height:0}
+  .qab-links .qab-side{padding-bottom:2rem}
 }

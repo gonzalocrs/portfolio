@@ -562,8 +562,6 @@
     var HOV = (Q.get('hov') || 'top').toLowerCase(); wrap.classList.add('hv-' + (HOV === 'none' ? 'none' : 'top'));
     var card = el('aside', 'qp-card', st), meta = el('div', 'meta', card);
     el('span', 'k', meta, p.kicker || '');
-    // the project's tags, under the place and year in the same type (his ask, 2026-11-09; first tried over the picture)
-    if(p.tags && p.tags.length) el('span', 'k qp-tags', meta, [p.group].concat(p.tags).join('   '));
     var cr = el('div', 'cr', meta);
     (p.credits || []).forEach(function(r){ if(r[0] === 'Year' || !r[1]) return; var c = el('p', '', cr); el('b', '', c, r[0]); c.appendChild(document.createTextNode('  ' + r[1])); });
     var tx = el('div', 'tx', card);
@@ -785,21 +783,6 @@
       cue.style.left = Math.round(x) + 'px'; cue.style.top = Math.round(y) + 'px';
       if(curIm && !cue.classList.contains('off')) cue.classList.add('in');   // shows with the first picture
     }
-    // tags over the picture (his ask, 2026-11-09: "add tags for each project", after his friend's EXHIBIT / ARCHITECTURE /
-    // 2025 line): the project's group in ink, then its tags and year in grey, small spaced capitals, standing on the
-    // picture's top left corner and moving with it. Tags come from the project's tags: [...] in projects.js
-    var tagEl = el('div', 'qtag', wrap); tagEl.style.display = 'none';   // moved into the words (2026-11-09)
-    (function(){
-      var yr = (p.kicker || '').match(/(\d{4})\s*$/), bits = [p.group].concat(p.tags || []).concat(yr ? [yr[1]] : []);
-      bits.forEach(function(b, i){ el('span', i ? '' : 'qtag-lead', tagEl, b); });
-    })();
-    function placeTag(){
-      var r = curIm && curIm.isConnected ? curIm.getBoundingClientRect() : null, rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
-      if(!r || !r.width){ return; }
-      tagEl.style.left = Math.round(r.left) + 'px'; tagEl.style.top = Math.round(r.top - 1.5 * rem) + 'px';
-      tagEl.classList.add('in');
-    }
-    on(window, 'resize', placeTag);
     function placeUp(){
       if(!cueUp) return;
       var r = chevRect(), rem = parseFloat(getComputedStyle(document.documentElement).fontSize), x = (r.left + r.right) / 2, y = Math.max(r.top - 1.5 * rem, 1.8 * rem);
@@ -907,7 +890,7 @@
             };
             if(window.ResizeObserver) new ResizeObserver(function(){ fit(); }).observe(L);
           }
-          var fit0 = fit; fit = function(){ fit0(); centre(L, im); fit0(); curIm = im; placeCue(); placeUp(); placeTag(); setTimeout(placeTag, 950); };
+          var fit0 = fit; fit = function(){ fit0(); centre(L, im); fit0(); curIm = im; placeCue(); placeUp(); };
           im.addEventListener('load', fit); f.fit = fit; if(im.complete) requestAnimationFrame(fit);
         }
         else el('div', 'plate', f, 'In preparation');

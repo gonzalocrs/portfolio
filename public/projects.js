@@ -37,7 +37,9 @@ window.PROJECTS = {
     title: "Outer Dock", group: "Unbuilt", hue: 200,
     // notes beside the pictures, one per picture as shown (hero first), his own sentences from the text below, word
     // for word (his ask, 2026-11-09: "the small tag descriptions next to the images explaining the project"); "" = none
+    // the opening picture never carries a note (his note, 2026-11-09), so this one sits with the second picture
     notes: [
+      "",
       "The barge tends to the artists, the artists tend to the barge, the dock tends to both."
     ],
     kicker: "New York, 2026",

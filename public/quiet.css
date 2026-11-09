@@ -615,3 +615,9 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
   body.qh-one.qb-names-thin .qt-ticks:hover .qk.cur:not(:hover) span{opacity:1}
   body.qh-one.qb-names-thin .qt-ticks .qk:not(.cur):not(.qa):hover i{width:3rem;transform:none}
 }
+/* the name pointed at comes up to the open project's size (his note, 2026-11-09: "the other titles are still so small
+   while hovering"); the rest stay small and faint */
+@media (min-width:701px){
+  .qp .qt-ticks .qk:not(.cur):not(.qa):hover span,
+  body.qh-one.qb-names-thin .qt-ticks .qk:not(.cur):not(.qa):hover span{font-size:clamp(1rem,1.2vw,1.15rem)}
+}

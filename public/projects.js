@@ -95,8 +95,9 @@ window.PROJECTS = {
         // no effects; his own original colours (his call, 2026-11-06, after copper, Joint and 30%-darker versions); since
         // 2026-11-06 ~10:40pm NY his redone Artboard 10 (white ground, new palette), refs in the same places;
         // lines as his. Note on the left (notes below). Since 2026-11-06 ~12:15am NY his Artboard 30 (tenement facades +
-        // the five diagrams, no references); the sheet still shows only the five diagrams
-      {src: "img/social-sanctuary/tenement-diagram.webp", drawing: true, sheet: .6, sheetSrc: "img/social-sanctuary/sheet-diagram-2.webp", caption: "Tenement facades and underspecificity diagram"},
+        // the five diagrams, no references); the sheet still shows only the five diagrams. Since 2026-11-09 ~3:50am NY
+        // (his ask): the brownstones at 85% and the diagrams at 120% on the same sheet (tenement-diagram-2.webp)
+      {src: "img/social-sanctuary/tenement-diagram-2.webp", drawing: true, sheet: .6, sheetSrc: "img/social-sanctuary/sheet-diagram-2.webp", caption: "Tenement facades and underspecificity diagram"},
         // his artboard: neighbourhood map with the site, then the block plan; full width kept, the white above and below
         // cropped off so the tag sits beside the map (his ask, 2026-11-06)
       {src: "img/social-sanctuary/site-context.webp", drawing: true, scale: .75, caption: "Site in the East Village"},

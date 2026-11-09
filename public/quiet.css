@@ -663,4 +663,7 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 .qgend-none.qb-show .qcue{opacity:0!important;pointer-events:none!important}
 /* inside a project, back to only the pointed mark's name (his note, 2026-11-09: "i still see the faint word ... just put
    back the previous version when only the title showed when hovering"): no faint names over the column, whatever the trial */
-.qp:not(.open) .qt-ticks .qk:not(.cur):not(.qa):not(:hover) span{opacity:0!important}
+.qp:not(.open) .qt-ticks .qk:not(.cur):not(.qa):not(:hover) span{opacity:0!important;transition:none!important}   /* at once: a name that was the title a moment ago (moving between projects) mustn't linger as a faint word */
+/* and only once the pointer has moved onto the index: a pointer left resting there while the wheel moves between projects
+   doesn't wake the name under it (his "still here. see?", 2026-11-09) */
+.qp:not(.open) .qt-ticks:not(.qz) .qk:not(.cur):not(.qa) span{opacity:0!important;transition:none!important}

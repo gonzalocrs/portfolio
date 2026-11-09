@@ -155,8 +155,8 @@ window.PROJECTS = {
       "The shell develops through the orientation, edges, and connections of planar elements, bringing material constraints directly into the production of form.",
       "",
       "The study explores how changes in panel orientation generate structural depth, linking the shell’s geometric character to its potential stiffness.",
-      "Physical models serve as the primary design tool, allowing the surface to be assessed through its assembly, thickness, and spatial presence.",
       "The resulting geometry holds together two scales of expression: the precise articulation of individual panels and the continuity of the larger shell.",
+      "Physical models serve as the primary design tool, allowing the surface to be assessed through its assembly, thickness, and spatial presence.",   // these two swapped (his ask, 2026-11-09)
       "",
       "",
       "",

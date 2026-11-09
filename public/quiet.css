@@ -64,8 +64,8 @@
   .qk.cur i{width:3rem;height:2px;background:var(--rule)}
   .qk span{font-weight:800;font-size:clamp(1rem,1.2vw,1.15rem);letter-spacing:-.02em;white-space:nowrap;opacity:0;transform:translateX(-.35rem);transition:opacity .4s ease,transform .4s ease;pointer-events:none}
   .qk.cur span,.qk:hover span{opacity:1;transform:none}
-  .qt-ticks:hover .qk.cur:not(:hover) span{opacity:0}
-  .qp .qt-ticks:hover .qk.cur:not(:hover) span{opacity:1}
+  .qt-ticks.qz .qk.cur:not(:hover) span{opacity:0}
+  .qp .qt-ticks.qz .qk.cur:not(:hover) span{opacity:1}
   .qk.gs{margin-top:1.3rem}
   .qk.qa{margin-top:1.9rem}
   .qk.qa i{width:auto;height:auto;background:none;font-style:normal;font-family:var(--mono);font-size:.8rem;line-height:1;color:var(--faint)}
@@ -128,7 +128,7 @@
     .qk i::after{width:100%;height:100%;transform:scaleY(var(--p,0));transform-origin:bottom}
     .qk span{position:absolute;left:.45rem;top:calc(100% - 1.6rem);transform:none}
     .qk:hover:not(.cur) span{opacity:0}
-    .qt-ticks:hover .qk.cur:not(:hover) span{opacity:1}
+    .qt-ticks.qz .qk.cur:not(:hover) span{opacity:1}
     .qk.gs{margin:0 0 0 .9rem}
     .qk.qa{margin:0 0 0 .9rem}
     .qk.qa i{height:auto;width:auto}
@@ -581,14 +581,14 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 .qp-x.qp-x-top{position:fixed;left:auto;right:var(--gut,2.5rem);transform:translateY(-50%)}
 .qp-x:hover{color:var(--mute)}
 @media (min-width:701px){
-  .qp:not(.open) .qt-ticks:hover .qk:not(.cur):not(.qa) span{opacity:.32;transform:none}
-  .qp:not(.open) .qt-ticks:hover .qk:not(.cur):hover span{opacity:1}
+  .qp:not(.open) .qt-ticks.qz .qk:not(.cur):not(.qa) span{opacity:.32;transform:none}
+  .qp:not(.open) .qt-ticks.qz .qk:not(.cur):hover span{opacity:1}
   /* the other names read smaller than the open project's (his note, 2026-11-09: "make them read smaller") */
   .qp .qk:not(.cur):not(.qa) span{font-size:.8rem;letter-spacing:-.01em}
   /* "About" stays written at all times, on the home too (his note, 2026-11-09) */
-  .qk.qa span,.qt-ticks:hover .qk.qa span{opacity:1;transform:none}
+  .qk.qa span,.qt-ticks.qz .qk.qa span{opacity:1;transform:none}
   /* but not while a project's words are open, where it ran into them (his note, 2026-11-09) */
-  .qp.open .qk.qa span,.qp.open .qt-ticks:hover .qk.qa span{opacity:0}
+  .qp.open .qk.qa span,.qp.open .qt-ticks.qz .qk.qa span{opacity:0}
 }
 @media (max-width:700px){ .qp-x{position:fixed;left:auto;right:var(--gut,1.25rem);top:1.6rem;padding:.4rem 0} }
 /* trial ?tone=grey (2026-11-09): a light grey ground, as on his friend's site */
@@ -596,10 +596,10 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 /* the other names inside a project (his note, 2026-11-09), &names= */
 @media (min-width:701px){
   .qp.qnm-thin .qk:not(.cur):not(.qa) span{font-weight:300;letter-spacing:0}
-  .qp.qnm-thin:not(.open) .qt-ticks:hover .qk:not(.cur):not(.qa) span{opacity:.22}
-  .qp.qnm-thin:not(.open) .qt-ticks:hover .qk:not(.cur):not(.qa):hover span{opacity:1}
-  .qp.qnm-index:not(.open) .qt-ticks:hover .qk:not(.cur):not(.qa) span{opacity:0;transform:translateX(-.35rem)}
-  .qp.qnm-index:not(.open) .qt-ticks:hover .qk:not(.cur):not(.qa):hover span{opacity:1;transform:none}
+  .qp.qnm-thin:not(.open) .qt-ticks.qz .qk:not(.cur):not(.qa) span{opacity:.22}
+  .qp.qnm-thin:not(.open) .qt-ticks.qz .qk:not(.cur):not(.qa):hover span{opacity:1}
+  .qp.qnm-index:not(.open) .qt-ticks.qz .qk:not(.cur):not(.qa) span{opacity:0;transform:translateX(-.35rem)}
+  .qp.qnm-index:not(.open) .qt-ticks.qz .qk:not(.cur):not(.qa):hover span{opacity:1;transform:none}
   .qp.qnm-index.ix-on:not(.open) .qt-ticks .qk:not(.cur):not(.qa) span{opacity:.32;transform:none}
 }
 /* the name pointed at lines up with the open project's name: its mark lies flat at the open mark's length (his note,
@@ -609,9 +609,9 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
   /* the home, the same index (his ask, same day): over the column every name thin and faint, the current one as it is,
      the one pointed at in ink on a flat mark as long as the current one */
   body.qh-one.qb-names-thin .qt-ticks .qk:not(.cur):not(.qa) span{font-size:.8rem;font-weight:300;letter-spacing:0}
-  body.qh-one.qb-names-thin .qt-ticks:hover .qk:not(.cur):not(.qa) span{opacity:.22;transform:none}
-  body.qh-one.qb-names-thin .qt-ticks:hover .qk:not(.cur):not(.qa):hover span{opacity:1}
-  body.qh-one.qb-names-thin .qt-ticks:hover .qk.cur:not(:hover) span{opacity:1}
+  body.qh-one.qb-names-thin .qt-ticks.qz .qk:not(.cur):not(.qa) span{opacity:.22;transform:none}
+  body.qh-one.qb-names-thin .qt-ticks.qz .qk:not(.cur):not(.qa):hover span{opacity:1}
+  body.qh-one.qb-names-thin .qt-ticks.qz .qk.cur:not(:hover) span{opacity:1}
   body.qh-one.qb-names-thin .qt-ticks .qk:not(.cur):not(.qa):hover i{width:3rem;transform:none}
 }
 /* the name pointed at comes up to the open project's size (his note, 2026-11-09: "the other titles are still so small
@@ -630,3 +630,10 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 .qp-x{font-family:inherit;font-size:.68rem;font-weight:400;letter-spacing:.06em;text-transform:none;color:var(--mute)}
 .qp-x:hover{color:var(--ink)}
 .qp-x{z-index:5}   /* stays with the words open too (his note, 2026-11-09: "keep index even with description") */
+/* About in the INDEX button's type (his note, 2026-11-09: "make the about match the Index font"); on the About page
+   itself it stays the bold title */
+@media (min-width:701px){
+  .qk.qa:not(.cur) span{font-family:inherit;font-size:.68rem;font-weight:400;letter-spacing:.06em;text-transform:none;color:var(--mute)}
+  .qk.qa:not(.cur) i{font-size:.72rem;color:var(--mute)}
+  .qk.qa:not(.cur):hover span,.qk.qa:not(.cur):hover i{color:var(--ink)}
+}

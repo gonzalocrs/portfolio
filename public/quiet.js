@@ -1427,4 +1427,19 @@
     else if(H === 'flow' || Q.has('flow')) buildRoll();
     else buildRollOne();
   }
+  // the names show only while the pointer is on the index itself (his note, 2026-11-09: "make the faint names appear
+  // only in this area, that also for the home page"): from INDEX (or the first mark) down to the last project, as wide
+  // as the names; not the empty column above and below, not About. The CSS keys on .qz instead of :hover
+  function zone(e){
+    Array.prototype.forEach.call(document.querySelectorAll('.qt-ticks'), function(n){
+      var ks = n.querySelectorAll('.qk:not(.qa)'), x = n.querySelector('.qp-x'), on = false;
+      if(e && ks.length && innerWidth > 700){
+        var r = n.getBoundingClientRect(), a = (x && x.offsetParent ? x : ks[0]).getBoundingClientRect(), z = ks[ks.length - 1].getBoundingClientRect();
+        on = e.clientX >= r.left - 14 && e.clientX <= r.right && e.clientY >= a.top - 10 && e.clientY <= z.bottom + 10;
+      }
+      n.classList.toggle('qz', on);
+    });
+  }
+  document.addEventListener('mousemove', zone, {passive: true});
+  document.addEventListener('mouseleave', function(){ zone(null); });
 })();

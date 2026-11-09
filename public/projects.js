@@ -226,15 +226,15 @@ window.PROJECTS = {
       "Lean Shells investigates how a roof can do more with less material.",
       "",
       "Thin plywood panels form hollow units whose angled connections generate a vault, combining structural depth with space for insulation.",
-      "",
+      // moved here from the last drawing (his screenshots, 2026-11-09: this note with the model seen from the front)
+      "Material economy becomes a design ambition: creating strength, shelter, and spatial presence through a restrained system of parts.",
       "The study seeks an efficient enclosure through the careful arrangement of lightweight parts.",
       "Exposed plywood edges and repeating facets give the assembly its architectural character.",
       "",
       "",
       "Physical model making connects the detail of each joint to the geometry of the whole.",
       "",
-      "",
-      "Material economy becomes a design ambition: creating strength, shelter, and spatial presence through a restrained system of parts."
+      ""
     ],
     kicker: "New York, 2026",
     text: [

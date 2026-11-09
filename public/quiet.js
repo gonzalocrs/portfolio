@@ -618,6 +618,30 @@
       L.style.translate = Math.min(0, sh) + 'px 0';
     }
     on(window, 'resize', function(){ var L = st.querySelector('.p-layer.on'); centre(L, L && L.querySelector('.qf img, .qf .plate')); });
+    // where the drawing itself sits inside its file, as shares of the file (left, top, right, bottom): many drawings
+    // carry wide white margins, and a note placed by the file's edge ends up far from the drawing (Lean Shells' section,
+    // his note 2026-11-09: "the centering of the drawing is good but the note is too to the left"). Photos come out whole
+    function ink(im){
+      if(im._ink) return im._ink;
+      var all = {l: 0, t: 0, r: 1, b: 1};
+      if(!im.complete || !im.naturalWidth) return all;
+      try {
+        var W = Math.min(400, im.naturalWidth), H = Math.max(1, Math.round(W * im.naturalHeight / im.naturalWidth));
+        var c = document.createElement('canvas'); c.width = W; c.height = H;
+        var x = c.getContext('2d', {willReadFrequently: true}); x.drawImage(im, 0, 0, W, H);
+        var d = x.getImageData(0, 0, W, H).data, l = W, t = H, r = -1, b = -1;
+        for(var y = 0; y < H; y++) for(var i = 0; i < W; i++){
+          var o = (y * W + i) * 4;
+          if(d[o + 3] > 24 && (d[o] < 235 || d[o + 1] < 235 || d[o + 2] < 235)){ if(i < l) l = i; if(i > r) r = i; if(y < t) t = y; if(y > b) b = y; }
+        }
+        im._ink = r < 0 ? all : {l: l / W, t: t / H, r: (r + 1) / W, b: (b + 1) / H};
+      } catch(e){ im._ink = all; }
+      return im._ink;
+    }
+    function inkRect(im, r){
+      var k = ink(im);
+      return {left: r.left + k.l * r.width, right: r.left + k.r * r.width, top: r.top + k.t * r.height, bottom: r.top + k.b * r.height, width: r.width, k: k};
+    }
     // beside: the words start a short, fixed step after the "+" (whatever the width of the window), the kicker on the
     // name's line; the picture follows a little after the words
     function placeBeside(){
@@ -914,16 +938,21 @@
                   if(im.style.maxWidth !== base){ im.style.maxWidth = base; }
                   if(it.scale){ im.style.maxWidth = base; var w2 = im.getBoundingClientRect().width; if(w2) im.style.maxWidth = 'min(' + (base || '100%') + ', ' + Math.floor(w2 * it.scale) + 'px)'; }
                   centre(L, im); r = im.getBoundingClientRect();
-                  var M = Math.max(me.getBoundingClientRect().right - nameShift() + 2 * rem, 0), miss = (w + g) - (r.left - M);
+                  // and clear of the name itself, however long: the note starts at least 2.4rem past the name's "+", the gap
+                  // Joint's note has (his note, 2026-11-09: "the margin between the title and the note in Joint ... is
+                  // really good and then in Anticlastic is not working")
+                  // the room is counted from the drawing itself, not its file's white margin
+                  var M = Math.max(me.getBoundingClientRect().right - nameShift() + 2 * rem, plus.getBoundingClientRect().right + 2.4 * rem, 0), miss = (w + g) - (inkRect(im, r).left - M);
                   if(miss > 0){
                     var r0 = r;
-                    im.style.maxWidth = Math.floor(r0.width - miss) + 'px'; r = im.getBoundingClientRect();
+                    im.style.maxWidth = Math.floor(r0.width - miss / Math.max(.2, 1 - ink(im).l)) + 'px'; r = im.getBoundingClientRect();
                     L.style.translate = Math.round((parseFloat(L.style.translate) || 0) + r0.right - r.right) + 'px 0';
                     r = im.getBoundingClientRect();
                   }
                   lr = L.getBoundingClientRect();
                 }
-                nt.classList.remove('qn-low'); nt.style.width = w + 'px'; nt.style.left = (right ? r.right - lr.left + g : r.left - lr.left - w - g) + 'px'; nt.style.top = (r.bottom - lr.top - nt.offsetHeight) + 'px';
+                var v = inkRect(im, r);
+                nt.classList.remove('qn-low'); nt.style.width = w + 'px'; nt.style.left = (right ? v.right - lr.left + g : v.left - lr.left - w - g) + 'px'; nt.style.top = (v.bottom - lr.top - nt.offsetHeight) + 'px';
               }
               else {
                 // phone: the picture and its note centred together as one block, the note under it
@@ -937,10 +966,13 @@
                 if(im.style.maxHeight !== mh){ im.style.maxHeight = mh; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
                 if(im.style.marginBottom !== mb){ im.style.marginBottom = mb; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
                 var fl = (lr.width - fw) / 2;
-                nt.style.left = (long ? fl + (fw - nt.offsetWidth) / 2 : r.left - lr.left) + 'px'; nt.style.top = (r.bottom - lr.top + .7 * rem) + 'px';
+                var vp = inkRect(im, r);
+                nt.style.left = (long ? fl + (fw - nt.offsetWidth) / 2 : vp.left - lr.left) + 'px'; nt.style.top = (vp.bottom - lr.top + .7 * rem) + 'px';
               }
             };
-            if(window.ResizeObserver) new ResizeObserver(function(){ fit(); }).observe(L);
+            // the note too: its height changes once the web font arrives (a line more or less), which left its last
+            // line a line above the picture's bottom edge
+            if(window.ResizeObserver){ var ro = new ResizeObserver(function(){ fit(); }); ro.observe(L); ro.observe(nt); }
           }
           var fit0 = fit; fit = function(){ fit0(); centre(L, im); fit0(); curIm = im; placeCue(); placeUp(); };
           im.addEventListener('load', fit); f.fit = fit; if(im.complete) requestAnimationFrame(fit);

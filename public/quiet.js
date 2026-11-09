@@ -51,6 +51,9 @@
       if(b.parentNode !== want) want.appendChild(b);
     };
     put(); addEventListener('resize', put);
+    // About on a phone stands centred on the name's height (the CSS reads --ab-top)
+    var mid = function(){ var g = document.querySelector('.gv-mark'), r = g && g.getBoundingClientRect(); if(r && r.height) document.documentElement.style.setProperty('--ab-top', Math.round(r.top + r.height / 2) + 'px'); };
+    mid(); addEventListener('resize', mid); if(document.fonts) document.fonts.ready.then(mid);
   }
   function el(tag, cls, parent, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; if(parent) parent.appendChild(e); return e; }
   function fader(st){

@@ -689,11 +689,11 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
   .qab .qt-ticks{order:2;padding-bottom:2.4rem;margin-top:1.2rem}
 }
 /* phone, third note (2026-11-09: "the about feels lost and uninteresting"; "delete the word index and just leave the
-   chevron"): About set in the name's own type (Archivo 300, 14px, capitals spaced as in the name), in ink, on the line
-   of VALCÁRCEL, so it reads as part of the header; Index only its chevron, with room round it for a thumb */
+   chevron"): About in capitals, smaller (10px), centred on the name's height (his fourth note: "caps but smaller and
+   centered vertically to the logo"); Index only its chevron, with room round it for a thumb */
 @media (max-width:700px){
-  .qt-ticks .qk.qa{top:calc(1.6rem - .4rem + 6px);padding:.4rem 0}
-  .qt-ticks .qk.qa span{font-family:'Archivo',sans-serif;font-size:14px;font-weight:300;line-height:1;letter-spacing:.42em;margin-right:-.42em;text-transform:uppercase;color:var(--ink)}
-  .qt-ticks .qp-x span{display:none}
-  .qt-ticks .qp-x{padding:.5rem 0 .3rem .9rem}
+  .qt-ticks .qk.qa{top:var(--ab-top,32px);padding:.4rem 0;transform:translateY(-50%)}
+  .qt-ticks .qk.qa span{font-family:'Archivo',sans-serif;font-size:10px;font-weight:300;line-height:1;letter-spacing:.3em;margin-right:-.3em;text-transform:uppercase;color:var(--ink)}
+  /* the word goes, the chevron stays exactly where it was (his note: "you didn't have to move the position of the chevron") */
+  .qt-ticks .qp-x span{visibility:hidden}
 }

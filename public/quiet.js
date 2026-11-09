@@ -943,6 +943,11 @@
                   // really good and then in Anticlastic is not working")
                   // the room is counted from the drawing itself, not its file's white margin
                   var M = Math.max(me.getBoundingClientRect().right - nameShift() + 2 * rem, plus.getBoundingClientRect().right + 2.4 * rem, 0), miss = (w + g) - (inkRect(im, r).left - M);
+                  // and Joint's own gap between the "+" and the note, measured where Joint's "+" would be (his example,
+                  // 2026-11-09: Joint's screenshot, "use this as an example"): a longer name takes the picture's left edge
+                  // in by what it adds, so the note keeps that gap after this project's own "+"
+                  var MJ = Math.max(me.getBoundingClientRect().right - nameShift() + 2 * rem, plusX() + 2.4 * rem, 0);
+                  miss = Math.max(miss, Math.max(0, (w + g) - (inkRect(im, r).left - MJ)) + nameShift());
                   if(miss > 0){
                     var r0 = r;
                     im.style.maxWidth = Math.floor(r0.width - miss / Math.max(.2, 1 - ink(im).l)) + 'px'; r = im.getBoundingClientRect();

@@ -649,3 +649,8 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 .qab-li{font-size:.68rem;font-weight:400;letter-spacing:.06em;color:var(--mute);text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:.15rem;transition:color .25s}
 .qab-li:hover{color:var(--ink)}
 .qab-li.tbc{cursor:default}
+/* the mark way smaller with only the email and LinkedIn (his note, 2026-11-09); "Click to copy" shows on hover */
+.qab-links .qab-mark{width:6rem}
+@media (max-width:700px){ .qab-links .qab-mark{width:5rem} }
+.qab-links .qab-reach{margin-top:1.6rem}
+.qab-mailrow:hover .qab-copied{opacity:1}

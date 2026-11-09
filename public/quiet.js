@@ -1353,13 +1353,14 @@
       var EMAIL = 'gc3139@columbia.edu', LINKEDIN = '';   // LINKEDIN: his profile address, still to come
       wrap.classList.add('qab-links');
       var box = el('div', 'qab-reach', wrap.querySelector('.qab-side'));
-      var row = el('div', 'qab-mailrow', box), mail = el('a', 'qab-mail', row, EMAIL), said = el('span', 'qab-copied', row, 'Copied');
+      var row = el('div', 'qab-mailrow', box), mail = el('a', 'qab-mail', row, EMAIL), said = el('span', 'qab-copied', row, 'Click to copy');   // 'Click to copy' on hover, 'Copied' once clicked (his note, 2026-11-09)
       mail.href = 'mailto:' + EMAIL;
       mail.addEventListener('click', function(e){
         if(!navigator.clipboard || e.metaKey || e.ctrlKey) return;
         e.preventDefault();
         navigator.clipboard.writeText(EMAIL).then(function(){
-          said.classList.add('on'); clearTimeout(said.t); said.t = setTimeout(function(){ said.classList.remove('on'); }, 1800);
+          said.textContent = 'Copied'; said.classList.add('on'); clearTimeout(said.t);
+          said.t = setTimeout(function(){ said.classList.remove('on'); setTimeout(function(){ said.textContent = 'Click to copy'; }, 300); }, 1800);
         }, function(){ location.href = 'mailto:' + EMAIL; });
       });
       var li = el('a', 'qab-li', box, 'LinkedIn');

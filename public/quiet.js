@@ -1644,6 +1644,7 @@
   // left, at the name's margin), name (just under the name). Kept for the visit; &abp=off: under the marks as before
   (function(){
     var V = Q.get('abp'); try{ if(V) sessionStorage.setItem('gc-abp', V); V = sessionStorage.getItem('gc-abp') || V; }catch(e){}
+    V = V || 'top';   // his pick (2026-11-09 1:08pm NY: "this is good"): top right, level with the name
     if(['top', 'foot', 'name'].indexOf(V) === -1) return;
     document.documentElement.classList.add('abp', 'abp-' + V);
     var set = function(){

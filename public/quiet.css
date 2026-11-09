@@ -659,3 +659,5 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
   .qab-links .qab-li{font-size:1.7rem;font-weight:300;letter-spacing:0;color:var(--mute);border-bottom-width:1px;padding-bottom:.1rem;line-height:1.2}
   .qab-links .qab-copied{margin-left:.9rem}
 }
+/* &gend=none (trial 2026-11-09): no chevrons on the gallery */
+.qgend-none.qb-show .qcue{opacity:0!important;pointer-events:none!important}

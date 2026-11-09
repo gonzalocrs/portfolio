@@ -740,6 +740,18 @@
     //   chev   a small thin chevron pointing down, drifting gently
     //   off    nothing (as live until now)
     var CUE = Q.get('cue'), NEXT = SLUGS[(SLUGS.indexOf(slug) + 1) % SLUGS.length];
+    // what comes after the gallery (trial, his ask 2026-11-09: "make two iterations. one with no chevron in gallery so i
+    // force people to click index or hover over the lines. and in the other, they keep scrolling back and forth"):
+    // &gend=next (on to the next project, as built earlier tonight) | none (no chevrons on the gallery; scrolling on does
+    // nothing, scrolling back still returns to the pictures) | loop (the project goes round: on past the gallery comes the
+    // first picture again, back past the first picture comes the gallery). Kept for the visit
+    var GEND = Q.get('gend'); try{ if(GEND) sessionStorage.setItem('gc-gend', GEND); GEND = sessionStorage.getItem('gc-gend') || GEND; }catch(e){}
+    GEND = ['next', 'none', 'loop'].indexOf(GEND) > -1 ? GEND : 'next';
+    wrap.classList.add('qgend-' + GEND);
+    function pastB(){   // on past the gallery
+      if(GEND === 'next') goProject(NEXT);
+      else if(GEND === 'loop'){ var t0 = tileAt(0); if(t0) pick(0, t0); else { flip(false); go(0); } }
+    }
     try{ if(CUE) sessionStorage.setItem('gc-cue', CUE); CUE = sessionStorage.getItem('gc-cue') || CUE; }catch(e){}
     CUE = ['word', 'line', 'chev', 'off'].indexOf(CUE) > -1 ? CUE : 'chev';   // his pick, 2026-11-05: the chevron, kept on every picture
     var cue = null;
@@ -752,7 +764,7 @@
       // last photo keep the chevron even when in gallery mode"); on side B it stays as it is, a still mark
       // on side B it goes on to the next project in the index, round to the first (his ask, 2026-11-09); the words "Next
       // project" over it were tried and dropped ("too busy")
-      cue.addEventListener('click', function(e){ e.stopPropagation(); if(bOn){ goProject(NEXT); return; } if(at === n - 1 && bBtn){ flip(true); return; } go(at + 1); });
+      cue.addEventListener('click', function(e){ e.stopPropagation(); if(bOn){ pastB(); return; } if(at === n - 1 && bBtn){ flip(true); return; } go(at + 1); });
     }
     // and one pointing up, at the head of the picture area (his ask, 2026-11-06: "we need another chevron to go up as
     // well"): back one picture; on side B back to the pictures; gone on the first picture, where there's nothing above
@@ -760,9 +772,9 @@
     if(cue && CUE === 'chev'){
       cueUp = el('button', 'qcue qcue-chev qcue-up off', wrap); cueUp.type = 'button'; cueUp.setAttribute('aria-label', 'Previous picture');
       cueUp.innerHTML = '<svg viewBox="0 0 16 8" width="16" height="8"><path d="M1 7l7-6 7 6"/></svg>';
-      cueUp.addEventListener('click', function(e){ e.stopPropagation(); if(bOn){ flip(false); return; } go(at - 1); });
+      cueUp.addEventListener('click', function(e){ e.stopPropagation(); if(bOn){ flip(false); return; } if(at === 0 && bBtn && GEND === 'loop'){ flip(true); return; } go(at - 1); });
     }
-    function syncUp(){ if(cueUp) cueUp.classList.toggle('off', !bOn && at <= 0); }
+    function syncUp(){ if(cueUp) cueUp.classList.toggle('off', !bOn && at <= 0 && GEND !== 'loop'); }
     // close to the picture (his note, 2026-11-06: "put both chevrons closer to the image"): the down one a short step under
     // the picture on show, the up one the same step above it, both on its centre line; when the next picture is a
     // different size they glide there rather than jump. Never past the window's foot or head (1.8rem), and on a phone
@@ -1257,19 +1269,20 @@
         if((BACK === 'crate' || BACK === 'strip') && slide(d * 1.2) && !(d < 0 && bx >= -1)) return;
         var nb = Date.now(); if(nb - bTurn < 900) return;
         if(d < 0){ lock = nb; flip(false); }
-        else if(cue && nb - lock > 750){ lock = nb; goProject(NEXT); }   // on past the sheet: the next project
+        else if(cue && nb - lock > 750){ lock = nb; pastB(); }   // on past the sheet (&gend=)
         return;
       }
       var now = Date.now(); if(now - lock < 750) return; lock = now;
       // on past the last picture, the record turns over to side B
       if(d > 0 && at === n - 1 && bBtn){ flip(true); return; }
+      if(d < 0 && at === 0 && bBtn && GEND === 'loop'){ flip(true); return; }   // round the other way
       if(n === 1){ toggle(d > 0); return; }
       go(at + (d > 0 ? 1 : -1));
     }, {passive: false});
     on(window, 'keydown', function(e){
-      if(bOn && /^Arrow/.test(e.key)){ if(e.key === 'ArrowUp') flip(false); else if(e.key === 'ArrowDown' && cue) goProject(NEXT); e.preventDefault(); return; }
+      if(bOn && /^Arrow/.test(e.key)){ if(e.key === 'ArrowUp') flip(false); else if(e.key === 'ArrowDown' && cue) pastB(); e.preventDefault(); return; }
       if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){ if(n === 1) toggle(true); else go(at + 1); e.preventDefault(); }
-      if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ go(at - 1); e.preventDefault(); }
+      if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ if(at === 0 && bBtn && GEND === 'loop') flip(true); else go(at - 1); e.preventDefault(); }
       if(e.key === 'Escape'){ if(bOn) flip(false); else if(isOpen()) toggle(false); else goHome(slug); }
     });
     var sx = null, sy0 = 0;

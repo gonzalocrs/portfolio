@@ -687,7 +687,7 @@
       // gallery if i click the + for description i should get it in gallery, not roll back to the previous image")
       if(bOn) setTimeout(function(){ requestAnimationFrame(layB); }, 0);
       if(on === isOpen()) return;
-      if(cue && n === 1) cue.classList.toggle('off', on);
+      if(cue && (n === 1 || (at === n - 1 && !bBtn && innerWidth > 700))) cue.classList.toggle('off', on);
       st.style.setProperty('--ny', nameY() + 'px');
       if(D === 'beside') placeBeside();
       if(D === 'under' && innerWidth > 700) turn(on);
@@ -776,7 +776,7 @@
       // last photo keep the chevron even when in gallery mode"); on side B it stays as it is, a still mark
       // on side B it goes on to the next project in the index, round to the first (his ask, 2026-11-09); the words "Next
       // project" over it were tried and dropped ("too busy")
-      cue.addEventListener('click', function(e){ e.stopPropagation(); if(n === 1){ toggle(true); return; } if(bOn){ pastB(); return; } if(at === n - 1 && bBtn){ flip(true); return; } go(at + 1); });
+      cue.addEventListener('click', function(e){ e.stopPropagation(); if(n === 1){ toggle(true); return; } if(bOn){ pastB(); return; } if(wordsStep(1)) return; if(at === n - 1 && bBtn){ flip(true); return; } go(at + 1); });
     }
     // and one pointing up, at the head of the picture area (his ask, 2026-11-06: "we need another chevron to go up as
     // well"): back one picture; on side B back to the pictures; gone on the first picture, where there's nothing above
@@ -931,17 +931,23 @@
       if(hint && !first) hint.classList.add('off');
       // the chevron stays under every picture (his note, 2026-11-05: "keep it and make it clickable"); it stays put while the
       // pictures change; past the last picture it leads into all the pictures (gone there only if a project has no side B)
-      if(cue) cue.classList.toggle('off', n === 1 ? isOpen() : k === n - 1 && !bBtn);
+      if(cue) cue.classList.toggle('off', n === 1 ? isOpen() : k === n - 1 && !bBtn && (isOpen() || innerWidth <= 700));
       syncUp();
-      // the words come up by themselves with the last picture (his ask, 2026-11-09: "the description pops with the last
-      // image in each project"), and go again on the way back if they came by themselves; once the + or Esc has been used
-      // they're left as set. Not on a phone, where the words are a card over the picture
-      if(innerWidth > 700){
-        if(k === n - 1 && n > 1 && !isOpen()){ clearTimeout(autoT); autoT = setTimeout(function(){ if(at === n - 1 && !bOn && !isOpen()){ toggle(true); autoW = true; } }, first ? 900 : 450); }
-        else if(k < n - 1){ clearTimeout(autoT); if(autoW && isOpen()) toggle(false); autoW = false; }
-      }
+      // the last picture comes alone; one more scroll (or the chevron, or the down key) brings the words beside it, and
+      // only the next one goes on to the gallery (his ask, 2026-11-09: "the last render appears without description, then
+      // you scroll once more and you get the description"; before, the words came by themselves with it). On the way back
+      // they go again if that step opened them; once the + or Esc has been used they're left as set. Not on a phone,
+      // where the words are a card over the picture
+      if(innerWidth > 700 && k < n - 1){ if(autoW && isOpen()) toggle(false); autoW = false; }
     }
-    var autoW = false, autoT = 0;
+    var autoW = false;
+    // the step between the last picture and the gallery: true if it opened (or, going back, closed) the words
+    function wordsStep(d){
+      if(innerWidth <= 700 || n < 2 || bOn || at !== n - 1) return false;
+      if(d > 0 && !isOpen()){ toggle(true); autoW = true; return true; }
+      if(d < 0 && autoW && isOpen()){ toggle(false); return true; }
+      return false;
+    }
     // side B (trial ?back=): all the pictures at once
     var sideB = null, bOn = false, bBtn = null, bTurn = 0, nameEl0 = me.querySelector('span');
     if(BACK !== 'off' && all.length > 1){
@@ -1296,6 +1302,7 @@
       }
       var now = Date.now(); if(now - lock < 750) return; lock = now;
       // on past the last picture, the record turns over to side B
+      if(wordsStep(d)) return;
       if(d > 0 && at === n - 1 && bBtn){ flip(true); return; }
       if(d < 0 && at === 0 && GEND === 'loop' && !(n === 1 && isOpen())){ beforeA(); return; }   // back into the previous project
       if(n === 1 && d > 0 && isOpen() && GEND === 'loop'){ goProject(NEXT); return; }
@@ -1304,8 +1311,8 @@
     }, {passive: false});
     on(window, 'keydown', function(e){
       if(bOn && /^Arrow/.test(e.key)){ if(e.key === 'ArrowUp') flip(false); else if(e.key === 'ArrowDown' && cue) pastB(); e.preventDefault(); return; }
-      if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){ if(n === 1) toggle(true); else go(at + 1); e.preventDefault(); }
-      if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ if(at === 0 && GEND === 'loop') beforeA(); else go(at - 1); e.preventDefault(); }
+      if(e.key === 'ArrowDown' || e.key === 'ArrowRight'){ if(n === 1) toggle(true); else if(!wordsStep(1)) go(at + 1); e.preventDefault(); }
+      if(e.key === 'ArrowUp' || e.key === 'ArrowLeft'){ if(wordsStep(-1)){ e.preventDefault(); return; } if(at === 0 && GEND === 'loop') beforeA(); else go(at - 1); e.preventDefault(); }
       if(e.key === 'Escape'){ if(bOn) flip(false); else if(isOpen()) toggle(false); else goHome(slug); }
     });
     var sx = null, sy0 = 0;

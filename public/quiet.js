@@ -913,7 +913,7 @@
               // a drawing standing in white (its file wider than its lines) gets twice the gap to its note: open lines
               // need more air than a photo's hard edge (his note, 2026-11-09, Lean Shells' section: "give it more
               // breathing room")
-              var ik = ink(im); if(ik.l > .02 || ik.r < .98) g = 3.6 * rem;
+              var ik = ink(im); if(it.drawing || ik.l > .02 || ik.r < .98) g = 6 * rem;   // then more, for every drawing ("more spacing to all those drawings")
               if(!low){
                 if(im.style.marginBottom){ im.style.marginBottom = ''; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
                 // short of room: first a narrower column, then the picture steps right (never past the window's edge)

@@ -1175,7 +1175,7 @@
     // on a phone every version sits in the top right corner, level with the name
     var OUT = Q.get('out');
     try{ if(OUT) sessionStorage.setItem('gc-out', OUT); OUT = sessionStorage.getItem('gc-out') || OUT; }catch(e){}
-    OUT = ['foot', 'head', 'close', 'off'].indexOf(OUT) > -1 ? OUT : 'foot';
+    OUT = ['foot', 'head', 'close', 'off'].indexOf(OUT) > -1 ? OUT : 'off';   // off since the index-on-hover below
     if(OUT !== 'off'){
       var outB = el('a', 'qout qout-' + OUT, document.body); outB.href = '/'; outB.setAttribute('aria-label', 'Back to the index');
       outB.innerHTML = OUT === 'close' ? '<svg viewBox="0 0 12 12" width="12" height="12"><path d="M1 1l10 10M11 1L1 11"/></svg>'
@@ -1193,6 +1193,18 @@
       };
       placeOut(); on(window, 'resize', placeOut); if(document.fonts && document.fonts.ready) document.fonts.ready.then(placeOut);
     }
+    // the index on hover (his ask, 2026-11-09: "when i'm in a project and i hover over this area the other titles appear
+    // more faint like a proper index and a X shows somewhere to go back"): over the column every project's name shows,
+    // faint (the CSS), and a thin x stands a step above the first mark; it goes back to the home. Not while the words
+    // are open (they fill that column), and not on a phone (no hover there)
+    var ix = el('button', 'qp-x', nav); ix.type = 'button'; ix.setAttribute('aria-label', 'Back to the index');
+    ix.innerHTML = '<svg viewBox="0 0 10 10" width="10" height="10"><path d="M1 1l8 8M9 1L1 9"/></svg>';
+    ix.addEventListener('click', function(e){ e.stopPropagation(); goHome(slug); });
+    function placeX(){
+      var k = nav.querySelector('.qk'), rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      if(k) ix.style.top = Math.round(k.offsetTop - 2.2 * rem) + 'px';
+    }
+    nav.addEventListener('mouseenter', placeX); placeX();
     on(window, 'wheel', function(e){
       if(card.contains(e.target) && card.scrollHeight > card.clientHeight) return;
       var d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;

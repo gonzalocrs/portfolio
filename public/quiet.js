@@ -51,6 +51,14 @@
       if(b.parentNode !== want) want.appendChild(b);
     };
     put(); addEventListener('resize', put);
+    // on a computer the word "Index" shows only while the pointer is left of the pictures (the stage, or the About page's
+    // mark); its chevron stays (his note, 2026-11-09: "make the word index only show when hovering to the left of the
+    // images otherwise invisible")
+    addEventListener('mousemove', function(e){
+      if(innerWidth <= 700) return;
+      var z = document.querySelector('.qt-stage, .qab-side'), L = z ? z.getBoundingClientRect().left : innerWidth * .25;
+      b.classList.toggle('qx-near', e.clientX < L);
+    }, {passive: true});
     // About on a phone stands centred on the name's height (the CSS reads --ab-top)
     var mid = function(){ var g = document.querySelector('.gv-mark'), r = g && g.getBoundingClientRect(); if(r && r.height) document.documentElement.style.setProperty('--ab-top', Math.round(r.top + r.height / 2) + 'px'); };
     mid(); addEventListener('resize', mid); if(document.fonts) document.fonts.ready.then(mid);

@@ -705,3 +705,8 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
   .qab .qt-ticks{padding:0;margin:0;min-height:0}
   .qab-links .qab-side{padding-bottom:2rem}
 }
+/* computer: the word Index hidden until the pointer is left of the pictures (his note, 2026-11-09); the chevron stays */
+@media (min-width:701px){
+  .qp-x span{opacity:0;transition:opacity .35s ease}
+  .qp-x.qx-near span,.qp-x:hover span,.qp-x:focus-visible span{opacity:1}
+}

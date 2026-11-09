@@ -43,6 +43,15 @@
     return out;
   }
   function coverOf(slug){ var p = P[slug], all = pictures(slug); return all.length ? (p.cover ? {src: p.cover} : all[0]) : null; }
+  // on a phone Index sits at the end of the row of marks at the foot, where About stood, and About goes to the top
+  // right (the CSS), where Index was (his note, 2026-11-09, sketch on his phone); back in the column above 700px
+  function phoneIx(nav, b){
+    var put = function(){
+      var t = nav.querySelector('.qt-ticks'), want = innerWidth <= 700 && t ? t : nav;
+      if(b.parentNode !== want) want.appendChild(b);
+    };
+    put(); addEventListener('resize', put);
+  }
   function el(tag, cls, parent, text){ var e = document.createElement(tag); if(cls) e.className = cls; if(text != null) e.textContent = text; if(parent) parent.appendChild(e); return e; }
   function fader(st){
     var layers = [0, 1].map(function(){ return el('div', 'p-layer', st); });
@@ -1288,6 +1297,7 @@
     nav.addEventListener('mouseenter', placeX2); on(window, 'resize', placeX2); placeX2(); requestAnimationFrame(placeX2);
     if(document.fonts && document.fonts.ready) document.fonts.ready.then(placeX2);
     setTimeout(function(){ placeX2(); ix.classList.add('in'); }, 900);
+    phoneIx(nav, ix);
     on(window, 'wheel', function(e){
       if(card.contains(e.target) && card.scrollHeight > card.clientHeight) return;
       var d = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
@@ -1399,6 +1409,7 @@
     };
     placeIxA(); addEventListener('resize', placeIxA); if(document.fonts) document.fonts.ready.then(placeIxA);
     setTimeout(function(){ placeIxA(); ixA.classList.add('in'); }, 300);
+    phoneIx(nav, ixA);
     // just his email and LinkedIn, no form (trial, his note 2026-11-09: "in about i like how my friend only placed his
     // email and his linkedin"): under his mark, the email (a click copies it and says "Copied") and a LinkedIn link.
     // &contact=links (default) | form (the topics and fields, as before). Kept for the visit

@@ -671,3 +671,14 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 /* Index's chevron: the pictures' chevron turned left, same thin line (2026-11-09) */
 .qp-x svg.ix-chev{margin-top:0;stroke-width:1}
 .qp-x{gap:.5rem}
+
+/* phone (his note, 2026-11-09, sketch on his phone): About at the top right, where Index was, in Index's small type;
+   Index at the end of the row of marks, where About stood; no chevrons (a phone swipes, the chevrons "don't make sense
+   there") */
+@media (max-width:700px){
+  .qt-ticks .qk.qa{position:fixed;top:1.6rem;right:var(--gut,1.25rem);margin:0;padding:.4rem 0;z-index:5;flex-direction:row;height:auto}
+  .qt-ticks .qk.qa i{display:none}
+  .qt-ticks .qk.qa span{display:block!important;position:static;opacity:1!important;transform:none;font-size:.68rem;font-weight:400;letter-spacing:.06em;color:var(--mute)}
+  .qt-ticks .qp-x{position:static;margin-left:auto;align-self:flex-end;padding:0 0 .05rem;top:auto;right:auto;transform:none}
+  .qcue{display:none!important}
+}

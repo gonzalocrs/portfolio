@@ -1371,6 +1371,18 @@
     var wrap = document.querySelector('.qab'), nav = wrap.querySelector('.qt-ticks');
     quietMarks(nav, null, function(s){ return quietHref(s); });
     var ab = nav.querySelector('.qk.qa'); ab.classList.add('cur'); ab.setAttribute('aria-current', 'page');
+    // Index here too, as on a project page (his note, 2026-11-09: "you forgot the index here as well!"): the chevron and the
+    // word a little above the first mark; back to the home
+    var ixA = el('a', 'qp-x', nav); ixA.href = '/'; ixA.setAttribute('aria-label', 'Back to the index');
+    ixA.innerHTML = '<svg class="ix-chev" viewBox="0 0 8 16" width="8" height="16"><path d="M7 1L1 8l6 7"/></svg><span>Index</span>';
+    var placeIxA = function(){
+      ixA.style.top = '';
+      if(innerWidth <= 700) return;
+      var k = nav.querySelector('.qk'), o = ixA.offsetParent, rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      if(k && o) ixA.style.top = Math.round(k.getBoundingClientRect().top - o.getBoundingClientRect().top - 3 * rem) + 'px';
+    };
+    placeIxA(); addEventListener('resize', placeIxA); if(document.fonts) document.fonts.ready.then(placeIxA);
+    setTimeout(function(){ placeIxA(); ixA.classList.add('in'); }, 300);
     // just his email and LinkedIn, no form (trial, his note 2026-11-09: "in about i like how my friend only placed his
     // email and his linkedin"): under his mark, the email (a click copies it and says "Copied") and a LinkedIn link.
     // &contact=links (default) | form (the topics and fields, as before). Kept for the visit

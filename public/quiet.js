@@ -637,6 +637,11 @@
         // the sides of the drawing's body: a long ground line running out past the building (one row of ink) doesn't
         // count, so the gap to the note is measured from the building (his note, 2026-11-09, Anticlastic's section and
         // elevation: "works for this but not for the other two drawings")
+        // a drawing on its own grey or textured ground (Sierra's axon) is framed like a photo: its edge is the file's edge
+        // (his note, 2026-11-09 8:52pm NY: the axon's note had slid onto its grey ground)
+        var eb = 0, en = 0; for(var q = 0; q < W; q++){ [0, H - 1].forEach(function(yy){ var o2 = (yy * W + q) * 4; eb += (d[o2] + d[o2 + 1] + d[o2 + 2]) / 3 * (d[o2 + 3] / 255) + 255 * (1 - d[o2 + 3] / 255); en++; }); }
+        for(var yq = 0; yq < H; yq++){ [0, W - 1].forEach(function(xx){ var o3 = (yq * W + xx) * 4; eb += (d[o3] + d[o3 + 1] + d[o3 + 2]) / 3 * (d[o3 + 3] / 255) + 255 * (1 - d[o3 + 3] / 255); en++; }); }
+        if(eb / en < 247){ im._ink = {l: 0, t: 0, r: 1, b: 1, framed: true}; return im._ink; }
         var bl = 0, br = W - 1; while(bl < W - 1 && cn[bl] < 3) bl++; while(br > 0 && cn[br] < 3) br--;
         if(br < bl){ bl = l; br = r; }
         im._ink = r < 0 ? all : {l: bl / W, t: t / H, r: (br + 1) / W, b: (b + 1) / H, fl: l / W, fr: (r + 1) / W};
@@ -920,7 +925,7 @@
               // a drawing standing in white (its file wider than its lines) gets twice the gap to its note: open lines
               // need more air than a photo's hard edge (his note, 2026-11-09, Lean Shells' section: "give it more
               // breathing room")
-              var g0 = g, ik = ink(im); if(it.drawing || ik.l > .02 || ik.r < .98) g = 6 * rem;
+              var g0 = g, ik = ink(im); if(!ik.framed && (it.drawing || ik.l > .02 || ik.r < .98)) g = 6 * rem;
               // where the note's gap is counted from: the building, but never closer than a photo's gap to a ground line's end
               function edgeL(v){ return Math.min(v.left, v.fl + g - g0); } function edgeR(v){ return Math.max(v.right, v.fr - g + g0); }   // then more, for every drawing ("more spacing to all those drawings")
               if(!low){

@@ -316,9 +316,9 @@ window.PROJECTS = {
       "This project transformed an existing structural shell into a hotel, requiring a complete redesign of the interior layout and façade.",
       "As my first non-residential project, it gave me the opportunity to explore how architecture could shape a guest’s experience while working within the constraints of an existing structure.",
       "Materiality became a central focus of the design, connecting the hotel to Cusco’s architectural character.",
-      "Entrance details",   // his tag for the entrance details drawing (2026-11-09)
+      "",   // the entrance details drawing: its "Entrance details" tag taken off (his ask, 2026-11-09 8:52pm NY)
       "",   // the entrance render after it
-      "The base draws on the city’s rustic textures, while the body reinterprets the same warm palette through a contemporary, restrained composition.",
+      "",   // the hero photo: "The base draws on the city’s rustic textures..." taken off (same ask)
       "At the rooftop, natural materials and floor-to-ceiling glazing frame the surrounding mountains, making the landscape part of the guest experience."
     ],
     kicker: "Cusco, 2023",

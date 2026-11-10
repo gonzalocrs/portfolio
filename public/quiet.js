@@ -990,7 +990,8 @@
                 if(im.style.marginBottom !== mb){ im.style.marginBottom = mb; r = im.getBoundingClientRect(); lr = L.getBoundingClientRect(); }
                 var fl = (lr.width - fw) / 2;
                 var vp = inkRect(im, r);
-                nt.style.left = (long ? fl + (fw - nt.offsetWidth) / 2 : vp.left - lr.left) + 'px'; nt.style.top = (vp.bottom - lr.top + .7 * rem) + 'px';
+                // from the drawing's left edge, but never past the frame's right edge (a narrow drawing in white)
+                nt.style.left = (long ? fl + (fw - nt.offsetWidth) / 2 : Math.max(0, Math.min(vp.left - lr.left, lr.width - nt.offsetWidth))) + 'px'; nt.style.top = (vp.bottom - lr.top + .7 * rem) + 'px';
               }
             };
             // the note too: its height changes once the web font arrives (a line more or less), which left its last
@@ -1537,7 +1538,7 @@
       // &ab=off: as it was. Kept for the visit; computers only (a phone keeps the page as it is)
       var AB = Q.get('ab'); try{ if(AB) sessionStorage.setItem('gc-ab', AB); AB = sessionStorage.getItem('gc-ab') || AB; }catch(e){}
       AB = AB || 'words';   // his pick (2026-11-09 12:48pm NY: "keep this."): A, his words alone; ?ab=off for the old page
-      if(['words', 'mark', 'column'].indexOf(AB) > -1 && innerWidth > 700){
+      if(['words', 'mark', 'column'].indexOf(AB) > -1 && (innerWidth > 700 || AB !== 'mark')){   // a phone too (his ask, 2026-11-09 9:35pm NY: "update the mobile version with this new ABOUT page")
         wrap.classList.add('abv', 'abv-' + AB);
         var room = wrap.querySelector('.qab-room');
         if(AB !== 'mark'){
@@ -1547,6 +1548,7 @@
           var layW = function(){
             mk.style.transform = ''; wd.style.transform = '';
             if(AB === 'column'){ mk.style.width = '3.2rem'; }
+            if(innerWidth <= 700){ if(window.gcMark) [0, 1, 2].forEach(function(i){ window.gcMark.tone(i, 0); }); return; }   // a phone: one column in the page's flow
             // the column centred in the room right of the index, as a picture is (Joint's spacing)
             var w = wd.getBoundingClientRect(), nm = document.querySelector('.gv-mark'), nr = nm ? nm.getBoundingClientRect() : {left: 40, right: 270};
             var want = nr.right + (innerWidth - nr.left - nr.right - w.width) / 2;
@@ -1666,7 +1668,17 @@
       d.setProperty('--nm-mid', Math.round(r.top + r.height / 2) + 'px'); d.setProperty('--nm-left', Math.round(r.left) + 'px');
       d.setProperty('--nm-top', Math.round(r.top) + 'px'); d.setProperty('--nm-bottom', Math.round(r.bottom) + 'px');
     };
+    // a phone: About at the right end of the project name's line at the foot (his ask, 2026-11-09 9:35pm NY: the new About
+    // button on the phone too); where no name stands (the About page), level with the name at the top
+    var foot = function(){
+      var d = document.documentElement, t = document.querySelector('.qt-ticks .qk.cur:not(.qa) span');
+      var r = t && t.getBoundingClientRect();
+      d.classList.toggle('ab-foot', !!(r && r.height && innerWidth <= 700));
+      if(r && r.height) d.style.setProperty('--ab-bot', Math.round(innerHeight - r.bottom) + 'px');
+    };
     set(); addEventListener('resize', set); if(document.fonts) document.fonts.ready.then(set); setTimeout(set, 600);
+    foot(); addEventListener('resize', foot); setTimeout(foot, 300); setTimeout(foot, 1200);
+    new MutationObserver(function(){ requestAnimationFrame(foot); }).observe(document.body, {subtree: true, attributes: true, attributeFilter: ['class']});
   })();
   if(document.body.getAttribute('data-page') === 'about'){ buildAbout(); return; }
   if(document.body.getAttribute('data-page') === 'project'){

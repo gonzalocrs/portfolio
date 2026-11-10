@@ -774,3 +774,26 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
   .abs-ring .qt-ticks .qk.qa:hover span,.abs-ring .qt-ticks .qk.qa.cur span,.abs-title .qt-ticks .qk.qa:hover span{color:var(--ink);font-weight:800}
   .abs-note .qt-ticks .qk.qa:hover span,.abs-note .qt-ticks .qk.qa.cur span{font-weight:400}
 }
+/* phone (his ask 2026-11-09 9:35pm NY: the new About page and button on the phone too): "+ About" in the project names'
+   bold, light grey, at the right end of the project name's line; the About page his words alone in the notes' type */
+@media (max-width:700px){
+  .abs-title .qt-ticks .qk.qa{position:fixed;right:var(--gut,1.25rem);left:auto;top:auto;bottom:auto;transform:translateY(-50%);top:var(--ab-top,32px);display:flex;align-items:baseline;gap:.35rem;z-index:6}
+  .abs-title.ab-foot .qt-ticks .qk.qa{top:auto;bottom:var(--ab-bot,24px);transform:none}
+  .abs-title .qt-ticks .qk.qa i{display:block;width:auto;height:auto;background:none;font:300 1rem/1 var(--font);color:var(--faint)}
+  .abs-title .qt-ticks .qk.qa span{display:block;position:static;opacity:1;transform:none;font:800 1.05rem/1 var(--font);letter-spacing:-.02em;margin:0;text-transform:none;color:var(--faint)}
+  .abs-title .qt-ticks .qk.qa.cur span{color:var(--ink)}
+  .qab.abv-words .qab-side,.qab.abv-column .qab-side{display:none}
+  .qab.abv .qab-words .k{margin:0 0 .9rem;font:400 .85rem/1.5 var(--font);letter-spacing:0;text-transform:none;color:var(--mute)}
+  .qab.abv .qab-words h1{margin:0 0 .35rem;font-size:.85rem;line-height:1.5;font-weight:800;letter-spacing:0}
+  .qab.abv .qab-words .med{margin:0 0 .9rem;font:400 .85rem/1.5 var(--font);color:var(--ink)}
+  .qab.abv .qab-words .text{font:400 .85rem/1.5 var(--font);color:var(--mute)}
+  .qab.abv .qab-reach{position:static;margin:1.6rem 0 0;display:flex;flex-direction:column;align-items:flex-start;gap:.15rem;pointer-events:auto}
+  .qab.abv .qab-reach .qab-mailrow,.qab.abv .qab-reach .qab-li{position:static;transform:none}
+  .qab.abv .qab-mail,.qab.abv .qab-li{font:400 .85rem/1.5 var(--font);color:var(--mute);border:0;padding:0;letter-spacing:0}
+}
+@media (max-width:700px){
+  .abs-title .qt-ticks .qk.qa{padding:0}
+  .abs-title .qt-ticks .qk.qa span{font-size:1rem;line-height:1.4}
+  .qab.abv .qab-mailrow{display:flex;align-items:baseline}
+  .qab.abv .qab-copied{position:static;margin-left:.7rem}
+}

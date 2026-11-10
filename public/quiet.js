@@ -1653,6 +1653,7 @@
     // more things. it does not fit"): &abs=title (the project names' bold, grey), note (the notes' small grey), logo (the
     // name's light spaced capitals), ring (a small ring as its mark, the word only on hover, as the projects' names)
     var A = Q.get('abs'); try{ if(A) sessionStorage.setItem('gc-abs', A); A = sessionStorage.getItem('gc-abs') || A; }catch(e){}
+    A = A || 'title';   // his pick (2026-11-09 7:53pm NY: "go with A")
     if(V === 'col' && ['title', 'note', 'logo', 'ring'].indexOf(A) > -1) document.documentElement.classList.add('abs', 'abs-' + A);
     var set = function(){
       var g = document.querySelector('.gv-mark'), r = g && g.getBoundingClientRect(); if(!r || !r.height) return;

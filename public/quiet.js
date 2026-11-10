@@ -1541,7 +1541,7 @@
       // a phone: &abq=old (as it was, the default again after his note 2026-11-09 9:42pm NY: "looks terrible. redo about") or
       // &abq=words (his words alone, centred in the screen's height)
       var ABQ = Q.get('abq'); try{ if(ABQ) sessionStorage.setItem('gc-abq', ABQ); ABQ = sessionStorage.getItem('gc-abq') || ABQ; }catch(e){}
-      if(ABQ !== 'words') ABQ = 'old';
+      if(ABQ !== 'old') ABQ = 'words';   // his pick 2026-11-09 10:12pm NY: his words, centred, the desktop's size
       if(['words', 'mark', 'column'].indexOf(AB) > -1 && (innerWidth > 700 || (AB !== 'mark' && ABQ === 'words'))){
         wrap.classList.add('abv', 'abv-' + AB);
         var room = wrap.querySelector('.qab-room');
@@ -1675,7 +1675,7 @@
     // a phone: About at the right end of the project name's line at the foot (his ask, 2026-11-09 9:35pm NY: the new About
     // button on the phone too); where no name stands (the About page), level with the name at the top
     var M = Q.get('abm'); try{ if(M) sessionStorage.setItem('gc-abm', M); M = sessionStorage.getItem('gc-abm') || M; }catch(e){}
-    if(['top', 'plus', 'row', 'foot'].indexOf(M) === -1) M = 'top';
+    if(['top', 'plus', 'row', 'foot'].indexOf(M) === -1) M = 'plus';   // his pick 2026-11-09 10:12pm NY: "let's go with +"
     document.documentElement.classList.add('abm-' + M);
     var foot = function(){
       var d = document.documentElement, t = document.querySelector('.qt-ticks .qk.cur:not(.qa) span');

@@ -809,8 +809,10 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 }
 /* phone &abq=words: his words alone, centred in the screen's height between the name and the foot */
 @media (max-width:700px){
-  .qab.abv-words .qab-room{display:flex;flex-direction:column;justify-content:center;min-height:calc(100svh - 9rem)}
-  .qab.abv-words .qab-words{width:auto;max-width:21rem}
+  .qab.abv-words .qab-room{display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:calc(100svh - 9rem)}
+  .qab.abv-words .qab-words{width:100%;max-width:18.5rem;margin:0 auto}
+  /* the desktop's size (his ask 2026-11-09 10:12pm NY: "make it smaller so it reads as the desktop version does") */
+  .qab.abv .qab-words .k,.qab.abv .qab-words h1,.qab.abv .qab-words .med,.qab.abv .qab-words .text,.qab.abv .qab-mail,.qab.abv .qab-li{font-size:.8rem}
 }
 /* phone, the page as it was too: "Click to copy" beside the email pushed the page wider than the screen (About cut off) */
 @media (max-width:700px){

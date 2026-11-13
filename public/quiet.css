@@ -860,3 +860,30 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
   body.qh-one.qb-names-thin.hv .qt-ticks.qz .qk.hv-pt[data-d="0"]:not(.cur):not(.qa) i{width:3rem;height:2px;background:var(--ink);transform:none}
   body.hv .qt-ticks.qz{cursor:pointer}
 }
+/* second round (2026-11-13, his notes: "let's try more options"; "it makes no sense that if i'm hovering the one above the
+   one below keeps highlighted"): .hv-o = every row but the one pointed at, the open project's included, so only one name
+   is lit at a time */
+@media (min-width:701px){
+  body.qh-one.qb-names-thin.hv.hv-light .qt-ticks.qz .qk.hv-o.hv-o span,
+  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.hv-o.hv-o span,
+  body.qh-one.qb-names-thin.hv.hv-caps .qt-ticks.qz .qk.hv-o.hv-o span,
+  body.qh-one.qb-names-thin.hv.hv-trio .qt-ticks.qz .qk.hv-o.hv-o span{transform:none;filter:none;transition:opacity .45s ease,color .45s ease}
+  body.qh-one.qb-names-thin.hv.hv-light .qt-ticks.qz .qk.hv-o.hv-o i,
+  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.hv-o.hv-o i,
+  body.qh-one.qb-names-thin.hv.hv-caps .qt-ticks.qz .qk.hv-o.hv-o i,
+  body.qh-one.qb-names-thin.hv.hv-trio .qt-ticks.qz .qk.hv-o.hv-o.cur i{width:.9rem;height:1px;background:var(--faint)}
+  /* the pointed row, the open project's too */
+  body.qh-one.qb-names-thin.hv .qt-ticks.qz .qk.hv-pt.hv-pt span{opacity:1;filter:none;color:var(--ink);font-size:clamp(1rem,1.2vw,1.15rem);font-weight:800;letter-spacing:-.02em;transform:none}
+  /* F light: every other name in the title's size, Light, grey */
+  body.qh-one.qb-names-thin.hv.hv-light .qt-ticks.qz .qk.hv-o.hv-o span{opacity:1;color:var(--mute);font-size:clamp(1rem,1.2vw,1.15rem);font-weight:300;letter-spacing:-.01em}
+  /* G lens: names step down in size and tone away from the pointer, as through a lens */
+  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.hv-o.hv-o span{opacity:.1;color:var(--ink);font-size:.62rem;font-weight:800;letter-spacing:-.005em}
+  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.hv-o.hv-o[data-d="1"] span{opacity:.5;font-size:.92rem}
+  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.hv-o.hv-o[data-d="2"] span{opacity:.3;font-size:.78rem}
+  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.hv-o.hv-o[data-d="3"] span{opacity:.18;font-size:.68rem}
+  /* H caps: every other name in small spaced capitals, grey, like a label */
+  body.qh-one.qb-names-thin.hv.hv-caps .qt-ticks.qz .qk.hv-o.hv-o span{opacity:1;color:var(--mute);font-size:.6rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase}
+  /* I trio: only the two neighbours, small and grey; the rest marks only */
+  body.qh-one.qb-names-thin.hv.hv-trio .qt-ticks.qz .qk.hv-o.hv-o span{opacity:0}
+  body.qh-one.qb-names-thin.hv.hv-trio .qt-ticks.qz .qk.hv-o.hv-o[data-d="1"] span{opacity:1;color:var(--mute);font-size:.8rem;font-weight:400;letter-spacing:0}
+}

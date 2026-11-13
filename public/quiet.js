@@ -1720,7 +1720,8 @@
   // the other names while pointing at one (trial ?hv=, his note 2026-11-13: "i hate how the other projects look ...
   // maybe only the 3 closer get highlighted"): every mark knows how far it is from the one pointed at (data-d);
   // near = the two neighbours only | solo = no other names | even = all names in the title type, pale |
-  // fade = names fade with distance | reach = no other names, the neighbours' marks reach toward it. ?hv=off clears
+  // fade = names fade with distance | reach = no other names, the neighbours' marks reach toward it | mist = fade + blur.
+  // Second round (same night): light | lens | caps | trio, where the open project's name steps back too. ?hv=off clears
   var HV = (Q.get('hv') || '').toLowerCase();
   try{ if(HV === 'off') sessionStorage.removeItem('gc-hv'); else if(HV) sessionStorage.setItem('gc-hv', HV); HV = sessionStorage.getItem('gc-hv'); }catch(e){}
   if(HV){
@@ -1738,6 +1739,8 @@
         });
         ks.forEach(function(m, j){
           m.classList.toggle('hv-pt', j === best);
+          // every other row, the open project's too: only one name is lit at a time (his note, 2026-11-13)
+          m.classList.toggle('hv-o', best >= 0 && j !== best);
           if(best >= 0) m.setAttribute('data-d', Math.abs(j - best));
         });
       });

@@ -292,23 +292,25 @@ window.PROJECTS = {
     ],
     // captions this time (his ask, 2026-11-06): his own sentences from the text, word for word, beside each picture as on Joint
     notes: [
-      // his pairing (2026-11-06 ~2:55am NY): cube, tiling ("minus the polyhedra"), kit of parts
+      // his pairing (2026-11-06 ~2:55am NY): cube, tiling ("minus the polyhedra"), kit of parts; moved with their
+      // pictures when he renumbered them (2026-11-13), "" = no note
       "Living Assemble is a modular kit based on regular polygons.",
-      "Its pieces can be taken apart and recombined into unexpected patterns and spatial arrangements.",
-      "Building and rebuilding reveal how simple connections and repeated parts can create adaptable structures."
+      "",
+      "Building and rebuilding reveal how simple connections and repeated parts can create adaptable structures.",
+      "",
+      "Its pieces can be taken apart and recombined into unexpected patterns and spatial arrangements."
     ],
     credits: [["Studio", "ADR 2, Columbia GSAPP"], ["Type", "Modular Systems"], ["Design", "Gonzalo Cáceres Valcárcel"], ["Year", "2025"]],
     // his diagram.pdf (2026-11-06 ~1:15am NY), one picture per page, in its order; it replaced everything before
     inOrder: true,
     grid: [
+      // his numbering (2026-11-13 4:17am NY); sphere-side.jpg crossed out and removed
       {src: "img/modular-living-architecture/cuboctahedron.webp", drawing: true, caption: "Truncated cuboctahedron, net and assembly"},
-      {src: "img/modular-living-architecture/hexagon-tiling.webp", drawing: true, caption: "Hexagon tiling"},
-      {src: "img/modular-living-architecture/sheet-3.webp", drawing: true, caption: "Ring and connector parts"},
-      // his photos of the printed kit (2026-11-13), in the order he sent them, after the drawings
-      {src: "img/modular-living-architecture/kit-parts.jpg", caption: "The kit of parts"},
       {src: "img/modular-living-architecture/sphere-front.jpg", caption: "Truncated cuboctahedron, assembled"},
+      {src: "img/modular-living-architecture/sheet-3.webp", drawing: true, caption: "Ring and connector parts"},
+      {src: "img/modular-living-architecture/kit-parts.jpg", caption: "The kit of parts"},
+      {src: "img/modular-living-architecture/hexagon-tiling.webp", drawing: true, caption: "Hexagon tiling"},
       {src: "img/modular-living-architecture/sphere-close.jpg", caption: "Truncated cuboctahedron, detail"},
-      {src: "img/modular-living-architecture/sphere-side.jpg", caption: "Truncated cuboctahedron, assembled"},
       {src: "img/modular-living-architecture/sphere-left.jpg", caption: "Truncated cuboctahedron, assembled"}
     ]
   },

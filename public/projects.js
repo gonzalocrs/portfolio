@@ -303,7 +303,13 @@ window.PROJECTS = {
     grid: [
       {src: "img/modular-living-architecture/cuboctahedron.webp", drawing: true, caption: "Truncated cuboctahedron, net and assembly"},
       {src: "img/modular-living-architecture/hexagon-tiling.webp", drawing: true, caption: "Hexagon tiling"},
-      {src: "img/modular-living-architecture/sheet-3.webp", drawing: true, caption: "Ring and connector parts"}
+      {src: "img/modular-living-architecture/sheet-3.webp", drawing: true, caption: "Ring and connector parts"},
+      // his photos of the printed kit (2026-11-13), in the order he sent them, after the drawings
+      {src: "img/modular-living-architecture/kit-parts.jpg", caption: "The kit of parts"},
+      {src: "img/modular-living-architecture/sphere-front.jpg", caption: "Truncated cuboctahedron, assembled"},
+      {src: "img/modular-living-architecture/sphere-close.jpg", caption: "Truncated cuboctahedron, detail"},
+      {src: "img/modular-living-architecture/sphere-side.jpg", caption: "Truncated cuboctahedron, assembled"},
+      {src: "img/modular-living-architecture/sphere-left.jpg", caption: "Truncated cuboctahedron, assembled"}
     ]
   },
   // Built at the bottom of the index (his ask, 2026-11-09)

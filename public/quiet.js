@@ -1723,15 +1723,18 @@
   // fade = names fade with distance | reach = no other names, the neighbours' marks reach toward it | mist = fade + blur.
   // Second round (same night): light | lensmove | caps | trio, where the open project's name steps back too;
   // lens (his pick) = sizes stepping down from the open project, static. ?hv=off clears
+  // Published 2026-11-13 with the static lens as the default (his "good, publish"); ?hv=off shows the earlier look
   var HV = (Q.get('hv') || '').toLowerCase();
-  try{ if(HV === 'off') sessionStorage.removeItem('gc-hv'); else if(HV) sessionStorage.setItem('gc-hv', HV); HV = sessionStorage.getItem('gc-hv'); }catch(e){}
-  if(HV){
+  try{ if(HV) sessionStorage.setItem('gc-hv', HV); HV = sessionStorage.getItem('gc-hv') || HV; }catch(e){}
+  HV = HV || 'lens';
+  if(HV !== 'off'){
     document.body.classList.add('hv', 'hv-' + HV);
     // the name pointed at is the row the pointer is level with, anywhere across the index, not only over the name itself
     // (his note, 2026-11-13: moving right of a name and then up kept the first one lit): .hv-pt marks it, data-d counts
     // the rows away from it; a click there opens it as a click on the name would
     var hvPt = function(e){
       zone(e);
+      if(!document.body.classList.contains('qh-one')) return;   // the home's index only
       Array.prototype.forEach.call(document.querySelectorAll('.qt-ticks'), function(n){
         var ks = Array.prototype.slice.call(n.querySelectorAll('.qk:not(.qa)')), best = -1, bd = 1e9;
         if(n.classList.contains('qz')) ks.forEach(function(m, j){
@@ -1758,7 +1761,7 @@
     new MutationObserver(hvC).observe(document.body, {subtree: true, attributes: true, attributeFilter: ['class']});
     hvC();
     document.addEventListener('click', function(e){
-      if(e.target.closest && e.target.closest('a')) return;
+      if(!document.body.classList.contains('qh-one') || (e.target.closest && e.target.closest('a'))) return;
       var m = document.querySelector('.qt-ticks.qz .qk.hv-pt'); if(m){ e.preventDefault(); m.click(); }
     });
   }

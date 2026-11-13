@@ -858,7 +858,7 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 @media (min-width:701px){
   body.qh-one.qb-names-thin.hv .qt-ticks.qz .qk.hv-pt[data-d="0"]:not(.cur):not(.qa) span{opacity:1;filter:none;color:var(--ink);font-size:clamp(1rem,1.2vw,1.15rem);font-weight:800;letter-spacing:-.02em;transition:opacity .6s ease,filter .6s ease}
   body.qh-one.qb-names-thin.hv .qt-ticks.qz .qk.hv-pt[data-d="0"]:not(.cur):not(.qa) i{width:3rem;height:2px;background:var(--ink);transform:none}
-  body.hv .qt-ticks.qz{cursor:pointer}
+  body.qh-one.hv .qt-ticks.qz{cursor:pointer}
 }
 /* second round (2026-11-13, his notes: "let's try more options"; "it makes no sense that if i'm hovering the one above the
    one below keeps highlighted"): .hv-o = every row but the one pointed at, the open project's included, so only one name
@@ -890,8 +890,10 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 /* G lens, his pick (2026-11-13: "i like the lens, let's keep it static centered to the one project clicked. space out more
    the names so there's more room"): sizes and tones step down from the open project, not from the pointer; the name
    pointed at only turns to ink, at its own size; the rows further apart */
-body.hv-lens .qt-ticks .qk:not(.qa){height:1.85rem}
-body.hv-lens .qt-ticks .qk.gs{margin-top:1.7rem}
+@media (min-width:701px){   /* the home on a computer only */
+  body.qh-one.hv-lens .qt-ticks .qk:not(.qa){height:1.85rem}
+  body.qh-one.hv-lens .qt-ticks .qk.gs{margin-top:1.7rem}
+}
 @media (min-width:701px){
   body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.qk.qk:not(.qa) span{opacity:.1;color:var(--ink);filter:none;transform:none;font-size:.62rem;font-weight:800;letter-spacing:-.005em;transition:opacity .45s ease,color .3s ease}
   body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.qk.qk:not(.qa)[data-c="0"] span{opacity:1;font-size:clamp(1rem,1.2vw,1.15rem);letter-spacing:-.02em}

@@ -72,6 +72,9 @@
   .qk.qa i::after{display:none}
   .qk.qa span{font-weight:300;color:var(--mute)}
   .qk.qa:hover i{color:var(--ink)}
+  /* while a project's words are open, "+ About" steps out of the way (his note, 2026-11-13: it sat over the words) */
+  .qk.qa{transition:opacity .4s ease}
+  .qp.open .qk.qa{opacity:0;pointer-events:none}
   .qt-stage{min-height:0}
   .qt-stage .p-layer{align-items:center;background:var(--paper);transition:opacity 1.1s ease}
   /* inside a project: under the open mark, one mark per picture; the "+" beside the name holds the words */

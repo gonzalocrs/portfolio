@@ -29,7 +29,7 @@
         var s = (tv && it.trial[tv]) || (it.src && web(it.src));
         if(!s || seen[s]) return; seen[s] = 1;
         var dr = isDrawing(it);
-        out.push({src: s, drawing: dr, sheet: it.sheet, sheetSrc: it.sheetSrc, fitAs: it.fitAs, scale: it.scale, kind: dr ? 'drawing' : /\/physical\//.test(s) ? 'physical' : 'photo', caption: it.caption || '', link: it.link});
+        out.push({src: s, drawing: dr, sheet: it.sheet, sheetSrc: it.sheetSrc, fitAs: it.fitAs, scale: it.scale, centred: it.centred, kind: dr ? 'drawing' : /\/physical\//.test(s) ? 'physical' : 'photo', caption: it.caption || '', link: it.link});
       });
     });
     // order: the pictures' order set by hand, hero and diagram included (Sierra Hotel, his numbering 2026-11-06); any
@@ -996,7 +996,9 @@
                   // 2026-11-09: Joint's screenshot, "use this as an example"): a longer name takes the picture's left edge
                   // in by what it adds, so the note keeps that gap after this project's own "+"
                   var MJ = Math.max(me.getBoundingClientRect().right - nameShift() + 2 * rem, plusX() + 3 * rem, 0);
-                  miss = Math.max(miss, Math.max(0, (w + g) - (edgeL(inkRect(im, r)) - MJ)) + nameShift());
+                  // (not for a picture marked centred: it stays centred on the page's middle line, like the arrows, and its
+                  // note only has to clear the name; his note 2026-11-13 on Urba: "make the image be centered")
+                  if(!it.centred) miss = Math.max(miss, Math.max(0, (w + g) - (edgeL(inkRect(im, r)) - MJ)) + nameShift());
                   // a picture already shown smaller (scale) has room to its right: it steps right by what's missing
                   // rather than shrinking again (Urba's posters and step-by-step came out tiny beside their notes, his
                   // note 2026-11-13: "wrongly scaled"); only what the room can't take still comes off its left edge

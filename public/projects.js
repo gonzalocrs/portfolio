@@ -396,10 +396,10 @@ window.PROJECTS = {
       // on the gallery sheet: the wordmark with its side margins trimmed (sheetSrc), so the gap to the posters is small (a little more on the right, his second note);
       // the Ur mark with white round it, so it reads at the wordmark's size, then 20% smaller (his asks, 2026-11-09)
       {src: "img/urba-branding/wordmark-tagline-2.png", sheetSrc: "img/urba-branding/sheet-wordmark.png", drawing: true, scale: .8, caption: "Wordmark: Creamos espacios, construimos comunidad"},
-      // the posters 20% larger (his ask, 2026-11-13)
-      {src: "img/urba-branding/posters.png", drawing: true, scale: .6, caption: "Isotype in the three colours"},
+      // the posters 20% larger (his ask, 2026-11-13); centred: the picture stays on the page's middle line with its note beside (his ask, 2026-11-13)
+      {src: "img/urba-branding/posters.png", drawing: true, scale: .6, centred: true, caption: "Isotype in the three colours"},
       // the step-by-step a little larger than the other half-size drawings (his ask, 2026-11-13)
-      {src: "img/urba-branding/isotype-steps.png", drawing: true, scale: .6, caption: "Isotype, step by step"},
+      {src: "img/urba-branding/isotype-steps.png", drawing: true, scale: .6, centred: true, caption: "Isotype, step by step"},
       // his Ur mark (logo_black_white-100.jpg, 2026-11-06) with the note's last paragraph; trimmed, shown smaller (scale .3) so it sits at the size of the other half-size drawings
       {src: "img/urba-branding/ur-mark.png", sheetSrc: "img/urba-branding/sheet-ur-mark.png", drawing: true, scale: .3, caption: "Ur mark", link: {href: "https://urba.pe", text: "urba.pe"}}
     ]

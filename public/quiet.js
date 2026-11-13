@@ -1783,7 +1783,20 @@
           m.classList.toggle('hv-o', best >= 0 && j !== best);
           if(best >= 0) m.setAttribute('data-d', Math.abs(j - best));
         });
+        hvOg(n, ks);
       });
+    };
+    // the group shown is the one under the pointer (his note, 2026-11-13: "if i hover over the next category i should see
+    // the three titles but not the ones above (keep the project in showcase of course)"), else the open project's; the
+    // open project's name always stays. .hv-og = rows of the other groups; .hv-away on the column when the group shown
+    // is not the open project's
+    var hvOg = function(n, ks){
+      var cur = null, pt = null;
+      ks.forEach(function(m){ if(m.classList.contains('cur')) cur = m; if(m.classList.contains('hv-pt')) pt = m; });
+      var gOf = function(m){ return m ? (P[m.slug] || {}).group : null; };
+      var g = gOf(pt) || gOf(cur), away = !!(pt && cur && gOf(pt) !== gOf(cur));
+      ks.forEach(function(m){ var og = g != null && m !== cur && gOf(m) !== g; if(m.classList.contains('hv-og') !== og) m.classList.toggle('hv-og', og); });
+      if(n.classList.contains('hv-away') !== away) n.classList.toggle('hv-away', away);
     };
     document.addEventListener('mousemove', hvPt, {passive: true});
     // data-c: rows away from the open project (the static lens, ?hv=lens), kept up as the open project changes
@@ -1794,8 +1807,7 @@
         ks.forEach(function(m, j){ if(c < 0) m.removeAttribute('data-c'); else if(m.getAttribute('data-c') !== String(Math.abs(j - c))) m.setAttribute('data-c', Math.abs(j - c)); });
         // only the open project's group shows its names (his note, 2026-11-13: "hovering only show the projects from the
         // same category"): .hv-og on the rows of the other groups
-        var g = c < 0 ? null : (P[ks[c].slug] || {}).group;
-        ks.forEach(function(m){ var og = g !== null && (P[m.slug] || {}).group !== g; if(m.classList.contains('hv-og') !== og) m.classList.toggle('hv-og', og); });
+        hvOg(n, ks);
       });
     };
     new MutationObserver(hvC).observe(document.body, {subtree: true, attributes: true, attributeFilter: ['class']});

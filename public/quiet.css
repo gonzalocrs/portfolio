@@ -935,3 +935,9 @@ body.hv-rest .qt-ticks .qk:not(.qa){pointer-events:none}
   body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.qk.qk.hv-og:not(.qa)[data-c] span{opacity:0}
   body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.qk.qk.hv-og.hv-pt:not(.qa)[data-c] span{opacity:1;font-size:.92rem}
 }
+/* pointing into another group (his note, 2026-11-13): its names show at the neighbours' size, the one pointed at in ink,
+   the open project's name stays as it is */
+@media (min-width:701px){
+  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz.hv-away .qk.qk.qk:not(.qa):not(.cur):not(.hv-og)[data-c] span{opacity:.45;font-size:.92rem}
+  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz.hv-away .qk.qk.qk.hv-pt:not(.qa):not(.cur):not(.hv-og)[data-c] span{opacity:1}
+}

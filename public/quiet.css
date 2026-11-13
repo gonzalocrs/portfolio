@@ -927,3 +927,5 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
   .qcl-word .qp .qk.cur i:hover::after,.qcl-word.qcl-near .qp .qk.cur i::after{opacity:0}
   .qcl-word .qp .qk.cur i:hover::before,.qcl-word.qcl-near .qp .qk.cur i::before{opacity:1}
 }
+/* just after closing a project with the x: the index ignores the pointer until it moves (his note, 2026-11-13) */
+body.hv-rest .qt-ticks .qk:not(.qa){pointer-events:none}

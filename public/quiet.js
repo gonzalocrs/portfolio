@@ -566,7 +566,19 @@
     CL = ['x', 'back', 'word'].indexOf(CL) > -1 ? CL : 'x';
     document.body.classList.remove('qcl-x', 'qcl-back', 'qcl-word'); document.body.classList.add('qcl-' + CL);
     var dash = me.querySelector('i'); dash.setAttribute('title', 'Close');
-    dash.addEventListener('click', function(e){ if(innerWidth <= 700) return; e.preventDefault(); e.stopPropagation(); goHome(slug); });
+    dash.addEventListener('click', function(e){
+      if(innerWidth <= 700) return; e.preventDefault(); e.stopPropagation();
+      // the home's index lays out differently, so the pointer would land on another project's name and light it up
+      // (his note, 2026-11-13): the index ignores the pointer until it has moved a little
+      var R = window.__hvRest = {x: e.clientX, y: e.clientY}; document.body.classList.add('hv-rest');
+      var wake = function(ev){
+        if(Math.abs(ev.clientX - R.x) + Math.abs(ev.clientY - R.y) < 14) return;
+        if(window.__hvRest === R) window.__hvRest = null;
+        document.body.classList.remove('hv-rest'); removeEventListener('mousemove', wake);
+      };
+      addEventListener('mousemove', wake, {passive: true});
+      goHome(slug);
+    });
     // the x shows while the pointer is anywhere over the index column, left of the pictures (his note, 2026-11-13: "x
     // should appear while hovering this areas"); the x itself is what closes
     if(!window.__qclNear){
@@ -1753,6 +1765,11 @@
     // the rows away from it; a click there opens it as a click on the name would
     var hvPt = function(e){
       zone(e);
+      var R = window.__hvRest;
+      if(R){
+        if(Math.abs(e.clientX - R.x) + Math.abs(e.clientY - R.y) < 14) return;
+        window.__hvRest = null; document.body.classList.remove('hv-rest');
+      }
       if(!document.body.classList.contains('qh-one')) return;   // the home's index only
       Array.prototype.forEach.call(document.querySelectorAll('.qt-ticks'), function(n){
         var ks = Array.prototype.slice.call(n.querySelectorAll('.qk:not(.qa)')), best = -1, bd = 1e9;

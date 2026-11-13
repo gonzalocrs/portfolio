@@ -1792,6 +1792,10 @@
         var ks = Array.prototype.slice.call(n.querySelectorAll('.qk:not(.qa)')), c = -1;
         ks.forEach(function(m, j){ if(m.classList.contains('cur')) c = j; });
         ks.forEach(function(m, j){ if(c < 0) m.removeAttribute('data-c'); else if(m.getAttribute('data-c') !== String(Math.abs(j - c))) m.setAttribute('data-c', Math.abs(j - c)); });
+        // only the open project's group shows its names (his note, 2026-11-13: "hovering only show the projects from the
+        // same category"): .hv-og on the rows of the other groups
+        var g = c < 0 ? null : (P[ks[c].slug] || {}).group;
+        ks.forEach(function(m){ var og = g !== null && (P[m.slug] || {}).group !== g; if(m.classList.contains('hv-og') !== og) m.classList.toggle('hv-og', og); });
       });
     };
     new MutationObserver(hvC).observe(document.body, {subtree: true, attributes: true, attributeFilter: ['class']});

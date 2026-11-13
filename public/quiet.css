@@ -929,3 +929,9 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
 }
 /* just after closing a project with the x: the index ignores the pointer until it moves (his note, 2026-11-13) */
 body.hv-rest .qt-ticks .qk:not(.qa){pointer-events:none}
+/* the static lens shows only the open project's group (his note, 2026-11-13); a name from another group shows only while
+   pointed at, at the neighbours' size */
+@media (min-width:701px){
+  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.qk.qk.hv-og:not(.qa)[data-c] span{opacity:0}
+  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.qk.qk.hv-og.hv-pt:not(.qa)[data-c] span{opacity:1;font-size:.92rem}
+}

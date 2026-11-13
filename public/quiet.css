@@ -854,3 +854,9 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
   /* the one pointed at keeps the title's size */
   body.qh-one.qb-names-thin.hv-mist .qt-ticks .qk:not(.cur):not(.qa):hover span{font-size:clamp(1rem,1.2vw,1.15rem);font-weight:800;letter-spacing:-.02em}
 }
+/* the row the pointer is level with counts as pointed at, wherever the pointer is across the index (his note, 2026-11-13) */
+@media (min-width:701px){
+  body.qh-one.qb-names-thin.hv .qt-ticks.qz .qk.hv-pt[data-d="0"]:not(.cur):not(.qa) span{opacity:1;filter:none;color:var(--ink);font-size:clamp(1rem,1.2vw,1.15rem);font-weight:800;letter-spacing:-.02em;transition:opacity .6s ease,filter .6s ease}
+  body.qh-one.qb-names-thin.hv .qt-ticks.qz .qk.hv-pt[data-d="0"]:not(.cur):not(.qa) i{width:3rem;height:2px;background:var(--ink);transform:none}
+  body.hv .qt-ticks.qz{cursor:pointer}
+}

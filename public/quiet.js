@@ -1725,10 +1725,27 @@
   try{ if(HV === 'off') sessionStorage.removeItem('gc-hv'); else if(HV) sessionStorage.setItem('gc-hv', HV); HV = sessionStorage.getItem('gc-hv'); }catch(e){}
   if(HV){
     document.body.classList.add('hv', 'hv-' + HV);
-    document.addEventListener('mouseover', function(e){
-      var k = e.target.closest && e.target.closest('.qt-ticks .qk:not(.qa)'); if(!k) return;
-      var ks = Array.prototype.slice.call(k.parentNode.querySelectorAll('.qk:not(.qa)')), i = ks.indexOf(k);
-      ks.forEach(function(m, j){ m.setAttribute('data-d', Math.abs(j - i)); });
+    // the name pointed at is the row the pointer is level with, anywhere across the index, not only over the name itself
+    // (his note, 2026-11-13: moving right of a name and then up kept the first one lit): .hv-pt marks it, data-d counts
+    // the rows away from it; a click there opens it as a click on the name would
+    var hvPt = function(e){
+      zone(e);
+      Array.prototype.forEach.call(document.querySelectorAll('.qt-ticks'), function(n){
+        var ks = Array.prototype.slice.call(n.querySelectorAll('.qk:not(.qa)')), best = -1, bd = 1e9;
+        if(n.classList.contains('qz')) ks.forEach(function(m, j){
+          var r = m.getBoundingClientRect(), dy = Math.abs(e.clientY - (r.top + r.height / 2));
+          if(dy < bd){ bd = dy; best = j; }
+        });
+        ks.forEach(function(m, j){
+          m.classList.toggle('hv-pt', j === best);
+          if(best >= 0) m.setAttribute('data-d', Math.abs(j - best));
+        });
+      });
+    };
+    document.addEventListener('mousemove', hvPt, {passive: true});
+    document.addEventListener('click', function(e){
+      if(e.target.closest && e.target.closest('a')) return;
+      var m = document.querySelector('.qt-ticks.qz .qk.hv-pt'); if(m){ e.preventDefault(); m.click(); }
     });
   }
   document.addEventListener('mousemove', zone, {passive: true});

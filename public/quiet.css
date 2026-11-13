@@ -840,3 +840,17 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
   body.qh-one.qb-names-thin.hv-reach .qt-ticks.qz .qk:not(.cur):not(.qa):not(:hover)[data-d="1"] i{width:2rem;transform:none;background:var(--mute)}
   body.qh-one.qb-names-thin.hv-reach .qt-ticks.qz .qk:not(.cur):not(.qa):not(:hover)[data-d="2"] i{width:1.3rem;transform:none}
 }
+/* mist (trial ?hv=mist, his note 2026-11-13 on fade: "it should feel more like discovering through the mist and also maybe
+   smaller fonts"): the other names smaller, bold, sharper and clearer the closer they are, coming out of a blur slowly */
+@media (min-width:701px){
+  body.qh-one.qb-names-thin.hv-mist .qt-ticks .qk:not(.cur):not(.qa) span{font-size:.82rem;font-weight:700;letter-spacing:-.01em;filter:blur(3px);transition:opacity 1.1s ease,filter 1.1s ease,color .35s ease}
+  body.qh-one.qb-names-thin.hv-mist .qt-ticks.qz .qk:not(.cur):not(.qa):not(:hover) span{opacity:.05}
+  body.qh-one.qb-names-thin.hv-mist .qt-ticks.qz .qk:not(.cur):not(.qa):not(:hover)[data-d="1"] span{opacity:.42;filter:blur(.5px)}
+  body.qh-one.qb-names-thin.hv-mist .qt-ticks.qz .qk:not(.cur):not(.qa):not(:hover)[data-d="2"] span{opacity:.22;filter:blur(1.3px)}
+  body.qh-one.qb-names-thin.hv-mist .qt-ticks.qz .qk:not(.cur):not(.qa):not(:hover)[data-d="3"] span{opacity:.11;filter:blur(2.1px)}
+  body.qh-one.qb-names-thin.hv-mist .qt-ticks.qz .qk:not(.cur):not(.qa):hover span{filter:none;transition:opacity .6s ease,filter .6s ease}
+}
+@media (min-width:701px){
+  /* the one pointed at keeps the title's size */
+  body.qh-one.qb-names-thin.hv-mist .qt-ticks .qk:not(.cur):not(.qa):hover span{font-size:clamp(1rem,1.2vw,1.15rem);font-weight:800;letter-spacing:-.02em}
+}

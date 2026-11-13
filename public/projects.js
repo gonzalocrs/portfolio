@@ -107,7 +107,7 @@ window.PROJECTS = {
       {src: "img/social-sanctuary/plan-typical-floor.png", drawing: true, caption: "Typical floor plan"},
       {src: "img/social-sanctuary/model-1.jpg", caption: "Physical model"},
       {src: "img/social-sanctuary/section-ns-c.png", drawing: true, caption: "Section north-south"},   // cropped at his red lines, the buildings behind faded (2026-11-09)
-      {src: "img/social-sanctuary/section-ew.png", drawing: true, caption: "Section east-west"},
+      {src: "img/social-sanctuary/section-ew.webp", drawing: true, caption: "Section east-west"},   // his new export (Artboard 1, context buildings faint), 2026-11-13
         // the second model photo just before the aerial render (his call, 2026-11-06)
       {src: "img/social-sanctuary/model-2.jpg", caption: "Physical model"},
       // his new aerial render (Image2_5, 2026-11-06), replacing the earlier one

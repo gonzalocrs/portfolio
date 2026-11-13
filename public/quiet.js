@@ -544,7 +544,7 @@
       // references slide, his ask 2026-11-06)
       // never on the opening picture (his note, 2026-11-09: "the starting image here shouldn't have a foot note"), unless
       // the project says firstNote: true (Joint and Open Assembly, his ask the same night: "bring back the note in this two")
-      (p.notes || []).forEach(function(t, i){ if((!i && !p.firstNote) || !all[i] || !t) return; if(typeof t === 'object'){ all[i].note = t.text; all[i].noteSide = t.side; } else all[i].note = t; });
+      (p.notes || []).forEach(function(t, i){ if((!i && !p.firstNote) || !all[i] || !t) return; if(typeof t === 'object'){ all[i].note = t.text; all[i].noteSide = t.side; all[i].noteW = t.width; } else all[i].note = t; });
     }
     var n = Math.max(1, all.length);
     var i0 = SLUGS.indexOf(slug); CUR = slug;
@@ -911,7 +911,7 @@
               var r = im.getBoundingClientRect(), lr = L.getBoundingClientRect(), rem = parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
               if(!r.width) return;
               // the column may reach left past the stage, but stays clear of the project's name in the index
-              var w = 11 * rem, g = 1.8 * rem, room = r.left - Math.max(me.getBoundingClientRect().right - nameShift() + 2 * rem, 0);
+              var w = (it.noteW || 11) * rem, g = 1.8 * rem, room = r.left - Math.max(me.getBoundingClientRect().right - nameShift() + 2 * rem, 0);
               // wide pictures take the note under them, from their left edge; upright and square ones beside (his rule,
               // 2026-11-01: "if the image is wide do under, if it's vertical or square do side")
               // then beside for all (below). Every wide picture keeps the size it had with a note under it ("don't resize anything")

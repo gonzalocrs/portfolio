@@ -966,6 +966,14 @@
                   // in by what it adds, so the note keeps that gap after this project's own "+"
                   var MJ = Math.max(me.getBoundingClientRect().right - nameShift() + 2 * rem, plusX() + 3 * rem, 0);
                   miss = Math.max(miss, Math.max(0, (w + g) - (edgeL(inkRect(im, r)) - MJ)) + nameShift());
+                  // a picture already shown smaller (scale) has room to its right: it steps right by what's missing
+                  // rather than shrinking again (Urba's posters and step-by-step came out tiny beside their notes, his
+                  // note 2026-11-13: "wrongly scaled"); only what the room can't take still comes off its left edge
+                  if(miss > 0 && it.scale){
+                    var fr = f.getBoundingClientRect(), pad = parseFloat(getComputedStyle(f).paddingRight) || 0;
+                    var step = Math.max(0, Math.min(miss, Math.floor(fr.right - (parseFloat(L.style.translate) || 0) - pad - r.right)));
+                    if(step){ L.style.translate = Math.round((parseFloat(L.style.translate) || 0) + step) + 'px 0'; r = im.getBoundingClientRect(); miss -= step; }
+                  }
                   if(miss > 0){
                     var r0 = r;
                     im.style.maxWidth = Math.floor(r0.width - miss / Math.max(.2, 1 - ink(im).l)) + 'px'; r = im.getBoundingClientRect();

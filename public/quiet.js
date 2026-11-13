@@ -558,6 +558,15 @@
       if(m === me) return;
       m.addEventListener('click', function(e){ if(e.metaKey || e.ctrlKey || e.shiftKey || e.button) return; e.preventDefault(); goProject(m.slug); });
     });
+    // the open project's dash closes it (his note, 2026-11-13: "people don't even notice the index arrow. instead ... while
+    // hovering the dash for the title prompts them to click it to close it"): on a computer the Index button goes, and
+    // the dash turns into a close sign under the pointer. &close=x (default: the dash folds into an x) | back (into a
+    // chevron pointing left) | word (the word Close in its place)
+    var CL = Q.get('close'); try{ if(CL) sessionStorage.setItem('gc-close', CL); CL = sessionStorage.getItem('gc-close') || CL; }catch(e){}
+    CL = ['x', 'back', 'word'].indexOf(CL) > -1 ? CL : 'x';
+    document.body.classList.remove('qcl-x', 'qcl-back', 'qcl-word'); document.body.classList.add('qcl-' + CL);
+    var dash = me.querySelector('i'); dash.setAttribute('title', 'Close');
+    dash.addEventListener('click', function(e){ if(innerWidth <= 700) return; e.preventDefault(); e.stopPropagation(); goHome(slug); });
     var plus = el('button', 'qp-plus', me.querySelector('span'), '+'); plus.type = 'button'; plus.setAttribute('aria-label', 'About this project');
     // every project lays out from Joint's spacing (his ask, 2026-11-06: "make Joint spacing and everything else the
     // baseline for every project"): the picture, its note and the chevrons are centred on the space right of where

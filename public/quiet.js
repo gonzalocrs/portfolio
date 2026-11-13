@@ -1717,6 +1717,20 @@
       n.classList.toggle('qz', on);
     });
   }
+  // the other names while pointing at one (trial ?hv=, his note 2026-11-13: "i hate how the other projects look ...
+  // maybe only the 3 closer get highlighted"): every mark knows how far it is from the one pointed at (data-d);
+  // near = the two neighbours only | solo = no other names | even = all names in the title type, pale |
+  // fade = names fade with distance | reach = no other names, the neighbours' marks reach toward it. ?hv=off clears
+  var HV = (Q.get('hv') || '').toLowerCase();
+  try{ if(HV === 'off') sessionStorage.removeItem('gc-hv'); else if(HV) sessionStorage.setItem('gc-hv', HV); HV = sessionStorage.getItem('gc-hv'); }catch(e){}
+  if(HV){
+    document.body.classList.add('hv', 'hv-' + HV);
+    document.addEventListener('mouseover', function(e){
+      var k = e.target.closest && e.target.closest('.qt-ticks .qk:not(.qa)'); if(!k) return;
+      var ks = Array.prototype.slice.call(k.parentNode.querySelectorAll('.qk:not(.qa)')), i = ks.indexOf(k);
+      ks.forEach(function(m, j){ m.setAttribute('data-d', Math.abs(j - i)); });
+    });
+  }
   document.addEventListener('mousemove', zone, {passive: true});
   document.addEventListener('mouseleave', function(){ zone(null); });
 })();

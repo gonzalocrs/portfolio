@@ -822,3 +822,21 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
   .qab .qab-mailrow{display:flex;align-items:baseline;flex-wrap:wrap}
   .qab .qab-copied{position:static;margin-left:.7rem}
 }
+/* the other names while pointing at one (trial ?hv=, his note 2026-11-13: "i hate how the other projects look") */
+@media (min-width:701px){
+  /* every trial: the other names hidden unless the trial brings them back */
+  body.qh-one.qb-names-thin.hv .qt-ticks.qz .qk:not(.cur):not(.qa):not(:hover) span{opacity:0;transition:opacity .35s ease,color .35s ease}
+  /* near: only the two neighbours, in the title's size, light and grey */
+  body.qh-one.qb-names-thin.hv-near .qt-ticks.qz .qk:not(.cur):not(.qa):not(:hover)[data-d="1"] span{opacity:1;color:var(--mute);font-size:clamp(1rem,1.2vw,1.15rem);font-weight:300;letter-spacing:-.01em}
+  /* even: every name in the title's own type, pale; only the tone changes */
+  body.qh-one.qb-names-thin.hv-even .qt-ticks .qk:not(.cur):not(.qa) span{font-size:clamp(1rem,1.2vw,1.15rem);font-weight:800;letter-spacing:-.02em}
+  body.qh-one.qb-names-thin.hv-even .qt-ticks.qz .qk:not(.cur):not(.qa):not(:hover) span{opacity:.16}
+  /* fade: the title's type, fading out step by step away from the one pointed at */
+  body.qh-one.qb-names-thin.hv-fade .qt-ticks .qk:not(.cur):not(.qa) span{font-size:clamp(1rem,1.2vw,1.15rem);font-weight:800;letter-spacing:-.02em}
+  body.qh-one.qb-names-thin.hv-fade .qt-ticks.qz .qk:not(.cur):not(.qa):not(:hover)[data-d="1"] span{opacity:.32}
+  body.qh-one.qb-names-thin.hv-fade .qt-ticks.qz .qk:not(.cur):not(.qa):not(:hover)[data-d="2"] span{opacity:.14}
+  body.qh-one.qb-names-thin.hv-fade .qt-ticks.qz .qk:not(.cur):not(.qa):not(:hover)[data-d="3"] span{opacity:.05}
+  /* reach: no other names; the neighbours' marks lie flatter and longer the closer they are */
+  body.qh-one.qb-names-thin.hv-reach .qt-ticks.qz .qk:not(.cur):not(.qa):not(:hover)[data-d="1"] i{width:2rem;transform:none;background:var(--mute)}
+  body.qh-one.qb-names-thin.hv-reach .qt-ticks.qz .qk:not(.cur):not(.qa):not(:hover)[data-d="2"] i{width:1.3rem;transform:none}
+}

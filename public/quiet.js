@@ -567,6 +567,16 @@
     document.body.classList.remove('qcl-x', 'qcl-back', 'qcl-word'); document.body.classList.add('qcl-' + CL);
     var dash = me.querySelector('i'); dash.setAttribute('title', 'Close');
     dash.addEventListener('click', function(e){ if(innerWidth <= 700) return; e.preventDefault(); e.stopPropagation(); goHome(slug); });
+    // the x shows while the pointer is anywhere over the index column, left of the pictures (his note, 2026-11-13: "x
+    // should appear while hovering this areas"); the x itself is what closes
+    if(!window.__qclNear){
+      window.__qclNear = 1;
+      addEventListener('mousemove', function(e){
+        var z = document.querySelector('.qp .qt-stage'), L = z ? z.getBoundingClientRect().left : 0;
+        document.body.classList.toggle('qcl-near', !!z && innerWidth > 700 && e.clientX < L);
+      }, {passive: true});
+      document.addEventListener('mouseleave', function(){ document.body.classList.remove('qcl-near'); });
+    }
     var plus = el('button', 'qp-plus', me.querySelector('span'), '+'); plus.type = 'button'; plus.setAttribute('aria-label', 'About this project');
     // every project lays out from Joint's spacing (his ask, 2026-11-06: "make Joint spacing and everything else the
     // baseline for every project"): the picture, its note and the chevrons are centred on the space right of where

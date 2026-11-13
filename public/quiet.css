@@ -865,25 +865,40 @@ body.q-grey:not(.q-night){--paper:#ececec;--plate:#e2e2e2;background:#ececec}
    is lit at a time */
 @media (min-width:701px){
   body.qh-one.qb-names-thin.hv.hv-light .qt-ticks.qz .qk.hv-o.hv-o span,
-  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.hv-o.hv-o span,
+  body.qh-one.qb-names-thin.hv.hv-lensmove .qt-ticks.qz .qk.hv-o.hv-o span,
   body.qh-one.qb-names-thin.hv.hv-caps .qt-ticks.qz .qk.hv-o.hv-o span,
   body.qh-one.qb-names-thin.hv.hv-trio .qt-ticks.qz .qk.hv-o.hv-o span{transform:none;filter:none;transition:opacity .45s ease,color .45s ease}
   body.qh-one.qb-names-thin.hv.hv-light .qt-ticks.qz .qk.hv-o.hv-o i,
-  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.hv-o.hv-o i,
+  body.qh-one.qb-names-thin.hv.hv-lensmove .qt-ticks.qz .qk.hv-o.hv-o i,
   body.qh-one.qb-names-thin.hv.hv-caps .qt-ticks.qz .qk.hv-o.hv-o i,
   body.qh-one.qb-names-thin.hv.hv-trio .qt-ticks.qz .qk.hv-o.hv-o.cur i{width:.9rem;height:1px;background:var(--faint)}
   /* the pointed row, the open project's too */
   body.qh-one.qb-names-thin.hv .qt-ticks.qz .qk.hv-pt.hv-pt span{opacity:1;filter:none;color:var(--ink);font-size:clamp(1rem,1.2vw,1.15rem);font-weight:800;letter-spacing:-.02em;transform:none}
   /* F light: every other name in the title's size, Light, grey */
   body.qh-one.qb-names-thin.hv.hv-light .qt-ticks.qz .qk.hv-o.hv-o span{opacity:1;color:var(--mute);font-size:clamp(1rem,1.2vw,1.15rem);font-weight:300;letter-spacing:-.01em}
-  /* G lens: names step down in size and tone away from the pointer, as through a lens */
-  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.hv-o.hv-o span{opacity:.1;color:var(--ink);font-size:.62rem;font-weight:800;letter-spacing:-.005em}
-  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.hv-o.hv-o[data-d="1"] span{opacity:.5;font-size:.92rem}
-  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.hv-o.hv-o[data-d="2"] span{opacity:.3;font-size:.78rem}
-  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.hv-o.hv-o[data-d="3"] span{opacity:.18;font-size:.68rem}
+  /* G lens, following the pointer (now ?hv=lensmove): names step down in size and tone away from the pointer, as through a lens */
+  body.qh-one.qb-names-thin.hv.hv-lensmove .qt-ticks.qz .qk.hv-o.hv-o span{opacity:.1;color:var(--ink);font-size:.62rem;font-weight:800;letter-spacing:-.005em}
+  body.qh-one.qb-names-thin.hv.hv-lensmove .qt-ticks.qz .qk.hv-o.hv-o[data-d="1"] span{opacity:.5;font-size:.92rem}
+  body.qh-one.qb-names-thin.hv.hv-lensmove .qt-ticks.qz .qk.hv-o.hv-o[data-d="2"] span{opacity:.3;font-size:.78rem}
+  body.qh-one.qb-names-thin.hv.hv-lensmove .qt-ticks.qz .qk.hv-o.hv-o[data-d="3"] span{opacity:.18;font-size:.68rem}
   /* H caps: every other name in small spaced capitals, grey, like a label */
   body.qh-one.qb-names-thin.hv.hv-caps .qt-ticks.qz .qk.hv-o.hv-o span{opacity:1;color:var(--mute);font-size:.6rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase}
   /* I trio: only the two neighbours, small and grey; the rest marks only */
   body.qh-one.qb-names-thin.hv.hv-trio .qt-ticks.qz .qk.hv-o.hv-o span{opacity:0}
   body.qh-one.qb-names-thin.hv.hv-trio .qt-ticks.qz .qk.hv-o.hv-o[data-d="1"] span{opacity:1;color:var(--mute);font-size:.8rem;font-weight:400;letter-spacing:0}
+}
+/* G lens, his pick (2026-11-13: "i like the lens, let's keep it static centered to the one project clicked. space out more
+   the names so there's more room"): sizes and tones step down from the open project, not from the pointer; the name
+   pointed at only turns to ink, at its own size; the rows further apart */
+body.hv-lens .qt-ticks .qk:not(.qa){height:1.85rem}
+body.hv-lens .qt-ticks .qk.gs{margin-top:1.7rem}
+@media (min-width:701px){
+  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.qk.qk:not(.qa) span{opacity:.1;color:var(--ink);filter:none;transform:none;font-size:.62rem;font-weight:800;letter-spacing:-.005em;transition:opacity .45s ease,color .3s ease}
+  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.qk.qk:not(.qa)[data-c="0"] span{opacity:1;font-size:clamp(1rem,1.2vw,1.15rem);letter-spacing:-.02em}
+  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.qk.qk:not(.qa)[data-c="1"] span{opacity:.5;font-size:.92rem}
+  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.qk.qk:not(.qa)[data-c="2"] span{opacity:.3;font-size:.78rem}
+  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.qk.qk:not(.qa)[data-c="3"] span{opacity:.18;font-size:.68rem}
+  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.qk.qk.hv-pt:not(.qa)[data-c] span{opacity:1}
+  /* the marks stay as they are; the pointed one draws out a little in ink */
+  body.qh-one.qb-names-thin.hv.hv-lens .qt-ticks.qz .qk.qk.qk.hv-pt:not(.qa):not(.cur) i{width:1.6rem;height:1px;background:var(--ink)}
 }

@@ -1721,7 +1721,8 @@
   // maybe only the 3 closer get highlighted"): every mark knows how far it is from the one pointed at (data-d);
   // near = the two neighbours only | solo = no other names | even = all names in the title type, pale |
   // fade = names fade with distance | reach = no other names, the neighbours' marks reach toward it | mist = fade + blur.
-  // Second round (same night): light | lens | caps | trio, where the open project's name steps back too. ?hv=off clears
+  // Second round (same night): light | lensmove | caps | trio, where the open project's name steps back too;
+  // lens (his pick) = sizes stepping down from the open project, static. ?hv=off clears
   var HV = (Q.get('hv') || '').toLowerCase();
   try{ if(HV === 'off') sessionStorage.removeItem('gc-hv'); else if(HV) sessionStorage.setItem('gc-hv', HV); HV = sessionStorage.getItem('gc-hv'); }catch(e){}
   if(HV){
@@ -1746,6 +1747,16 @@
       });
     };
     document.addEventListener('mousemove', hvPt, {passive: true});
+    // data-c: rows away from the open project (the static lens, ?hv=lens), kept up as the open project changes
+    var hvC = function(){
+      Array.prototype.forEach.call(document.querySelectorAll('.qt-ticks'), function(n){
+        var ks = Array.prototype.slice.call(n.querySelectorAll('.qk:not(.qa)')), c = -1;
+        ks.forEach(function(m, j){ if(m.classList.contains('cur')) c = j; });
+        ks.forEach(function(m, j){ if(c < 0) m.removeAttribute('data-c'); else if(m.getAttribute('data-c') !== String(Math.abs(j - c))) m.setAttribute('data-c', Math.abs(j - c)); });
+      });
+    };
+    new MutationObserver(hvC).observe(document.body, {subtree: true, attributes: true, attributeFilter: ['class']});
+    hvC();
     document.addEventListener('click', function(e){
       if(e.target.closest && e.target.closest('a')) return;
       var m = document.querySelector('.qt-ticks.qz .qk.hv-pt'); if(m){ e.preventDefault(); m.click(); }

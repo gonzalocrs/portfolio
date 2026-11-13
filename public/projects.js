@@ -107,7 +107,7 @@ window.PROJECTS = {
       {src: "img/social-sanctuary/plan-typical-floor.png", drawing: true, caption: "Typical floor plan"},
       {src: "img/social-sanctuary/model-1.jpg", caption: "Physical model"},
       {src: "img/social-sanctuary/section-ns-c.png", drawing: true, caption: "Section north-south"},   // cropped at his red lines, the buildings behind faded (2026-11-09)
-      {src: "img/social-sanctuary/section-ew.png", drawing: true, caption: "Section east-west"},
+      {src: "img/social-sanctuary/section-ew.webp", drawing: true, caption: "Section east-west"},   // his new export (Artboard 1, context buildings faint), 2026-11-13
         // the second model photo just before the aerial render (his call, 2026-11-06)
       {src: "img/social-sanctuary/model-2.jpg", caption: "Physical model"},
       // his new aerial render (Image2_5, 2026-11-06), replacing the earlier one
@@ -390,14 +390,16 @@ window.PROJECTS = {
     // every drawing at half its usual size (his ask, 2026-11-06): scale .5; the wordmark's file carries its own margin
     inOrder: true,
     // his note for the step-by-step isotype (2026-11-06), word for word, beside the pictures as on Joint: one paragraph each beside the posters, the step-by-step and the Ur mark (his ask)
-    notes: ["", "Urba’s mark reflects a city that is always evolving. Its shifting letterforms trace a process of forming ideas, building, and adapting to changing needs.", "While sketching variations of the name, I found that the relationship between the drawings mattered more than any single version. That discovery became the basis of the identity: a form that remains recognizable while allowing for change."],   // the Ur mark's note ("The mark expresses a principle...") taken off at his ask
+    notes: ["", "Urba’s mark reflects a city that is always evolving. Its shifting letterforms trace a process of forming ideas, building, and adapting to changing needs.", {text: "While sketching variations of the name, I found that the relationship between the drawings mattered more than any single version. That discovery became the basis of the identity: a form that remains recognizable while allowing for change.", width: 15}],   // the Ur mark's note ("The mark expresses a principle...") taken off at his ask; the step-by-step's note in a wider column (width, rem), a shorter block beside the picture, his words unchanged (his ask, 2026-11-13: "make the paragraph shorter")
     grid: [
       // 20% smaller than before (his ask, 2026-11-09)
       // on the gallery sheet: the wordmark with its side margins trimmed (sheetSrc), so the gap to the posters is small (a little more on the right, his second note);
       // the Ur mark with white round it, so it reads at the wordmark's size, then 20% smaller (his asks, 2026-11-09)
       {src: "img/urba-branding/wordmark-tagline-2.png", sheetSrc: "img/urba-branding/sheet-wordmark.png", drawing: true, scale: .8, caption: "Wordmark: Creamos espacios, construimos comunidad"},
-      {src: "img/urba-branding/posters.png", drawing: true, scale: .5, caption: "Isotype in the three colours"},
-      {src: "img/urba-branding/isotype-steps.png", drawing: true, scale: .5, caption: "Isotype, step by step"},
+      // the posters 20% larger (his ask, 2026-11-13)
+      {src: "img/urba-branding/posters.png", drawing: true, scale: .6, caption: "Isotype in the three colours"},
+      // the step-by-step a little larger than the other half-size drawings (his ask, 2026-11-13)
+      {src: "img/urba-branding/isotype-steps.png", drawing: true, scale: .6, caption: "Isotype, step by step"},
       // his Ur mark (logo_black_white-100.jpg, 2026-11-06) with the note's last paragraph; trimmed, shown smaller (scale .3) so it sits at the size of the other half-size drawings
       {src: "img/urba-branding/ur-mark.png", sheetSrc: "img/urba-branding/sheet-ur-mark.png", drawing: true, scale: .3, caption: "Ur mark", link: {href: "https://urba.pe", text: "urba.pe"}}
     ]

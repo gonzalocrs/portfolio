@@ -308,7 +308,7 @@ window.PROJECTS = {
       {src: "img/modular-living-architecture/cuboctahedron.webp", drawing: true, caption: "Truncated cuboctahedron, net and assembly"},
       {src: "img/modular-living-architecture/sphere-front.jpg", caption: "Truncated cuboctahedron, assembled"},
       {src: "img/modular-living-architecture/sheet-3.webp", drawing: true, caption: "Ring and connector parts"},
-      {src: "img/modular-living-architecture/kit-parts.jpg", caption: "The kit of parts"},
+      {src: "img/modular-living-architecture/kit-parts.jpg", scale: .8, caption: "The kit of parts"},
       {src: "img/modular-living-architecture/hexagon-tiling.webp", drawing: true, caption: "Hexagon tiling"},
       {src: "img/modular-living-architecture/sphere-close.jpg", caption: "Truncated cuboctahedron, detail"},
       {src: "img/modular-living-architecture/sphere-left.jpg", caption: "Truncated cuboctahedron, assembled"}

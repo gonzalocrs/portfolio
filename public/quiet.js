@@ -777,6 +777,7 @@
       // gallery if i click the + for description i should get it in gallery, not roll back to the previous image")
       if(bOn) setTimeout(function(){ requestAnimationFrame(layB); }, 0);
       if(on === isOpen()) return;
+      if(on) said();
       if(cue && (n === 1 || (at === n - 1 && !bBtn && innerWidth > 700))) cue.classList.toggle('off', on);
       st.style.setProperty('--ny', nameY() + 'px');
       if(D === 'beside') placeBeside();
@@ -862,6 +863,10 @@
       if(CUE === 'word') el('span', '', cue, innerWidth <= 700 ? 'Swipe' : 'Scroll');
       else if(CUE === 'line') el('i', '', cue);
       else cue.innerHTML = '<svg viewBox="0 0 16 8" width="16" height="8"><path d="M1 1l7 6 7-6"/></svg>';
+      // the first time a visitor enters a project (once per project, kept in this browser) the chevron's place first
+      // says "Tap or scroll" ("Tap or swipe" on a phone); at the first move on it turns into the chevron (his ask,
+      // 2026-11-22: "some people might miss it"). A phone has no chevron, so there the words just fade
+      if(CUE === 'chev') sayFirst();
       // on the last picture it opens all the pictures (side B), as scrolling on does there (his note, 2026-11-05: "after the
       // last photo keep the chevron even when in gallery mode"); on side B it stays as it is, a still mark
       // on side B it goes on to the next project in the index, round to the first (his ask, 2026-11-09); the words "Next
@@ -875,6 +880,21 @@
       cueUp = el('button', 'qcue qcue-chev qcue-up off', wrap); cueUp.type = 'button'; cueUp.setAttribute('aria-label', 'Previous picture');
       cueUp.innerHTML = '<svg viewBox="0 0 16 8" width="16" height="8"><path d="M1 7l7-6 7 6"/></svg>';
       cueUp.addEventListener('click', function(e){ e.stopPropagation(); if(bOn){ flip(false); return; } if(at === 0 && GEND === 'loop'){ beforeA(); return; } go(at - 1); });
+    }
+    var saying;   // set by sayFirst(), which runs above this line
+    function sayFirst(){
+      var seen = [];
+      try{ seen = JSON.parse(localStorage.getItem('gc-seen') || '[]') || []; }catch(e){}
+      if(Q.has('say')) seen = seen.filter(function(x){ return x !== slug; });   // ?say shows it again
+      if(seen.indexOf(slug) > -1) return;
+      seen.push(slug); try{ localStorage.setItem('gc-seen', JSON.stringify(seen)); }catch(e){}
+      el('span', 'qcue-say-w', cue, innerWidth <= 700 ? 'Tap or swipe' : 'Tap or scroll');
+      cue.classList.add('qcue-say'); saying = true;
+    }
+    function said(){
+      if(!saying || !cue) return; saying = false;
+      cue.classList.add('qcue-said'); cue.classList.remove('qcue-say');
+      setTimeout(function(){ if(!cue) return; cue.classList.remove('qcue-said'); var w = cue.querySelector('.qcue-say-w'); if(w) w.remove(); }, 1400);
     }
     function syncUp(){ if(cueUp) cueUp.classList.toggle('off', !bOn && at <= 0 && GEND !== 'loop'); }
     // close to the picture (his note, 2026-11-06: "put both chevrons closer to the image"): the down one a short step under
@@ -1049,6 +1069,7 @@
       dots.forEach(function(d, j){ d.classList.toggle('cur', j === k); });
       if(up){ up.classList.toggle('off', k === 0); dn.classList.toggle('off', k === n - 1); }
       if(hint && !first) hint.classList.add('off');
+      if(!first) said();
       // the chevron stays under every picture (his note, 2026-11-05: "keep it and make it clickable"); it stays put while the
       // pictures change; past the last picture it leads into all the pictures (gone there only if a project has no side B)
       if(cue) cue.classList.toggle('off', n === 1 ? isOpen() : k === n - 1 && !bBtn && (isOpen() || innerWidth <= 700));
@@ -1255,6 +1276,7 @@
     }
     function flip(to){
       if(to === bOn) return;
+      if(to) said();
       if(to && isOpen()) toggle(false);
       if(!to){
         var t0 = tileAt(at);

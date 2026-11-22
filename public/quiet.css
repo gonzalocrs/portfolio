@@ -562,6 +562,16 @@ body.q-night .qo-fig img[src$=".svg"],body.q-night .qo-fig img[src$=".png"],body
 .qb-show .qcue.in{pointer-events:none}
 .qb-show .qcue-up.in{pointer-events:auto}
 .qcue-up svg{animation-name:qcue-drift-up}
+/* the first visit to a project: the words in the chevron's place, then the chevron (his ask, 2026-11-22) */
+.qcue-say-w{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);white-space:nowrap;font-size:.68rem;font-weight:400;letter-spacing:.06em;opacity:0;transition:opacity .7s ease;pointer-events:none}
+.qcue svg{transition:opacity .7s ease .5s}
+.qcue-say .qcue-say-w{opacity:1;transition:opacity .8s ease}
+.qcue-say svg{opacity:0;transition:none}
+.qcue-say{padding:.7rem 2.6rem}
+@media (max-width:700px){
+  .qcue.qcue-say,.qcue.qcue-said{display:flex!important}
+  .qcue-say svg,.qcue-said svg{opacity:0!important}
+}
 @keyframes qcue-drift-up{0%,100%{transform:translateY(1px)}50%{transform:translateY(-2px)}}
 /* a faded-out picture layer stays in place under the current one: nothing in it may take a click (its picture sat
    over the urba.pe link, 2026-11-06) */

@@ -42,6 +42,8 @@
     }
     return out;
   }
+  // notHome: the project's pictures stay off the home (his ask, 2026-11-22: Outer Dock and Urba until they're complete)
+  function onHome(slug){ return !P[slug].notHome && !!coverOf(slug); }
   function coverOf(slug){ var p = P[slug], all = pictures(slug); return all.length ? (p.cover ? {src: p.cover} : all[0]) : null; }
   // on a phone Index sits at the end of the row of marks at the foot, where About stood, and About goes to the top
   // right (the CSS), where Index was (his note, 2026-11-09, sketch on his phone); back in the column above 700px
@@ -235,7 +237,7 @@
   function buildQuiet(){
     var wrap = el('div', 'qt', main), nav = el('nav', 'qt-ticks', wrap), st = el('div', 'p-stage qt-stage', wrap), fade = fader(st);
     var marks = quietMarks(nav, null, function(s){ return quietHref(s); });
-    var withPics = SLUGS.filter(coverOf), cur = null, list = [], at = 0, hold = false, timer = null, lock = 0;
+    var withPics = SLUGS.filter(onHome), cur = null, list = [], at = 0, hold = false, timer = null, lock = 0;
     function markOf(s){ return marks.filter(function(m){ return m.slug === s; })[0]; }
     function paint(instant){
       var it = list[at], s = cur;
@@ -319,7 +321,7 @@
       f.slug = s; f.k = k; par.speed = (rnd() - .5) * .22;
       figs.push(f); return f;
     }
-    var withPics = SLUGS.filter(coverOf);
+    var withPics = SLUGS.filter(onHome);
     Promise.all(withPics.map(function(s){ return loadAll(pictures(s)); })).then(function(all){
       all.forEach(function(got, j){
         got = homePicks(got, withPics[j]);
@@ -427,7 +429,7 @@
       show(at + d, d);   // the prompt stays (his note, 2026-11-09: "let's keep that scroll always present")
       return true;
     }
-    var withPics = SLUGS.filter(coverOf);
+    var withPics = SLUGS.filter(onHome);
     // each visit opens on a different project (his call, 2026-10-26: "i always see sierra"): picked at random, never the
     // one the last visit opened on; scrolling then goes on through the others in the usual order and comes round again
     var last = null; try { last = localStorage.getItem('gc-first'); } catch(e){}

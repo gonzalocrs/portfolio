@@ -32,11 +32,13 @@
     hide      optional: pictures kept in the lists but not shown, e.g. ["img/x/b.jpg"]
     firstNote optional: true lets the opening picture carry its note (otherwise notes[0] is never shown)
     notFirst  true: the home never opens a visit on this project (it still comes up as you scroll)
+    notHome   true: the project's pictures stay off the home (its mark and page stay); delete the line to bring it back
 
   Drop image files into public/img/<slug>/ and reference them here.
 */
 window.PROJECTS = {
   "the-outermost-dock": {
+    notHome: true,   // off the home pictures until the work is all in (his ask, 2026-11-22)
     title: "Outer Dock", group: "Unbuilt", hue: 200,
     // notes beside the pictures, one per picture as shown (hero first), his own sentences from the text below, word
     // for word (his ask, 2026-11-09: "the small tag descriptions next to the images explaining the project"); "" = none
@@ -377,6 +379,7 @@ window.PROJECTS = {
     diagram: {}
   },
   "urba-branding": {
+    notHome: true,   // off the home pictures until the work is all in (his ask, 2026-11-22)
     notFirst: true,   // never the project a visit opens on (his ask, 2026-11-06)
     title: "Urba Inmobiliaria", group: "Built", hue: 96,
     kicker: "Lima, 2020",
